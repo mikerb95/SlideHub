@@ -1,0 +1,10 @@
+/home/mike/dev/learning/SlideHub/slidehub-ai/src/main/java/com/slidehub/ai/AiApplication.java
+/home/mike/dev/learning/SlideHub/slidehub-ai/src/main/java/com/slidehub/ai/config/GroqConfig.java
+/home/mike/dev/learning/SlideHub/slidehub-ai/src/main/java/com/slidehub/ai/controller/NotesApiController.java
+/home/mike/dev/learning/SlideHub/slidehub-ai/src/main/java/com/slidehub/ai/model/GenerationRequest.java
+/home/mike/dev/learning/SlideHub/slidehub-ai/src/main/java/com/slidehub/ai/model/GenerationResult.java
+/home/mike/dev/learning/SlideHub/slidehub-ai/src/main/java/com/slidehub/ai/model/PresenterNote.java
+/home/mike/dev/learning/SlideHub/slidehub-ai/src/main/java/com/slidehub/ai/repository/PresenterNoteRepository.java
+/home/mike/dev/learning/SlideHub/slidehub-ai/src/main/java/com/slidehub/ai/service/GroqService.java
+/home/mike/dev/learning/SlideHub/slidehub-ai/src/main/java/com/slidehub/ai/service/NoteGenerationService.java
+/home/mike/dev/learning/SlideHub/slidehub-ai/src/main/java/com/slidehub/ai/service/PromptBuilderService.java
