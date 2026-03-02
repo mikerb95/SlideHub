@@ -17,7 +17,7 @@ COPY --from=builder /workspace/ai-service/target/ai-service-*.jar app.jar
 LABEL service="ai-service" version="1.0"
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://localhost:8083/actuator/health || exit 1
+    CMD wget --quiet --tries=1 --spider http://localhost:8083/actuator/health || exit 1
 
 EXPOSE 8083
 
