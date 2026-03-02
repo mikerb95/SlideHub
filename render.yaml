@@ -17,7 +17,6 @@ services:
     plan: standard
     runtime: docker
     region: oregon
-    repo: https://github.com/tu-usuario/SlideHub.git  # CAMBIA ESTO
     dockerfilePath: gateway-service/Dockerfile
     autoDeploy: true
     healthCheckPath: /actuator/health
@@ -48,7 +47,6 @@ services:
     plan: standard
     runtime: docker
     region: oregon
-    repo: https://github.com/tu-usuario/SlideHub.git  # CAMBIA ESTO
     dockerfilePath: state-service/Dockerfile
     autoDeploy: true
     healthCheckPath: /actuator/health
@@ -68,7 +66,6 @@ services:
     plan: standard
     runtime: docker
     region: oregon
-    repo: https://github.com/tu-usuario/SlideHub.git  # CAMBIA ESTO
     dockerfilePath: ui-service/Dockerfile
     autoDeploy: true
     healthCheckPath: /actuator/health
@@ -120,7 +117,6 @@ services:
     plan: standard
     runtime: docker
     region: oregon
-    repo: https://github.com/tu-usuario/SlideHub.git  # CAMBIA ESTO
     dockerfilePath: ai-service/Dockerfile
     autoDeploy: true
     healthCheckPath: /actuator/health
