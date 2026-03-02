@@ -14,7 +14,7 @@ services:
   # ────────────────────────────────────────────────────────────────
   - type: web
     name: slidehub-gateway
-    plan: standard
+    plan: free
     runtime: docker
     region: oregon
     dockerfilePath: gateway-service/Dockerfile
@@ -35,7 +35,7 @@ services:
   # ────────────────────────────────────────────────────────────────
   - type: web
     name: slidehub-state
-    plan: standard
+    plan: free
     runtime: docker
     region: oregon
     dockerfilePath: state-service/Dockerfile
@@ -54,7 +54,7 @@ services:
   # ────────────────────────────────────────────────────────────────
   - type: web
     name: slidehub-ui
-    plan: standard
+    plan: free
     runtime: docker
     region: oregon
     dockerfilePath: ui-service/Dockerfile
@@ -99,7 +99,7 @@ services:
   # ────────────────────────────────────────────────────────────────
   - type: web
     name: slidehub-ai
-    plan: standard
+    plan: free
     runtime: docker
     region: oregon
     dockerfilePath: ai-service/Dockerfile
