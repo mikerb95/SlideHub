@@ -132,9 +132,3 @@ services:
       - key: GROQ_MODEL
         value: llama3-8b-8192
 
-# ────────────────────────────────────────────────────────────────
-# Variables compartidas (todas las instancias)
-# ────────────────────────────────────────────────────────────────
-env:
-  - key: SPRING_PROFILES_ACTIVE
-    value: prod
