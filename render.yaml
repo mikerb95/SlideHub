@@ -44,10 +44,8 @@ services:
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-      - key: REDIS_HOST
-        sync: false  # Configurable manualmente en el Dashboard
-      - key: REDIS_PORT
-        value: "6379"
+      - key: REDIS_URL
+        sync: false  # URL completa de Redis Cloud: rediss://default:<password>@<host>:<port>
 
   # ────────────────────────────────────────────────────────────────
   # UI Service (puerto 8082) — Vistas Thymeleaf + Auth + OAuth2
