@@ -9,7 +9,7 @@ COPY . .
 
 # Compilar y empaquetar SOLO gateway-service
 # -pl selecciona el módulo, -am agrega sus dependencias
-RUN ./mvnw clean package -pl gateway-service -am -DskipTests -q
+RUN ./mvnw clean package -pl gateway-service -am -Dmaven.test.skip=true -q
 
 # Runtime stage: imagen mínima, solo JRE + JAR compilado
 FROM eclipse-temurin:21-jre-alpine
@@ -23,11 +23,11 @@ COPY --from=builder /workspace/gateway-service/target/gateway-service-*.jar app.
 LABEL service="gateway-service" version="1.0"
 
 # Healthcheck (Render espera que el servicio responda en /actuator/health)
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=5s --start-period=120s --retries=3 \
     CMD wget --quiet --tries=1 --spider http://localhost:8080/actuator/health || exit 1
 
 # Puerto
 EXPOSE 8080
 
 # Comando de inicio
-ENTRYPOINT ["java", "-Xms64m", "-Xmx256m", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Xms128m", "-Xmx512m", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
