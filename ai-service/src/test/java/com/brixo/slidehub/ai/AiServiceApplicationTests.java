@@ -8,7 +8,8 @@ import org.springframework.test.context.TestPropertySource;
 /**
  * Verifica que el contexto arranca sin necesidad de un MongoDB activo.
  * En Spring Boot 4, excludeAutoConfiguration fue eliminado de @SpringBootTest.
- * Se usa spring.autoconfigure.exclude como propiedad y los packages actualizados.
+ * Se usa spring.autoconfigure.exclude como propiedad y los packages
+ * actualizados.
  */
 @SpringBootTest(webEnvironment = WebEnvironment.MOCK)
 @TestPropertySource(properties = {
