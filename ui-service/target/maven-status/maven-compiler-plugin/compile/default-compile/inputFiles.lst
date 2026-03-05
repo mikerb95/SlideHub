@@ -1,4 +1,5 @@
 /home/mike/dev/learning/SlideHub/ui-service/src/main/java/com/brixo/slidehub/ui/UiServiceApplication.java
+/home/mike/dev/learning/SlideHub/ui-service/src/main/java/com/brixo/slidehub/ui/config/DatabaseConfig.java
 /home/mike/dev/learning/SlideHub/ui-service/src/main/java/com/brixo/slidehub/ui/config/S3Config.java
 /home/mike/dev/learning/SlideHub/ui-service/src/main/java/com/brixo/slidehub/ui/config/SecurityConfig.java
 /home/mike/dev/learning/SlideHub/ui-service/src/main/java/com/brixo/slidehub/ui/controller/AuthController.java

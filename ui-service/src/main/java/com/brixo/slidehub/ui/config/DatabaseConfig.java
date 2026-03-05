@@ -17,11 +17,11 @@ import org.springframework.context.annotation.Configuration;
  * libpq. El driver JDBC de PostgreSQL no acepta ese formato directamente.
  *
  * Ejemplos de transformación:
- *   postgres://user:pass@host:port/db?sslmode=require
- *   → jdbc:postgresql://host:port/db?user=user&password=pass&sslmode=require
+ * postgres://user:pass@host:port/db?sslmode=require
+ * → jdbc:postgresql://host:port/db?user=user&password=pass&sslmode=require
  *
- *   postgresql://user:pass@host:port/db
- *   → jdbc:postgresql://host:port/db?user=user&password=pass
+ * postgresql://user:pass@host:port/db
+ * → jdbc:postgresql://host:port/db?user=user&password=pass
  *
  * Si la URL ya comienza con jdbc:, se usa tal cual (sin transformación).
  */
@@ -39,7 +39,8 @@ public class DatabaseConfig {
     @Bean
     public DataSource dataSource() {
         String jdbcUrl = convertToJdbcUrl(databaseUrl);
-        log.info("DataSource URL scheme: {}", jdbcUrl.substring(0, Math.min(jdbcUrl.indexOf("://") + 3, jdbcUrl.length())));
+        log.info("DataSource URL scheme: {}",
+                jdbcUrl.substring(0, Math.min(jdbcUrl.indexOf("://") + 3, jdbcUrl.length())));
 
         DataSourceBuilder<?> builder = DataSourceBuilder.create()
                 .url(jdbcUrl)
@@ -63,7 +64,7 @@ public class DatabaseConfig {
         }
 
         // Formato libpq: postgres://user:pass@host:port/db?params
-        // o:              postgresql://user:pass@host:port/db?params
+        // o: postgresql://user:pass@host:port/db?params
         if (url.startsWith("postgres://") || url.startsWith("postgresql://")) {
             return convertLibpqToJdbc(url);
         }

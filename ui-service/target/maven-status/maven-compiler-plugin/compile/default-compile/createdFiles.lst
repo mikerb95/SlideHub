@@ -32,3 +32,4 @@ com/brixo/slidehub/ui/controller/PresentationViewController.class
 com/brixo/slidehub/ui/service/PresentationService.class
 com/brixo/slidehub/ui/service/NotesBridgeService.class
 com/brixo/slidehub/ui/service/CustomOAuth2UserService.class
+com/brixo/slidehub/ui/config/DatabaseConfig.class
