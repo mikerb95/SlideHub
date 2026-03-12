@@ -324,7 +324,7 @@
                 await fetch(API_SLIDE_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ slide: target })
+                    body: JSON.stringify({ slide: target, totalSlides })
                 });
                 currentSlide = target;
                 updateUI();

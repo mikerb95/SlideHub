@@ -2,6 +2,10 @@ package com.brixo.slidehub.ui.config;
 
 import javax.sql.DataSource;
 
+import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,13 +42,21 @@ public class DatabaseConfig {
 
     @Bean
     public DataSource dataSource() {
-        String jdbcUrl = convertToJdbcUrl(databaseUrl);
+        JdbcConnectionInfo connectionInfo = parseConnectionInfo(databaseUrl);
+        String jdbcUrl = connectionInfo.jdbcUrl();
         log.info("DataSource URL scheme: {}",
                 jdbcUrl.substring(0, Math.min(jdbcUrl.indexOf("://") + 3, jdbcUrl.length())));
 
         DataSourceBuilder<?> builder = DataSourceBuilder.create()
                 .url(jdbcUrl)
                 .driverClassName(driverClassName);
+
+        if (connectionInfo.username() != null && !connectionInfo.username().isBlank()) {
+            builder.username(connectionInfo.username());
+        }
+        if (connectionInfo.password() != null) {
+            builder.password(connectionInfo.password());
+        }
 
         return builder.build();
     }
@@ -54,13 +66,17 @@ public class DatabaseConfig {
      * Si ya es jdbc:..., la retorna sin cambios.
      */
     String convertToJdbcUrl(String url) {
+        return parseConnectionInfo(url).jdbcUrl();
+    }
+
+    private JdbcConnectionInfo parseConnectionInfo(String url) {
         if (url == null || url.isBlank()) {
             throw new IllegalArgumentException("DATABASE_URL no puede estar vacía");
         }
 
         // Ya es formato JDBC — no tocar
         if (url.startsWith("jdbc:")) {
-            return url;
+            return new JdbcConnectionInfo(url, null, null);
         }
 
         // Formato libpq: postgres://user:pass@host:port/db?params
@@ -70,53 +86,55 @@ public class DatabaseConfig {
         }
 
         // H2 u otros formatos de desarrollo
-        return url;
+        return new JdbcConnectionInfo(url, null, null);
     }
 
-    private String convertLibpqToJdbc(String url) {
-        // Quitar el esquema (postgres:// o postgresql://)
-        String withoutScheme = url.replaceFirst("^postgres(ql)?://", "");
+    private JdbcConnectionInfo convertLibpqToJdbc(String url) {
+        URI uri = URI.create(url);
+        String authority = uri.getRawAuthority();
+        String rawUserInfo = uri.getRawUserInfo();
 
-        String userInfo = null;
-        String hostAndPath;
-
-        // Extraer user:pass si existe
-        int atIndex = withoutScheme.indexOf('@');
-        if (atIndex != -1) {
-            userInfo = withoutScheme.substring(0, atIndex);
-            hostAndPath = withoutScheme.substring(atIndex + 1);
-        } else {
-            hostAndPath = withoutScheme;
+        if (authority == null || authority.isBlank()) {
+            throw new IllegalArgumentException("DATABASE_URL inválida: falta host o authority");
         }
 
-        // Construir la URL JDBC base
-        StringBuilder jdbcUrl = new StringBuilder("jdbc:postgresql://");
-        jdbcUrl.append(hostAndPath);
+        if (rawUserInfo != null && !rawUserInfo.isBlank()) {
+            authority = authority.substring(rawUserInfo.length() + 1);
+        }
 
-        // Agregar credenciales como parámetros de query
-        if (userInfo != null && !userInfo.isEmpty()) {
-            String user;
-            String password = null;
+        StringBuilder jdbcUrl = new StringBuilder("jdbc:postgresql://")
+                .append(authority);
 
-            int colonIndex = userInfo.indexOf(':');
+        if (uri.getRawPath() != null) {
+            jdbcUrl.append(uri.getRawPath());
+        }
+        if (uri.getRawQuery() != null && !uri.getRawQuery().isBlank()) {
+            jdbcUrl.append('?').append(uri.getRawQuery());
+        }
+
+        String username = null;
+        String password = null;
+
+        if (rawUserInfo != null && !rawUserInfo.isBlank()) {
+            int colonIndex = rawUserInfo.indexOf(':');
             if (colonIndex != -1) {
-                user = userInfo.substring(0, colonIndex);
-                password = userInfo.substring(colonIndex + 1);
+                username = decode(rawUserInfo.substring(0, colonIndex));
+                password = decode(rawUserInfo.substring(colonIndex + 1));
             } else {
-                user = userInfo;
-            }
-
-            // Determinar si ya hay parámetros de query en la URL
-            char separator = hostAndPath.contains("?") ? '&' : '?';
-            jdbcUrl.append(separator).append("user=").append(user);
-            if (password != null) {
-                jdbcUrl.append("&password=").append(password);
+                username = decode(rawUserInfo);
             }
         }
 
         log.info("Converted libpq URL to JDBC format (host: {})",
-                hostAndPath.substring(0, Math.min(hostAndPath.indexOf('/'), hostAndPath.length())));
+                uri.getHost() != null ? uri.getHost() : authority);
 
-        return jdbcUrl.toString();
+        return new JdbcConnectionInfo(jdbcUrl.toString(), username, password);
+    }
+
+    private String decode(String value) {
+        return URLDecoder.decode(value, StandardCharsets.UTF_8);
+    }
+
+    private record JdbcConnectionInfo(String jdbcUrl, String username, String password) {
     }
 }

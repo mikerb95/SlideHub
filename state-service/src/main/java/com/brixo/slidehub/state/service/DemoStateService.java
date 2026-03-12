@@ -70,7 +70,7 @@ public class DemoStateService {
                 restoreSlide = 1;
             }
             // Restaurar el slide activo en state-service (Fase 4 tarea 41)
-            slideStateService.setSlide(restoreSlide);
+            slideStateService.setSlide(restoreSlide, null);
             newState = new DemoState("slides", restoreSlide, null, null);
         }
         try {

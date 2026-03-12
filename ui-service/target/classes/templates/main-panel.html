@@ -326,7 +326,7 @@
                 await fetch(API_SLIDE_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ slide: n })
+                    body: JSON.stringify({ slide: n, totalSlides })
                 });
                 currentSlide = n;
                 updateActiveThumb();

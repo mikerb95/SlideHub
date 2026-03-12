@@ -141,7 +141,7 @@ public class RepoAnalysisService {
 
     private String textOrDefault(JsonNode root, String field, String defaultValue) {
         JsonNode node = root.path(field);
-        return node.isMissingNode() || node.isNull() ? defaultValue : node.asText();
+        return node.isMissingNode() || node.isNull() ? defaultValue : node.asString(defaultValue);
     }
 
     private List<String> toStringList(JsonNode arrayNode) {
@@ -150,8 +150,8 @@ public class RepoAnalysisService {
             return list;
         }
         for (JsonNode item : arrayNode) {
-            if (item.isTextual())
-                list.add(item.asText());
+            if (item.isString())
+                list.add(item.asString());
         }
         return list;
     }
