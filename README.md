@@ -2,7 +2,7 @@
 
 Sistema de control de diapositivas en tiempo real con múltiples pantallas sincronizadas, control remoto desde el teléfono y notas del presentador generadas automáticamente con IA.
 
-Empezó como un módulo PHP heredado y lo reescribí completamente desde cero en Java usando arquitectura de microservicios. El objetivo principal era apreder Spring Boot, microservicios y las integraciones con APIs de IA — y de paso tener una herramienta que realmente me fuera útil para presentar proyectos.
+Empezó como un módulo PHP heredado y lo reescribimos completamente desde cero en Java usando arquitectura de microservicios. El objetivo principal era apreder Spring Boot, microservicios y las integraciones con APIs de IA — y de paso tener una herramienta que realmente fuera útil para presentar proyectos.
 
 ---
 
