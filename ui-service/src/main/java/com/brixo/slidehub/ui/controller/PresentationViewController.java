@@ -33,6 +33,14 @@ public class PresentationViewController {
     }
 
     /**
+     * Redirección raíz a showcase (HU-012).
+     */
+    @GetMapping("/")
+    public String index() {
+        return "redirect:/showcase";
+    }
+
+    /**
      * Vista del proyector/TV (HU-005) — polling a /api/slide para sincronización.
      */
     @GetMapping("/slides")

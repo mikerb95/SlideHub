@@ -75,7 +75,8 @@ public class RoutesConfig {
         public RouterFunction<ServerResponse> uiRoutes() {
                 return route("ui-service-routes")
                                 .route(
-                                                RequestPredicates.path("/auth/**")
+                                                RequestPredicates.path("/")
+                                                                .or(RequestPredicates.path("/auth/**"))
                                                                 .or(RequestPredicates.path("/oauth2/**")) // /oauth2/authorization/{provider}
                                                                 .or(RequestPredicates.path("/login/oauth2/**")) // /login/oauth2/code/{provider}
                                                                 .or(RequestPredicates.path("/slides"))
