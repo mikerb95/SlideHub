@@ -24,11 +24,11 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
       - key: STATE_SERVICE_URL
-        sync: false  # Ej: https://slidehub-state.onrender.com
+        value: https://slidehub-state.onrender.com
       - key: UI_SERVICE_URL
-        sync: false  # Ej: https://slidehub-ui.onrender.com
+        value: https://slidehub-ui.onrender.com
       - key: AI_SERVICE_URL
-        sync: false  # Ej: https://slidehub-ai.onrender.com
+        value: https://slidehub-ai.onrender.com
 
   # ────────────────────────────────────────────────────────────────
   # State Service (puerto 8081) — Gestión de estado en Redis
@@ -62,9 +62,9 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
       - key: STATE_SERVICE_URL
-        sync: false  # Ej: https://slidehub-state.onrender.com
+        value: https://slidehub-state.onrender.com
       - key: AI_SERVICE_URL
-        sync: false  # Ej: https://slidehub-ai.onrender.com
+        value: https://slidehub-ai.onrender.com
       - key: BASE_URL
         value: https://slide.lat
       - key: DATABASE_URL
