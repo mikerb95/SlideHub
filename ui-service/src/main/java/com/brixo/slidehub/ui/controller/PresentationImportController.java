@@ -202,6 +202,28 @@ public class PresentationImportController {
         }
     }
 
+    @PostMapping("/api/presentations/{presentationId}/quick-slide")
+    @ResponseBody
+    public ResponseEntity<?> createQuickSlide(
+            @PathVariable String presentationId,
+            @RequestParam String title,
+            @RequestParam(required = false) String body,
+            Authentication authentication) {
+        try {
+            User user = resolveUser(authentication);
+            return ResponseEntity.ok(presentationService.createQuickSlide(
+                    user.getId(),
+                    presentationId,
+                    title,
+                    body));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        } catch (Exception ex) {
+            log.error("Error creando quick slide para {}: {}", presentationId, ex.getMessage());
+            return ResponseEntity.internalServerError().body(Map.of("error", ex.getMessage()));
+        }
+    }
+
     // ── Helpers privados ──────────────────────────────────────────────────────
 
     /**

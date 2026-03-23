@@ -55,8 +55,8 @@ public class PresentationService {
         this.googleDriveService = googleDriveService;
         this.slideUploadService = slideUploadService;
         this.imageDownloadClient = WebClient.builder()
-            .codecs(cfg -> cfg.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
-            .build();
+                .codecs(cfg -> cfg.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
+                .build();
     }
 
     // ── Listado de presentaciones ─────────────────────────────────────────────
@@ -222,21 +222,21 @@ public class PresentationService {
         return saved;
     }
 
-        @Transactional
-        public Map<String, Object> createQuickSlide(String userId,
+    @Transactional
+    public Map<String, Object> createQuickSlide(String userId,
             String presentationId,
             String title,
             String bodyText) {
         Presentation presentation = presentationRepository.findByIdAndUserId(presentationId, userId)
-            .orElseThrow(() -> new IllegalArgumentException("Presentación no encontrada o sin permisos."));
+                .orElseThrow(() -> new IllegalArgumentException("Presentación no encontrada o sin permisos."));
 
         String effectiveTitle = title != null && !title.isBlank() ? title.trim() : "Nuevo slide";
         String effectiveBody = bodyText != null ? bodyText.trim() : "";
 
         int nextSlideNumber = presentation.getSlides().stream()
-            .mapToInt(Slide::getNumber)
-            .max()
-            .orElse(0) + 1;
+                .mapToInt(Slide::getNumber)
+                .max()
+                .orElse(0) + 1;
 
         Color primaryColor = detectPrimaryColor(presentation);
         byte[] imageBytes = renderQuickSlideImage(effectiveTitle, effectiveBody, primaryColor);
@@ -250,12 +250,12 @@ public class PresentationService {
         presentationRepository.save(presentation);
 
         return Map.of(
-            "success", true,
-            "slideNumber", nextSlideNumber,
-            "s3Url", s3Url,
-            "primaryColor", "#%02X%02X%02X".formatted(primaryColor.getRed(), primaryColor.getGreen(),
-                primaryColor.getBlue()));
-        }
+                "success", true,
+                "slideNumber", nextSlideNumber,
+                "s3Url", s3Url,
+                "primaryColor", "#%02X%02X%02X".formatted(primaryColor.getRed(), primaryColor.getGreen(),
+                        primaryColor.getBlue()));
+    }
 
     // ── Helpers privados ──────────────────────────────────────────────────────
 
@@ -379,7 +379,8 @@ public class PresentationService {
                     Math.min(255, sumG[bestBin] / bins[bestBin]),
                     Math.min(255, sumB[bestBin] / bins[bestBin]));
         } catch (Exception ex) {
-            log.warn("No se pudo detectar color primario para presentación {}: {}", presentation.getId(), ex.getMessage());
+            log.warn("No se pudo detectar color primario para presentación {}: {}", presentation.getId(),
+                    ex.getMessage());
             return new Color(38, 87, 173);
         }
     }
