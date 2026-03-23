@@ -71,6 +71,97 @@
             font-size: 0.85rem;
         }
 
+        #help-btn {
+            position: fixed;
+            bottom: 2rem;
+            left: 1.5rem;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 999px;
+            padding: 0.7rem 1.1rem;
+            font-size: 0.9rem;
+            display: none;
+            align-items: center;
+            gap: 0.45rem;
+            z-index: 210;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #help-btn.visible {
+            display: flex;
+        }
+
+        #help-btn:active {
+            transform: scale(0.97);
+        }
+
+        #join-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
+            display: none;
+            z-index: 500;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        #join-overlay.visible {
+            display: flex;
+        }
+
+        .join-card {
+            width: 100%;
+            max-width: 420px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .join-card h3 {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .join-card select,
+        .join-card input,
+        .join-card button {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #121212;
+            color: white;
+            padding: 0.7rem;
+            margin-bottom: 0.65rem;
+        }
+
+        .join-card button {
+            background: #2563eb;
+            border-color: #2563eb;
+            font-weight: 600;
+        }
+
+        #notice {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 0.6rem 0.75rem;
+            font-size: 0.8rem;
+            z-index: 600;
+            display: none;
+            max-width: 70vw;
+        }
+
+        #notice.visible {
+            display: block;
+        }
+
         /* Botón "Volver al Slide" — visible solo en modo url */
         #btn-return-slide {
             position: fixed;
@@ -230,6 +321,11 @@
     </div>
     <div id="swipe-hint">← desliza →</div>
 
+    <button id="help-btn" type="button" onclick="requestHelp()">
+        <i class="fa fa-life-ring"></i>
+        Pedir ayuda
+    </button>
+
     <!-- FAB Demo (solo si hay quick links) -->
     <button id="btn-demo-fab" th:style="${!hasQuickLinks} ? 'display:none' : ''" onclick="openSheet()" title="Demos">
         <i class="fa fa-globe"></i>
@@ -260,21 +356,45 @@
         </div>
     </div>
 
+    <div id="join-overlay">
+        <div class="join-card">
+            <h3><i class="fa fa-qrcode me-1"></i>Unirse a la reunión</h3>
+            <select id="join-participant-select"></select>
+            <input id="join-custom-name" type="text" maxlength="120" placeholder="Otro nombre (opcional)">
+            <button type="button" onclick="submitJoin()">Entrar</button>
+        </div>
+    </div>
+
+    <div id="notice"></div>
+
     <script th:inline="javascript">
         const POLL_INTERVAL_MS = /*[[${pollIntervalMs}]]*/ 1000;
         const API_SLIDE_URL = '/api/slide';
         const API_DEMO_URL = '/api/demo';
 
+        const query = new URLSearchParams(window.location.search);
+        const PRESENTATION_ID = query.get('presentationId') || '';
+        const JOIN_TOKEN = query.get('joinToken') || '';
+        const STORAGE_KEY = `participant-token:${PRESENTATION_ID}`;
+
         let currentSlide = 1;
         let totalSlides = 0;
         let demoMode = 'slides';
         let returnSlide = null;
+        let participantToken = localStorage.getItem(STORAGE_KEY) || '';
+        let lastSlideForAssignment = -1;
+        let noticeTimeout;
 
         const indicator = document.getElementById('slide-indicator');
         const btnPrev = document.getElementById('btn-prev');
         const btnNext = document.getElementById('btn-next');
         const btnReturn = document.getElementById('btn-return-slide');
         const returnLabel = document.getElementById('return-label');
+        const joinOverlay = document.getElementById('join-overlay');
+        const participantSelect = document.getElementById('join-participant-select');
+        const customNameInput = document.getElementById('join-custom-name');
+        const helpBtn = document.getElementById('help-btn');
+        const notice = document.getElementById('notice');
 
         // ── Estado de slides ───────────────────────────────────────────────────
 
@@ -292,13 +412,20 @@
                 ]);
                 if (slideRes.ok) {
                     const data = await slideRes.json();
+                    const previousSlide = currentSlide;
                     currentSlide = data.slide;
                     totalSlides = data.totalSlides;
                     updateUI();
+                    if (participantToken && previousSlide !== currentSlide) {
+                        await checkSlideAssignment();
+                    }
                 }
                 if (demoRes.ok) {
                     const demo = await demoRes.json();
                     onDemoStateChange(demo);
+                }
+                if (participantToken) {
+                    await pollHapticEvent();
                 }
             } catch (_) { }
         }
@@ -357,6 +484,129 @@
             closeSheet();
         }
 
+        async function checkSlideAssignment() {
+            if (!PRESENTATION_ID || !JOIN_TOKEN || !participantToken || currentSlide === lastSlideForAssignment) {
+                return;
+            }
+            lastSlideForAssignment = currentSlide;
+            try {
+                const res = await fetch(`/api/presentations/${PRESENTATION_ID}/meeting/assignment-check?joinToken=${encodeURIComponent(JOIN_TOKEN)}&participantToken=${encodeURIComponent(participantToken)}&slideNumber=${currentSlide}`);
+                if (!res.ok) {
+                    return;
+                }
+                const data = await res.json();
+                if (data.vibrate) {
+                    triggerHaptic(data.pattern || 'single', data.message || 'Tu slide está activa');
+                }
+            } catch (_) { }
+        }
+
+        async function pollHapticEvent() {
+            try {
+                const res = await fetch(`/api/haptics/events/next?participantToken=${encodeURIComponent(participantToken)}`);
+                if (res.status === 204 || !res.ok) {
+                    return;
+                }
+                const event = await res.json();
+                triggerHaptic(event.pattern || 'single', event.message || 'Notificación');
+            } catch (_) { }
+        }
+
+        function triggerHaptic(pattern, message) {
+            const sequence = pattern === 'triple' ? [90, 130, 90, 130, 90] : [110];
+            if (navigator.vibrate) {
+                navigator.vibrate(sequence);
+            }
+            showNotice(message || (pattern === 'triple' ? 'Solicitud de ayuda' : 'Turno asignado'));
+        }
+
+        function showNotice(message) {
+            if (!message) {
+                return;
+            }
+            notice.textContent = message;
+            notice.classList.add('visible');
+            clearTimeout(noticeTimeout);
+            noticeTimeout = setTimeout(() => notice.classList.remove('visible'), 2400);
+        }
+
+        async function loadJoinOptions() {
+            if (!PRESENTATION_ID || !JOIN_TOKEN || participantToken) {
+                return;
+            }
+            try {
+                const res = await fetch(`/api/presentations/${PRESENTATION_ID}/meeting/join-options?joinToken=${encodeURIComponent(JOIN_TOKEN)}`);
+                if (!res.ok) {
+                    showNotice('No fue posible validar la sesión de reunión');
+                    return;
+                }
+                const data = await res.json();
+                const participants = data.participants || [];
+                participantSelect.innerHTML = '<option value="">Selecciona tu nombre</option>' +
+                    participants.map(p => `<option value="${p.id}">${p.displayName}</option>`).join('');
+                joinOverlay.classList.add('visible');
+            } catch (_) {
+                showNotice('Error cargando participantes de la reunión');
+            }
+        }
+
+        async function submitJoin() {
+            const payload = {
+                joinToken: JOIN_TOKEN,
+                participantId: participantSelect.value || null,
+                customName: customNameInput.value || null
+            };
+
+            if (!payload.participantId && !payload.customName) {
+                showNotice('Selecciona un nombre o escribe uno');
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/presentations/${PRESENTATION_ID}/meeting/join`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) {
+                    showNotice('No se pudo completar el ingreso a la reunión');
+                    return;
+                }
+                const data = await res.json();
+                participantToken = data.participantToken || '';
+                if (participantToken) {
+                    localStorage.setItem(STORAGE_KEY, participantToken);
+                    helpBtn.classList.add('visible');
+                    joinOverlay.classList.remove('visible');
+                    showNotice(`Conectado como ${data.displayName || 'participante'}`);
+                }
+            } catch (_) {
+                showNotice('Error de red al unirse a la reunión');
+            }
+        }
+
+        async function requestHelp() {
+            if (!PRESENTATION_ID || !JOIN_TOKEN || !participantToken) {
+                showNotice('Primero debes unirte a la reunión');
+                return;
+            }
+            try {
+                const res = await fetch(`/api/presentations/${PRESENTATION_ID}/meeting/help`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ joinToken: JOIN_TOKEN, participantToken })
+                });
+                if (!res.ok) {
+                    showNotice('No se pudo enviar la solicitud de ayuda');
+                    return;
+                }
+                if (navigator.vibrate) navigator.vibrate([30, 40, 30]);
+                showNotice('Solicitud de ayuda enviada');
+            } catch (_) {
+                showNotice('Error enviando solicitud de ayuda');
+            }
+        }
+
         async function returnToSlide() {
             try {
                 await fetch(API_DEMO_URL, {
@@ -382,7 +632,11 @@
         }
 
         // Arrancar
+        if (participantToken) {
+            helpBtn.classList.add('visible');
+        }
         fetchState();
+        loadJoinOptions();
         setInterval(fetchState, POLL_INTERVAL_MS);
     </script>
 </body>
