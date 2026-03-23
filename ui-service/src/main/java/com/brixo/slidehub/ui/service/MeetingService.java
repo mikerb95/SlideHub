@@ -266,7 +266,8 @@ public class MeetingService {
             String senderName = sender.getParticipant().getDisplayName();
             String broadcastMessage = "IA para " + senderName + ": " + trimMessage(answer, 220);
             memberRepository.findBySessionIdAndActiveTrue(session.getId())
-                    .forEach(member -> hapticBridgeService.publishSingle(member.getParticipantToken(), broadcastMessage));
+                    .forEach(member -> hapticBridgeService.publishSingle(member.getParticipantToken(),
+                            broadcastMessage));
         }
 
         return response;

@@ -97,6 +97,61 @@
             transform: scale(0.97);
         }
 
+        #mic-btn {
+            position: fixed;
+            bottom: 2rem;
+            left: 9.2rem;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 999px;
+            padding: 0.7rem 1rem;
+            font-size: 0.9rem;
+            display: none;
+            align-items: center;
+            gap: 0.45rem;
+            z-index: 210;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #mic-btn.visible {
+            display: flex;
+        }
+
+        #mic-btn.recording {
+            background: #dc2626;
+        }
+
+        #assist-card {
+            position: fixed;
+            left: 0.8rem;
+            right: 0.8rem;
+            bottom: 5.9rem;
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 10px;
+            padding: 0.75rem;
+            z-index: 500;
+            display: none;
+        }
+
+        #assist-card.visible {
+            display: block;
+        }
+
+        #assist-card .title {
+            font-size: 0.76rem;
+            color: #93c5fd;
+            margin-bottom: 0.35rem;
+        }
+
+        #assist-card .content {
+            font-size: 0.8rem;
+            line-height: 1.35;
+            color: #e5e7eb;
+        }
+
         #join-overlay {
             position: fixed;
             inset: 0;
@@ -326,6 +381,16 @@
         Pedir ayuda
     </button>
 
+    <button id="mic-btn" type="button" title="Mantén presionado para preguntar">
+        <i class="fa fa-microphone"></i>
+        Mic
+    </button>
+
+    <div id="assist-card">
+        <div class="title">Sugerencia IA</div>
+        <div class="content" id="assist-answer-text"></div>
+    </div>
+
     <!-- FAB Demo (solo si hay quick links) -->
     <button id="btn-demo-fab" th:style="${!hasQuickLinks} ? 'display:none' : ''" onclick="openSheet()" title="Demos">
         <i class="fa fa-globe"></i>
@@ -384,6 +449,10 @@
         let participantToken = localStorage.getItem(STORAGE_KEY) || '';
         let lastSlideForAssignment = -1;
         let noticeTimeout;
+        let mediaRecorder = null;
+        let mediaStream = null;
+        let audioChunks = [];
+        let recording = false;
 
         const indicator = document.getElementById('slide-indicator');
         const btnPrev = document.getElementById('btn-prev');
@@ -394,7 +463,10 @@
         const participantSelect = document.getElementById('join-participant-select');
         const customNameInput = document.getElementById('join-custom-name');
         const helpBtn = document.getElementById('help-btn');
+        const micBtn = document.getElementById('mic-btn');
         const notice = document.getElementById('notice');
+        const assistCard = document.getElementById('assist-card');
+        const assistAnswerText = document.getElementById('assist-answer-text');
 
         // ── Estado de slides ───────────────────────────────────────────────────
 
@@ -518,6 +590,9 @@
                 navigator.vibrate(sequence);
             }
             showNotice(message || (pattern === 'triple' ? 'Solicitud de ayuda' : 'Turno asignado'));
+            if (message && message.startsWith('IA para')) {
+                showAssistCard(message);
+            }
         }
 
         function showNotice(message) {
@@ -577,6 +652,7 @@
                 if (participantToken) {
                     localStorage.setItem(STORAGE_KEY, participantToken);
                     helpBtn.classList.add('visible');
+                    micBtn.classList.add('visible');
                     joinOverlay.classList.remove('visible');
                     showNotice(`Conectado como ${data.displayName || 'participante'}`);
                 }
@@ -607,6 +683,87 @@
             }
         }
 
+        function showAssistCard(text) {
+            assistAnswerText.textContent = text;
+            assistCard.classList.add('visible');
+            setTimeout(() => assistCard.classList.remove('visible'), 14000);
+        }
+
+        async function startRecording() {
+            if (recording || !participantToken || !JOIN_TOKEN || !PRESENTATION_ID) {
+                return;
+            }
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                audioChunks = [];
+                mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'audio/webm' });
+                mediaRecorder.ondataavailable = event => {
+                    if (event.data && event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+                mediaRecorder.onstop = async () => {
+                    const blob = new Blob(audioChunks, { type: 'audio/webm' });
+                    await uploadAssistAudio(blob);
+                    if (mediaStream) {
+                        mediaStream.getTracks().forEach(track => track.stop());
+                    }
+                    mediaStream = null;
+                    mediaRecorder = null;
+                    audioChunks = [];
+                };
+                mediaRecorder.start();
+                recording = true;
+                micBtn.classList.add('recording');
+                showNotice('Grabando pregunta...');
+            } catch (_) {
+                showNotice('No se pudo activar el micrófono');
+            }
+        }
+
+        function stopRecording() {
+            if (!recording || !mediaRecorder) {
+                return;
+            }
+            recording = false;
+            micBtn.classList.remove('recording');
+            mediaRecorder.stop();
+        }
+
+        async function uploadAssistAudio(blob) {
+            if (!blob || blob.size === 0) {
+                return;
+            }
+            const formData = new FormData();
+            formData.append('joinToken', JOIN_TOKEN);
+            formData.append('participantToken', participantToken);
+            formData.append('slideNumber', String(currentSlide || 1));
+            formData.append('slideContext', `Slide ${currentSlide || 1}`);
+            formData.append('audio', blob, 'question.webm');
+
+            try {
+                showNotice('Procesando pregunta con IA...');
+                const res = await fetch(`/api/presentations/${PRESENTATION_ID}/meeting/assist/audio`, {
+                    method: 'POST',
+                    body: formData
+                });
+                if (!res.ok) {
+                    showNotice('No se pudo procesar la pregunta');
+                    return;
+                }
+                const data = await res.json();
+                if (!data.success) {
+                    showNotice('Error de IA: ' + (data.errorMessage || 'sin detalle'));
+                    return;
+                }
+                const answer = data.answer || 'Sin respuesta';
+                const transcription = data.transcription || '';
+                showAssistCard(`Q: ${transcription}\n\nA: ${answer}`);
+            } catch (_) {
+                showNotice('Error de red enviando el audio');
+            }
+        }
+
         async function returnToSlide() {
             try {
                 await fetch(API_DEMO_URL, {
@@ -631,9 +788,23 @@
             document.getElementById('sheet-overlay').classList.remove('visible');
         }
 
+        micBtn.addEventListener('mousedown', startRecording);
+        micBtn.addEventListener('touchstart', (event) => {
+            event.preventDefault();
+            startRecording();
+        }, { passive: false });
+        micBtn.addEventListener('mouseup', stopRecording);
+        micBtn.addEventListener('mouseleave', stopRecording);
+        micBtn.addEventListener('touchend', (event) => {
+            event.preventDefault();
+            stopRecording();
+        });
+        micBtn.addEventListener('touchcancel', stopRecording);
+
         // Arrancar
         if (participantToken) {
             helpBtn.classList.add('visible');
+            micBtn.classList.add('visible');
         }
         fetchState();
         loadJoinOptions();
