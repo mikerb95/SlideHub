@@ -11,11 +11,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -38,6 +46,7 @@ public class PresentationService {
     private final PresentationRepository presentationRepository;
     private final GoogleDriveService googleDriveService;
     private final SlideUploadService slideUploadService;
+    private final WebClient imageDownloadClient;
 
     public PresentationService(PresentationRepository presentationRepository,
             GoogleDriveService googleDriveService,
@@ -45,6 +54,9 @@ public class PresentationService {
         this.presentationRepository = presentationRepository;
         this.googleDriveService = googleDriveService;
         this.slideUploadService = slideUploadService;
+        this.imageDownloadClient = WebClient.builder()
+            .codecs(cfg -> cfg.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
+            .build();
     }
 
     // ── Listado de presentaciones ─────────────────────────────────────────────
@@ -210,6 +222,41 @@ public class PresentationService {
         return saved;
     }
 
+        @Transactional
+        public Map<String, Object> createQuickSlide(String userId,
+            String presentationId,
+            String title,
+            String bodyText) {
+        Presentation presentation = presentationRepository.findByIdAndUserId(presentationId, userId)
+            .orElseThrow(() -> new IllegalArgumentException("Presentación no encontrada o sin permisos."));
+
+        String effectiveTitle = title != null && !title.isBlank() ? title.trim() : "Nuevo slide";
+        String effectiveBody = bodyText != null ? bodyText.trim() : "";
+
+        int nextSlideNumber = presentation.getSlides().stream()
+            .mapToInt(Slide::getNumber)
+            .max()
+            .orElse(0) + 1;
+
+        Color primaryColor = detectPrimaryColor(presentation);
+        byte[] imageBytes = renderQuickSlideImage(effectiveTitle, effectiveBody, primaryColor);
+
+        String key = slideUploadService.buildSlideKey(presentation.getId(), nextSlideNumber);
+        String s3Url = slideUploadService.upload(key, imageBytes, "image/png");
+
+        Slide slide = buildSlide(presentation, nextSlideNumber, nextSlideNumber + ".png", null, s3Url);
+        presentation.getSlides().add(slide);
+        presentation.setUpdatedAt(LocalDateTime.now());
+        presentationRepository.save(presentation);
+
+        return Map.of(
+            "success", true,
+            "slideNumber", nextSlideNumber,
+            "s3Url", s3Url,
+            "primaryColor", "#%02X%02X%02X".formatted(primaryColor.getRed(), primaryColor.getGreen(),
+                primaryColor.getBlue()));
+        }
+
     // ── Helpers privados ──────────────────────────────────────────────────────
 
     private Presentation buildPresentation(User user,
@@ -262,5 +309,158 @@ public class PresentationService {
             case "image/webp" -> "image/webp";
             default -> "image/png";
         };
+    }
+
+    private Color detectPrimaryColor(Presentation presentation) {
+        if (presentation.getSlides().isEmpty()) {
+            return new Color(38, 87, 173);
+        }
+
+        String firstSlideUrl = presentation.getSlides().stream()
+                .filter(slide -> slide.getS3Url() != null && !slide.getS3Url().isBlank())
+                .map(Slide::getS3Url)
+                .findFirst()
+                .orElse(null);
+
+        if (firstSlideUrl == null) {
+            return new Color(38, 87, 173);
+        }
+
+        try {
+            byte[] data = imageDownloadClient.get()
+                    .uri(firstSlideUrl)
+                    .retrieve()
+                    .bodyToMono(byte[].class)
+                    .block();
+            if (data == null || data.length == 0) {
+                return new Color(38, 87, 173);
+            }
+
+            BufferedImage image = ImageIO.read(new ByteArrayInputStream(data));
+            if (image == null) {
+                return new Color(38, 87, 173);
+            }
+
+            int stepX = Math.max(1, image.getWidth() / 60);
+            int stepY = Math.max(1, image.getHeight() / 60);
+
+            int[] bins = new int[64];
+            int[] sumR = new int[64];
+            int[] sumG = new int[64];
+            int[] sumB = new int[64];
+
+            for (int y = 0; y < image.getHeight(); y += stepY) {
+                for (int x = 0; x < image.getWidth(); x += stepX) {
+                    int rgb = image.getRGB(x, y);
+                    int r = (rgb >> 16) & 0xFF;
+                    int g = (rgb >> 8) & 0xFF;
+                    int b = rgb & 0xFF;
+                    int bin = ((r / 64) * 16) + ((g / 64) * 4) + (b / 64);
+                    bins[bin]++;
+                    sumR[bin] += r;
+                    sumG[bin] += g;
+                    sumB[bin] += b;
+                }
+            }
+
+            int bestBin = 0;
+            for (int i = 1; i < bins.length; i++) {
+                if (bins[i] > bins[bestBin]) {
+                    bestBin = i;
+                }
+            }
+
+            if (bins[bestBin] == 0) {
+                return new Color(38, 87, 173);
+            }
+
+            return new Color(
+                    Math.min(255, sumR[bestBin] / bins[bestBin]),
+                    Math.min(255, sumG[bestBin] / bins[bestBin]),
+                    Math.min(255, sumB[bestBin] / bins[bestBin]));
+        } catch (Exception ex) {
+            log.warn("No se pudo detectar color primario para presentación {}: {}", presentation.getId(), ex.getMessage());
+            return new Color(38, 87, 173);
+        }
+    }
+
+    private byte[] renderQuickSlideImage(String title, String bodyText, Color primaryColor) {
+        try {
+            int width = 1600;
+            int height = 900;
+            BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D graphics = image.createGraphics();
+            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+            graphics.setColor(primaryColor);
+            graphics.fillRect(0, 0, width, height);
+
+            Color overlayColor = new Color(
+                    Math.max(0, primaryColor.getRed() - 25),
+                    Math.max(0, primaryColor.getGreen() - 25),
+                    Math.max(0, primaryColor.getBlue() - 25),
+                    180);
+            graphics.setColor(overlayColor);
+            graphics.fillRoundRect(80, 100, width - 160, height - 200, 36, 36);
+
+            Color textColor = resolveTextColor(primaryColor);
+            graphics.setColor(textColor);
+            graphics.setFont(new Font("SansSerif", Font.BOLD, 72));
+            graphics.drawString(title, 130, 240);
+
+            graphics.setFont(new Font("SansSerif", Font.PLAIN, 40));
+            List<String> lines = wrapText(graphics, bodyText, width - 260);
+            int y = 330;
+            for (String line : lines) {
+                graphics.drawString(line, 130, y);
+                y += 56;
+                if (y > height - 120) {
+                    break;
+                }
+            }
+
+            graphics.dispose();
+
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            ImageIO.write(image, "png", output);
+            return output.toByteArray();
+        } catch (IOException ex) {
+            throw new RuntimeException("No se pudo renderizar la diapositiva rápida.", ex);
+        }
+    }
+
+    private Color resolveTextColor(Color background) {
+        double luminance = (0.299 * background.getRed() + 0.587 * background.getGreen() + 0.114 * background.getBlue())
+                / 255.0;
+        return luminance > 0.5 ? new Color(18, 24, 33) : new Color(245, 247, 250);
+    }
+
+    private List<String> wrapText(Graphics2D graphics, String text, int maxWidth) {
+        if (text == null || text.isBlank()) {
+            return List.of("Sin descripción.");
+        }
+
+        FontMetrics fontMetrics = graphics.getFontMetrics();
+        List<String> lines = new ArrayList<>();
+        String[] words = text.split("\\s+");
+        StringBuilder line = new StringBuilder();
+
+        for (String word : words) {
+            String candidate = line.isEmpty() ? word : line + " " + word;
+            if (fontMetrics.stringWidth(candidate) <= maxWidth) {
+                line = new StringBuilder(candidate);
+            } else {
+                if (!line.isEmpty()) {
+                    lines.add(line.toString());
+                }
+                line = new StringBuilder(word);
+            }
+        }
+
+        if (!line.isEmpty()) {
+            lines.add(line.toString());
+        }
+        return lines;
     }
 }
