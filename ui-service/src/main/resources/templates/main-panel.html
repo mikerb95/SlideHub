@@ -419,10 +419,12 @@
         const API_DEMO_URL = '/api/demo';
         const LINKS_API = '/api/presentations/' + PRESENTATION_ID + '/links';
         const MEETING_API = '/api/presentations/' + PRESENTATION_ID + '/meeting';
+        const SLIDES_CATALOG_API = PRESENTATION_ID ? '/api/presentations/' + PRESENTATION_ID + '/slides' : '';
 
         let currentSlide = 0;
         let totalSlides = 0;
         let demoMode = 'slides';
+        let slideUrls = [];
         let participants = [];
         let assignments = [];
         let activeSession = null;
@@ -451,11 +453,51 @@
                 const div = document.createElement('div');
                 div.className = 'slide-thumb';
                 div.dataset.slide = i;
-                div.innerHTML = `<img src="/presentation/Slide${i}.PNG" alt="Slide ${i}" loading="lazy">
+                const url = slideUrls[i - 1] || `/presentation/Slide${i}.PNG`;
+                div.innerHTML = `<img src="${url}" alt="Slide ${i}" loading="lazy">
                                  <div class="slide-num">${i}</div>`;
                 div.addEventListener('click', () => goToSlide(i));
                 grid.appendChild(div);
             }
+        }
+
+        async function loadSlidesCatalog() {
+            if (!SLIDES_CATALOG_API) {
+                slideUrls = [];
+                return;
+            }
+            try {
+                const res = await fetch(SLIDES_CATALOG_API);
+                if (!res.ok) {
+                    slideUrls = [];
+                    return;
+                }
+                const data = await res.json();
+                slideUrls = (data.slides || [])
+                    .sort((a, b) => a.number - b.number)
+                    .map(slide => slide.s3Url || `/presentation/Slide${slide.number}.PNG`);
+                if (slideUrls.length > 0) {
+                    totalSlides = slideUrls.length;
+                    buildGrid(totalSlides);
+                    await syncSlideTotal();
+                }
+            } catch (_) {
+                slideUrls = [];
+            }
+        }
+
+        async function syncSlideTotal() {
+            if (!totalSlides || !Number.isFinite(totalSlides)) {
+                return;
+            }
+            const slideToKeep = currentSlide > 0 ? Math.min(currentSlide, totalSlides) : 1;
+            try {
+                await fetch(API_SLIDE_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ slide: slideToKeep, totalSlides })
+                });
+            } catch (_) { }
         }
 
         async function goToSlide(n) {
@@ -484,8 +526,9 @@
                 const [slideRes, demoRes] = await Promise.all([fetch(API_SLIDE_URL), fetch(API_DEMO_URL)]);
                 if (!slideRes.ok) return;
                 const data = await slideRes.json();
-                if (data.totalSlides !== totalSlides) {
-                    totalSlides = data.totalSlides;
+                const effectiveTotal = slideUrls.length > 0 ? slideUrls.length : data.totalSlides;
+                if (effectiveTotal !== totalSlides) {
+                    totalSlides = effectiveTotal;
                     buildGrid(totalSlides);
                     refreshSlideOptions();
                 }
@@ -713,6 +756,7 @@
             quickSlideTitleInput.value = '';
             quickSlideBodyInput.value = '';
             showToast(`Slide ${data.slideNumber} creada`);
+            await loadSlidesCatalog();
             await fetchState();
         }
 
@@ -832,7 +876,7 @@
             loadAssignments();
             loadActiveSession();
         }
-        fetchState();
+        loadSlidesCatalog().finally(fetchState);
         setInterval(fetchState, POLL_INTERVAL_MS);
     </script>
 </body>

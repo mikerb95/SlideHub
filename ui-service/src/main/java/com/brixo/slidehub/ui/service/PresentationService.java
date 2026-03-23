@@ -4,6 +4,7 @@ import com.brixo.slidehub.ui.model.DriveFile;
 import com.brixo.slidehub.ui.model.DriveFolder;
 import com.brixo.slidehub.ui.model.Presentation;
 import com.brixo.slidehub.ui.model.Slide;
+import com.brixo.slidehub.ui.model.SlideInfo;
 import com.brixo.slidehub.ui.model.SourceType;
 import com.brixo.slidehub.ui.model.User;
 import com.brixo.slidehub.ui.repository.PresentationRepository;
@@ -74,6 +75,15 @@ public class PresentationService {
      */
     public Optional<Presentation> getPresentation(String userId, String presentationId) {
         return presentationRepository.findByIdAndUserId(presentationId, userId);
+    }
+
+    public List<SlideInfo> getSlidesForPlayback(String presentationId) {
+        return presentationRepository.findById(presentationId)
+                .map(presentation -> presentation.getSlides().stream()
+                        .sorted((a, b) -> Integer.compare(a.getNumber(), b.getNumber()))
+                        .map(slide -> new SlideInfo(slide.getNumber(), slide.getFilename(), slide.getS3Url()))
+                        .toList())
+                .orElse(List.of());
     }
 
     // ── Importación desde Google Drive ────────────────────────────────────────

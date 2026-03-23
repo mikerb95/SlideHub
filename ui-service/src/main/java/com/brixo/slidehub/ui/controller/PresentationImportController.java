@@ -4,6 +4,7 @@ import com.brixo.slidehub.ui.model.DriveFile;
 import com.brixo.slidehub.ui.model.DriveFolder;
 import com.brixo.slidehub.ui.model.Presentation;
 import com.brixo.slidehub.ui.model.PresentationSummary;
+import com.brixo.slidehub.ui.model.SlideInfo;
 import com.brixo.slidehub.ui.model.User;
 import com.brixo.slidehub.ui.repository.UserRepository;
 import com.brixo.slidehub.ui.service.PresentationService;
@@ -91,6 +92,19 @@ public class PresentationImportController {
                 .map(PresentationSummary::from)
                 .toList();
         return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/api/presentations/{id}/slides")
+    @ResponseBody
+    public ResponseEntity<?> listSlidesForPlayback(@PathVariable String id) {
+        List<SlideInfo> slides = presentationService.getSlidesForPlayback(id);
+        if (slides.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(Map.of(
+                "presentationId", id,
+                "totalSlides", slides.size(),
+                "slides", slides));
     }
 
     /**

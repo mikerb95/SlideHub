@@ -44,8 +44,11 @@ public class PresentationViewController {
      * Vista del proyector/TV (HU-005) — polling a /api/slide para sincronización.
      */
     @GetMapping("/slides")
-    public String slidesView(Model model) {
+    public String slidesView(
+            @RequestParam(name = "presentationId", required = false) String presentationId,
+            Model model) {
         model.addAttribute("pollIntervalMs", slidePollIntervalMs);
+        model.addAttribute("presentationId", presentationId != null ? presentationId : "");
         return "slides";
     }
 
@@ -73,8 +76,11 @@ public class PresentationViewController {
      * Pantalla dual slides/iframe (HU-010, HU-011) — polling a /api/demo.
      */
     @GetMapping("/demo")
-    public String demoView(Model model) {
+    public String demoView(
+            @RequestParam(name = "presentationId", required = false) String presentationId,
+            Model model) {
         model.addAttribute("pollIntervalMs", demoPollIntervalMs);
+        model.addAttribute("presentationId", presentationId != null ? presentationId : "");
         return "demo";
     }
 

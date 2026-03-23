@@ -107,6 +107,7 @@
             </button>
         </div>
         <a href="/main-panel" class="btn btn-sm btn-outline-secondary ms-2">
+            
             <i class="fa fa-table-cells-large me-1"></i>Panel
         </a>
         <a href="/auth/logout" class="btn btn-sm btn-outline-danger ms-1" th:href="@{/auth/logout}">
@@ -133,22 +134,57 @@
     <script th:inline="javascript">
         const POLL_INTERVAL_MS = /*[[${pollIntervalMs}]]*/ 1500;
         const API_SLIDE_URL = '/api/slide';
+        const PRESENTATION_ID = /*[[${presentationId}]]*/ '';
+        const SLIDES_CATALOG_API = PRESENTATION_ID ? `/api/presentations/${PRESENTATION_ID}/slides` : '';
 
         let currentSlide = 0;
         let totalSlides = 0;
+        let slideUrls = [];
         const slideArea = document.getElementById('slide-area');
         const counter = document.getElementById('slide-counter');
         const btnPrev = document.getElementById('btn-prev');
         const btnNext = document.getElementById('btn-next');
 
+        if (PRESENTATION_ID) {
+            const panelLink = document.querySelector('a[href="/main-panel"]');
+            if (panelLink) {
+                panelLink.href = `/main-panel?presentationId=${encodeURIComponent(PRESENTATION_ID)}`;
+            }
+        }
+
         function buildSlides(total) {
             slideArea.innerHTML = '';
             for (let i = 1; i <= total; i++) {
                 const img = document.createElement('img');
-                img.src = `/presentation/Slide${i}.PNG`;
+                const url = slideUrls[i - 1] || `/presentation/Slide${i}.PNG`;
+                img.src = url;
                 img.alt = `Slide ${i}`;
                 img.id = `pres-slide-${i}`;
                 slideArea.appendChild(img);
+            }
+        }
+
+        async function loadSlidesCatalog() {
+            if (!SLIDES_CATALOG_API) {
+                slideUrls = [];
+                return;
+            }
+            try {
+                const res = await fetch(SLIDES_CATALOG_API);
+                if (!res.ok) {
+                    slideUrls = [];
+                    return;
+                }
+                const data = await res.json();
+                slideUrls = (data.slides || [])
+                    .sort((a, b) => a.number - b.number)
+                    .map(slide => slide.s3Url || `/presentation/Slide${slide.number}.PNG`);
+                if (slideUrls.length > 0) {
+                    totalSlides = slideUrls.length;
+                    buildSlides(totalSlides);
+                }
+            } catch (_) {
+                slideUrls = [];
             }
         }
 
@@ -167,8 +203,9 @@
                 const res = await fetch(API_SLIDE_URL);
                 if (!res.ok) return;
                 const data = await res.json();
-                if (data.totalSlides !== totalSlides) {
-                    totalSlides = data.totalSlides;
+                const effectiveTotal = slideUrls.length > 0 ? slideUrls.length : data.totalSlides;
+                if (effectiveTotal !== totalSlides) {
+                    totalSlides = effectiveTotal;
                     buildSlides(totalSlides);
                 }
                 if (data.slide !== currentSlide) {
@@ -195,7 +232,7 @@
         btnPrev.addEventListener('click', () => navigate(-1));
         btnNext.addEventListener('click', () => navigate(1));
 
-        fetchState();
+        loadSlidesCatalog().finally(fetchState);
         setInterval(fetchState, POLL_INTERVAL_MS);
     </script>
 </body>

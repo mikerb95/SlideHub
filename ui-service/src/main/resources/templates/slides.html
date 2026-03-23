@@ -65,9 +65,12 @@
     <script th:inline="javascript">
         const POLL_INTERVAL_MS = /*[[${pollIntervalMs}]]*/ 1000;
         const API_SLIDE_URL = '/api/slide';
+        const PRESENTATION_ID = /*[[${presentationId}]]*/ '';
+        const SLIDES_CATALOG_API = PRESENTATION_ID ? `/api/presentations/${PRESENTATION_ID}/slides` : '';
 
         let currentSlide = 0;
         let totalSlides = 0;
+        let slideUrls = [];
         const wrapper = document.getElementById('slide-wrapper');
         const errorMsg = document.getElementById('error-msg');
 
@@ -75,11 +78,36 @@
             wrapper.innerHTML = '';
             for (let i = 1; i <= total; i++) {
                 const img = document.createElement('img');
-                img.src = `/presentation/Slide${i}.PNG`;
+                const url = slideUrls[i - 1] || `/presentation/Slide${i}.PNG`;
+                img.src = url;
                 img.alt = `Slide ${i}`;
                 img.className = 'slide';
                 img.id = `slide-${i}`;
                 wrapper.appendChild(img);
+            }
+        }
+
+        async function loadSlidesCatalog() {
+            if (!SLIDES_CATALOG_API) {
+                slideUrls = [];
+                return;
+            }
+            try {
+                const res = await fetch(SLIDES_CATALOG_API);
+                if (!res.ok) {
+                    slideUrls = [];
+                    return;
+                }
+                const data = await res.json();
+                slideUrls = (data.slides || [])
+                    .sort((a, b) => a.number - b.number)
+                    .map(slide => slide.s3Url || `/presentation/Slide${slide.number}.PNG`);
+                if (slideUrls.length > 0) {
+                    totalSlides = slideUrls.length;
+                    buildSlides(totalSlides);
+                }
+            } catch (_) {
+                slideUrls = [];
             }
         }
 
@@ -97,8 +125,9 @@
                 const data = await res.json();
                 errorMsg.style.display = 'none';
 
-                if (data.totalSlides !== totalSlides) {
-                    totalSlides = data.totalSlides;
+                const effectiveTotal = slideUrls.length > 0 ? slideUrls.length : data.totalSlides;
+                if (effectiveTotal !== totalSlides) {
+                    totalSlides = effectiveTotal;
                     buildSlides(totalSlides);
                 }
                 if (data.slide !== currentSlide) {
@@ -110,7 +139,7 @@
             }
         }
 
-        poll();
+        loadSlidesCatalog().finally(poll);
         setInterval(poll, POLL_INTERVAL_MS);
     </script>
 </body>

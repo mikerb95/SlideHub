@@ -36,8 +36,11 @@ public class PresenterViewController {
      * Requiere rol PRESENTER o ADMIN (configurado en SecurityConfig).
      */
     @GetMapping("/presenter")
-    public String presenterView(Model model) {
+    public String presenterView(
+            @RequestParam(name = "presentationId", required = false) String presentationId,
+            Model model) {
         model.addAttribute("pollIntervalMs", presenterPollIntervalMs);
+        model.addAttribute("presentationId", presentationId != null ? presentationId : "");
         return "presenter";
     }
 
