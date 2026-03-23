@@ -53,7 +53,8 @@ public class MeetingController {
         try {
             String userId = resolveUser(authentication).getId();
             boolean presenter = request.presenter() == null || request.presenter();
-            return ResponseEntity.ok(meetingService.addParticipant(userId, presentationId, request.displayName(), presenter));
+            return ResponseEntity
+                    .ok(meetingService.addParticipant(userId, presentationId, request.displayName(), presenter));
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
         }

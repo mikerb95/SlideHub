@@ -9,5 +9,6 @@ public interface PresentationSessionRepository extends JpaRepository<Presentatio
 
     Optional<PresentationSession> findByPresentationIdAndActiveTrue(String presentationId);
 
-    Optional<PresentationSession> findByPresentationIdAndJoinTokenAndActiveTrue(String presentationId, String joinToken);
+    Optional<PresentationSession> findByPresentationIdAndJoinTokenAndActiveTrue(String presentationId,
+            String joinToken);
 }

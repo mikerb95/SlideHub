@@ -37,13 +37,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Vistas públicas (HU-005, HU-011, HU-012, HU-013)
                         .requestMatchers("/slides", "/remote", "/demo", "/showcase").permitAll()
-                    // Join de reunión por QR + comandos en remoto (públicos pero tokenizados)
-                    .requestMatchers(
-                        "/api/presentations/*/meeting/join-options",
-                        "/api/presentations/*/meeting/join",
-                        "/api/presentations/*/meeting/assignment-check",
-                        "/api/presentations/*/meeting/help")
-                    .permitAll()
+                        // Join de reunión por QR + comandos en remoto (públicos pero tokenizados)
+                        .requestMatchers(
+                                "/api/presentations/*/meeting/join-options",
+                                "/api/presentations/*/meeting/join",
+                                "/api/presentations/*/meeting/assignment-check",
+                                "/api/presentations/*/meeting/help")
+                        .permitAll()
                         // Auth pública — incluye rutas OAuth2 de Spring Security
                         .requestMatchers("/auth/**", "/oauth2/**", "/login/oauth2/**").permitAll()
                         // Assets estáticos de slides
