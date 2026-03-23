@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -84,6 +83,19 @@ public class MeetingController {
         try {
             String userId = resolveUser(authentication).getId();
             return ResponseEntity.ok(meetingService.startSession(userId, presentationId));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        }
+    }
+
+    @GetMapping("/session/active")
+    public ResponseEntity<?> activeSession(@PathVariable String presentationId,
+            Authentication authentication) {
+        try {
+            String userId = resolveUser(authentication).getId();
+            return meetingService.getActiveSession(userId, presentationId)
+                    .<ResponseEntity<?>>map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.noContent().build());
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
         }

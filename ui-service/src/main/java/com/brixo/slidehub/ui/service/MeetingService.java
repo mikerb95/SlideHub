@@ -63,6 +63,15 @@ public class MeetingService {
     public record AssignmentCheck(boolean vibrate, String pattern, String message) {
     }
 
+    public Optional<SessionInfo> getActiveSession(String userId, String presentationId) {
+        requireOwnedPresentation(userId, presentationId);
+        return sessionRepository.findByPresentationIdAndActiveTrue(presentationId)
+                .map(session -> new SessionInfo(
+                        session.getId(),
+                        session.getJoinToken(),
+                        buildJoinUrl(presentationId, session.getJoinToken())));
+    }
+
     @Transactional
     public ParticipantItem addParticipant(String userId, String presentationId, String displayName, boolean presenter) {
         Presentation presentation = requireOwnedPresentation(userId, presentationId);
@@ -153,8 +162,7 @@ public class MeetingService {
         session.setUpdatedAt(LocalDateTime.now());
 
         PresentationSession saved = sessionRepository.save(session);
-        String joinUrl = "%s/remote?presentationId=%s&joinToken=%s".formatted(baseUrl, presentationId, joinToken);
-        return new SessionInfo(saved.getId(), joinToken, joinUrl);
+        return new SessionInfo(saved.getId(), joinToken, buildJoinUrl(presentationId, joinToken));
     }
 
     public Map<String, Object> getJoinOptions(String presentationId, String joinToken) {
@@ -287,5 +295,9 @@ public class MeetingService {
             throw new IllegalArgumentException("displayName excede 120 caracteres.");
         }
         return normalized;
+    }
+
+    private String buildJoinUrl(String presentationId, String joinToken) {
+        return "%s/remote?presentationId=%s&joinToken=%s".formatted(baseUrl, presentationId, joinToken);
     }
 }
