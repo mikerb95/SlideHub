@@ -3,9 +3,11 @@ package com.brixo.slidehub.ai.service;
 import com.brixo.slidehub.ai.model.NoteContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.web.reactive.function.client.WebClient;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.JsonNode;
@@ -96,6 +98,79 @@ public class GroqService {
                     List.of(),
                     List.of());
         }
+    }
+
+    /**
+     * Transcribe audio bytes using Groq Whisper-compatible endpoint.
+     */
+    @SuppressWarnings("unchecked")
+    public String transcribeAudio(byte[] audioBytes, String filename, String contentType) {
+        if (audioBytes == null || audioBytes.length == 0) {
+            throw new IllegalArgumentException("Audio vacío.");
+        }
+
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("model", "whisper-large-v3-turbo");
+        builder.part("response_format", "verbose_json");
+        builder.part("language", "es");
+        builder.part("file", new ByteArrayResource(audioBytes) {
+            @Override
+            public String getFilename() {
+                return filename != null && !filename.isBlank() ? filename : "audio.webm";
+            }
+        }).contentType(MediaType.parseMediaType(contentType != null && !contentType.isBlank()
+                ? contentType
+                : "audio/webm"));
+
+        try {
+            Map<String, Object> response = groqClient.post()
+                    .uri("/openai/v1/audio/transcriptions")
+                    .header("Authorization", "Bearer " + apiKey)
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .bodyValue(builder.build())
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
+
+            if (response == null) {
+                return "";
+            }
+            Object text = response.get("text");
+            return text != null ? text.toString().trim() : "";
+        } catch (Exception ex) {
+            log.error("Error transcribiendo audio en Groq: {}", ex.getMessage());
+            throw new RuntimeException("No se pudo transcribir el audio.", ex);
+        }
+    }
+
+    /**
+     * Generates a concise answer for an audience question using extracted repo
+     * context.
+     */
+    public String answerAudienceQuestion(String transcription, String repoContext, String slideContext) {
+        String prompt = """
+                Contexto del slide: %s
+
+                Contexto técnico del repositorio:
+                %s
+
+                Pregunta del público (transcripción):
+                %s
+
+                Responde en español, máximo 4 frases, tono claro y práctico para exposición técnica.
+                Si falta contexto específico, indica una suposición breve y ofrece una respuesta útil.
+                """.formatted(
+                slideContext != null ? slideContext : "",
+                repoContext != null ? repoContext : "",
+                transcription != null ? transcription : "");
+
+        String answer = callGroqRaw(prompt,
+                "Eres un asistente técnico para expositores. Da respuestas cortas, concretas y útiles para responder preguntas del público.");
+        answer = stripMarkdownCode(answer);
+        if (answer.isBlank()) {
+            return "No tengo suficiente contexto para responder con precisión, pero puedes explicar el objetivo del módulo y su flujo principal.";
+        }
+        return answer;
     }
 
     // ── Generación de Dockerfile (Fase 5) ─────────────────────────────────────

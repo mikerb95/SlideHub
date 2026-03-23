@@ -42,7 +42,8 @@ public class SecurityConfig {
                                 "/api/presentations/*/meeting/join-options",
                                 "/api/presentations/*/meeting/join",
                                 "/api/presentations/*/meeting/assignment-check",
-                                "/api/presentations/*/meeting/help")
+                                "/api/presentations/*/meeting/help",
+                                "/api/presentations/*/meeting/assist/audio")
                         .permitAll()
                         // Auth pública — incluye rutas OAuth2 de Spring Security
                         .requestMatchers("/auth/**", "/oauth2/**", "/login/oauth2/**").permitAll()

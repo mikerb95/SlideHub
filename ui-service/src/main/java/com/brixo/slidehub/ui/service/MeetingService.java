@@ -30,6 +30,7 @@ public class MeetingService {
     private final PresentationSessionRepository sessionRepository;
     private final SessionMemberRepository memberRepository;
     private final HapticBridgeService hapticBridgeService;
+    private final AssistBridgeService assistBridgeService;
 
     @Value("${slidehub.base-url:http://localhost:8080}")
     private String baseUrl;
@@ -39,13 +40,15 @@ public class MeetingService {
             SlideAssignmentRepository assignmentRepository,
             PresentationSessionRepository sessionRepository,
             SessionMemberRepository memberRepository,
-            HapticBridgeService hapticBridgeService) {
+            HapticBridgeService hapticBridgeService,
+            AssistBridgeService assistBridgeService) {
         this.presentationRepository = presentationRepository;
         this.participantRepository = participantRepository;
         this.assignmentRepository = assignmentRepository;
         this.sessionRepository = sessionRepository;
         this.memberRepository = memberRepository;
         this.hapticBridgeService = hapticBridgeService;
+        this.assistBridgeService = assistBridgeService;
     }
 
     public record ParticipantItem(String id, String displayName, boolean presenter) {
@@ -236,6 +239,39 @@ public class MeetingService {
         return recipients.size();
     }
 
+    @Transactional
+    public Map<String, Object> assistFromAudio(String presentationId,
+            String joinToken,
+            String participantToken,
+            int slideNumber,
+            String slideContext,
+            byte[] audioBytes,
+            String filename,
+            String contentType) {
+        PresentationSession session = requireActiveSession(presentationId, joinToken);
+        SessionMember sender = requireActiveMember(session.getId(), participantToken);
+
+        Map<String, Object> response = assistBridgeService.processAudio(
+                audioBytes,
+                filename,
+                contentType,
+                session.getPresentation().getRepoUrl(),
+                slideNumber,
+                slideContext);
+
+        Object success = response.get("success");
+        boolean ok = success instanceof Boolean b && b;
+        if (ok) {
+            String answer = String.valueOf(response.getOrDefault("answer", ""));
+            String senderName = sender.getParticipant().getDisplayName();
+            String broadcastMessage = "IA para " + senderName + ": " + trimMessage(answer, 220);
+            memberRepository.findBySessionIdAndActiveTrue(session.getId())
+                    .forEach(member -> hapticBridgeService.publishSingle(member.getParticipantToken(), broadcastMessage));
+        }
+
+        return response;
+    }
+
     private Presentation requireOwnedPresentation(String userId, String presentationId) {
         return presentationRepository.findByIdAndUserId(presentationId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("Presentación no encontrada o sin permisos."));
@@ -299,5 +335,15 @@ public class MeetingService {
 
     private String buildJoinUrl(String presentationId, String joinToken) {
         return "%s/remote?presentationId=%s&joinToken=%s".formatted(baseUrl, presentationId, joinToken);
+    }
+
+    private String trimMessage(String raw, int maxLength) {
+        if (raw == null) {
+            return "";
+        }
+        if (raw.length() <= maxLength) {
+            return raw;
+        }
+        return raw.substring(0, maxLength - 1) + "…";
     }
 }
