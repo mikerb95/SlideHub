@@ -318,6 +318,20 @@
                 </div>
             </div>
 
+            <div class="sidebar-section">
+                <h6><i class="fa fa-wand-magic-sparkles me-1"></i>Slide Rápida</h6>
+                <div class="meeting-box">
+                    <input id="quick-slide-title" type="text" class="form-control form-control-sm mb-2" maxlength="120"
+                        placeholder="Título del slide">
+                    <textarea id="quick-slide-body" class="form-control form-control-sm mb-2" rows="3" maxlength="500"
+                        placeholder="Texto explicativo"></textarea>
+                    <button id="btn-generate-quick-slide" class="btn btn-sm btn-outline-primary w-100">
+                        <i class="fa fa-plus me-1"></i>Crear slide
+                    </button>
+                    <div class="meeting-help">Usa los colores primarios detectados en la presentación activa.</div>
+                </div>
+            </div>
+
             <!-- Quick Links -->
             <div class="sidebar-section flex-grow-1">
                 <div class="d-flex justify-content-between align-items-center mb-2">
@@ -426,6 +440,8 @@
         const assignmentSlideSelect = document.getElementById('assign-slide');
         const assignmentParticipantSelect = document.getElementById('assign-participant');
         const assignmentsList = document.getElementById('assignments-list');
+        const quickSlideTitleInput = document.getElementById('quick-slide-title');
+        const quickSlideBodyInput = document.getElementById('quick-slide-body');
 
         // ── Slide grid ─────────────────────────────────────────────────────────
 
@@ -665,6 +681,41 @@
             await loadAssignments();
         }
 
+        async function generateQuickSlide() {
+            if (!PRESENTATION_ID) {
+                showToast('Falta presentationId en la URL');
+                return;
+            }
+
+            const title = quickSlideTitleInput.value.trim();
+            const body = quickSlideBodyInput.value.trim();
+            if (!title) {
+                showToast('Ingresa un título para la diapositiva');
+                return;
+            }
+
+            const form = new URLSearchParams();
+            form.set('title', title);
+            form.set('body', body);
+
+            const res = await fetch(`/api/presentations/${PRESENTATION_ID}/quick-slide`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: form
+            });
+
+            if (!res.ok) {
+                showToast('No se pudo crear la diapositiva rápida');
+                return;
+            }
+
+            const data = await res.json();
+            quickSlideTitleInput.value = '';
+            quickSlideBodyInput.value = '';
+            showToast(`Slide ${data.slideNumber} creada`);
+            await fetchState();
+        }
+
         // ── Demo controls ──────────────────────────────────────────────────────
 
         /** Activa un quick link como demo, guardando returnSlide. */
@@ -704,6 +755,7 @@
         document.getElementById('btn-start-session').addEventListener('click', startSession);
         document.getElementById('btn-add-participant').addEventListener('click', addParticipant);
         document.getElementById('btn-assign-slide').addEventListener('click', assignSlideToParticipant);
+        document.getElementById('btn-generate-quick-slide').addEventListener('click', generateQuickSlide);
         document.getElementById('btn-copy-join-url').addEventListener('click', async () => {
             if (!joinUrl.value) return;
             try {
