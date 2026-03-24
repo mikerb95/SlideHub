@@ -13,6 +13,11 @@ La idea básica es esta: tienes una presentación de slides PNG y varias pantall
 Encima de eso fui añadiendo cosas:
 
 - **Control remoto táctil** — pantalla de smartphone con swipe y vibración háptica para avanzar/retroceder slides
+- **QR join de equipo** — el organizador crea una sesión y el equipo entra con token y nombre de participante
+- **Responsables por slide** — cada diapositiva puede tener un responsable y el sistema lo confirma con feedback háptico
+- **Botón de ayuda** — manda vibración triple al resto del equipo en la sesión
+- **Push-to-talk con IA** — mantén pulsado el micrófono, dicta una pregunta y recibe una respuesta con contexto del repo
+- **Quick slides** — genera una slide nueva usando los colores dominantes de la presentación activa
 - **Modo demo** — la pantalla de proyector puede alternar entre slides e iframes (para mostrar una app en vivo sin salir de la presentación)
 - **Quick Links con returnSlide** — defines links rápidos a demos; cuando cierras el iframe vuelve exactamente al slide donde estabas
 - **Notas del presentador con IA** — Gemini Vision analiza visualmente cada PNG, Gemini lee el repo de GitHub para extraer contexto, y Groq genera notas estructuradas con puntos clave, tiempo sugerido y tags de demo
@@ -66,6 +71,7 @@ Esta separación probablemente es overkill para un proyecto personal, pero es ex
 | `/deploy-tutor` | PRESENTER | Generador de Dockerfiles y guías de despliegue |
 | `/presentations` | PRESENTER | Gestión de presentaciones guardadas |
 | `/presentations/import` | PRESENTER | Importar desde Google Drive |
+| `/auth/profile` | PRESENTER | Perfil y cuentas OAuth vinculadas |
 | `/auth/login` | Público | Login local o con GitHub/Google |
 
 ---
@@ -160,7 +166,7 @@ Abre `http://localhost:8080/slides` para ver la pantalla del proyector.
 
 ---
 
-## API de Estado (state-service)
+## API de Estado y Reuniones (state-service + ui-service)
 
 La API principal que usan todos los dispositivos cliente:
 
@@ -169,14 +175,28 @@ GET  /api/slide              → { "slide": 3, "totalSlides": 11 }
 POST /api/slide              → { "slide": 4 }
 GET  /api/demo               → { "mode": "slides", "slide": 3, "returnSlide": null }
 POST /api/demo               → { "mode": "url", "url": "/demo-path", "returnSlide": 3 }
+
+GET  /api/presentations/{id}/meeting/participants      → lista de participantes
+POST /api/presentations/{id}/meeting/participants     → alta de participante
+GET  /api/presentations/{id}/meeting/assignments       → asignaciones slide-responsable
+POST /api/presentations/{id}/meeting/assignments      → asignar responsable a slide
+POST /api/presentations/{id}/meeting/session/start    → crea sesión con joinToken
+GET  /api/presentations/{id}/meeting/join-options     → opciones de ingreso por QR
+POST /api/presentations/{id}/meeting/join             → entra a la sesión y devuelve participantToken
+GET  /api/presentations/{id}/meeting/assignment-check → vibración si ese slide es responsable
+POST /api/presentations/{id}/meeting/help             → ayuda con vibración triple al equipo
+POST /api/presentations/{id}/meeting/assist/audio     → transcribe audio y devuelve una respuesta IA
 ```
 
 ```
 GET  /api/devices            → lista de dispositivos registrados (solo ADMIN)
 GET  /api/devices/token/{t}  → buscar dispositivo por token (solo ADMIN)
+
+GET  /api/haptics/events/next?participantToken=...    → siguiente evento háptico para un participante
+POST /api/haptics/events/publish                     → publica un evento háptico
 ```
 
-El polling de los clientes va **siempre al gateway en el puerto 8080**, no directamente al state-service.
+El polling de los clientes va **siempre al gateway en el puerto 8080**, no directamente al state-service ni a los controladores internos de ui-service.
 
 ## API de IA (ai-service)
 
@@ -190,6 +210,7 @@ POST /api/ai/deploy/analyze              → detecta lenguaje, framework, puerto
 POST /api/ai/deploy/dockerfile           → genera Dockerfile optimizado
 POST /api/ai/deploy/guide                → genera guía de despliegue (con cache)
 POST /api/ai/deploy/guide/refresh        → regenera descartando el cache
+POST /api/ai/assist/audio                → transcribe audio y devuelve una respuesta asistida
 
 GET  /api/ai/notes/health                → health check del ai-service
 ```
@@ -213,6 +234,7 @@ SlideHub/
 ```
 
 Los slides PNG van en `ui-service/src/main/resources/static/slides/` con el nombre `Slide_N.PNG` y el sistema los detecta automáticamente.
+Las vistas también consumen el catálogo por presentación cuando existe `presentationId`; el recurso estático queda como fallback.
 
 ---
 

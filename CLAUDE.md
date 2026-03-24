@@ -14,11 +14,16 @@ Es la reescritura de un módulo PHP/CodeIgniter 4 documentado en
 **Stack actual:**
 - Spring Boot 4.0.3 / Spring Cloud 2025.1.0 / Java 21
 - Maven multi-módulo (4 servicios creados en Fase 0)
-- Redis (estado en memoria), MongoDB (notas IA + deploy guides), PostgreSQL/JPA (usuarios, presentaciones), Thymeleaf (UI), Spring Security (auth local + OAuth2), Spring Cloud Gateway (enrutamiento)
+- Redis (estado en memoria y eventos hápticos), MongoDB (notas IA + deploy guides), PostgreSQL/JPA (usuarios, presentaciones, sesiones de reunión y asignaciones), Thymeleaf (UI), Spring Security (auth local + OAuth2), Spring Cloud Gateway (enrutamiento)
 - 4 microservicios: `state-service` (8081), `ui-service` (8082), `ai-service` (8083), `gateway-service` (8080)
 - **OAuth2:** GitHub + Google coexisten con login local; tokens en PostgreSQL
 - **Google Drive:** Google Drive REST API v3 vía `WebClient` (sin SDK)
 - **Gemini Vision:** analiza visualmente slides PNG para notas del presentador
+- **Reuniones QR:** joinToken + participantToken para sesiones activas por presentación
+- **Participantes y asignaciones:** un responsable por slide con feedback háptico
+- **Asistencia por audio:** push-to-talk, transcripción Groq Whisper y respuesta IA contextual
+- **Quick slides:** generación de una nueva diapositiva al final de la presentación activa
+- **Playback por presentación:** las vistas leen el catálogo de slides de cada presentación
 - **Deploy Tutor:** `ai-service` genera Dockerfiles y guías de despliegue vía Gemini + Groq
 - **Despliegue:** Render (un Web Service por microservicio)
 - **Emails:** Resend API vía HTTP (`WebClient`) — sin JavaMail ni SDKs
@@ -33,7 +38,7 @@ Antes de producir cualquier código, recorre este checklist internamente:
 
 1. ¿Esta tarea pertenece a `state-service`, `ui-service`, `ai-service` o `gateway-service`?
 2. ¿Qué historia de usuario cubre esto? Verificar `AGENTS.md §6` y los criterios de aceptación en el CSV.
-3. ¿El comportamiento detallado está en `docs/Presentation-Module-Analysis.md`? Si sí, cítalo.
+3. ¿El comportamiento detallado está en `docs/Presentation-Module-Analysis.md`? Si sí, cítalo; si no existe, usar el CSV y la implementación actual como base.
 4. ¿Qué paquete Java corresponde según la convención de `AGENTS.md §4`?
 5. ¿Requiere una nueva dependencia en `pom.xml`? Si sí, ¿ya está declarada en el parent?
 6. ¿El cambio contradice una decisión ya tomada de `AGENTS.md §9`? Si es así, no proceder.

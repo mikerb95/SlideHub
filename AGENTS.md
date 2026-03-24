@@ -352,6 +352,12 @@ Fuente canónica: [`docs/Historias de Usuario - SlideHub.csv`](<docs/Historias d
 | HU-028 | Presentador       | `POST /api/ai/deploy/dockerfile` — generar Dockerfile | `ai-service`                     |
 | HU-029 | Presentador       | `POST /api/ai/deploy/guide` — generar guía + cache   | `ai-service`                     |
 | HU-030 | Presentador       | Análisis visual de slides con Gemini Vision           | `ai-service`                     |
+| HU-031 | Presentador       | Unirse por QR a una sesión de presentación             | `ui-service` + `state-service`   |
+| HU-032 | Presentador       | Gestionar participantes y asignar responsables por slide | `ui-service` + `state-service` |
+| HU-033 | Presentador       | Solicitar ayuda con vibración triple al equipo         | `ui-service` + `state-service`   |
+| HU-034 | Presentador       | Dictado por audio con transcripción y respuesta IA     | `ui-service` + `ai-service`      |
+| HU-035 | Presentador       | Generar quick slides usando colores dominantes         | `ui-service` + `ai-service`      |
+| HU-036 | Presentador       | Consumir catálogo de slides por presentación           | `ui-service`                     |
 
 **Comportamientos críticos a respetar:**
 - `GET /api/slide` siempre responde `{ "slide": N, "totalSlides": M }` — nunca solo `{ "slide": N }` (HU-008)
@@ -368,6 +374,8 @@ Fuente canónica: [`docs/Historias de Usuario - SlideHub.csv`](<docs/Historias d
 
 Antes de implementar cualquier endpoint o vista, consultar el CSV de historias y
 [`docs/Presentation-Module-Analysis.md`](docs/Presentation-Module-Analysis.md).
+
+El CSV de historias es la fuente primaria de requisitos funcionales. El documento de análisis se usa como referencia histórica y arquitectónica, pero no reemplaza al CSV cuando hay diferencias.
 
 Secciones clave del doc de análisis por tarea:
 

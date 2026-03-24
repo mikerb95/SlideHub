@@ -1,6 +1,6 @@
 # FASE-6-RESUMEN.md — SlideHub: 6 Fases Completadas
 
-**Estado del Proyecto:** ✅ **v1.0 COMPLETA Y LISTA PARA PRODUCCIÓN**  
+**Estado del Proyecto:** ✅ **v1.0 COMPLETA Y LISTA PARA PRODUCCIÓN, CON EXTENSIONES OPERATIVAS DE REUNIÓN Y ASISTENCIA**  
 **Fecha:** Marzo 2, 2026  
 **Dominio:** slide.lat (Namecheap)  
 **Plataforma de despliegue:** Render (4 Web Services independientes)
@@ -11,7 +11,9 @@
 
 **SlideHub** es un sistema integral de presentación de diapositivas multi-pantalla, cloud-native, basado en **microservicios Java/Spring Boot** (4 servicios independientes). Comenzó como un módulo PHP heredado y fue completamente reescrito en Java con arquitectura moderna, integraciones de IA (Gemini + Groq), autenticación dual (local + OAuth2), y herramientas de despliegue automatizado.
 
-Las 6 fases implementadas cobrieron desde la arquitectura fundacional hasta características avanzadas de IA y deployed automation, todo en un monorepo Maven con buildeo encajonado en Docker.
+Las 6 fases implementadas cubrieron desde la arquitectura fundacional hasta características avanzadas de IA y deployed automation, todo en un monorepo Maven con buildeo encajonado en Docker.
+
+> Nota de alcance actual: además de las 6 fases originales, el código operativo ya incluye flujo de reunión por QR, asignaciones por slide, haptics, asistencia por audio y catálogo de slides por presentación.
 
 ---
 
