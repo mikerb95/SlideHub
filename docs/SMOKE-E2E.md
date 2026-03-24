@@ -39,3 +39,9 @@ Desde la raíz del repo:
 
 - `SMOKE_FORCE_DDL_UPDATE=false` para no forzar `ddl-auto=update`.
 - `KEEP_SMOKE_CONTAINERS=true` para no eliminar Redis/Mongo al finalizar.
+
+## Ejecutar desde GitHub Actions (manual)
+
+- Workflow: `.github/workflows/smoke-e2e.yml`
+- Trigger: **Actions → Smoke E2E → Run workflow**
+- Artifact al finalizar: `smoke-logs` (contenido de `target/smoke-logs/`)
