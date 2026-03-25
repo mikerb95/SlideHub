@@ -275,7 +275,14 @@ def main() -> int:
             print(f"[WARN] Failed to fetch logs for {service_name}: {exc}", file=sys.stderr)
             continue
 
-        log_items = payload.get("logs", []) if isinstance(payload, dict) else []
+        if isinstance(payload, dict):
+            log_items = payload.get("logs") or []
+        else:
+            log_items = []
+
+        if not isinstance(log_items, list):
+            log_items = []
+
         summary = summarize_logs(service_name, log_items)
         summary["resourceId"] = resource_id
         summary["logCount"] = len(log_items)
