@@ -32,6 +32,7 @@ from typing import Any, Iterable
 ROOT_DIR = Path(__file__).resolve().parents[1]
 DEFAULT_RENDER_YAML = ROOT_DIR / "render.yaml"
 OUTPUT_DIR = ROOT_DIR / "target" / "render-logs"
+LOCAL_ENV_FILE = ROOT_DIR / ".env"
 
 ERROR_PATTERNS = [
     re.compile(r"\b(exception|error|fatal|panic|stacktrace|caused by)\b", re.IGNORECASE),
@@ -96,6 +97,28 @@ def read_render_service_names(render_yaml_path: Path) -> list[str]:
         if line.startswith("-") and not line.startswith("- type:"):
             expecting_name = False
     return names
+
+
+def load_env_file(env_path: Path) -> None:
+    """Load simple KEY=VALUE pairs from a local .env file if present.
+
+    Existing environment variables always win; this only fills in missing ones.
+    """
+    if not env_path.exists():
+        return
+
+    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip()
+        if not key or key in os.environ:
+            continue
+        if (value.startswith('"') and value.endswith('"')) or (value.startswith("'") and value.endswith("'")):
+            value = value[1:-1]
+        os.environ[key] = value
 
 
 def http_get_json(url: str, api_key: str) -> Any:
@@ -223,6 +246,8 @@ def summarize_logs(service_name: str, log_items: list[dict[str, Any]]) -> dict[s
 
 
 def main() -> int:
+    load_env_file(LOCAL_ENV_FILE)
+
     args = parse_args()
     api_key = os.getenv("RENDER_API_KEY", "").strip()
     if not api_key:
