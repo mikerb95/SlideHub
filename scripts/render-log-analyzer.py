@@ -434,6 +434,17 @@ def summarize_failed_deploys(
 
         snippets = collect_error_snippets(deploy_log_items, limit=5)
         context = collect_build_context(deploy_log_items, limit=8)
+        app_log_items: list[dict[str, Any]] = []
+        app_snippets: list[str] = []
+        if not snippets:
+            try:
+                app_log_items = fetch_logs_between(api_key, owner_id, service_id, start_time, end_time, limit=250, log_type="app")
+            except Exception:
+                app_log_items = []
+            app_snippets = collect_error_snippets(app_log_items, limit=5)
+            if app_snippets:
+                snippets = app_snippets
+
         detail_messages = [
             str(detail.get("status", "")),
             str(detail.get("statusMessage", "")),
@@ -441,6 +452,7 @@ def summarize_failed_deploys(
             str(detail.get("failureReason", "")),
             str(deploy.get("status", "")),
             *context,
+            *app_snippets,
         ]
         cause = classify_cause([*snippets, *detail_messages])
         failed.append(
@@ -457,6 +469,7 @@ def summarize_failed_deploys(
                 "detailMessage": str(detail.get("statusMessage") or detail.get("message") or ""),
                 "errorSnippets": snippets,
                 "buildContext": context,
+                "appContext": app_snippets,
             }
         )
     return failed
@@ -576,6 +589,8 @@ def main() -> int:
                     print(f"    buildError: {deploy['errorSnippets'][0]}")
                 elif deploy.get("buildContext"):
                     print(f"    buildContext: {deploy['buildContext'][0]}")
+                elif deploy.get("appContext"):
+                    print(f"    appContext: {deploy['appContext'][0]}")
         if not svc["top_errors"]:
             print("  no probable error signatures found")
             continue
