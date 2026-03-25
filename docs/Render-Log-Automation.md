@@ -18,6 +18,20 @@ Este proyecto incluye un analizador local para los logs de Render.
 
 ## Uso
 
+Solo deploys fallidos de la última hora:
+
+```bash
+python3 scripts/render-log-analyzer.py --minutes 60 --deploy-only
+```
+
+Build logs + errores probables:
+
+```bash
+python3 scripts/render-log-analyzer.py --minutes 60 --log-type build
+```
+
+Logs generales:
+
 ```bash
 python3 scripts/render-log-analyzer.py --minutes 60
 ```
@@ -33,6 +47,7 @@ python3 scripts/render-log-analyzer.py --services slidehub-ui slidehub-ai
 El script imprime:
 
 - número de logs analizados por servicio,
+- deploys fallidos detectados,
 - cantidad de errores probables,
 - firmas agrupadas de error,
 - un artefacto JSON reproducible.

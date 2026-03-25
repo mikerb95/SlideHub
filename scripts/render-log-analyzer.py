@@ -62,6 +62,11 @@ def parse_args() -> argparse.Namespace:
         help="Render deploy statuses to report when searching for deployment errors.",
     )
     parser.add_argument(
+        "--deploy-only",
+        action="store_true",
+        help="Skip log scraping and report only failed deploys from the last window.",
+    )
+    parser.add_argument(
         "--services",
         nargs="*",
         help="Service names or IDs. Default: names discovered from render.yaml.",
@@ -335,19 +340,32 @@ def main() -> int:
         "services": [],
     }
 
-    print(f"[INFO] Querying logs for {len(resolved_services)} services")
+    mode_label = "deploys only" if args.deploy_only else f"logs type={args.log_type or 'all'}"
+    print(f"[INFO] Querying {mode_label} for {len(resolved_services)} services")
     setattr(fetch_logs, "log_type", args.log_type)
     for svc in resolved_services:
         service_name = svc.get("name", svc.get("id", "unknown"))
         resource_id = svc.get("id")
         print(f"[INFO] Fetching logs for {service_name} ({resource_id})")
         failed_deploys: list[dict[str, Any]] = []
-        if args.log_type == "build":
+        if args.deploy_only or args.log_type == "build":
             try:
                 deploys = list_deploys(api_key, resource_id, args.minutes, args.deploy_status)
                 failed_deploys = summarize_failed_deploys(service_name, deploys)
             except Exception as exc:
                 print(f"[WARN] Failed to fetch deploys for {service_name}: {exc}", file=sys.stderr)
+        if args.deploy_only:
+            summary = {
+                "service": service_name,
+                "resourceId": resource_id,
+                "logCount": 0,
+                "error_count": 0,
+                "top_errors": [],
+                "sample_logs": [],
+                "failedDeploys": failed_deploys,
+            }
+            report["services"].append(summary)
+            continue
         try:
             payload = fetch_logs(api_key, owner_id, [resource_id], args.minutes, args.limit)
         except Exception as exc:
