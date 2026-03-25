@@ -150,6 +150,11 @@ def http_get_json(url: str, api_key: str) -> Any:
         raise RuntimeError(f"Render API HTTP {exc.code} for {url}: {body[:500]}") from exc
 
 
+def render_timestamp(value: dt.datetime) -> str:
+    """Format timestamps in the RFC3339 shape Render accepts reliably."""
+    return value.astimezone(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
 def unwrap_service_entry(entry: dict[str, Any]) -> dict[str, Any]:
     """Render APIs often return wrapped objects like {cursor, service: {...}}."""
     if not isinstance(entry, dict):
@@ -194,8 +199,8 @@ def fetch_logs(api_key: str, owner_id: str, resource_ids: Iterable[str], minutes
     start = end - dt.timedelta(minutes=minutes)
     query: list[tuple[str, str]] = [
         ("ownerId", owner_id),
-        ("startTime", start.isoformat()),
-        ("endTime", end.isoformat()),
+        ("startTime", render_timestamp(start)),
+        ("endTime", render_timestamp(end)),
         ("direction", "backward"),
         ("limit", str(limit)),
     ]
@@ -216,7 +221,7 @@ def list_deploys(api_key: str, service_id: str, minutes: int, statuses: list[str
     start = end - dt.timedelta(minutes=minutes)
     query: list[tuple[str, str]] = [
         ("limit", "100"),
-        ("createdAfter", start.isoformat()),
+        ("createdAfter", render_timestamp(start)),
     ]
     for status in statuses:
         query.append(("status", status))
