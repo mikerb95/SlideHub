@@ -313,7 +313,7 @@ def normalize_signature(message: str) -> str:
     signature = UUID_RE.sub("<uuid>", signature)
     signature = NUM_RE.sub("<n>", signature)
     signature = WS_RE.sub(" ", signature).strip()
-    return signature[:220]
+    return signature[:320]
 
 
 def collect_error_snippets(log_items: list[dict[str, Any]], limit: int = 5) -> list[str]:
@@ -332,7 +332,7 @@ def collect_error_snippets(log_items: list[dict[str, Any]], limit: int = 5) -> l
         if sig in seen:
             continue
         seen.add(sig)
-        snippets.append(first_line[:220])
+        snippets.append(first_line[:700])
         if len(snippets) >= limit:
             break
     return snippets
@@ -348,12 +348,12 @@ def collect_build_context(log_items: list[dict[str, Any]], limit: int = 8) -> li
         if not first_line:
             continue
         if BUILD_HINT_RE.search(first_line):
-            lines.append(first_line[:220])
+            lines.append(first_line[:700])
 
     if lines:
         return lines[:limit]
 
-    tail = [str(item.get("message", "")).splitlines()[0].strip()[:220] for item in log_items if str(item.get("message", "")).strip()]
+    tail = [str(item.get("message", "")).splitlines()[0].strip()[:700] for item in log_items if str(item.get("message", "")).strip()]
     return tail[-limit:]
 
 
