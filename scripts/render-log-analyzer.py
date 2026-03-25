@@ -50,6 +50,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--minutes", type=int, default=60, help="Time window in minutes (default: 60)")
     parser.add_argument("--limit", type=int, default=100, help="Max logs per service (default: 100)")
     parser.add_argument(
+        "--log-type",
+        choices=["app", "request", "build"],
+        help="Optional Render log type filter. Use 'build' to inspect deploy/build logs only.",
+    )
+    parser.add_argument(
         "--services",
         nargs="*",
         help="Service names or IDs. Default: names discovered from render.yaml.",
@@ -111,15 +116,30 @@ def http_get_json(url: str, api_key: str) -> Any:
         raise RuntimeError(f"Render API HTTP {exc.code} for {url}: {body[:500]}") from exc
 
 
+def unwrap_service_entry(entry: dict[str, Any]) -> dict[str, Any]:
+    """Render APIs often return wrapped objects like {cursor, service: {...}}."""
+    if not isinstance(entry, dict):
+        return {}
+    for key in ("service", "owner", "resource"):
+        value = entry.get(key)
+        if isinstance(value, dict):
+            return value
+    return entry
+
+
 def list_services(api_key: str, name: str | None = None) -> list[dict[str, Any]]:
-    query: dict[str, Any] = {"limit": 20}
+    query: dict[str, Any] = {"limit": 100}
     if name:
         query["name"] = name
     url = "https://api.render.com/v1/services?" + urllib.parse.urlencode(query, doseq=True)
     data = http_get_json(url, api_key)
     if isinstance(data, list):
-        return data
-    return data.get("items", []) if isinstance(data, dict) else []
+        return [unwrap_service_entry(item) for item in data]
+    if isinstance(data, dict):
+        items = data.get("items") or data.get("services") or data.get("data") or []
+        if isinstance(items, list):
+            return [unwrap_service_entry(item) for item in items]
+    return []
 
 
 def resolve_service(api_key: str, service_ref: str) -> dict[str, Any]:
@@ -145,6 +165,11 @@ def fetch_logs(api_key: str, owner_id: str, resource_ids: Iterable[str], minutes
         ("direction", "backward"),
         ("limit", str(limit)),
     ]
+    # Optional filter for deploy/build-only analysis.
+    # Keep the API call flexible: if no log type is requested we fetch all types.
+    # The Render API accepts type=app|request|build.
+    if getattr(fetch_logs, "log_type", None):
+        query.append(("type", str(getattr(fetch_logs, "log_type"))))
     for resource_id in resource_ids:
         query.append(("resource", resource_id))
 
@@ -219,6 +244,7 @@ def main() -> int:
     for ref in service_refs:
         try:
             resolved = resolve_service(api_key, ref)
+            resolved = unwrap_service_entry(resolved)
             resolved_services.append(resolved)
         except Exception as exc:
             print(f"[WARN] Could not resolve service '{ref}': {exc}", file=sys.stderr)
@@ -238,6 +264,7 @@ def main() -> int:
     }
 
     print(f"[INFO] Querying logs for {len(resolved_services)} services")
+    setattr(fetch_logs, "log_type", args.log_type)
     for svc in resolved_services:
         service_name = svc.get("name", svc.get("id", "unknown"))
         resource_id = svc.get("id")
