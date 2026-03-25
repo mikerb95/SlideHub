@@ -50,6 +50,10 @@ BUILD_HINT_RE = re.compile(
 )
 
 CAUSE_PATTERNS: list[tuple[re.Pattern[str], str]] = [
+    (
+        re.compile(r"\b(entitymanagerfactory|hibernate sessionfactory|beancreationexception|schema-validation|relation .* does not exist|table .* doesn't exist)\b", re.IGNORECASE),
+        "database_schema_or_jpa_startup_failure",
+    ),
     (re.compile(r"\b(outofmemory|killed|oom|memory limit)\b", re.IGNORECASE), "memory_limit"),
     (re.compile(r"\b(module not found|cannot find symbol|classnotfound|no such file)\b", re.IGNORECASE), "missing_dependency_or_file"),
     (re.compile(r"\b(authentication failed|permission denied|access denied|forbidden|unauthorized)\b", re.IGNORECASE), "permissions_or_auth"),
