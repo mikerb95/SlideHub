@@ -56,6 +56,12 @@ def parse_args() -> argparse.Namespace:
         help="Optional Render log type filter. Use 'build' to inspect deploy/build logs only.",
     )
     parser.add_argument(
+        "--deploy-status",
+        nargs="*",
+        default=["build_failed", "update_failed", "pre_deploy_failed"],
+        help="Render deploy statuses to report when searching for deployment errors.",
+    )
+    parser.add_argument(
         "--services",
         nargs="*",
         help="Service names or IDs. Default: names discovered from render.yaml.",
@@ -200,6 +206,23 @@ def fetch_logs(api_key: str, owner_id: str, resource_ids: Iterable[str], minutes
     return http_get_json(url, api_key)
 
 
+def list_deploys(api_key: str, service_id: str, minutes: int, statuses: list[str]) -> list[dict[str, Any]]:
+    end = dt.datetime.now(dt.timezone.utc)
+    start = end - dt.timedelta(minutes=minutes)
+    query: list[tuple[str, str]] = [
+        ("limit", "100"),
+        ("createdAfter", start.isoformat()),
+    ]
+    for status in statuses:
+        query.append(("status", status))
+
+    url = f"https://api.render.com/v1/services/{service_id}/deploys?" + urllib.parse.urlencode(query)
+    payload = http_get_json(url, api_key)
+    if isinstance(payload, list):
+        return [item.get("deploy", item) if isinstance(item, dict) else {} for item in payload]
+    return []
+
+
 def is_error_log(message: str) -> bool:
     return any(pattern.search(message) for pattern in ERROR_PATTERNS)
 
@@ -243,6 +266,30 @@ def summarize_logs(service_name: str, log_items: list[dict[str, Any]]) -> dict[s
         "top_errors": grouped[:10],
         "sample_logs": matches[:20],
     }
+
+
+def summarize_failed_deploys(service_name: str, deploys: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    failed = []
+    for deploy in deploys:
+        if not isinstance(deploy, dict):
+            continue
+        status = str(deploy.get("status", "")).strip()
+        if status not in {"build_failed", "update_failed", "pre_deploy_failed"}:
+            continue
+        commit = deploy.get("commit") if isinstance(deploy.get("commit"), dict) else {}
+        failed.append(
+            {
+                "deployId": deploy.get("id"),
+                "status": status,
+                "trigger": deploy.get("trigger"),
+                "createdAt": deploy.get("createdAt"),
+                "startedAt": deploy.get("startedAt"),
+                "finishedAt": deploy.get("finishedAt"),
+                "commitId": commit.get("id"),
+                "commitMessage": commit.get("message"),
+            }
+        )
+    return failed
 
 
 def main() -> int:
@@ -294,6 +341,13 @@ def main() -> int:
         service_name = svc.get("name", svc.get("id", "unknown"))
         resource_id = svc.get("id")
         print(f"[INFO] Fetching logs for {service_name} ({resource_id})")
+        failed_deploys: list[dict[str, Any]] = []
+        if args.log_type == "build":
+            try:
+                deploys = list_deploys(api_key, resource_id, args.minutes, args.deploy_status)
+                failed_deploys = summarize_failed_deploys(service_name, deploys)
+            except Exception as exc:
+                print(f"[WARN] Failed to fetch deploys for {service_name}: {exc}", file=sys.stderr)
         try:
             payload = fetch_logs(api_key, owner_id, [resource_id], args.minutes, args.limit)
         except Exception as exc:
@@ -311,6 +365,7 @@ def main() -> int:
         summary = summarize_logs(service_name, log_items)
         summary["resourceId"] = resource_id
         summary["logCount"] = len(log_items)
+        summary["failedDeploys"] = failed_deploys
         report["services"].append(summary)
 
     artifact_path = output_dir / f"render-log-report-{dt.datetime.now().strftime('%Y%m%d-%H%M%S')}.json"
@@ -321,6 +376,15 @@ def main() -> int:
     print(f"Artifact: {artifact_path}")
     for svc in report["services"]:
         print(f"\n[{svc['service']}] logs={svc['logCount']} probableErrors={svc['error_count']}")
+        if svc.get("failedDeploys"):
+            print(f"  failed deploys={len(svc['failedDeploys'])}")
+            for deploy in svc["failedDeploys"][:5]:
+                print(
+                    f"  - {deploy['status']} deploy={deploy['deployId']} trigger={deploy.get('trigger')} "
+                    f"commit={deploy.get('commitId')}"
+                )
+                if deploy.get("commitMessage"):
+                    print(f"    commit: {deploy['commitMessage']}")
         if not svc["top_errors"]:
             print("  no probable error signatures found")
             continue
