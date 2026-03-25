@@ -35,7 +35,7 @@ OUTPUT_DIR = ROOT_DIR / "target" / "render-logs"
 LOCAL_ENV_FILE = ROOT_DIR / ".env"
 
 ERROR_PATTERNS = [
-    re.compile(r"\b(exception|error|fatal|panic|stacktrace|caused by)\b", re.IGNORECASE),
+    re.compile(r"\b(exception|error|fatal|panic|stacktrace|caused by|failed)\b", re.IGNORECASE),
     re.compile(r"\b(5\d\d|bad gateway|service unavailable|gateway timeout|connection refused|timeout)\b", re.IGNORECASE),
     re.compile(r"\b(beancreationexception|unsatisfieddependencyexception|sqlsyntaxerrorexception|constraintviolationexception)\b", re.IGNORECASE),
 ]
@@ -44,6 +44,10 @@ UUID_RE = re.compile(r"\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f
 ISO_RE = re.compile(r"\b\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z\b")
 NUM_RE = re.compile(r"\b\d+\b")
 WS_RE = re.compile(r"\s+")
+BUILD_HINT_RE = re.compile(
+    r"\b(failed|exited with|exit code|cannot|unable to|not found|missing|denied|killed|oom|timeout|timed out|compile)\b",
+    re.IGNORECASE,
+)
 
 CAUSE_PATTERNS: list[tuple[re.Pattern[str], str]] = [
     (re.compile(r"\b(outofmemory|killed|oom|memory limit)\b", re.IGNORECASE), "memory_limit"),
@@ -330,6 +334,25 @@ def collect_error_snippets(log_items: list[dict[str, Any]], limit: int = 5) -> l
     return snippets
 
 
+def collect_build_context(log_items: list[dict[str, Any]], limit: int = 8) -> list[str]:
+    lines: list[str] = []
+    for item in log_items:
+        raw = str(item.get("message", "")).strip()
+        if not raw:
+            continue
+        first_line = raw.splitlines()[0].strip()
+        if not first_line:
+            continue
+        if BUILD_HINT_RE.search(first_line):
+            lines.append(first_line[:220])
+
+    if lines:
+        return lines[:limit]
+
+    tail = [str(item.get("message", "")).splitlines()[0].strip()[:220] for item in log_items if str(item.get("message", "")).strip()]
+    return tail[-limit:]
+
+
 def classify_cause(messages: list[str]) -> str:
     for message in messages:
         for pattern, label in CAUSE_PATTERNS:
@@ -410,12 +433,14 @@ def summarize_failed_deploys(
             deploy_log_items = []
 
         snippets = collect_error_snippets(deploy_log_items, limit=5)
+        context = collect_build_context(deploy_log_items, limit=8)
         detail_messages = [
             str(detail.get("status", "")),
             str(detail.get("statusMessage", "")),
             str(detail.get("message", "")),
             str(detail.get("failureReason", "")),
             str(deploy.get("status", "")),
+            *context,
         ]
         cause = classify_cause([*snippets, *detail_messages])
         failed.append(
@@ -431,6 +456,7 @@ def summarize_failed_deploys(
                 "suspectedCause": cause,
                 "detailMessage": str(detail.get("statusMessage") or detail.get("message") or ""),
                 "errorSnippets": snippets,
+                "buildContext": context,
             }
         )
     return failed
@@ -548,6 +574,8 @@ def main() -> int:
                     print(f"    detail: {str(deploy['detailMessage'])[:180]}")
                 if deploy.get("errorSnippets"):
                     print(f"    buildError: {deploy['errorSnippets'][0]}")
+                elif deploy.get("buildContext"):
+                    print(f"    buildContext: {deploy['buildContext'][0]}")
         if not svc["top_errors"]:
             print("  no probable error signatures found")
             continue
