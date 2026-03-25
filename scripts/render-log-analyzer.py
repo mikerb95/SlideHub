@@ -45,6 +45,16 @@ ISO_RE = re.compile(r"\b\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z\b")
 NUM_RE = re.compile(r"\b\d+\b")
 WS_RE = re.compile(r"\s+")
 
+CAUSE_PATTERNS: list[tuple[re.Pattern[str], str]] = [
+    (re.compile(r"\b(outofmemory|killed|oom|memory limit)\b", re.IGNORECASE), "memory_limit"),
+    (re.compile(r"\b(module not found|cannot find symbol|classnotfound|no such file)\b", re.IGNORECASE), "missing_dependency_or_file"),
+    (re.compile(r"\b(authentication failed|permission denied|access denied|forbidden|unauthorized)\b", re.IGNORECASE), "permissions_or_auth"),
+    (re.compile(r"\b(environment variable|missing env|not set|undefined variable)\b", re.IGNORECASE), "missing_environment_variable"),
+    (re.compile(r"\b(compilation failed|build failed|maven|gradle|npm err|failed to compile)\b", re.IGNORECASE), "build_or_compile_failure"),
+    (re.compile(r"\b(bind|port|address already in use|failed to start|startup)\b", re.IGNORECASE), "startup_or_port_failure"),
+    (re.compile(r"\b(timeout|timed out|deadline exceeded)\b", re.IGNORECASE), "timeout"),
+]
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Analyze Render logs for SlideHub services.")
@@ -233,6 +243,58 @@ def list_deploys(api_key: str, service_id: str, minutes: int, statuses: list[str
     return []
 
 
+def get_deploy_detail(api_key: str, service_id: str, deploy_id: str) -> dict[str, Any]:
+    url = f"https://api.render.com/v1/services/{service_id}/deploys/{deploy_id}"
+    payload = http_get_json(url, api_key)
+    if isinstance(payload, dict):
+        if isinstance(payload.get("deploy"), dict):
+            return payload.get("deploy", {})
+        return payload
+    return {}
+
+
+def parse_render_time(timestamp: str | None) -> dt.datetime | None:
+    if not timestamp:
+        return None
+    text = str(timestamp).strip()
+    if not text:
+        return None
+    if text.endswith("Z"):
+        text = text[:-1] + "+00:00"
+    try:
+        parsed = dt.datetime.fromisoformat(text)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=dt.timezone.utc)
+    return parsed.astimezone(dt.timezone.utc)
+
+
+def fetch_logs_between(
+    api_key: str,
+    owner_id: str,
+    resource_id: str,
+    start: dt.datetime,
+    end: dt.datetime,
+    limit: int = 250,
+    log_type: str = "build",
+) -> list[dict[str, Any]]:
+    query: list[tuple[str, str]] = [
+        ("ownerId", owner_id),
+        ("startTime", render_timestamp(start)),
+        ("endTime", render_timestamp(end)),
+        ("direction", "forward"),
+        ("limit", str(limit)),
+        ("type", log_type),
+        ("resource", resource_id),
+    ]
+    url = "https://api.render.com/v1/logs?" + urllib.parse.urlencode(query)
+    payload = http_get_json(url, api_key)
+    if isinstance(payload, dict) and isinstance(payload.get("logs"), list):
+        return payload.get("logs", [])
+    return []
+
+
 def is_error_log(message: str) -> bool:
     return any(pattern.search(message) for pattern in ERROR_PATTERNS)
 
@@ -244,6 +306,36 @@ def normalize_signature(message: str) -> str:
     signature = NUM_RE.sub("<n>", signature)
     signature = WS_RE.sub(" ", signature).strip()
     return signature[:220]
+
+
+def collect_error_snippets(log_items: list[dict[str, Any]], limit: int = 5) -> list[str]:
+    seen: set[str] = set()
+    snippets: list[str] = []
+    for item in log_items:
+        raw = str(item.get("message", "")).strip()
+        if not raw:
+            continue
+        first_line = raw.splitlines()[0].strip()
+        if not first_line:
+            continue
+        if not is_error_log(first_line):
+            continue
+        sig = normalize_signature(first_line)
+        if sig in seen:
+            continue
+        seen.add(sig)
+        snippets.append(first_line[:220])
+        if len(snippets) >= limit:
+            break
+    return snippets
+
+
+def classify_cause(messages: list[str]) -> str:
+    for message in messages:
+        for pattern, label in CAUSE_PATTERNS:
+            if pattern.search(message):
+                return label
+    return "unknown"
 
 
 def summarize_logs(service_name: str, log_items: list[dict[str, Any]]) -> dict[str, Any]:
@@ -278,7 +370,13 @@ def summarize_logs(service_name: str, log_items: list[dict[str, Any]]) -> dict[s
     }
 
 
-def summarize_failed_deploys(service_name: str, deploys: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def summarize_failed_deploys(
+    service_name: str,
+    deploys: list[dict[str, Any]],
+    api_key: str,
+    owner_id: str,
+    service_id: str,
+) -> list[dict[str, Any]]:
     failed = []
     for deploy in deploys:
         if not isinstance(deploy, dict):
@@ -287,9 +385,42 @@ def summarize_failed_deploys(service_name: str, deploys: list[dict[str, Any]]) -
         if status not in {"build_failed", "update_failed", "pre_deploy_failed"}:
             continue
         commit = deploy.get("commit") if isinstance(deploy.get("commit"), dict) else {}
+        deploy_id = str(deploy.get("id", "")).strip()
+        detail = {}
+        if deploy_id:
+            try:
+                detail = get_deploy_detail(api_key, service_id, deploy_id)
+            except Exception:
+                detail = {}
+
+        started_at = parse_render_time(str(deploy.get("startedAt", "")))
+        created_at = parse_render_time(str(deploy.get("createdAt", "")))
+        finished_at = parse_render_time(str(deploy.get("finishedAt", "")))
+        start_time = started_at or created_at
+        if start_time is None:
+            start_time = dt.datetime.now(dt.timezone.utc) - dt.timedelta(minutes=15)
+        end_time = finished_at or (start_time + dt.timedelta(minutes=20))
+        if end_time <= start_time:
+            end_time = start_time + dt.timedelta(minutes=20)
+
+        deploy_log_items: list[dict[str, Any]] = []
+        try:
+            deploy_log_items = fetch_logs_between(api_key, owner_id, service_id, start_time, end_time, limit=250, log_type="build")
+        except Exception:
+            deploy_log_items = []
+
+        snippets = collect_error_snippets(deploy_log_items, limit=5)
+        detail_messages = [
+            str(detail.get("status", "")),
+            str(detail.get("statusMessage", "")),
+            str(detail.get("message", "")),
+            str(detail.get("failureReason", "")),
+            str(deploy.get("status", "")),
+        ]
+        cause = classify_cause([*snippets, *detail_messages])
         failed.append(
             {
-                "deployId": deploy.get("id"),
+                "deployId": deploy_id,
                 "status": status,
                 "trigger": deploy.get("trigger"),
                 "createdAt": deploy.get("createdAt"),
@@ -297,6 +428,9 @@ def summarize_failed_deploys(service_name: str, deploys: list[dict[str, Any]]) -
                 "finishedAt": deploy.get("finishedAt"),
                 "commitId": commit.get("id"),
                 "commitMessage": commit.get("message"),
+                "suspectedCause": cause,
+                "detailMessage": str(detail.get("statusMessage") or detail.get("message") or ""),
+                "errorSnippets": snippets,
             }
         )
     return failed
@@ -356,7 +490,7 @@ def main() -> int:
         if args.deploy_only or args.log_type == "build":
             try:
                 deploys = list_deploys(api_key, resource_id, args.minutes, args.deploy_status)
-                failed_deploys = summarize_failed_deploys(service_name, deploys)
+                failed_deploys = summarize_failed_deploys(service_name, deploys, api_key, owner_id, resource_id)
             except Exception as exc:
                 print(f"[WARN] Failed to fetch deploys for {service_name}: {exc}", file=sys.stderr)
         if args.deploy_only:
@@ -408,6 +542,12 @@ def main() -> int:
                 )
                 if deploy.get("commitMessage"):
                     print(f"    commit: {deploy['commitMessage']}")
+                if deploy.get("suspectedCause"):
+                    print(f"    suspectedCause: {deploy['suspectedCause']}")
+                if deploy.get("detailMessage"):
+                    print(f"    detail: {str(deploy['detailMessage'])[:180]}")
+                if deploy.get("errorSnippets"):
+                    print(f"    buildError: {deploy['errorSnippets'][0]}")
         if not svc["top_errors"]:
             print("  no probable error signatures found")
             continue
