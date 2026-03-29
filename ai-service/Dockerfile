@@ -21,5 +21,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=120s --retries=3 \
 
 EXPOSE 8083
 
-# Shell form so ${MONGODB_URI} is expanded from the runtime environment
-ENTRYPOINT java -Xms128m -Xmx512m -Dspring.profiles.active=prod -Dspring.data.mongodb.uri=${MONGODB_URI} -jar app.jar
+# Shell form so environment variables are expanded at runtime
+ENTRYPOINT java -Xms128m -Xmx512m -Dspring.profiles.active=prod -jar app.jar
