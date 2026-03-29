@@ -8,10 +8,6 @@ import org.springframework.web.servlet.function.RequestPredicates;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 
-import org.springframework.web.servlet.function.ServerRequest;
-
-import static org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.preserveHostHeader;
-import static org.springframework.cloud.gateway.server.mvc.filter.RewriteLocationResponseHeaderFilterFunctions.rewriteLocationResponseHeader;
 import static org.springframework.cloud.gateway.server.mvc.filter.FilterFunctions.uri;
 import static org.springframework.cloud.gateway.server.mvc.handler.GatewayRouterFunctions.route;
 import static org.springframework.cloud.gateway.server.mvc.handler.HandlerFunctions.http;
@@ -39,25 +35,6 @@ public class RoutesConfig {
 
         @Value("${slidehub.ui-service.url:http://localhost:8082}")
         private String uiServiceUrl;
-
-        @Value("${slidehub.external-host:localhost:8080}")
-        private String externalHost;
-
-        @Value("${slidehub.external-proto:https}")
-        private String externalProto;
-
-        /**
-         * Inyecta X-Forwarded-Host y X-Forwarded-Proto para que ui-service
-         * genere redirects con el dominio público (slide.lat), no con el
-         * host interno de Render (.onrender.com).
-         */
-        private ServerRequest addForwardedHeaders(ServerRequest request) {
-                return ServerRequest.from(request)
-                                .header("X-Forwarded-Host", externalHost)
-                                .header("X-Forwarded-Proto", externalProto)
-                                .header("X-Forwarded-Port", "443")
-                                .build();
-        }
 
         /** IA routes — DEBE evaluarse antes que /api/** (Order=1) */
         @Bean
@@ -114,12 +91,6 @@ public class RoutesConfig {
                                                                 .or(RequestPredicates.path("/js/**"))
                                                                 .or(RequestPredicates.path("/favicon.ico")), // Fase 2
                                                 http())
-                                .before(preserveHostHeader())
-                                .before(this::addForwardedHeaders)
-                                .after(rewriteLocationResponseHeader(config -> config
-                                                .setLocationHeaderName("Location")
-                                                .setHostValue(externalHost)
-                                                .setProtocolsRegex("https?|ftps?")))
                                 .filter(uri(uiServiceUrl))
                                 .build();
         }
@@ -130,12 +101,6 @@ public class RoutesConfig {
         public RouterFunction<ServerResponse> presentationRoutes() {
                 return route("presentation-routes")
                                 .route(RequestPredicates.path("/presentation/**"), http())
-                                .before(preserveHostHeader())
-                                .before(this::addForwardedHeaders)
-                                .after(rewriteLocationResponseHeader(config -> config
-                                                .setLocationHeaderName("Location")
-                                                .setHostValue(externalHost)
-                                                .setProtocolsRegex("https?|ftps?")))
                                 .filter(uri(uiServiceUrl))
                                 .build();
         }
