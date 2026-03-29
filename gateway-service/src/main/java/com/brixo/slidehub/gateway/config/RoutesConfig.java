@@ -115,9 +115,10 @@ public class RoutesConfig {
                                                                 .or(RequestPredicates.path("/favicon.ico")), // Fase 2
                                                 http())
                                 .before(preserveHostHeader())
+                                .before(this::addForwardedHeaders)
                                 .after(rewriteLocationResponseHeader(config -> config
                                                 .setLocationHeaderName("Location")
-                                                .setHostValue("slide.lat")
+                                                .setHostValue(externalHost)
                                                 .setProtocolsRegex("https?|ftps?")))
                                 .filter(uri(uiServiceUrl))
                                 .build();
@@ -130,9 +131,10 @@ public class RoutesConfig {
                 return route("presentation-routes")
                                 .route(RequestPredicates.path("/presentation/**"), http())
                                 .before(preserveHostHeader())
+                                .before(this::addForwardedHeaders)
                                 .after(rewriteLocationResponseHeader(config -> config
                                                 .setLocationHeaderName("Location")
-                                                .setHostValue("slide.lat")
+                                                .setHostValue(externalHost)
                                                 .setProtocolsRegex("https?|ftps?")))
                                 .filter(uri(uiServiceUrl))
                                 .build();
