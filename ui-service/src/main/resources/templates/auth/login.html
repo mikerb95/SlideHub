@@ -66,9 +66,7 @@
 
 <body>
     <div class="login-card">
-        <div class="logo">
-            <span class="text-success">●</span> SlideHub
-        </div>
+        <div th:replace="~{fragments/logo :: slidehubLogo('SlideHub', 'logo', '')}"></div>
 
         <div class="alert alert-danger py-2 small" th:if="${errorMessage}" th:text="${errorMessage}"></div>
         <div class="alert alert-success py-2 small" th:if="${logoutMessage}" th:text="${logoutMessage}"></div>

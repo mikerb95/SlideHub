@@ -142,9 +142,7 @@
 
 <body>
     <div class="card-register">
-        <div class="logo">
-            <span class="text-info">○</span> Crear cuenta
-        </div>
+        <div th:replace="~{fragments/logo :: slidehubLogo('Crear cuenta', 'logo', '')}"></div>
 
         <!-- Mensajes de error / éxito -->
         <div th:if="${errorMessage}" class="alert-message alert-error mb-3" role="alert">
