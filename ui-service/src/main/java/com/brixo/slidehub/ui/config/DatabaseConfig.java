@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
+import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,6 +60,34 @@ public class DatabaseConfig {
         }
 
         return builder.build();
+    }
+
+    /**
+     * Configura Flyway explícitamente para que use el DataSource custom.
+     * Sin esto, FlywayAutoConfiguration puede no ejecutar las migraciones
+     * cuando el DataSource se define manualmente en un @Bean.
+     */
+    @Bean(initMethod = "migrate")
+    public Flyway flyway(DataSource dataSource,
+                         @Value("${spring.flyway.locations:classpath:db/migration}") String locations,
+                         @Value("${spring.flyway.baseline-on-migrate:false}") boolean baselineOnMigrate,
+                         @Value("${spring.flyway.default-schema:#{null}}") String defaultSchema,
+                         @Value("${spring.flyway.schemas:#{null}}") String schemas) {
+        var config = Flyway.configure()
+                .dataSource(dataSource)
+                .locations(locations)
+                .baselineOnMigrate(baselineOnMigrate);
+
+        if (defaultSchema != null && !defaultSchema.isBlank()) {
+            config.defaultSchema(defaultSchema);
+        }
+        if (schemas != null && !schemas.isBlank()) {
+            config.schemas(schemas.split(","));
+        }
+
+        Flyway flyway = config.load();
+        log.info("Flyway configured explicitly with custom DataSource");
+        return flyway;
     }
 
     /**
