@@ -96,8 +96,13 @@ public class DatabaseConfig {
      * antes de validar el esquema.
      */
     @Bean
-    public static EntityManagerFactoryDependsOnPostProcessor entityManagerFactoryDependsOnFlyway() {
-        return new EntityManagerFactoryDependsOnPostProcessor("flyway");
+    public static BeanFactoryPostProcessor flywayDependencyPostProcessor() {
+        return beanFactory -> {
+            if (beanFactory.containsBeanDefinition("entityManagerFactory")) {
+                beanFactory.getBeanDefinition("entityManagerFactory")
+                        .setDependsOn(new String[]{"flyway"});
+            }
+        };
     }
 
     /**
