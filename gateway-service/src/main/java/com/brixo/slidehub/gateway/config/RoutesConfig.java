@@ -8,6 +8,8 @@ import org.springframework.web.servlet.function.RequestPredicates;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 
+import static org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.preserveHostHeader;
+import static org.springframework.cloud.gateway.server.mvc.filter.RewriteLocationResponseHeaderFilterFunctions.rewriteLocationResponseHeader;
 import static org.springframework.cloud.gateway.server.mvc.filter.FilterFunctions.uri;
 import static org.springframework.cloud.gateway.server.mvc.handler.GatewayRouterFunctions.route;
 import static org.springframework.cloud.gateway.server.mvc.handler.HandlerFunctions.http;
@@ -91,6 +93,11 @@ public class RoutesConfig {
                                                                 .or(RequestPredicates.path("/js/**"))
                                                                 .or(RequestPredicates.path("/favicon.ico")), // Fase 2
                                                 http())
+                                .before(preserveHostHeader())
+                                .after(rewriteLocationResponseHeader(config -> config
+                                                .setLocationHeaderName("Location")
+                                                .setHostValue("slide.lat")
+                                                .setProtocolsRegex("https?|ftps?")))
                                 .filter(uri(uiServiceUrl))
                                 .build();
         }
@@ -101,6 +108,11 @@ public class RoutesConfig {
         public RouterFunction<ServerResponse> presentationRoutes() {
                 return route("presentation-routes")
                                 .route(RequestPredicates.path("/presentation/**"), http())
+                                .before(preserveHostHeader())
+                                .after(rewriteLocationResponseHeader(config -> config
+                                                .setLocationHeaderName("Location")
+                                                .setHostValue("slide.lat")
+                                                .setProtocolsRegex("https?|ftps?")))
                                 .filter(uri(uiServiceUrl))
                                 .build();
         }
