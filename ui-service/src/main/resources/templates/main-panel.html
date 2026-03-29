@@ -5,61 +5,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SlideHub — Panel Maestro</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <th:block th:replace="~{fragments/head :: assets}"></th:block>
     <style>
-        body {
-            background: #0d1117;
-            color: #e6edf3;
-            min-height: 100vh;
-        }
-
-        .topbar {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: #161b22;
-            border-bottom: 1px solid #30363d;
-            padding: 0.6rem 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .layout {
-            display: flex;
-            height: calc(100vh - 52px);
-        }
-
-        /* Grid de slides */
-        .slide-area {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-        }
-
-        .slide-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 0.75rem;
-        }
+        /* ── View-specific: dynamically-created elements ── */
 
         .slide-thumb {
-            background: #161b22;
-            border: 2px solid #30363d;
-            border-radius: 6px;
+            background: var(--sh-card);
+            border: 2px solid var(--sh-border);
+            border-radius: var(--sh-r-md);
             overflow: hidden;
             cursor: pointer;
-            transition: border-color 0.15s, transform 0.1s;
+            transition: border-color var(--sh-t-fast), transform 0.1s;
         }
 
         .slide-thumb:hover {
-            border-color: #58a6ff;
+            border-color: var(--sh-blue);
             transform: translateY(-2px);
         }
 
         .slide-thumb.active {
-            border-color: #3fb950;
+            border-color: var(--sh-green);
+            box-shadow: 0 0 8px var(--sh-green-dim);
         }
 
         .slide-thumb img {
@@ -72,298 +38,274 @@
         .slide-thumb .slide-num {
             text-align: center;
             padding: 0.2rem;
-            font-size: 0.75rem;
-            opacity: 0.6;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 300px;
-            min-width: 260px;
-            background: #161b22;
-            border-left: 1px solid #30363d;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-
-        .sidebar-section {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid #21262d;
-        }
-
-        .sidebar-section h6 {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #8b949e;
-            margin-bottom: 0.5rem;
+            font-family: var(--sh-font-mono);
+            font-size: 0.7rem;
+            color: var(--sh-text-3);
         }
 
         .quick-link-btn {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            background: #0d1117;
-            border: 1px solid #30363d;
-            color: #e6edf3;
-            border-radius: 6px;
+            background: var(--sh-deep);
+            border: 1px solid var(--sh-border);
+            color: var(--sh-text-1);
+            border-radius: var(--sh-r-md);
             padding: 0.5rem 0.75rem;
             width: 100%;
             text-align: left;
-            transition: background 0.15s, border-color 0.15s;
-            font-size: 0.85rem;
+            transition: background var(--sh-t-fast), border-color var(--sh-t-fast), color var(--sh-t-fast);
+            font-family: var(--sh-font-mono);
+            font-size: 0.8rem;
             cursor: pointer;
         }
 
         .quick-link-btn:hover {
-            background: #1f2428;
-            border-color: #58a6ff;
-            color: #58a6ff;
+            background: var(--sh-hover);
+            border-color: var(--sh-blue);
+            color: var(--sh-blue);
         }
 
         .quick-link-btn.active-demo {
-            border-color: #f78166;
-            color: #f78166;
+            border-color: var(--sh-amber);
+            color: var(--sh-amber);
+            background: var(--sh-amber-dim);
         }
 
         .quick-link-btn .link-desc {
-            font-size: 0.7rem;
-            opacity: 0.6;
+            font-size: 0.65rem;
+            color: var(--sh-text-3);
             display: block;
-        }
-
-        /* Modal CRUD */
-        #links-modal .modal-content {
-            background: #161b22;
-            border: 1px solid #30363d;
-            color: #e6edf3;
-        }
-
-        #links-modal .modal-header {
-            border-bottom-color: #30363d;
-        }
-
-        #links-modal .modal-footer {
-            border-top-color: #30363d;
-        }
-
-        #links-modal .form-control,
-        #links-modal .form-select {
-            background: #0d1117;
-            border-color: #30363d;
-            color: #e6edf3;
-        }
-
-        .link-item {
-            background: #0d1117;
-            border: 1px solid #21262d;
-            border-radius: 6px;
-            padding: 0.5rem 0.75rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .meeting-box {
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            padding: 0.6rem;
-            margin-bottom: 0.6rem;
-        }
-
-        .meeting-box .form-control,
-        .meeting-box .form-select {
-            background: #0b1016;
-            border-color: #30363d;
-            color: #e6edf3;
-            font-size: 0.8rem;
-        }
-
-        .meeting-help {
-            color: #8b949e;
-            font-size: 0.72rem;
-            margin-top: 0.25rem;
-        }
-
-        .meeting-list {
-            max-height: 132px;
-            overflow-y: auto;
+            font-family: var(--sh-font-body);
         }
 
         .meeting-item {
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 0.4rem 0.5rem;
+            border: 1px solid var(--sh-border);
+            border-radius: var(--sh-r-md);
+            padding: 0.4rem 0.6rem;
             margin-bottom: 0.4rem;
-            font-size: 0.76rem;
+            font-family: var(--sh-font-mono);
+            font-size: 0.75rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 0.4rem;
+            color: var(--sh-text-2);
+        }
+
+        .link-item {
+            background: var(--sh-deep);
+            border: 1px solid var(--sh-border);
+            border-radius: var(--sh-r-md);
+            padding: 0.6rem 0.75rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
         }
 
         #join-qr {
             width: 120px;
             height: 120px;
-            border-radius: 6px;
-            border: 1px solid #30363d;
+            border-radius: var(--sh-r-md);
+            border: 1px solid var(--sh-border);
             background: #fff;
             object-fit: contain;
         }
     </style>
 </head>
 
-<body>
-    <div class="topbar">
-        <span class="fw-bold"><i class="fa fa-table-cells-large text-success me-1"></i>Panel Maestro</span>
-        <span id="slide-counter" class="badge bg-secondary ms-2">— / —</span>
-        <a href="/presenter" class="btn btn-sm btn-outline-secondary ms-auto">
-            <i class="fa fa-presentation-screen me-1"></i>Presentador
-        </a>
-        <a href="/auth/logout" class="btn btn-sm btn-outline-danger ms-1">
-            <i class="fa fa-sign-out-alt"></i>
-        </a>
-    </div>
+<body class="sh bg-sh-deep antialiased min-h-screen">
 
-    <div class="layout">
-        <!-- Slide Grid -->
-        <div class="slide-area">
-            <div class="slide-grid" id="slide-grid">
-                <div class="text-center text-secondary" style="grid-column:1/-1; padding:3rem 0;">
-                    <i class="fa fa-spinner fa-spin fa-2x mb-2 d-block"></i>Cargando slides...
+    <!-- ═══════════════════════════════════
+         TOPBAR — Glass Navigation
+         ═══════════════════════════════════ -->
+    <nav class="sh-nav">
+        <div class="sh-nav-inner">
+            <div class="flex items-center gap-3">
+                <img th:src="@{/images/logo.svg}" alt="SlideHub" class="h-5 w-5">
+                <span class="font-brand text-base tracking-tight">Panel Maestro</span>
+                <span id="slide-counter" class="sh-badge ml-1">&mdash; / &mdash;</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="sh-status hidden sm:inline-flex">
+                    <span class="sh-dot"></span>
+                    <span class="sh-label">POLLING</span>
+                </div>
+                <a href="/presenter" class="sh-btn sh-btn-ghost text-xs">
+                    <i class="fa-solid fa-presentation-screen"></i>
+                    <span class="hidden sm:inline">Presenter</span>
+                </a>
+                <a href="/auth/profile" class="sh-btn sh-btn-ghost text-xs">
+                    <i class="fa-solid fa-user"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- ═══════════════════════════════════
+         LAYOUT — Grid + Sidebar
+         ═══════════════════════════════════ -->
+    <div class="flex" style="height: calc(100vh - 48px);">
+
+        <!-- ── Slide Grid Area ── -->
+        <div class="flex-1 overflow-y-auto p-4">
+            <div id="slide-grid"
+                 class="grid gap-3"
+                 style="grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));">
+                <div style="grid-column: 1 / -1;"
+                     class="flex flex-col items-center justify-center py-12 text-[var(--sh-text-3)]">
+                    <i class="fa-solid fa-spinner fa-spin text-2xl mb-3"></i>
+                    <span class="sh-label">LOADING_SLIDES</span>
                 </div>
             </div>
         </div>
 
-        <!-- Sidebar -->
-        <div class="sidebar">
+        <!-- ── Sidebar ── -->
+        <div class="w-[300px] min-w-[260px] bg-sh-card border-l border-[var(--sh-border)] flex flex-col overflow-y-auto">
 
-            <!-- Demo: modo slides -->
-            <div class="sidebar-section">
-                <h6><i class="fa fa-display me-1"></i>Modo Demo</h6>
-                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
-                    <span id="demo-mode-badge" class="badge bg-secondary">slides</span>
-                    <button class="btn btn-sm btn-outline-success" id="btn-demo-slides">
-                        <i class="fa fa-images me-1"></i>Volver a Slides
+            <!-- DEMO MODE -->
+            <div class="p-4 border-b border-[var(--sh-border-subtle)]">
+                <div class="sh-label mb-3">
+                    <i class="fa-solid fa-display mr-1"></i>DEMO_MODE
+                </div>
+                <div class="flex items-center gap-2 mb-3 flex-wrap">
+                    <span id="demo-mode-badge" class="sh-badge">slides</span>
+                    <button class="sh-btn text-xs py-1 px-2" id="btn-demo-slides">
+                        <i class="fa-solid fa-images"></i>
+                        Slides
                     </button>
                 </div>
-                <div class="input-group input-group-sm mb-1">
-                    <input type="url" class="form-control bg-dark text-light border-secondary" id="demo-url-input"
-                        placeholder="https://mi-demo.com">
-                    <button class="btn btn-outline-info" id="btn-demo-url">
-                        <i class="fa fa-arrow-up-right-from-square"></i>
+                <div class="flex gap-1">
+                    <input type="url" class="sh-input text-xs" id="demo-url-input"
+                           placeholder="https://demo-url.app">
+                    <button class="sh-btn sh-btn-blue text-xs px-2 flex-shrink-0" id="btn-demo-url">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
                     </button>
                 </div>
-                <div class="form-text" style="color:#8b949e; font-size:0.7rem;">
-                    Usar URL personalizada
-                </div>
+                <div class="font-mono text-[0.65rem] text-[var(--sh-text-3)] mt-1.5">Custom URL → iframe</div>
             </div>
 
-            <div class="sidebar-section">
-                <h6><i class="fa fa-users me-1"></i>Reunión</h6>
-                <div id="meeting-missing-presentation" class="meeting-help" style="display:none;">
-                    Abre esta vista con <code>?presentationId=...</code> para habilitar QR, participantes y
-                    asignaciones.
+            <!-- MEETING -->
+            <div class="p-4 border-b border-[var(--sh-border-subtle)]">
+                <div class="sh-label mb-3">
+                    <i class="fa-solid fa-users mr-1"></i>MEETING_SESSION
+                </div>
+                <div id="meeting-missing-presentation"
+                     class="text-[var(--sh-text-3)] text-xs font-mono" style="display:none;">
+                    Open with <code class="text-[var(--sh-blue)]">?presentationId=...</code> to enable sessions.
                 </div>
 
                 <div id="meeting-controls">
-                    <div class="meeting-box">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span style="font-size:0.78rem; color:#c9d1d9;">Acceso por QR</span>
-                            <button class="btn btn-sm btn-outline-success" id="btn-start-session"
-                                style="font-size:0.7rem;">
-                                <i class="fa fa-qrcode me-1"></i>Generar
+                    <!-- QR Access -->
+                    <div class="bg-[var(--sh-deep)] border border-[var(--sh-border)] rounded-tech p-3 mb-3">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-mono text-xs text-[var(--sh-text-2)]">QR_ACCESS</span>
+                            <button class="sh-btn text-xs py-0.5 px-2" id="btn-start-session"
+                                    style="font-size: 0.7rem;">
+                                <i class="fa-solid fa-qrcode"></i>
+                                Generate
                             </button>
                         </div>
                         <div id="meeting-session-panel" style="display:none;">
-                            <img id="join-qr" alt="QR de reunión">
-                            <div class="input-group input-group-sm mt-2">
-                                <input id="join-url" type="text" class="form-control" readonly>
-                                <button id="btn-copy-join-url" class="btn btn-outline-secondary" type="button"
-                                    title="Copiar URL">
-                                    <i class="fa fa-copy"></i>
+                            <img id="join-qr" alt="Meeting QR">
+                            <div class="flex gap-1 mt-2">
+                                <input id="join-url" type="text" class="sh-input text-xs" readonly>
+                                <button id="btn-copy-join-url" class="sh-btn text-xs px-2 flex-shrink-0" type="button">
+                                    <i class="fa-solid fa-copy"></i>
                                 </button>
                             </div>
-                            <div class="meeting-help">Comparte este QR para que el equipo entre desde su celular.</div>
+                            <div class="font-mono text-[0.6rem] text-[var(--sh-text-3)] mt-1">
+                                Share QR for team join via mobile.
+                            </div>
                         </div>
                     </div>
 
-                    <div class="meeting-box">
-                        <div style="font-size:0.78rem; color:#c9d1d9;" class="mb-2">Participantes</div>
-                        <div class="input-group input-group-sm mb-2">
-                            <input id="participant-name" class="form-control" maxlength="120"
-                                placeholder="Nombre del expositor">
-                            <button id="btn-add-participant" class="btn btn-outline-info" type="button">
-                                <i class="fa fa-plus"></i>
+                    <!-- Participants -->
+                    <div class="bg-[var(--sh-deep)] border border-[var(--sh-border)] rounded-tech p-3 mb-3">
+                        <div class="font-mono text-xs text-[var(--sh-text-2)] mb-2">PARTICIPANTS</div>
+                        <div class="flex gap-1 mb-2">
+                            <input id="participant-name" class="sh-input text-xs" maxlength="120"
+                                   placeholder="Participant name">
+                            <button id="btn-add-participant" class="sh-btn sh-btn-blue text-xs px-2 flex-shrink-0"
+                                    type="button">
+                                <i class="fa-solid fa-plus"></i>
                             </button>
                         </div>
-                        <div class="meeting-list" id="participants-list"></div>
+                        <div class="max-h-[132px] overflow-y-auto" id="participants-list"></div>
                     </div>
 
-                    <div class="meeting-box">
-                        <div style="font-size:0.78rem; color:#c9d1d9;" class="mb-2">Asignar slide</div>
-                        <div class="row g-2 mb-2">
-                            <div class="col-4">
-                                <select id="assign-slide" class="form-select form-select-sm"></select>
-                            </div>
-                            <div class="col-8">
-                                <select id="assign-participant" class="form-select form-select-sm"></select>
-                            </div>
+                    <!-- Assignments -->
+                    <div class="bg-[var(--sh-deep)] border border-[var(--sh-border)] rounded-tech p-3">
+                        <div class="font-mono text-xs text-[var(--sh-text-2)] mb-2">SLIDE_ASSIGNMENT</div>
+                        <div class="grid grid-cols-[1fr_2fr] gap-2 mb-2">
+                            <select id="assign-slide" class="sh-select text-xs py-1"></select>
+                            <select id="assign-participant" class="sh-select text-xs py-1"></select>
                         </div>
-                        <button id="btn-assign-slide" class="btn btn-sm btn-outline-warning w-100">
-                            <i class="fa fa-user-check me-1"></i>Guardar asignación
+                        <button id="btn-assign-slide" class="sh-btn sh-btn-blue text-xs w-full justify-center">
+                            <i class="fa-solid fa-user-check"></i>
+                            Save_Assignment
                         </button>
-                        <div class="meeting-list mt-2" id="assignments-list"></div>
+                        <div class="max-h-[132px] overflow-y-auto mt-2" id="assignments-list"></div>
                     </div>
                 </div>
             </div>
 
-            <div class="sidebar-section">
-                <h6><i class="fa fa-wand-magic-sparkles me-1"></i>Slide Rápida</h6>
-                <div class="meeting-box">
-                    <input id="quick-slide-title" type="text" class="form-control form-control-sm mb-2" maxlength="120"
-                        placeholder="Título del slide">
-                    <textarea id="quick-slide-body" class="form-control form-control-sm mb-2" rows="3" maxlength="500"
-                        placeholder="Texto explicativo"></textarea>
-                    <button id="btn-generate-quick-slide" class="btn btn-sm btn-outline-primary w-100">
-                        <i class="fa fa-plus me-1"></i>Crear slide
+            <!-- QUICK SLIDE -->
+            <div class="p-4 border-b border-[var(--sh-border-subtle)]">
+                <div class="sh-label mb-3">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>QUICK_SLIDE
+                </div>
+                <div class="bg-[var(--sh-deep)] border border-[var(--sh-border)] rounded-tech p-3">
+                    <input id="quick-slide-title" type="text" class="sh-input text-xs mb-2" maxlength="120"
+                           placeholder="Slide title">
+                    <textarea id="quick-slide-body" class="sh-textarea text-xs mb-2" rows="3" maxlength="500"
+                              placeholder="Slide body text" style="min-height: 60px;"></textarea>
+                    <button id="btn-generate-quick-slide" class="sh-btn sh-btn-primary text-xs w-full justify-center">
+                        <i class="fa-solid fa-plus"></i>
+                        Create_Slide
                     </button>
-                    <div class="meeting-help">Usa los colores primarios detectados en la presentación activa.</div>
+                    <div class="font-mono text-[0.6rem] text-[var(--sh-text-3)] mt-1.5">
+                        Uses active presentation color palette.
+                    </div>
                 </div>
             </div>
 
-            <!-- Quick Links -->
-            <div class="sidebar-section flex-grow-1">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="mb-0"><i class="fa fa-bolt me-1"></i>Quick Links</h6>
-                    <button th:if="${presentationId != ''}" class="btn btn-sm btn-outline-secondary py-0 px-2"
-                        style="font-size:0.7rem;" data-bs-toggle="modal" data-bs-target="#links-modal">
-                        <i class="fa fa-pencil"></i> Editar
+            <!-- QUICK LINKS -->
+            <div class="p-4 flex-grow">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="sh-label">
+                        <i class="fa-solid fa-bolt mr-1"></i>QUICK_LINKS
+                    </div>
+                    <button th:if="${presentationId != ''}"
+                            class="sh-btn sh-btn-ghost text-xs py-0.5 px-2"
+                            onclick="openLinksModal()">
+                        <i class="fa-solid fa-pencil"></i>
                     </button>
                 </div>
 
-                <!-- Inyectado server-side desde Thymeleaf -->
                 <div id="quick-links-list">
-                    <div th:if="${quickLinks.isEmpty()}" class="text-center"
-                        style="color:#8b949e; font-size:0.8rem; padding: 1rem 0;">
+                    <div th:if="${quickLinks.isEmpty()}"
+                         class="text-center py-4 text-[var(--sh-text-3)] text-xs font-mono">
                         <span th:if="${presentationId == ''}">
-                            Abre esta vista con <code>?presentationId=...</code>
+                            Open with <code class="text-[var(--sh-blue)]">?presentationId=...</code>
                         </span>
                         <span th:if="${presentationId != ''}">
-                            Sin links configurados.
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#links-modal"
-                                class="text-info">Añadir</a>
+                            No links configured.
+                            <a href="#" onclick="openLinksModal(); return false;"
+                               class="text-[var(--sh-blue)] hover:underline">Add</a>
                         </span>
                     </div>
 
                     <button th:each="link : ${quickLinks}" th:data-url="${link.url}" th:data-title="${link.title}"
-                        class="quick-link-btn mb-2" onclick="activateDemoLink(this.dataset.url, this.dataset.title)">
+                            class="quick-link-btn mb-2" onclick="activateDemoLink(this.dataset.url, this.dataset.title)">
                         <i th:if="${link.icon != null}" th:class="${link.icon} + ' fa-fw'"></i>
-                        <i th:if="${link.icon == null}" class="fa fa-link fa-fw"></i>
+                        <i th:if="${link.icon == null}" class="fa-solid fa-link fa-fw"></i>
                         <span>
-                            <span th:text="${link.title}">Título</span>
+                            <span th:text="${link.title}">Title</span>
                             <span th:if="${link.description != null}" th:text="${link.description}"
-                                class="link-desc"></span>
+                                  class="link-desc"></span>
                         </span>
                     </button>
                 </div>
@@ -372,46 +314,58 @@
         </div><!-- /sidebar -->
     </div><!-- /layout -->
 
-    <!-- Modal CRUD Quick Links -->
-    <div class="modal fade" id="links-modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fa fa-bolt me-2"></i>Gestionar Quick Links</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="links-list-modal" class="mb-3"><!-- populated by JS --></div>
-                    <hr style="border-color:#30363d;">
-                    <h6 class="mb-2">Nuevo link</h6>
-                    <div class="row g-2">
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" id="new-link-title" placeholder="Título *">
-                        </div>
-                        <div class="col-md-6">
-                            <input type="url" class="form-control" id="new-link-url" placeholder="URL *">
-                        </div>
-                        <div class="col-md-4">
-                            <input type="text" class="form-control" id="new-link-icon"
-                                placeholder="Icono FA (ej. fa-brands fa-github)">
-                        </div>
-                        <div class="col-md-8">
-                            <input type="text" class="form-control" id="new-link-desc"
-                                placeholder="Descripción (opcional)">
-                        </div>
+
+    <!-- ═══════════════════════════════════
+         MODAL — Quick Links CRUD
+         ═══════════════════════════════════ -->
+    <div id="links-modal" class="sh-overlay hidden" onclick="if(event.target===this)closeLinksModal()">
+        <div class="sh-modal max-w-xl w-[90%]">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-2">
+                    <div class="sh-icon sh-icon-sm sh-icon-blue">
+                        <i class="fa-solid fa-bolt text-xs"></i>
                     </div>
+                    <h3 class="font-brand text-lg">Quick Links</h3>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="addQuickLink()">
-                        <i class="fa fa-plus me-1"></i>Añadir Link
-                    </button>
-                </div>
+                <button class="sh-btn sh-btn-ghost text-xs px-2 py-1" onclick="closeLinksModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Existing links -->
+            <div id="links-list-modal" class="mb-4 max-h-[240px] overflow-y-auto"></div>
+
+            <hr class="sh-divider">
+
+            <!-- New link form -->
+            <div class="sh-label mb-3">ADD_LINK</div>
+            <div class="grid grid-cols-2 gap-2 mb-2">
+                <input type="text" class="sh-input text-xs" id="new-link-title" placeholder="Title *">
+                <input type="url" class="sh-input text-xs" id="new-link-url" placeholder="URL *">
+            </div>
+            <div class="grid grid-cols-[1fr_2fr] gap-2 mb-4">
+                <input type="text" class="sh-input text-xs" id="new-link-icon"
+                       placeholder="FA icon class">
+                <input type="text" class="sh-input text-xs" id="new-link-desc"
+                       placeholder="Description (optional)">
+            </div>
+
+            <!-- Footer -->
+            <div class="flex justify-end gap-2">
+                <button class="sh-btn text-xs" onclick="closeLinksModal()">Close</button>
+                <button class="sh-btn sh-btn-primary text-xs" onclick="addQuickLink()">
+                    <i class="fa-solid fa-plus"></i>
+                    Add_Link
+                </button>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- ═══════════════════════════════════
+         SCRIPTS
+         ═══════════════════════════════════ -->
     <script th:inline="javascript">
         const POLL_INTERVAL_MS = /*[[${pollIntervalMs}]]*/ 1000;
         const PRESENTATION_ID = /*[[${presentationId}]]*/ '';
@@ -444,6 +398,17 @@
         const assignmentsList = document.getElementById('assignments-list');
         const quickSlideTitleInput = document.getElementById('quick-slide-title');
         const quickSlideBodyInput = document.getElementById('quick-slide-body');
+
+        // ── Modal helpers ──────────────────────────────────────────────────────
+
+        function openLinksModal() {
+            loadLinksModal();
+            document.getElementById('links-modal').classList.remove('hidden');
+        }
+
+        function closeLinksModal() {
+            document.getElementById('links-modal').classList.add('hidden');
+        }
 
         // ── Slide grid ─────────────────────────────────────────────────────────
 
@@ -543,15 +508,14 @@
 
         function updateDemoBadge(demo) {
             if (demo.mode === 'url') {
-                demoModeBadge.textContent = '🌐 Demo activa';
-                demoModeBadge.className = 'badge bg-info text-dark';
-                // Marcar el link activo
+                demoModeBadge.textContent = 'URL_ACTIVE';
+                demoModeBadge.className = 'sh-badge-amber';
                 document.querySelectorAll('.quick-link-btn').forEach(btn => {
                     btn.classList.toggle('active-demo', btn.dataset.url === demo.url);
                 });
             } else {
                 demoModeBadge.textContent = 'slides';
-                demoModeBadge.className = 'badge bg-secondary';
+                demoModeBadge.className = 'sh-badge';
                 document.querySelectorAll('.quick-link-btn').forEach(btn => btn.classList.remove('active-demo'));
             }
         }
@@ -590,8 +554,8 @@
 
         function renderParticipants() {
             if (participants.length === 0) {
-                participantsList.innerHTML = '<div class="meeting-help">Sin participantes aún.</div>';
-                assignmentParticipantSelect.innerHTML = '<option value="">Participante</option>';
+                participantsList.innerHTML = '<div class="font-mono text-[0.65rem]" style="color: var(--sh-text-3);">No participants yet.</div>';
+                assignmentParticipantSelect.innerHTML = '<option value="">Participant</option>';
                 return;
             }
 
@@ -599,13 +563,13 @@
                 .map(participant => `
                     <div class="meeting-item">
                         <span>${participant.displayName}</span>
-                        <span class="badge ${participant.presenter ? 'bg-success' : 'bg-secondary'}">${participant.presenter ? 'Expo' : 'Inv'}</span>
+                        <span class="${participant.presenter ? 'sh-badge-green' : 'sh-badge'}" style="font-size:0.6rem; padding:0.15rem 0.4rem;">${participant.presenter ? 'Expo' : 'Inv'}</span>
                     </div>
                 `)
                 .join('');
 
             const selectedParticipant = assignmentParticipantSelect.value;
-            assignmentParticipantSelect.innerHTML = '<option value="">Participante</option>' +
+            assignmentParticipantSelect.innerHTML = '<option value="">Participant</option>' +
                 participants.map(participant =>
                     `<option value="${participant.id}">${participant.displayName}</option>`)
                     .join('');
@@ -616,7 +580,7 @@
 
         function renderAssignments() {
             if (assignments.length === 0) {
-                assignmentsList.innerHTML = '<div class="meeting-help">Sin asignaciones todavía.</div>';
+                assignmentsList.innerHTML = '<div class="font-mono text-[0.65rem]" style="color: var(--sh-text-3);">No assignments yet.</div>';
                 return;
             }
 
@@ -625,7 +589,7 @@
                 .map(assignment => `
                     <div class="meeting-item">
                         <span>Slide ${assignment.slideNumber}</span>
-                        <span class="text-info">${assignment.participantName}</span>
+                        <span style="color: var(--sh-blue);">${assignment.participantName}</span>
                     </div>
                 `)
                 .join('');
@@ -677,7 +641,7 @@
                 headers: { 'Content-Type': 'application/json' }
             });
             if (!res.ok) {
-                showToast('No fue posible iniciar la sesión de reunión.');
+                showToast('Could not start meeting session.');
                 return;
             }
             const session = await res.json();
@@ -688,7 +652,7 @@
             if (!PRESENTATION_ID) return;
             const displayName = participantNameInput.value.trim();
             if (!displayName) {
-                showToast('Ingresa el nombre del participante.');
+                showToast('Enter participant name.');
                 return;
             }
             const res = await fetch(MEETING_API + '/participants', {
@@ -697,7 +661,7 @@
                 body: JSON.stringify({ displayName, presenter: true })
             });
             if (!res.ok) {
-                showToast('No se pudo agregar el participante.');
+                showToast('Could not add participant.');
                 return;
             }
             participantNameInput.value = '';
@@ -709,7 +673,7 @@
             const slideNumber = Number(assignmentSlideSelect.value);
             const participantId = assignmentParticipantSelect.value;
             if (!slideNumber || !participantId) {
-                showToast('Selecciona slide y participante.');
+                showToast('Select slide and participant.');
                 return;
             }
             const res = await fetch(MEETING_API + '/assignments', {
@@ -718,7 +682,7 @@
                 body: JSON.stringify({ slideNumber, participantId })
             });
             if (!res.ok) {
-                showToast('No se pudo guardar la asignación.');
+                showToast('Could not save assignment.');
                 return;
             }
             await loadAssignments();
@@ -726,14 +690,14 @@
 
         async function generateQuickSlide() {
             if (!PRESENTATION_ID) {
-                showToast('Falta presentationId en la URL');
+                showToast('Missing presentationId in URL');
                 return;
             }
 
             const title = quickSlideTitleInput.value.trim();
             const body = quickSlideBodyInput.value.trim();
             if (!title) {
-                showToast('Ingresa un título para la diapositiva');
+                showToast('Enter a slide title');
                 return;
             }
 
@@ -748,21 +712,20 @@
             });
 
             if (!res.ok) {
-                showToast('No se pudo crear la diapositiva rápida');
+                showToast('Could not create quick slide');
                 return;
             }
 
             const data = await res.json();
             quickSlideTitleInput.value = '';
             quickSlideBodyInput.value = '';
-            showToast(`Slide ${data.slideNumber} creada`);
+            showToast(`Slide ${data.slideNumber} created`);
             await loadSlidesCatalog();
             await fetchState();
         }
 
         // ── Demo controls ──────────────────────────────────────────────────────
 
-        /** Activa un quick link como demo, guardando returnSlide. */
         async function activateDemoLink(url, title) {
             try {
                 await fetch(API_DEMO_URL, {
@@ -804,9 +767,9 @@
             if (!joinUrl.value) return;
             try {
                 await navigator.clipboard.writeText(joinUrl.value);
-                showToast('URL de reunión copiada.');
+                showToast('Meeting URL copied.');
             } catch (_) {
-                showToast('No se pudo copiar la URL.');
+                showToast('Could not copy URL.');
             }
         });
 
@@ -818,18 +781,18 @@
             const links = res.ok ? await res.json() : [];
             const container = document.getElementById('links-list-modal');
             if (links.length === 0) {
-                container.innerHTML = '<p class="text-secondary small">Sin links todavía.</p>';
+                container.innerHTML = '<p class="font-mono text-xs" style="color: var(--sh-text-3);">No links yet.</p>';
                 return;
             }
             container.innerHTML = links.map(l => `
-                <div class="link-item d-flex align-items-center gap-2">
-                    <i class="${l.icon || 'fa fa-link'} fa-fw text-info"></i>
-                    <div class="flex-grow-1">
-                        <div class="fw-semibold small">${l.title}</div>
-                        <div class="text-secondary" style="font-size:0.7rem;">${l.url}</div>
+                <div class="link-item">
+                    <i class="${l.icon || 'fa fa-link'} fa-fw" style="color: var(--sh-blue);"></i>
+                    <div style="flex: 1; min-width: 0;">
+                        <div class="text-sm font-medium" style="color: var(--sh-text-1);">${l.title}</div>
+                        <div class="font-mono text-[0.65rem] truncate" style="color: var(--sh-text-3);">${l.url}</div>
                     </div>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteLink('${l.id}')">
-                        <i class="fa fa-trash"></i>
+                    <button class="sh-btn sh-btn-danger text-xs px-2 py-1" onclick="deleteLink('${l.id}')">
+                        <i class="fa-solid fa-trash"></i>
                     </button>
                 </div>`).join('');
         }
@@ -840,7 +803,7 @@
             const url = document.getElementById('new-link-url').value.trim();
             const icon = document.getElementById('new-link-icon').value.trim() || null;
             const description = document.getElementById('new-link-desc').value.trim() || null;
-            if (!title || !url) { alert('Título y URL son obligatorios.'); return; }
+            if (!title || !url) { alert('Title and URL are required.'); return; }
             try {
                 const res = await fetch(LINKS_API, {
                     method: 'POST',
@@ -851,24 +814,21 @@
                     ['new-link-title', 'new-link-url', 'new-link-icon', 'new-link-desc']
                         .forEach(id => document.getElementById(id).value = '');
                     await loadLinksModal();
-                    // Recargar la página para reflejar los links nuevos en el sidebar
                     location.reload();
                 }
             } catch (_) { }
         }
 
         async function deleteLink(linkId) {
-            if (!confirm('¿Eliminar este link?')) return;
+            if (!confirm('Delete this link?')) return;
             try {
                 const res = await fetch(LINKS_API + '/' + linkId, { method: 'DELETE' });
                 if (res.ok) { await loadLinksModal(); location.reload(); }
             } catch (_) { }
         }
 
-        // Cargar links cuando se abre el modal
-        document.getElementById('links-modal').addEventListener('show.bs.modal', loadLinksModal);
+        // ── Init ───────────────────────────────────────────────────────────────
 
-        // Arrancar
         setupMeetingVisibility();
         refreshSlideOptions();
         if (PRESENTATION_ID) {
