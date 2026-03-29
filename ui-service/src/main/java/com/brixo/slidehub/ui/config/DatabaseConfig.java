@@ -92,6 +92,15 @@ public class DatabaseConfig {
     }
 
     /**
+     * Asegura que JPA (EntityManagerFactory) espere a que Flyway termine
+     * antes de validar el esquema.
+     */
+    @Bean
+    public static EntityManagerFactoryDependsOnPostProcessor entityManagerFactoryDependsOnFlyway() {
+        return new EntityManagerFactoryDependsOnPostProcessor("flyway");
+    }
+
+    /**
      * Convierte URL de formato libpq a JDBC si es necesario.
      * Si ya es jdbc:..., la retorna sin cambios.
      */
