@@ -79,6 +79,7 @@ public class RoutesConfig {
         public RouterFunction<ServerResponse> presentationApiRoutes() {
                 return route("presentation-api-routes")
                                 .route(RequestPredicates.path("/api/presentations/**"), http())
+                                .before(forwardedHeaders())
                                 .filter(uri(uiServiceUrl))
                                 .build();
         }
