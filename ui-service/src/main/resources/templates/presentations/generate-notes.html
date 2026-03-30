@@ -5,232 +5,209 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="'Notas IA — ' + ${presentation.name}">Notas IA — SlideHub</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <th:block th:replace="~{fragments/head :: assets}"></th:block>
     <style>
-        body {
-            background: #0f172a;
-            color: #e2e8f0;
-            min-height: 100vh;
-        }
-
-        .card {
-            background: #1e293b;
-            border: 1px solid #334155;
-        }
-
         .slide-thumb {
-            width: 120px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 6px;
-            border: 2px solid #334155;
-            cursor: pointer;
-            transition: border-color 0.2s;
+            width: 120px; height: 80px; object-fit: cover;
+            border-radius: var(--sh-r-md); border: 2px solid var(--sh-border);
+            cursor: pointer; transition: border-color var(--sh-t-fast);
         }
-
-        .slide-thumb:hover {
-            border-color: #3b82f6;
-        }
+        .slide-thumb:hover { border-color: var(--sh-blue); }
 
         .slide-card {
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 1rem;
+            background: var(--sh-deep); border: 1px solid var(--sh-border);
+            border-radius: var(--sh-r-md); padding: 1rem;
         }
-
         .note-card {
-            background: #1a2540;
-            border: 1px solid #2d4a8a;
-            border-radius: 8px;
-            padding: 1rem;
+            background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.15);
+            border-radius: var(--sh-r-md); padding: 1rem;
         }
-
-        .tag-badge {
-            font-size: 0.7rem;
-        }
-
-        #generation-progress {
-            transition: all 0.3s;
-        }
-
-        .phase-indicator {
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
-
         .key-phrase {
-            background: #1d4ed8;
-            border-radius: 4px;
-            padding: 2px 8px;
-            font-size: 0.75rem;
+            background: rgba(88,166,255,0.2); border-radius: var(--sh-r-md);
+            padding: 2px 8px; font-size: 0.75rem; font-family: var(--sh-font-mono);
+            color: var(--sh-blue);
         }
-
         .demo-tag {
-            background: #059669;
-            border-radius: 4px;
-            padding: 2px 8px;
-            font-size: 0.75rem;
+            background: rgba(63,185,80,0.2); border-radius: var(--sh-r-md);
+            padding: 2px 8px; font-size: 0.75rem; font-family: var(--sh-font-mono);
+            color: var(--sh-green);
+        }
+        .progress-track {
+            height: 4px; background: var(--sh-border); border-radius: 2px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: var(--sh-blue); border-radius: 2px;
+            transition: width 0.3s ease;
         }
     </style>
 </head>
 
-<body>
+<body class="sh bg-sh-deep antialiased min-h-screen">
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-dark" style="background:#0f172a; border-bottom:1px solid #1e293b;">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="/presenter">
-                <i class="fa-solid fa-presentation-screen me-2"></i>SlideHub
-            </a>
-            <div class="d-flex align-items-center gap-3">
-                <span class="text-slate-400 small" th:text="${presentation.name}">Presentación</span>
-                <a href="/presentations/import" class="btn btn-sm btn-outline-secondary">
-                    <i class="fa-solid fa-arrow-left me-1"></i>Volver
+    <!-- ═══ Topbar ═══ -->
+    <nav class="sh-nav" style="position: sticky;">
+        <div class="sh-nav-inner">
+            <div class="flex items-center gap-3">
+                <img th:src="@{/images/logo.svg}" alt="SlideHub" class="h-5 w-5">
+                <span class="font-brand text-base tracking-tight">AI_Notes</span>
+                <span class="font-mono text-xs text-[var(--sh-text-3)]" th:text="${presentation.name}">Presentation</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="/presentations/import" class="sh-btn sh-btn-ghost text-xs">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span class="hidden sm:inline">Back</span>
+                </a>
+                <a href="/presenter" class="sh-btn sh-btn-ghost text-xs">
+                    <i class="fa-solid fa-chalkboard"></i>
                 </a>
             </div>
         </div>
     </nav>
 
-    <div class="container-fluid py-4">
-        <div class="row g-4">
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        <div class="flex flex-col lg:flex-row gap-6">
 
-            <!-- Columna izquierda: configuración y control -->
-            <div class="col-lg-4">
-                <div class="card rounded-3 p-3 mb-3">
-                    <h6 class="text-slate-300 mb-3">
-                        <i class="fa-solid fa-robot me-2 text-blue-400"></i>Generar Notas con IA
-                    </h6>
+            <!-- Left column: config + controls -->
+            <div class="lg:w-[340px] flex-shrink-0 space-y-4">
 
-                    <div class="mb-3">
-                        <div class="badge mb-2"
-                            th:classappend="${presentation.sourceType.name() == 'DRIVE'} ? 'bg-primary' : 'bg-success'"
-                            th:text="${presentation.sourceType.name() == 'DRIVE' ? 'Google Drive' : 'Upload Manual'}">
-                        </div>
-                        <div class="text-white fw-semibold" th:text="${presentation.name}">Nombre</div>
-                        <div class="text-slate-400 small" th:text="${totalSlides} + ' slides'">0 slides</div>
+                <!-- Config card -->
+                <div class="sh-card p-4">
+                    <div class="sh-label mb-4">
+                        <i class="fa-solid fa-robot mr-1"></i>GENERATE_AI_NOTES
                     </div>
 
-                    <!-- Campo repoUrl -->
-                    <div class="mb-3">
-                        <label class="form-label small text-slate-300">
-                            <i class="fa-brands fa-github me-1"></i>Repositorio GitHub
+                    <div class="mb-4">
+                        <span class="sh-badge mb-2"
+                              th:classappend="${presentation.sourceType.name() == 'DRIVE'} ? 'sh-badge-blue' : 'sh-badge-green'"
+                              th:text="${presentation.sourceType.name() == 'DRIVE' ? 'Google_Drive' : 'Manual_Upload'}">
+                        </span>
+                        <div class="text-[var(--sh-text-1)] font-semibold mt-1" th:text="${presentation.name}">Name</div>
+                        <div class="text-[var(--sh-text-3)] text-xs font-mono" th:text="${totalSlides} + ' slides'">0 slides</div>
+                    </div>
+
+                    <!-- Repo URL -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-mono text-[var(--sh-text-3)] mb-1">
+                            <i class="fa-brands fa-github mr-1"></i>REPO_URL
                         </label>
-                        <input type="url" id="repo-url" class="form-control bg-dark text-white border-secondary"
-                            placeholder="https://github.com/user/repo" th:value="${presentation.repoUrl}">
-                        <div class="form-text text-slate-500">
-                            Gemini analizará el repo para generar notas más precisas.
+                        <input type="url" id="repo-url" class="sh-input w-full"
+                               placeholder="https://github.com/user/repo" th:value="${presentation.repoUrl}">
+                        <div class="text-[var(--sh-text-3)] text-xs mt-1">
+                            Gemini analyzes the repo for more precise notes.
                         </div>
                     </div>
 
                     <!-- Pipeline description -->
-                    <div class="mb-3 p-2 rounded" style="background:#0f172a; font-size:0.78rem; color:#64748b;">
-                        <div class="mb-1"><i class="fa-solid fa-eye me-1 text-purple-400"></i>Gemini Vision — analiza
-                            cada slide</div>
-                        <div class="mb-1"><i class="fa-solid fa-code-branch me-1 text-yellow-400"></i>Gemini — extrae
-                            contexto del repo</div>
-                        <div><i class="fa-solid fa-bolt me-1 text-green-400"></i>Groq — genera notas estructuradas</div>
+                    <div class="rounded p-3 mb-4" style="background: var(--sh-deep); font-size: 0.75rem;">
+                        <div class="flex items-center gap-2 mb-1.5 text-[var(--sh-text-3)]">
+                            <i class="fa-solid fa-eye" style="color: var(--sh-blue);"></i>
+                            <span>Gemini_Vision — visual slide analysis</span>
+                        </div>
+                        <div class="flex items-center gap-2 mb-1.5 text-[var(--sh-text-3)]">
+                            <i class="fa-solid fa-code-branch" style="color: var(--sh-amber);"></i>
+                            <span>Gemini — repo context extraction</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-[var(--sh-text-3)]">
+                            <i class="fa-solid fa-bolt" style="color: var(--sh-green);"></i>
+                            <span>Groq — structured note generation</span>
+                        </div>
                     </div>
 
-                    <!-- Botón de generación -->
-                    <button type="button" class="btn btn-primary w-100" id="btn-generate" onclick="generateAllNotes()">
-                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Generar Todas las Notas
+                    <!-- Generate button -->
+                    <button type="button" class="sh-btn sh-btn-primary w-full" id="btn-generate" onclick="generateAllNotes()">
+                        <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Generate_All_Notes
                     </button>
-                    <div class="form-text text-slate-500 small mt-1">
-                        ~<span th:text="${totalSlides * 5}">30</span> segundos para
+                    <div class="text-[var(--sh-text-3)] text-xs font-mono mt-1.5 text-center">
+                        ~<span th:text="${totalSlides * 5}">30</span>s for
                         <span th:text="${totalSlides}">N</span> slides
                     </div>
                 </div>
 
-                <!-- Progreso de generación -->
-                <div id="generation-progress" class="card rounded-3 p-3 d-none">
-                    <div class="d-flex align-items-center gap-2 mb-2">
-                        <i class="fa-solid fa-spinner fa-spin text-blue-400"></i>
-                        <span class="fw-semibold small">Generando notas…</span>
+                <!-- Progress card -->
+                <div id="generation-progress" class="sh-card p-4 hidden">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="fa-solid fa-spinner fa-spin" style="color: var(--sh-blue);"></i>
+                        <span class="font-mono text-sm text-[var(--sh-text-1)]">Generating_Notes…</span>
                     </div>
-                    <div class="progress mb-2" style="height: 6px;">
-                        <div class="progress-bar bg-blue-500" id="progress-bar" role="progressbar" style="width: 0%">
-                        </div>
+                    <div class="progress-track mb-2">
+                        <div class="progress-fill" id="progress-bar" style="width: 0%"></div>
                     </div>
-                    <div id="progress-text" class="phase-indicator">Iniciando pipeline de IA…</div>
+                    <div id="progress-text" class="text-xs font-mono text-[var(--sh-text-3)]">Starting AI pipeline…</div>
                 </div>
 
-                <!-- Resultado de generación -->
-                <div id="generation-result" class="card rounded-3 p-3 d-none">
-                    <div id="result-success" class="d-none">
-                        <div class="text-success fw-semibold">
-                            <i class="fa-solid fa-circle-check me-2"></i>¡Notas generadas!
+                <!-- Result card -->
+                <div id="generation-result" class="sh-card p-4 hidden">
+                    <div id="result-success" class="hidden">
+                        <div class="flex items-center gap-2" style="color: var(--sh-green);">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span class="font-mono text-sm font-semibold">Notes_Generated</span>
                         </div>
-                        <div id="result-count" class="text-slate-400 small mt-1"></div>
+                        <div id="result-count" class="text-[var(--sh-text-3)] text-xs font-mono mt-1"></div>
                     </div>
-                    <div id="result-error" class="d-none">
-                        <div class="text-danger fw-semibold">
-                            <i class="fa-solid fa-triangle-exclamation me-2"></i>Error
+                    <div id="result-error" class="hidden">
+                        <div class="flex items-center gap-2" style="color: var(--sh-red);">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <span class="font-mono text-sm font-semibold">Error</span>
                         </div>
-                        <div id="error-message" class="text-slate-400 small mt-1"></div>
+                        <div id="error-message" class="text-[var(--sh-text-3)] text-xs font-mono mt-1"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Columna central+derecha: slides + notas -->
-            <div class="col-lg-8">
-
-                <!-- Slides con sus notas -->
-                <div id="slides-container">
-                    <div th:if="${#lists.isEmpty(presentation.slides)}" class="text-slate-500 text-center py-5">
-                        Esta presentación no tiene slides aún.
+            <!-- Right column: slides + notes -->
+            <div class="flex-1 min-w-0">
+                <div id="slides-container" class="space-y-3">
+                    <div th:if="${#lists.isEmpty(presentation.slides)}"
+                         class="text-center py-12 text-[var(--sh-text-3)]">
+                        <i class="fa-solid fa-image text-2xl mb-3 block opacity-40"></i>
+                        <p class="text-xs font-mono">No slides in this presentation yet.</p>
                     </div>
 
                     <div th:each="slide : ${presentation.slides}" th:id="${'slide-' + slide.number}"
-                        class="slide-card mb-3">
-                        <div class="row g-3 align-items-start">
+                         class="slide-card">
+                        <div class="flex gap-4">
 
                             <!-- Thumbnail -->
-                            <div class="col-auto">
-                                <img th:src="${slide.s3Url}" th:alt="${'Slide ' + slide.number}" class="slide-thumb"
-                                    loading="lazy" onerror="this.style.display='none'">
+                            <div class="flex-shrink-0">
+                                <img th:src="${slide.s3Url}" th:alt="${'Slide ' + slide.number}"
+                                     class="slide-thumb" loading="lazy" onerror="this.style.display='none'">
                             </div>
 
-                            <!-- Nota del slide -->
-                            <div class="col">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span class="badge bg-secondary me-2" th:text="${'Slide ' + slide.number}">Slide
-                                        N</span>
+                            <!-- Note content -->
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="sh-badge" th:text="${'Slide_' + slide.number}">Slide N</span>
                                     <span th:each="note : ${existingNotes}"
-                                        th:if="${note.get('slideNumber') == slide.number}"
-                                        class="badge bg-success tag-badge">
-                                        <i class="fa-solid fa-robot me-1"></i>Nota generada
+                                          th:if="${note.get('slideNumber') == slide.number}"
+                                          class="sh-badge-green text-xs">
+                                        <i class="fa-solid fa-robot mr-1"></i>AI_Note
                                     </span>
                                 </div>
 
-                                <!-- Nota existente -->
+                                <!-- Existing note -->
                                 <div th:each="note : ${existingNotes}"
-                                    th:if="${note.get('slideNumber') == slide.number}"
-                                    th:id="${'note-content-' + slide.number}" class="note-card">
-                                    <div class="fw-semibold mb-2" th:text="${note.get('title')}">Título</div>
-                                    <ul class="mb-2 ps-3" style="font-size:0.85rem;">
-                                        <li th:each="point : ${note.get('points')}" th:text="${point}"
-                                            class="text-slate-300 mb-1">
-                                        </li>
+                                     th:if="${note.get('slideNumber') == slide.number}"
+                                     th:id="${'note-content-' + slide.number}" class="note-card">
+                                    <div class="font-semibold text-sm text-[var(--sh-text-1)] mb-2" th:text="${note.get('title')}">Title</div>
+                                    <ul class="mb-2 pl-4 space-y-1 text-sm text-[var(--sh-text-2)]">
+                                        <li th:each="point : ${note.get('points')}" th:text="${point}"></li>
                                     </ul>
-                                    <div class="d-flex flex-wrap gap-1 mb-1">
-                                        <span th:each="kp : ${note.get('keyPhrases')}" th:text="${kp}"
-                                            class="key-phrase text-white"></span>
+                                    <div class="flex flex-wrap gap-1 mb-1">
+                                        <span th:each="kp : ${note.get('keyPhrases')}" th:text="${kp}" class="key-phrase"></span>
                                     </div>
-                                    <div class="d-flex flex-wrap gap-1">
-                                        <span th:each="tag : ${note.get('demoTags')}" th:text="${tag}"
-                                            class="demo-tag text-white"></span>
+                                    <div class="flex flex-wrap gap-1">
+                                        <span th:each="tag : ${note.get('demoTags')}" th:text="${tag}" class="demo-tag"></span>
                                     </div>
-                                    <div class="text-slate-500 small mt-2" th:if="${note.get('suggestedTime') != null}"
-                                        th:text="'⏱ ' + ${note.get('suggestedTime')}"></div>
+                                    <div class="text-[var(--sh-text-3)] text-xs font-mono mt-2"
+                                         th:if="${note.get('suggestedTime') != null}"
+                                         th:text="'⏱ ' + ${note.get('suggestedTime')}"></div>
                                 </div>
 
-                                <!-- Placeholder si no hay nota todavía -->
+                                <!-- Placeholder -->
                                 <div th:if="${#lists.isEmpty(existingNotes) || !#lists.contains(existingNotes.![get('slideNumber')], slide.number)}"
-                                    th:id="${'note-placeholder-' + slide.number}"
-                                    class="text-slate-500 small fst-italic py-2">
-                                    No hay nota para este slide. Genera notas con IA.
+                                     th:id="${'note-placeholder-' + slide.number}"
+                                     class="text-[var(--sh-text-3)] text-xs font-mono italic py-2">
+                                    No note for this slide. Generate with AI.
                                 </div>
                             </div>
                         </div>
@@ -243,26 +220,25 @@
     <script th:inline="javascript">
         const presentationId = /*[[${presentation.id}]]*/ '';
         const totalSlides = /*[[${totalSlides}]]*/ 0;
+        const INTER_SLIDE_MS = 1500;
 
         async function generateAllNotes() {
             const repoUrl = document.getElementById('repo-url').value.trim();
             const btn = document.getElementById('btn-generate');
 
             btn.disabled = true;
-            document.getElementById('generation-progress').classList.remove('d-none');
-            document.getElementById('generation-result').classList.add('d-none');
-            document.getElementById('result-success').classList.add('d-none');
-            document.getElementById('result-error').classList.add('d-none');
-            updateProgress(0, 'Conectando con el pipeline de IA…');
+            document.getElementById('generation-progress').classList.remove('hidden');
+            document.getElementById('generation-result').classList.add('hidden');
+            document.getElementById('result-success').classList.add('hidden');
+            document.getElementById('result-error').classList.add('hidden');
+            updateProgress(0, 'Connecting to AI pipeline…');
 
-            // Fake progress animation mientras la petición está en vuelo
             let fakePct = 5;
             const fakeTimer = setInterval(() => {
                 if (fakePct < 90) {
                     fakePct += Math.random() * 3;
                     const slideEst = Math.floor((fakePct / 100) * totalSlides);
-                    updateProgress(fakePct,
-                        `Analizando slide ~${slideEst + 1} de ${totalSlides}…`);
+                    updateProgress(fakePct, `Analyzing slide ~${slideEst + 1} of ${totalSlides}…`);
                 }
             }, INTER_SLIDE_MS);
 
@@ -277,27 +253,26 @@
                 clearInterval(fakeTimer);
                 const data = await res.json();
 
-                updateProgress(100, '¡Completado!');
-                document.getElementById('generation-result').classList.remove('d-none');
+                updateProgress(100, 'Complete!');
+                document.getElementById('generation-result').classList.remove('hidden');
 
                 if (res.ok && data.success !== false) {
-                    document.getElementById('result-success').classList.remove('d-none');
+                    document.getElementById('result-success').classList.remove('hidden');
                     document.getElementById('result-count').textContent =
-                        `${data.notesGenerated} de ${data.totalSlides || totalSlides} notas generadas.`;
-                    // Recargar la página para mostrar las notas recién generadas
+                        `${data.notesGenerated} of ${data.totalSlides || totalSlides} notes generated.`;
                     setTimeout(() => window.location.reload(), 2000);
                 } else {
-                    document.getElementById('result-error').classList.remove('d-none');
+                    document.getElementById('result-error').classList.remove('hidden');
                     document.getElementById('error-message').textContent =
-                        data.error || data.errorMessage || 'Error desconocido.';
+                        data.error || data.errorMessage || 'Unknown error.';
                     btn.disabled = false;
                 }
             } catch (e) {
                 clearInterval(fakeTimer);
-                document.getElementById('generation-result').classList.remove('d-none');
-                document.getElementById('result-error').classList.remove('d-none');
+                document.getElementById('generation-result').classList.remove('hidden');
+                document.getElementById('result-error').classList.remove('hidden');
                 document.getElementById('error-message').textContent =
-                    'Error de conexión: ' + e.message;
+                    'Connection error: ' + e.message;
                 btn.disabled = false;
             }
         }
@@ -306,9 +281,6 @@
             document.getElementById('progress-bar').style.width = Math.min(100, pct) + '%';
             document.getElementById('progress-text').textContent = text;
         }
-
-        // Tiempo estimado entre slides (ms) reflejando el delay en NotesService
-        const INTER_SLIDE_MS = 1500;
     </script>
 </body>
 
