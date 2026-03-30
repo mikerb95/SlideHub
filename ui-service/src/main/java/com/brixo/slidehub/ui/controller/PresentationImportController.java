@@ -56,12 +56,30 @@ public class PresentationImportController {
         this.authorizedClientService = authorizedClientService;
     }
 
-    // ── Vista MVC ─────────────────────────────────────────────────────────────
+    // ── Vistas MVC ────────────────────────────────────────────────────────────
+
+    /** Dashboard de presentaciones — landing post-login. */
+    @GetMapping("/presentations")
+    public String dashboard(Authentication authentication, Model model) {
+        User user = resolveUser(authentication);
+        List<PresentationSummary> presentations = presentationService
+                .listPresentations(user.getId())
+                .stream()
+                .map(PresentationSummary::from)
+                .toList();
+        model.addAttribute("presentations", presentations);
+        return "presentations/dashboard";
+    }
+
+    /** Wizard de creación de presentación (6 pasos). */
+    @GetMapping("/presentations/new")
+    public String wizard(Authentication authentication, Model model) {
+        model.addAttribute("hasGoogleToken", hasGoogleToken(authentication));
+        return "presentations/wizard";
+    }
 
     /**
-     * Vista principal de importación de presentaciones.
-     * Carga la lista de presentaciones del usuario para mostrarla en la misma
-     * página.
+     * Vista de importación (legacy, sigue accesible).
      */
     @GetMapping("/presentations/import")
     public String importPage(Authentication authentication, Model model) {

@@ -78,13 +78,13 @@ public class SecurityConfig {
                                 .formLogin(form -> form
                                                 .loginPage("/auth/login")
                                                 .loginProcessingUrl("/auth/login")
-                                                .defaultSuccessUrl("/presenter", true)
+                                                .defaultSuccessUrl("/presentations", true)
                                                 .failureUrl("/auth/login?error=true")
                                                 .permitAll())
                                 // Login OAuth2 (GitHub y Google)
                                 .oauth2Login(oauth -> oauth
                                                 .loginPage("/auth/login")
-                                                .defaultSuccessUrl("/presenter", true)
+                                                .defaultSuccessUrl("/presentations", true)
                                                 .failureUrl("/auth/login?error=oauth2")
                                                 .userInfoEndpoint(userInfo -> userInfo
                                                                 .userService(oAuth2UserService)))
