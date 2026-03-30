@@ -98,6 +98,9 @@ public class AuthController {
                     "¡Cuenta creada! Revisa tu email (" + email
                             + ") para confirmar tu cuenta antes de iniciar sesión.");
             return "auth/register";
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "auth/register";
         } catch (UserAlreadyExistsException ex) {
             // Mensaje genérico para no revelar si fue el username o el email (seguridad)
             model.addAttribute("errorMessage", "El usuario o email ya está registrado. Prueba con otro.");

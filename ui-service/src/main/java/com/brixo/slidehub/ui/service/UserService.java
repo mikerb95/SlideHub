@@ -46,6 +46,10 @@ public class UserService {
      */
     @Transactional
     public User registerUser(String username, String email, String rawPassword) {
+        if (username == null || !username.matches("^[a-zA-Z0-9._-]{3,30}$")) {
+            throw new IllegalArgumentException(
+                    "El nombre de usuario solo puede contener letras, numeros, puntos, guiones y guiones bajos (3-30 caracteres).");
+        }
         if (userRepository.findByUsername(username).isPresent()) {
             throw new UserAlreadyExistsException("El nombre de usuario ya está registrado.");
         }
