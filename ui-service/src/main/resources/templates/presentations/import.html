@@ -75,7 +75,7 @@
                         </div>
                         <div th:each="p : ${presentations}"
                              class="bg-[var(--sh-deep)] border border-[var(--sh-border)] rounded-tech p-3">
-                            <div class="flex justify-between items-start">
+                            <div class="flex justify-between items-start mb-2">
                                 <div>
                                     <div class="text-sm font-medium text-[var(--sh-text-1)]" th:text="${p.name()}">Name</div>
                                     <div class="font-mono text-xs text-[var(--sh-text-3)]" th:text="${p.totalSlides()} + ' slides'">0 slides</div>
@@ -84,6 +84,20 @@
                                       th:classappend="${p.sourceType() == 'DRIVE'} ? 'sh-badge-blue' : 'sh-badge-green'"
                                       th:text="${p.sourceType() == 'DRIVE' ? 'Drive' : 'Upload'}">
                                 </span>
+                            </div>
+                            <div class="flex gap-1.5 flex-wrap">
+                                <a th:href="@{/main-panel(presentationId=${p.id()})}"
+                                   class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
+                                    <i class="fa-solid fa-table-cells-large"></i> Panel
+                                </a>
+                                <a th:href="@{/presenter(presentationId=${p.id()})}"
+                                   class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
+                                    <i class="fa-solid fa-chalkboard"></i> Present
+                                </a>
+                                <a th:href="@{/presentations/{id}/generate-notes(id=${p.id()})}"
+                                   class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
+                                    <i class="fa-solid fa-robot"></i> AI_Notes
+                                </a>
                             </div>
                         </div>
                     </div>
