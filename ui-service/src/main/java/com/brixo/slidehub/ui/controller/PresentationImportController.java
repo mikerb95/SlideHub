@@ -27,7 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Controller de importación y gestión de presentaciones (PLAN-EXPANSION.md Fase
