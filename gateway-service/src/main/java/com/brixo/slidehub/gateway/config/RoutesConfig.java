@@ -116,6 +116,7 @@ public class RoutesConfig {
                                                                 .or(RequestPredicates.path("/js/**"))
                                                                 .or(RequestPredicates.path("/favicon.ico")), // Fase 2
                                                 http())
+                                .before(forwardedHeaders())
                                 .filter(uri(uiServiceUrl))
                                 .build();
         }
