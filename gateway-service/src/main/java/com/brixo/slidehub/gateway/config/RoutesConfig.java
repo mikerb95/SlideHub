@@ -127,6 +127,7 @@ public class RoutesConfig {
         public RouterFunction<ServerResponse> presentationRoutes() {
                 return route("presentation-routes")
                                 .route(RequestPredicates.path("/presentation/**"), http())
+                                .before(forwardedHeaders())
                                 .filter(uri(uiServiceUrl))
                                 .build();
         }
