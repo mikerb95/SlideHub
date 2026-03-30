@@ -29,6 +29,8 @@ services:
         value: https://slidehub-ui.onrender.com
       - key: AI_SERVICE_URL
         value: https://slidehub-ai.onrender.com
+      - key: BASE_URL
+        value: https://slide.lat
 
   # ────────────────────────────────────────────────────────────────
   # State Service (puerto 8081) — Gestión de estado en Redis
