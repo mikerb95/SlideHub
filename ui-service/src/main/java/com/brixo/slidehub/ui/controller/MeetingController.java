@@ -191,7 +191,8 @@ public class MeetingController {
             throw new IllegalArgumentException("Autenticación requerida.");
         }
         String identifier = authentication.getName();
-        Optional<User> user = userRepository.findByEmail(identifier);
-        return user.orElseThrow(() -> new IllegalArgumentException("Usuario autenticado no encontrado."));
+        return userRepository.findByEmail(identifier)
+                .or(() -> userRepository.findByUsername(identifier))
+                .orElseThrow(() -> new IllegalArgumentException("Usuario autenticado no encontrado."));
     }
 }

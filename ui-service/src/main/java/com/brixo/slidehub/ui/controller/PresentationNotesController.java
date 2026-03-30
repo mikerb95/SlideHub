@@ -189,6 +189,7 @@ public class PresentationNotesController {
     private User resolveUser(Authentication authentication) {
         String identifier = authentication.getName();
         return userRepository.findByEmail(identifier)
+                .or(() -> userRepository.findByUsername(identifier))
                 .orElseThrow(() -> new IllegalStateException("Usuario autenticado no encontrado: " + identifier));
     }
 }
