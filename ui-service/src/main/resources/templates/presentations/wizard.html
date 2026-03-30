@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Presentacion — SlideHub</title>
+    <th:block th:replace="~{fragments/head :: assets}"></th:block>
+    <style>
+        /* ── Wizard step indicator ── */
+        .step-dot {
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--sh-font-mono); font-size: 0.75rem; font-weight: 600;
+            border: 2px solid var(--sh-border);
+            color: var(--sh-text-3); background: var(--sh-deep);
+            transition: all 0.3s ease;
+        }
+        .step-dot.active { border-color: var(--sh-blue); color: var(--sh-blue); background: rgba(88,166,255,0.1); }
+        .step-dot.done   { border-color: var(--sh-green); color: var(--sh-deep); background: var(--sh-green); }
+        .step-line {
+            flex: 1; height: 2px; background: var(--sh-border); transition: background 0.3s ease;
+        }
+        .step-line.done { background: var(--sh-green); }
+
+        /* ── Upload zone ── */
+        #upload-drop-zone {
+            border: 2px dashed var(--sh-border-active); border-radius: var(--sh-r-md);
+            padding: 2.5rem; text-align: center; cursor: pointer;
+            transition: border-color var(--sh-t-fast), background var(--sh-t-fast);
+        }
+        #upload-drop-zone.drag-over { border-color: var(--sh-blue); background: var(--sh-blue-dim); }
+
+        /* ── Folder/image items ── */
+        .folder-item {
+            cursor: pointer; padding: 0.4rem 0.7rem; border-radius: var(--sh-r-md);
+            transition: background var(--sh-t-fast), border-color var(--sh-t-fast);
+            background: var(--sh-deep); border: 1px solid var(--sh-border);
+            font-family: var(--sh-font-mono); font-size: 0.8rem; color: var(--sh-text-2);
+        }
+        .folder-item:hover { border-color: var(--sh-blue); color: var(--sh-text-1); }
+        .folder-item.selected { background: var(--sh-blue-dim); border-color: var(--sh-blue); color: var(--sh-blue); }
+
+        /* ── Progress bar ── */
+        .progress-track { height: 4px; background: var(--sh-border); border-radius: 2px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--sh-blue); border-radius: 2px; transition: width 0.3s ease; }
+
+        /* ── Note cards ── */
+        .note-card {
+            background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.15);
+            border-radius: var(--sh-r-md); padding: 1rem;
+        }
+        .key-phrase {
+            background: rgba(88,166,255,0.2); border-radius: var(--sh-r-md);
+            padding: 2px 8px; font-size: 0.75rem; font-family: var(--sh-font-mono); color: var(--sh-blue);
+        }
+
+        /* ── Participant items ── */
+        .participant-item {
+            background: var(--sh-deep); border: 1px solid var(--sh-border); border-radius: var(--sh-r-md);
+            padding: 0.5rem 0.75rem; display: flex; justify-content: space-between; align-items: center;
+        }
+
+        /* ── Step panel transitions ── */
+        .wizard-step { display: none; animation: fade-in 0.4s ease both; }
+        .wizard-step.active { display: block; }
+    </style>
+</head>
+
+<body class="sh bg-sh-deep antialiased min-h-screen">
+
+    <!-- ═══ Nav ═══ -->
+    <nav class="sh-nav">
+        <div class="sh-nav-inner">
+            <div class="flex items-center gap-3">
+                <a href="/presentations" class="flex items-center gap-3 no-underline text-[var(--sh-text-1)]">
+                    <span class="font-brand text-base tracking-tight">SlideHub</span>
+                </a>
+                <span class="sh-badge ml-1">SETUP</span>
+            </div>
+            <a href="/presentations" class="sh-btn sh-btn-ghost text-xs">
+                <i class="fa-solid fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </nav>
+
+    <div class="max-w-3xl mx-auto px-4 pt-16 pb-12">
+
+        <!-- ═══ Step Indicator ═══ -->
+        <div class="flex items-center gap-0 mb-8 px-4" id="step-indicator">
+            <div class="step-dot active" data-step="1">1</div>
+            <div class="step-line" data-line="1"></div>
+            <div class="step-dot" data-step="2">2</div>
+            <div class="step-line" data-line="2"></div>
+            <div class="step-dot" data-step="3">3</div>
+            <div class="step-line" data-line="3"></div>
+            <div class="step-dot" data-step="4">4</div>
+            <div class="step-line" data-line="4"></div>
+            <div class="step-dot" data-step="5">5</div>
+            <div class="step-line" data-line="5"></div>
+            <div class="step-dot" data-step="6">6</div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- STEP 1: Upload Slides                                              -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <div class="wizard-step active" id="step-1">
+            <div class="sh-card p-6">
+                <div class="sh-label mb-1"><i class="fa-solid fa-upload mr-1"></i>STEP_1</div>
+                <h2 class="font-brand text-2xl mb-2 text-[var(--sh-text-1)]">Sube tu presentacion</h2>
+                <p class="text-sm text-[var(--sh-text-3)] mb-5">Importa las diapositivas desde Google Drive o sube los archivos desde tu PC.</p>
+
+                <!-- Name + Description -->
+                <div class="grid md:grid-cols-2 gap-3 mb-5">
+                    <div>
+                        <label class="sh-input-label">Nombre *</label>
+                        <input type="text" id="pres-name" class="sh-input" placeholder="Mi presentacion">
+                    </div>
+                    <div>
+                        <label class="sh-input-label">Descripcion</label>
+                        <input type="text" id="pres-desc" class="sh-input" placeholder="Opcional">
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="sh-tabs mb-5">
+                    <button class="sh-tab" id="tab-upload" onclick="showImportTab('upload')">
+                        <i class="fa-solid fa-upload mr-1"></i> Subir archivos
+                    </button>
+                    <button class="sh-tab" id="tab-drive" onclick="showImportTab('drive')">
+                        <i class="fa-brands fa-google-drive mr-1"></i> Google Drive
+                    </button>
+                </div>
+
+                <!-- Upload Panel -->
+                <div id="panel-upload">
+                    <div id="upload-drop-zone" onclick="document.getElementById('file-input').click()">
+                        <i class="fa-solid fa-cloud-arrow-up text-2xl mb-2 block text-[var(--sh-text-3)]"></i>
+                        <p class="text-sm text-[var(--sh-text-2)] mb-1">Arrastra imagenes aqui o haz clic</p>
+                        <p class="font-mono text-xs text-[var(--sh-text-3)]">PNG, JPG, GIF, WEBP</p>
+                        <input type="file" id="file-input" accept=".png,.jpg,.jpeg,.gif,.webp" multiple
+                               class="hidden" onchange="onFilesSelected(event)">
+                    </div>
+                    <div id="file-preview" class="mt-3 flex flex-wrap gap-2"></div>
+                    <div id="upload-error" class="sh-alert sh-alert-error hidden mt-2"></div>
+                    <button type="button" class="sh-btn sh-btn-primary mt-4" id="btn-upload" onclick="doUpload()" disabled>
+                        <i class="fa-solid fa-upload mr-1"></i> Subir Presentacion
+                    </button>
+                    <div id="upload-progress" class="hidden mt-2 font-mono text-xs text-[var(--sh-text-3)]">
+                        <i class="fa-solid fa-spinner fa-spin mr-1"></i>Subiendo archivos...
+                    </div>
+                </div>
+
+                <!-- Drive Panel -->
+                <div id="panel-drive" class="hidden">
+                    <div th:if="${!hasGoogleToken}" class="sh-alert sh-alert-warn mb-4">
+                        <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+                        <span>Vincula tu <a href="/oauth2/authorization/google" class="underline">cuenta de Google</a> para acceder a Drive.</span>
+                    </div>
+                    <div th:if="${hasGoogleToken}">
+                        <div class="flex items-center gap-2 mb-3">
+                            <label class="sh-input-label mb-0">Carpeta de Drive *</label>
+                            <button type="button" class="sh-btn text-xs py-0.5 px-2" onclick="loadFolders()">
+                                <i class="fa-solid fa-arrows-rotate"></i> Cargar
+                            </button>
+                        </div>
+                        <div id="folders-loading" class="hidden font-mono text-xs text-[var(--sh-text-3)] mb-2">
+                            <i class="fa-solid fa-spinner fa-spin mr-1"></i>Cargando carpetas...
+                        </div>
+                        <div id="folders-list" class="flex flex-wrap gap-2 mb-4"></div>
+                        <div id="images-section" class="hidden mb-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="sh-input-label mb-0">Imagenes</span>
+                                <span id="images-count" class="sh-badge text-[0.6rem]">0</span>
+                            </div>
+                            <div id="images-list" class="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto"></div>
+                        </div>
+                        <div id="drive-error" class="sh-alert sh-alert-error hidden mb-3"></div>
+                        <button type="button" class="sh-btn sh-btn-primary" id="btn-import-drive" onclick="doDriveImport()" disabled>
+                            <i class="fa-solid fa-download mr-1"></i> Importar desde Drive
+                        </button>
+                        <div id="drive-progress" class="hidden mt-2 font-mono text-xs text-[var(--sh-text-3)]">
+                            <i class="fa-solid fa-spinner fa-spin mr-1"></i>Importando...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- STEP 2: GitHub Repo                                                -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <div class="wizard-step" id="step-2">
+            <div class="sh-card p-6">
+                <div class="sh-label mb-1"><i class="fa-brands fa-github mr-1"></i>STEP_2</div>
+                <h2 class="font-brand text-2xl mb-2 text-[var(--sh-text-1)]">Repositorio GitHub</h2>
+                <p class="text-sm text-[var(--sh-text-3)] mb-5">Proporciona la URL del repositorio para que Gemini analice el contexto del proyecto.</p>
+
+                <div class="mb-4">
+                    <label class="sh-input-label">URL del Repositorio</label>
+                    <input type="url" id="repo-url" class="sh-input" placeholder="https://github.com/usuario/proyecto">
+                    <div class="text-xs text-[var(--sh-text-3)] mt-1">Gemini usara el codigo fuente para generar notas mas precisas.</div>
+                </div>
+
+                <button type="button" class="sh-btn sh-btn-primary" id="btn-analyze-repo" onclick="analyzeRepo()">
+                    <i class="fa-solid fa-magnifying-glass-chart mr-1"></i> Analizar Repositorio
+                </button>
+                <div id="repo-progress" class="hidden mt-3 font-mono text-xs text-[var(--sh-text-3)]">
+                    <i class="fa-solid fa-spinner fa-spin mr-1"></i>Analizando repositorio con Gemini...
+                </div>
+                <div id="repo-result" class="hidden mt-3 note-card">
+                    <div class="font-mono text-xs text-[var(--sh-green)] mb-2"><i class="fa-solid fa-check mr-1"></i>Repositorio analizado</div>
+                    <div id="repo-summary" class="text-sm text-[var(--sh-text-2)]"></div>
+                </div>
+                <div id="repo-error" class="sh-alert sh-alert-error hidden mt-3"></div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- STEP 3: AI Analysis + Notes Generation                             -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <div class="wizard-step" id="step-3">
+            <div class="sh-card p-6">
+                <div class="sh-label mb-1"><i class="fa-solid fa-robot mr-1"></i>STEP_3</div>
+                <h2 class="font-brand text-2xl mb-2 text-[var(--sh-text-1)]">Analisis IA de diapositivas</h2>
+                <p class="text-sm text-[var(--sh-text-3)] mb-5">Gemini analiza visualmente cada diapositiva y Groq genera notas de apoyo para el presentador.</p>
+
+                <!-- Pipeline info -->
+                <div class="rounded p-3 mb-5" style="background: var(--sh-deep); font-size: 0.75rem;">
+                    <div class="flex items-center gap-2 mb-1.5 text-[var(--sh-text-3)]">
+                        <i class="fa-solid fa-eye" style="color: var(--sh-blue);"></i>
+                        <span>Gemini_Vision — analisis visual de cada slide</span>
+                    </div>
+                    <div class="flex items-center gap-2 mb-1.5 text-[var(--sh-text-3)]">
+                        <i class="fa-solid fa-code-branch" style="color: var(--sh-amber);"></i>
+                        <span>Gemini — extraccion de contexto del repositorio</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-[var(--sh-text-3)]">
+                        <i class="fa-solid fa-bolt" style="color: var(--sh-green);"></i>
+                        <span>Groq — generacion de notas estructuradas</span>
+                    </div>
+                </div>
+
+                <button type="button" class="sh-btn sh-btn-primary w-full" id="btn-generate-notes" onclick="generateNotes()">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Generar Notas IA
+                </button>
+                <div class="text-xs font-mono text-[var(--sh-text-3)] text-center mt-1" id="notes-estimate"></div>
+
+                <!-- Progress -->
+                <div id="notes-progress" class="hidden mt-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fa-solid fa-spinner fa-spin" style="color: var(--sh-blue);"></i>
+                        <span class="font-mono text-sm text-[var(--sh-text-1)]">Generando notas...</span>
+                    </div>
+                    <div class="progress-track mb-2">
+                        <div class="progress-fill" id="notes-progress-bar" style="width: 0%"></div>
+                    </div>
+                    <div id="notes-progress-text" class="text-xs font-mono text-[var(--sh-text-3)]">Iniciando pipeline IA...</div>
+                </div>
+
+                <!-- Success -->
+                <div id="notes-success" class="hidden mt-4">
+                    <div class="flex items-center gap-2" style="color: var(--sh-green);">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span class="font-mono text-sm font-semibold">Notas generadas</span>
+                    </div>
+                    <div id="notes-count" class="text-xs font-mono text-[var(--sh-text-3)] mt-1"></div>
+                </div>
+                <div id="notes-error" class="sh-alert sh-alert-error hidden mt-3"></div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- STEP 4: Review Notes                                               -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <div class="wizard-step" id="step-4">
+            <div class="sh-card p-6">
+                <div class="sh-label mb-1"><i class="fa-solid fa-clipboard-list mr-1"></i>STEP_4</div>
+                <h2 class="font-brand text-2xl mb-2 text-[var(--sh-text-1)]">Revisa las notas</h2>
+                <p class="text-sm text-[var(--sh-text-3)] mb-5">Revisa las notas generadas por IA para cada diapositiva.</p>
+                <div id="notes-review-container" class="space-y-3">
+                    <div class="text-center py-6 text-[var(--sh-text-3)] font-mono text-xs">Cargando notas...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- STEP 5: Participants                                               -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <div class="wizard-step" id="step-5">
+            <div class="sh-card p-6">
+                <div class="sh-label mb-1"><i class="fa-solid fa-users mr-1"></i>STEP_5</div>
+                <h2 class="font-brand text-2xl mb-2 text-[var(--sh-text-1)]">Participantes</h2>
+                <p class="text-sm text-[var(--sh-text-3)] mb-5">Agrega los co-presentadores que expondran contigo. Si presentas solo, puedes omitir este paso.</p>
+
+                <div class="flex gap-2 mb-4">
+                    <input id="participant-name" class="sh-input flex-1" maxlength="120" placeholder="Nombre del participante">
+                    <button type="button" class="sh-btn sh-btn-primary px-3" id="btn-add-participant" onclick="addParticipant()">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                </div>
+                <div id="participants-list" class="space-y-2">
+                    <div class="text-xs font-mono text-[var(--sh-text-3)]">Sin participantes aun.</div>
+                </div>
+                <div id="participant-error" class="sh-alert sh-alert-error hidden mt-3"></div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- STEP 6: Session + QR                                               -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <div class="wizard-step" id="step-6">
+            <div class="sh-card p-6 text-center">
+                <div class="sh-label mb-1"><i class="fa-solid fa-qrcode mr-1"></i>STEP_6</div>
+                <h2 class="font-brand text-2xl mb-2 text-[var(--sh-text-1)]">Listo para presentar</h2>
+                <p class="text-sm text-[var(--sh-text-3)] mb-5">Inicia la sesion y comparte el QR con tu equipo.</p>
+
+                <div id="session-not-started">
+                    <button type="button" class="sh-btn sh-btn-primary text-base px-8 py-3" onclick="startSession()">
+                        <i class="fa-solid fa-play mr-2"></i> Iniciar Sesion
+                    </button>
+                </div>
+
+                <div id="session-started" class="hidden">
+                    <div class="inline-block p-4 bg-white rounded-tech-lg mb-4">
+                        <img id="session-qr" alt="QR" class="mx-auto" style="width: 220px; height: 220px;">
+                    </div>
+                    <div class="flex justify-center gap-2 mb-4">
+                        <input id="session-join-url" type="text" class="sh-input text-xs max-w-sm" readonly>
+                        <button type="button" class="sh-btn text-xs px-2" onclick="copyJoinUrl()">
+                            <i class="fa-solid fa-copy"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs font-mono text-[var(--sh-text-3)] mb-6">Escanea el QR o comparte el link para unirse.</p>
+
+                    <div class="flex justify-center gap-3">
+                        <a id="link-presenter" href="#" class="sh-btn sh-btn-primary">
+                            <i class="fa-solid fa-chalkboard mr-1"></i> Presentar
+                        </a>
+                        <a id="link-panel" href="#" class="sh-btn sh-btn-ghost">
+                            <i class="fa-solid fa-table-cells-large mr-1"></i> Panel
+                        </a>
+                    </div>
+                </div>
+                <div id="session-error" class="sh-alert sh-alert-error hidden mt-3"></div>
+            </div>
+        </div>
+
+        <!-- ═══ Navigation Buttons ═══ -->
+        <div class="flex justify-between mt-6">
+            <button type="button" class="sh-btn sh-btn-ghost" id="btn-prev" onclick="prevStep()" style="display:none;">
+                <i class="fa-solid fa-arrow-left mr-1"></i> Anterior
+            </button>
+            <div class="flex-1"></div>
+            <button type="button" class="sh-btn sh-btn-ghost" id="btn-skip" onclick="nextStep()" style="display:none;">
+                Omitir <i class="fa-solid fa-forward ml-1"></i>
+            </button>
+            <button type="button" class="sh-btn sh-btn-primary ml-2" id="btn-next" onclick="nextStep()" style="display:none;">
+                Siguiente <i class="fa-solid fa-arrow-right ml-1"></i>
+            </button>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        const hasGoogleToken = /*[[${hasGoogleToken}]]*/ false;
+
+        // ── Wizard State ──
+        const W = {
+            step: 1,
+            totalSteps: 6,
+            presentationId: null,
+            totalSlides: 0,
+            repoUrl: null,
+            notesGenerated: false,
+            participants: [],
+            sessionStarted: false
+        };
+
+        // ── Step Navigation ──
+        function goToStep(n) {
+            if (n < 1 || n > W.totalSteps) return;
+            document.querySelectorAll('.wizard-step').forEach(el => el.classList.remove('active'));
+            document.getElementById('step-' + n).classList.add('active');
+
+            // Update dots
+            document.querySelectorAll('.step-dot').forEach(dot => {
+                const s = parseInt(dot.dataset.step);
+                dot.classList.toggle('active', s === n);
+                dot.classList.toggle('done', s < n);
+            });
+            document.querySelectorAll('.step-line').forEach(line => {
+                const s = parseInt(line.dataset.line);
+                line.classList.toggle('done', s < n);
+            });
+
+            W.step = n;
+            history.replaceState(null, '', '#step-' + n);
+            updateNavButtons();
+            onStepEnter(n);
+        }
+
+        function nextStep() { goToStep(W.step + 1); }
+        function prevStep() { goToStep(W.step - 1); }
+
+        function updateNavButtons() {
+            const prev = document.getElementById('btn-prev');
+            const next = document.getElementById('btn-next');
+            const skip = document.getElementById('btn-skip');
+
+            prev.style.display = W.step > 1 ? '' : 'none';
+            next.style.display = W.step < W.totalSteps ? '' : 'none';
+            skip.style.display = '';
+
+            // Step 1: must have uploaded slides
+            if (W.step === 1) {
+                next.disabled = !W.presentationId;
+                skip.style.display = 'none';
+            }
+            // Step 2: repo is optional (skippable)
+            else if (W.step === 2) {
+                next.disabled = false;
+                skip.style.display = '';
+            }
+            // Step 3: notes generation (skippable)
+            else if (W.step === 3) {
+                next.disabled = false;
+                skip.style.display = '';
+            }
+            // Step 4: review only
+            else if (W.step === 4) {
+                next.disabled = false;
+                skip.style.display = 'none';
+            }
+            // Step 5: participants (skippable)
+            else if (W.step === 5) {
+                next.disabled = false;
+                skip.style.display = '';
+            }
+            // Step 6: final
+            else if (W.step === 6) {
+                next.style.display = 'none';
+                skip.style.display = 'none';
+            }
+        }
+
+        function onStepEnter(n) {
+            if (n === 3) {
+                document.getElementById('notes-estimate').textContent =
+                    '~' + (W.totalSlides * 5) + 's para ' + W.totalSlides + ' diapositivas';
+            }
+            if (n === 4) loadNotesReview();
+            if (n === 6) {
+                document.getElementById('link-presenter').href = '/presenter?presentationId=' + W.presentationId;
+                document.getElementById('link-panel').href = '/main-panel?presentationId=' + W.presentationId;
+            }
+        }
+
+        // ── STEP 1: Upload ──
+        function showImportTab(tab) {
+            document.getElementById('panel-upload').classList.toggle('hidden', tab !== 'upload');
+            document.getElementById('panel-drive').classList.toggle('hidden', tab !== 'drive');
+            document.getElementById('tab-upload').classList.toggle('active', tab === 'upload');
+            document.getElementById('tab-drive').classList.toggle('active', tab === 'drive');
+        }
+
+        let selectedFiles = [];
+        let selectedFolderId = null, selectedFolderName = '';
+
+        function onFilesSelected(event) {
+            selectedFiles = Array.from(event.target.files);
+            renderFilePreview();
+            document.getElementById('btn-upload').disabled = selectedFiles.length === 0;
+        }
+
+        function renderFilePreview() {
+            const preview = document.getElementById('file-preview');
+            preview.innerHTML = '';
+            selectedFiles.sort((a, b) => a.name.localeCompare(b.name));
+            selectedFiles.forEach((f, i) => {
+                const span = document.createElement('span');
+                span.className = 'sh-badge';
+                span.textContent = (i + 1) + '. ' + f.name;
+                preview.appendChild(span);
+            });
+        }
+
+        // Drag-drop
+        const dropZone = document.getElementById('upload-drop-zone');
+        if (dropZone) {
+            dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+            dropZone.addEventListener('drop', e => {
+                e.preventDefault(); dropZone.classList.remove('drag-over');
+                selectedFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+                renderFilePreview();
+                document.getElementById('btn-upload').disabled = selectedFiles.length === 0;
+            });
+        }
+
+        async function doUpload() {
+            const name = document.getElementById('pres-name').value.trim();
+            if (!name) { showError('upload-error', 'El nombre es requerido.'); return; }
+            if (selectedFiles.length === 0) { showError('upload-error', 'Selecciona al menos un archivo.'); return; }
+            hideError('upload-error');
+            document.getElementById('btn-upload').disabled = true;
+            document.getElementById('upload-progress').classList.remove('hidden');
+
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('description', document.getElementById('pres-desc').value.trim());
+            selectedFiles.forEach(f => formData.append('files', f));
+
+            try {
+                const res = await fetch('/api/presentations/create-from-upload', { method: 'POST', body: formData });
+                const data = await res.json();
+                document.getElementById('upload-progress').classList.add('hidden');
+                if (res.ok && data.success) {
+                    W.presentationId = data.presentationId;
+                    W.totalSlides = data.totalSlides || selectedFiles.length;
+                    onUploadComplete();
+                } else {
+                    showError('upload-error', data.error || 'Error al subir.');
+                    document.getElementById('btn-upload').disabled = false;
+                }
+            } catch (e) {
+                document.getElementById('upload-progress').classList.add('hidden');
+                showError('upload-error', 'Error de conexion.');
+                document.getElementById('btn-upload').disabled = false;
+            }
+        }
+
+        async function loadFolders() {
+            document.getElementById('folders-loading').classList.remove('hidden');
+            document.getElementById('folders-list').innerHTML = '';
+            document.getElementById('images-section').classList.add('hidden');
+            selectedFolderId = null;
+            document.getElementById('btn-import-drive').disabled = true;
+            try {
+                const res = await fetch('/api/presentations/drive/folders');
+                const data = await res.json();
+                document.getElementById('folders-loading').classList.add('hidden');
+                if (!res.ok) { showError('drive-error', data.error || 'Error cargando carpetas.'); return; }
+                const list = document.getElementById('folders-list');
+                if (!data.folders || data.folders.length === 0) {
+                    list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)">No se encontraron carpetas.</span>';
+                    return;
+                }
+                data.folders.forEach(f => {
+                    const el = document.createElement('button');
+                    el.className = 'folder-item';
+                    el.innerHTML = '<i class="fa-solid fa-folder mr-1"></i>' + escHtml(f.name);
+                    el.onclick = () => selectFolder(f.id, f.name, el);
+                    list.appendChild(el);
+                });
+            } catch (e) {
+                document.getElementById('folders-loading').classList.add('hidden');
+                showError('drive-error', 'Error de red.');
+            }
+        }
+
+        async function selectFolder(folderId, folderName, el) {
+            document.querySelectorAll('#folders-list .folder-item').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedFolderId = folderId;
+            selectedFolderName = folderName;
+            document.getElementById('btn-import-drive').disabled = false;
+
+            const section = document.getElementById('images-section');
+            const list = document.getElementById('images-list');
+            section.classList.remove('hidden');
+            list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)"><i class="fa-solid fa-spinner fa-spin mr-1"></i>Cargando...</span>';
+            try {
+                const res = await fetch('/api/presentations/drive/folders/' + folderId + '/images');
+                const data = await res.json();
+                list.innerHTML = '';
+                document.getElementById('images-count').textContent = data.images ? data.images.length : 0;
+                if (data.images && data.images.length > 0) {
+                    data.images.forEach(img => {
+                        const span = document.createElement('span');
+                        span.className = 'sh-badge';
+                        span.textContent = img.name;
+                        list.appendChild(span);
+                    });
+                } else {
+                    list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)">No hay imagenes.</span>';
+                    document.getElementById('btn-import-drive').disabled = true;
+                }
+            } catch (e) {
+                list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)">Error cargando imagenes.</span>';
+            }
+        }
+
+        async function doDriveImport() {
+            const name = document.getElementById('pres-name').value.trim();
+            if (!name) { showError('drive-error', 'El nombre es requerido.'); return; }
+            if (!selectedFolderId) { showError('drive-error', 'Selecciona una carpeta de Drive.'); return; }
+            hideError('drive-error');
+            document.getElementById('btn-import-drive').disabled = true;
+            document.getElementById('drive-progress').classList.remove('hidden');
+
+            const params = new URLSearchParams({
+                name,
+                description: document.getElementById('pres-desc').value.trim(),
+                driveFolderId: selectedFolderId,
+                driveFolderName: selectedFolderName
+            });
+
+            try {
+                const res = await fetch('/api/presentations/create-from-drive', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params
+                });
+                const data = await res.json();
+                document.getElementById('drive-progress').classList.add('hidden');
+                if (res.ok && data.success) {
+                    W.presentationId = data.presentationId;
+                    W.totalSlides = data.totalSlides || 0;
+                    onUploadComplete();
+                } else {
+                    showError('drive-error', data.error || 'Error de importacion.');
+                    document.getElementById('btn-import-drive').disabled = false;
+                }
+            } catch (e) {
+                document.getElementById('drive-progress').classList.add('hidden');
+                showError('drive-error', 'Error de red.');
+                document.getElementById('btn-import-drive').disabled = false;
+            }
+        }
+
+        function onUploadComplete() {
+            document.getElementById('btn-next').disabled = false;
+            // Auto-advance after brief delay
+            setTimeout(() => nextStep(), 600);
+        }
+
+        // ── STEP 2: Repo Analysis ──
+        async function analyzeRepo() {
+            const repoUrl = document.getElementById('repo-url').value.trim();
+            if (!repoUrl) { showError('repo-error', 'Ingresa una URL de repositorio.'); return; }
+            W.repoUrl = repoUrl;
+            hideError('repo-error');
+            document.getElementById('btn-analyze-repo').disabled = true;
+            document.getElementById('repo-progress').classList.remove('hidden');
+            document.getElementById('repo-result').classList.add('hidden');
+
+            try {
+                const res = await fetch('/api/presentations/' + W.presentationId + '/analyze-repo?repoUrl=' + encodeURIComponent(repoUrl), { method: 'POST' });
+                const data = await res.json();
+                document.getElementById('repo-progress').classList.add('hidden');
+                document.getElementById('btn-analyze-repo').disabled = false;
+                if (res.ok) {
+                    document.getElementById('repo-result').classList.remove('hidden');
+                    const summary = data.summary || data.language || 'Analisis completado';
+                    const parts = [];
+                    if (data.language) parts.push('Lenguaje: ' + data.language);
+                    if (data.framework) parts.push('Framework: ' + data.framework);
+                    if (data.technologies && data.technologies.length) parts.push('Tech: ' + data.technologies.join(', '));
+                    document.getElementById('repo-summary').textContent = parts.length ? parts.join(' | ') : summary;
+                } else {
+                    showError('repo-error', data.error || 'Error analizando repositorio.');
+                }
+            } catch (e) {
+                document.getElementById('repo-progress').classList.add('hidden');
+                document.getElementById('btn-analyze-repo').disabled = false;
+                showError('repo-error', 'Error de conexion.');
+            }
+        }
+
+        // ── STEP 3: Generate Notes ──
+        async function generateNotes() {
+            document.getElementById('btn-generate-notes').disabled = true;
+            document.getElementById('notes-progress').classList.remove('hidden');
+            document.getElementById('notes-success').classList.add('hidden');
+            hideError('notes-error');
+
+            let fakePct = 5;
+            const fakeTimer = setInterval(() => {
+                if (fakePct < 90) {
+                    fakePct += Math.random() * 3;
+                    const slideEst = Math.floor((fakePct / 100) * W.totalSlides);
+                    document.getElementById('notes-progress-bar').style.width = fakePct + '%';
+                    document.getElementById('notes-progress-text').textContent =
+                        'Analizando slide ~' + (slideEst + 1) + ' de ' + W.totalSlides + '...';
+                }
+            }, 1500);
+
+            const params = new URLSearchParams();
+            if (W.repoUrl) params.append('repoUrl', W.repoUrl);
+
+            try {
+                const res = await fetch('/api/presentations/' + W.presentationId + '/generate-notes?' + params, { method: 'POST' });
+                clearInterval(fakeTimer);
+                const data = await res.json();
+
+                document.getElementById('notes-progress-bar').style.width = '100%';
+                document.getElementById('notes-progress-text').textContent = 'Completado!';
+
+                if (res.ok && data.success !== false) {
+                    W.notesGenerated = true;
+                    document.getElementById('notes-success').classList.remove('hidden');
+                    document.getElementById('notes-count').textContent =
+                        (data.notesGenerated || W.totalSlides) + ' notas generadas para ' + W.totalSlides + ' diapositivas.';
+                    document.getElementById('btn-generate-notes').disabled = false;
+                    document.getElementById('btn-generate-notes').innerHTML =
+                        '<i class="fa-solid fa-arrows-rotate mr-1"></i> Regenerar Notas';
+                } else {
+                    showError('notes-error', data.error || data.errorMessage || 'Error generando notas.');
+                    document.getElementById('btn-generate-notes').disabled = false;
+                }
+            } catch (e) {
+                clearInterval(fakeTimer);
+                showError('notes-error', 'Error de conexion: ' + e.message);
+                document.getElementById('btn-generate-notes').disabled = false;
+            }
+        }
+
+        // ── STEP 4: Load Notes Review ──
+        async function loadNotesReview() {
+            const container = document.getElementById('notes-review-container');
+            container.innerHTML = '<div class="text-center py-6 text-[var(--sh-text-3)] font-mono text-xs"><i class="fa-solid fa-spinner fa-spin mr-1"></i>Cargando notas...</div>';
+
+            try {
+                // Load slides
+                const slidesRes = await fetch('/api/presentations/' + W.presentationId + '/slides');
+                const slides = slidesRes.ok ? await slidesRes.json() : [];
+
+                // Load notes
+                const notesRes = await fetch('/api/presentations/' + W.presentationId + '/notes');
+                const notes = notesRes.ok ? await notesRes.json() : [];
+
+                if (slides.length === 0) {
+                    container.innerHTML = '<div class="text-center py-6 text-[var(--sh-text-3)] font-mono text-xs">No hay diapositivas.</div>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                slides.forEach(slide => {
+                    const note = notes.find(n => n.slideNumber === slide.number);
+                    const card = document.createElement('div');
+                    card.className = 'bg-[var(--sh-deep)] border border-[var(--sh-border)] rounded-tech p-4';
+
+                    let noteHtml = '<div class="text-[var(--sh-text-3)] text-xs font-mono italic">Sin notas para este slide.</div>';
+                    if (note) {
+                        const pointsHtml = (note.points || []).map(p => '<li>' + escHtml(p) + '</li>').join('');
+                        const kpHtml = (note.keyPhrases || []).map(kp => '<span class="key-phrase">' + escHtml(kp) + '</span>').join(' ');
+                        noteHtml = `
+                            <div class="note-card">
+                                <div class="font-semibold text-sm text-[var(--sh-text-1)] mb-2">${escHtml(note.title || '')}</div>
+                                <ul class="mb-2 pl-4 space-y-1 text-sm text-[var(--sh-text-2)]">${pointsHtml}</ul>
+                                <div class="flex flex-wrap gap-1">${kpHtml}</div>
+                                ${note.suggestedTime ? '<div class="text-[var(--sh-text-3)] text-xs font-mono mt-2">&#9201; ' + escHtml(note.suggestedTime) + '</div>' : ''}
+                            </div>`;
+                    }
+
+                    card.innerHTML = `
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0">
+                                <img src="${slide.s3Url}" alt="Slide ${slide.number}"
+                                     class="w-[120px] h-[80px] object-cover rounded-tech border-2 border-[var(--sh-border)]" loading="lazy">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <span class="sh-badge mb-2">Slide_${slide.number}</span>
+                                ${noteHtml}
+                            </div>
+                        </div>`;
+                    container.appendChild(card);
+                });
+            } catch (e) {
+                container.innerHTML = '<div class="text-center py-6 text-[var(--sh-text-3)] font-mono text-xs">Error cargando notas.</div>';
+            }
+        }
+
+        // ── STEP 5: Participants ──
+        async function addParticipant() {
+            const input = document.getElementById('participant-name');
+            const name = input.value.trim();
+            if (!name) return;
+            hideError('participant-error');
+
+            try {
+                const res = await fetch('/api/presentations/' + W.presentationId + '/meeting/participants', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ displayName: name, presenter: true })
+                });
+                if (res.ok) {
+                    input.value = '';
+                    await refreshParticipants();
+                } else {
+                    showError('participant-error', 'No se pudo agregar el participante.');
+                }
+            } catch (e) {
+                showError('participant-error', 'Error de conexion.');
+            }
+        }
+
+        async function refreshParticipants() {
+            try {
+                const res = await fetch('/api/presentations/' + W.presentationId + '/meeting/participants');
+                W.participants = res.ok ? await res.json() : [];
+            } catch (e) { W.participants = []; }
+
+            const list = document.getElementById('participants-list');
+            if (W.participants.length === 0) {
+                list.innerHTML = '<div class="text-xs font-mono text-[var(--sh-text-3)]">Sin participantes aun.</div>';
+                return;
+            }
+            list.innerHTML = W.participants.map(p =>
+                '<div class="participant-item">' +
+                    '<span class="text-sm text-[var(--sh-text-1)]">' + escHtml(p.displayName) + '</span>' +
+                    '<span class="sh-badge text-[0.6rem]">' + (p.presenter ? 'Expositor' : 'Invitado') + '</span>' +
+                '</div>'
+            ).join('');
+        }
+
+        // ── STEP 6: Start Session ──
+        async function startSession() {
+            hideError('session-error');
+            try {
+                const res = await fetch('/api/presentations/' + W.presentationId + '/meeting/session/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (res.ok) {
+                    const session = await res.json();
+                    W.sessionStarted = true;
+                    document.getElementById('session-not-started').classList.add('hidden');
+                    document.getElementById('session-started').classList.remove('hidden');
+                    document.getElementById('session-qr').src =
+                        'https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=' + encodeURIComponent(session.joinUrl);
+                    document.getElementById('session-join-url').value = session.joinUrl || '';
+                } else {
+                    showError('session-error', 'No se pudo iniciar la sesion.');
+                }
+            } catch (e) {
+                showError('session-error', 'Error de conexion.');
+            }
+        }
+
+        function copyJoinUrl() {
+            const input = document.getElementById('session-join-url');
+            input.select();
+            navigator.clipboard.writeText(input.value);
+        }
+
+        // ── Helpers ──
+        function showError(id, msg) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-2"></i>' + msg;
+            el.classList.remove('hidden');
+        }
+        function hideError(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden');
+        }
+        function escHtml(str) {
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // ── Init ──
+        (function init() {
+            showImportTab('upload');
+            updateNavButtons();
+
+            // Participant enter key
+            document.getElementById('participant-name').addEventListener('keydown', e => {
+                if (e.key === 'Enter') addParticipant();
+            });
+
+            // Restore step from hash
+            const hash = window.location.hash;
+            if (hash && hash.startsWith('#step-')) {
+                const n = parseInt(hash.substring(6));
+                if (n >= 1 && n <= W.totalSteps) goToStep(n);
+            }
+        })();
+    </script>
+</body>
+</html>
