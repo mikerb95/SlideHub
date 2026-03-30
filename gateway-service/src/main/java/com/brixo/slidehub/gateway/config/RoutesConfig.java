@@ -11,7 +11,7 @@ import org.springframework.web.servlet.function.ServerResponse;
 
 import java.util.function.Function;
 
-import static org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.addRequestHeader;
+import static org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.setRequestHeader;
 import static org.springframework.cloud.gateway.server.mvc.filter.FilterFunctions.uri;
 import static org.springframework.cloud.gateway.server.mvc.handler.GatewayRouterFunctions.route;
 import static org.springframework.cloud.gateway.server.mvc.handler.HandlerFunctions.http;
@@ -55,9 +55,9 @@ public class RoutesConfig {
                 }
                 String proto = baseUrl.contains("://") ? baseUrl.substring(0, baseUrl.indexOf("://")) : "https";
                 String host = baseUrl.contains("://") ? baseUrl.substring(baseUrl.indexOf("://") + 3) : baseUrl;
-                return addRequestHeader("X-Forwarded-Host", host)
-                        .andThen(addRequestHeader("X-Forwarded-Proto", proto))
-                        .andThen(addRequestHeader("X-Forwarded-Port", "https".equals(proto) ? "443" : "80"));
+                return setRequestHeader("X-Forwarded-Host", host)
+                        .andThen(setRequestHeader("X-Forwarded-Proto", proto))
+                        .andThen(setRequestHeader("X-Forwarded-Port", "https".equals(proto) ? "443" : "80"));
         }
 
         /** IA routes — DEBE evaluarse antes que /api/** (Order=1) */
