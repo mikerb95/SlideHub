@@ -4,113 +4,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Importar Presentación — SlideHub</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <title>Importar Presentacion — SlideHub</title>
+    <th:block th:replace="~{fragments/head :: assets}"></th:block>
     <style>
-        body {
-            background: #0f172a;
-            color: #e2e8f0;
-            min-height: 100vh;
-        }
-
-        .card {
-            background: #1e293b;
-            border: 1px solid #334155;
-        }
-
-        .nav-tabs .nav-link {
-            color: #94a3b8;
-            border: none;
-        }
-
-        .nav-tabs .nav-link.active {
-            background: #334155;
-            color: #fff;
-            border: none;
-        }
-
-        .folder-item,
-        .image-item {
+        .folder-item, .image-item {
             cursor: pointer;
-            padding: 0.5rem 0.75rem;
-            border-radius: 6px;
-            transition: background 0.15s;
+            padding: 0.4rem 0.7rem;
+            border-radius: var(--sh-r-md);
+            transition: background var(--sh-t-fast), border-color var(--sh-t-fast);
+            background: var(--sh-deep);
+            border: 1px solid var(--sh-border);
+            font-family: var(--sh-font-mono);
+            font-size: 0.8rem;
+            color: var(--sh-text-2);
         }
-
-        .folder-item:hover,
-        .image-item:hover {
-            background: #334155;
-        }
-
-        .folder-item.selected,
-        .image-item.selected {
-            background: #1d4ed8;
-        }
+        .folder-item:hover, .image-item:hover { border-color: var(--sh-blue); color: var(--sh-text-1); }
+        .folder-item.selected { background: var(--sh-blue-dim); border-color: var(--sh-blue); color: var(--sh-blue); }
 
         #upload-drop-zone {
-            border: 2px dashed #475569;
-            border-radius: 10px;
+            border: 2px dashed var(--sh-border-active);
+            border-radius: var(--sh-r-md);
             padding: 2.5rem;
             text-align: center;
-            transition: border-color 0.2s, background 0.2s;
+            transition: border-color var(--sh-t-fast), background var(--sh-t-fast);
             cursor: pointer;
         }
-
         #upload-drop-zone.drag-over {
-            border-color: #3b82f6;
-            background: rgba(59, 130, 246, 0.08);
-        }
-
-        .presentation-badge {
-            font-size: 0.7rem;
+            border-color: var(--sh-blue);
+            background: var(--sh-blue-dim);
         }
     </style>
 </head>
 
-<body>
+<body class="sh bg-sh-deep antialiased min-h-screen">
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-dark" style="background:#0f172a; border-bottom:1px solid #1e293b;">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="/presenter">
-                <i class="fa-solid fa-presentation-screen me-2 text-blue-400"></i>SlideHub
-            </a>
-            <div class="d-flex gap-2">
-                <a href="/main-panel" class="btn btn-sm btn-outline-secondary">
-                    <i class="fa-solid fa-table-cells me-1"></i>Panel
+    <!-- ═══ Nav ═══ -->
+    <nav class="sh-nav">
+        <div class="sh-nav-inner">
+            <div class="flex items-center gap-3">
+                <a href="/presenter" class="flex items-center gap-3 no-underline text-[var(--sh-text-1)]">
+                    <img th:src="@{/images/logo.svg}" alt="SlideHub" class="h-5 w-5">
+                    <span class="font-brand text-base tracking-tight">SlideHub</span>
                 </a>
-                <a href="/auth/logout" class="btn btn-sm btn-outline-danger">
-                    <i class="fa-solid fa-arrow-right-from-bracket me-1"></i>Salir
+                <span class="sh-badge ml-1">IMPORT</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="/main-panel" class="sh-btn sh-btn-ghost text-xs">
+                    <i class="fa-solid fa-table-cells-large"></i> Panel
+                </a>
+                <a href="/auth/profile" class="sh-btn sh-btn-ghost text-xs">
+                    <i class="fa-solid fa-user"></i>
                 </a>
             </div>
         </div>
     </nav>
 
-    <div class="container-fluid py-4">
-        <div class="row g-4">
+    <div class="max-w-7xl mx-auto px-4 pt-16 pb-8">
+        <div class="grid lg:grid-cols-[1fr_2fr] gap-6">
 
-            <!-- Columna izquierda: presentaciones existentes -->
-            <div class="col-lg-4">
-                <div class="card rounded-3 p-3">
-                    <h6 class="mb-3 text-slate-300">
-                        <i class="fa-solid fa-layer-group me-2"></i>Mis Presentaciones
-                    </h6>
-                    <div id="presentations-list" class="d-flex flex-column gap-2">
-                        <div th:if="${#lists.isEmpty(presentations)}" class="text-slate-500 small text-center py-3">
-                            No tienes presentaciones todavía.
+            <!-- ── Left: Existing Presentations ── -->
+            <div>
+                <div class="sh-card p-5">
+                    <div class="sh-label mb-3">
+                        <i class="fa-solid fa-layer-group mr-1"></i>MY_PRESENTATIONS
+                    </div>
+                    <div id="presentations-list" class="flex flex-col gap-2">
+                        <div th:if="${#lists.isEmpty(presentations)}"
+                             class="text-center py-6 font-mono text-xs text-[var(--sh-text-3)]">
+                            No presentations yet.
                         </div>
-                        <div th:each="p : ${presentations}" class="card p-2 rounded-2"
-                            style="background:#0f172a; border-color:#334155">
-                            <div class="d-flex justify-content-between align-items-start">
+                        <div th:each="p : ${presentations}"
+                             class="bg-[var(--sh-deep)] border border-[var(--sh-border)] rounded-tech p-3">
+                            <div class="flex justify-between items-start">
                                 <div>
-                                    <div class="fw-semibold small" th:text="${p.name()}">Nombre</div>
-                                    <div class="text-slate-400 small" th:text="${p.totalSlides()} + ' slides'">0 slides
-                                    </div>
+                                    <div class="text-sm font-medium text-[var(--sh-text-1)]" th:text="${p.name()}">Name</div>
+                                    <div class="font-mono text-xs text-[var(--sh-text-3)]" th:text="${p.totalSlides()} + ' slides'">0 slides</div>
                                 </div>
-                                <span class="badge presentation-badge"
-                                    th:classappend="${p.sourceType() == 'DRIVE'} ? 'bg-primary' : 'bg-success'"
-                                    th:text="${p.sourceType() == 'DRIVE' ? 'Drive' : 'Upload'}">
+                                <span class="sh-badge text-[0.6rem]"
+                                      th:classappend="${p.sourceType() == 'DRIVE'} ? 'sh-badge-blue' : 'sh-badge-green'"
+                                      th:text="${p.sourceType() == 'DRIVE' ? 'Drive' : 'Upload'}">
                                 </span>
                             </div>
                         </div>
@@ -118,136 +90,111 @@
                 </div>
             </div>
 
-            <!-- Columna derecha: importar -->
-            <div class="col-lg-8">
-                <div class="card rounded-3 p-4">
-                    <h5 class="mb-3">
-                        <i class="fa-solid fa-download me-2 text-blue-400"></i>Importar Presentación
-                    </h5>
+            <!-- ── Right: Import ── -->
+            <div>
+                <div class="sh-card p-6">
+                    <div class="sh-label mb-1">
+                        <i class="fa-solid fa-download mr-1"></i>IMPORT_PRESENTATION
+                    </div>
+                    <h2 class="font-brand text-2xl mb-5 text-[var(--sh-text-1)]">Import</h2>
 
                     <!-- Tabs -->
-                    <ul class="nav nav-tabs mb-4" id="importTabs">
-                        <li class="nav-item">
-                            <button class="nav-link active px-4" id="tab-drive" onclick="showTab('drive')">
-                                <i class="fa-brands fa-google-drive me-2"></i>Google Drive
-                            </button>
-                        </li>
-                        <li class="nav-item">
-                            <button class="nav-link px-4" id="tab-upload" onclick="showTab('upload')">
-                                <i class="fa-solid fa-upload me-2"></i>Upload Manual
-                            </button>
-                        </li>
-                    </ul>
+                    <div class="sh-tabs mb-6">
+                        <button class="sh-tab active" id="tab-drive" onclick="showTab('drive')">
+                            <i class="fa-brands fa-google-drive mr-1"></i> Google Drive
+                        </button>
+                        <button class="sh-tab" id="tab-upload" onclick="showTab('upload')">
+                            <i class="fa-solid fa-upload mr-1"></i> Manual Upload
+                        </button>
+                    </div>
 
-                    <!-- ── Tab Google Drive ── -->
+                    <!-- ── Tab: Google Drive ── -->
                     <div id="panel-drive">
-                        <div th:if="${!hasGoogleToken}" class="alert alert-warning">
-                            <i class="fa-solid fa-triangle-exclamation me-2"></i>
-                            Para acceder a Google Drive debes
-                            <a href="/oauth2/authorization/google" class="alert-link">vincular tu cuenta de Google</a>.
+                        <div th:if="${!hasGoogleToken}" class="sh-alert sh-alert-warn mb-4">
+                            <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+                            <span>Link your <a href="/oauth2/authorization/google" class="underline">Google account</a> to access Drive.</span>
                         </div>
 
                         <div th:if="${hasGoogleToken}">
-                            <!-- Nombre y descripción -->
-                            <div class="row g-3 mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label small text-slate-300">Nombre *</label>
-                                    <input type="text" id="drive-name"
-                                        class="form-control bg-dark text-white border-secondary"
-                                        placeholder="Mi presentación">
+                            <div class="grid md:grid-cols-2 gap-3 mb-4">
+                                <div>
+                                    <label class="sh-input-label">Name *</label>
+                                    <input type="text" id="drive-name" class="sh-input" placeholder="My presentation">
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small text-slate-300">Repositorio GitHub (opcional)</label>
-                                    <input type="url" id="drive-repo"
-                                        class="form-control bg-dark text-white border-secondary"
-                                        placeholder="https://github.com/...">
+                                <div>
+                                    <label class="sh-input-label">GitHub Repo (optional)</label>
+                                    <input type="url" id="drive-repo" class="sh-input" placeholder="https://github.com/...">
                                 </div>
-                                <div class="col-12">
-                                    <label class="form-label small text-slate-300">Descripción</label>
-                                    <input type="text" id="drive-desc"
-                                        class="form-control bg-dark text-white border-secondary"
-                                        placeholder="Descripción opcional">
+                                <div class="md:col-span-2">
+                                    <label class="sh-input-label">Description</label>
+                                    <input type="text" id="drive-desc" class="sh-input" placeholder="Optional description">
                                 </div>
                             </div>
 
-                            <!-- Selección de carpeta -->
-                            <label class="form-label small text-slate-300">
-                                Carpeta de Drive *
-                                <button type="button" class="btn btn-sm btn-outline-secondary ms-2 py-0"
-                                    onclick="loadFolders()">
-                                    <i class="fa-solid fa-arrows-rotate me-1"></i>Cargar
+                            <div class="flex items-center gap-2 mb-3">
+                                <label class="sh-input-label mb-0">Drive Folder *</label>
+                                <button type="button" class="sh-btn text-xs py-0.5 px-2" onclick="loadFolders()">
+                                    <i class="fa-solid fa-arrows-rotate"></i> Load
                                 </button>
-                            </label>
-                            <div id="folders-loading" class="text-slate-400 small d-none">
-                                <i class="fa-solid fa-spinner fa-spin me-1"></i>Cargando carpetas…
                             </div>
-                            <div id="folders-list" class="d-flex flex-wrap gap-2 mb-3"></div>
+                            <div id="folders-loading" class="hidden font-mono text-xs text-[var(--sh-text-3)] mb-2">
+                                <i class="fa-solid fa-spinner fa-spin mr-1"></i>Loading folders...
+                            </div>
+                            <div id="folders-list" class="flex flex-wrap gap-2 mb-4"></div>
 
-                            <!-- Preview de imágenes de la carpeta seleccionada -->
-                            <div id="images-section" class="d-none">
-                                <label class="form-label small text-slate-300">
-                                    Imágenes en la carpeta seleccionada
-                                    <span id="images-count" class="badge bg-secondary ms-1">0</span>
-                                </label>
-                                <div id="images-list" class="d-flex flex-wrap gap-2 mb-3"
-                                    style="max-height: 200px; overflow-y: auto;"></div>
+                            <div id="images-section" class="hidden mb-4">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="sh-input-label mb-0">Images</span>
+                                    <span id="images-count" class="sh-badge text-[0.6rem]">0</span>
+                                </div>
+                                <div id="images-list" class="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto"></div>
                             </div>
 
-                            <div id="drive-error" class="alert alert-danger d-none small"></div>
+                            <div id="drive-error" class="sh-alert sh-alert-error hidden mb-3"></div>
 
-                            <button type="button" class="btn btn-primary" id="btn-import-drive"
-                                onclick="importFromDrive()" disabled>
-                                <i class="fa-solid fa-download me-2"></i>Importar desde Drive
+                            <button type="button" class="sh-btn sh-btn-primary" id="btn-import-drive" onclick="importFromDrive()" disabled>
+                                <i class="fa-solid fa-download"></i> Import_From_Drive
                             </button>
-                            <div id="drive-progress" class="mt-2 small text-slate-400 d-none">
-                                <i class="fa-solid fa-spinner fa-spin me-1"></i>
-                                Importando… esto puede tardar unos segundos.
+                            <div id="drive-progress" class="hidden mt-2 font-mono text-xs text-[var(--sh-text-3)]">
+                                <i class="fa-solid fa-spinner fa-spin mr-1"></i>Importing...
                             </div>
                         </div>
                     </div>
 
-                    <!-- ── Tab Upload Manual ── -->
-                    <div id="panel-upload" class="d-none">
-                        <!-- Nombre y descripción -->
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label small text-slate-300">Nombre *</label>
-                                <input type="text" id="upload-name"
-                                    class="form-control bg-dark text-white border-secondary"
-                                    placeholder="Mi presentación">
+                    <!-- ── Tab: Manual Upload ── -->
+                    <div id="panel-upload" class="hidden">
+                        <div class="grid md:grid-cols-2 gap-3 mb-4">
+                            <div>
+                                <label class="sh-input-label">Name *</label>
+                                <input type="text" id="upload-name" class="sh-input" placeholder="My presentation">
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label small text-slate-300">Repositorio GitHub (opcional)</label>
-                                <input type="url" id="upload-repo"
-                                    class="form-control bg-dark text-white border-secondary"
-                                    placeholder="https://github.com/...">
+                            <div>
+                                <label class="sh-input-label">GitHub Repo (optional)</label>
+                                <input type="url" id="upload-repo" class="sh-input" placeholder="https://github.com/...">
                             </div>
-                            <div class="col-12">
-                                <label class="form-label small text-slate-300">Descripción</label>
-                                <input type="text" id="upload-desc"
-                                    class="form-control bg-dark text-white border-secondary"
-                                    placeholder="Descripción opcional">
+                            <div class="md:col-span-2">
+                                <label class="sh-input-label">Description</label>
+                                <input type="text" id="upload-desc" class="sh-input" placeholder="Optional description">
                             </div>
                         </div>
 
-                        <!-- Drop zone -->
                         <div id="upload-drop-zone" onclick="document.getElementById('file-input').click()">
-                            <i class="fa-solid fa-cloud-arrow-up fa-2x mb-2 text-slate-400"></i>
-                            <p class="mb-1">Arrastra imágenes aquí o haz clic para seleccionar</p>
-                            <p class="text-slate-500 small">PNG, JPG, GIF, WEBP — ordenadas por nombre</p>
+                            <i class="fa-solid fa-cloud-arrow-up text-2xl mb-2 block text-[var(--sh-text-3)]"></i>
+                            <p class="text-sm text-[var(--sh-text-2)] mb-1">Drag images here or click to select</p>
+                            <p class="font-mono text-xs text-[var(--sh-text-3)]">PNG, JPG, GIF, WEBP — sorted by name</p>
                             <input type="file" id="file-input" accept=".png,.jpg,.jpeg,.gif,.webp" multiple
-                                class="d-none" onchange="onFilesSelected(event)">
+                                   class="hidden" onchange="onFilesSelected(event)">
                         </div>
 
-                        <div id="file-preview" class="mt-3 d-flex flex-wrap gap-2"></div>
-                        <div id="upload-error" class="alert alert-danger d-none small mt-2"></div>
+                        <div id="file-preview" class="mt-3 flex flex-wrap gap-2"></div>
+                        <div id="upload-error" class="sh-alert sh-alert-error hidden mt-2"></div>
 
-                        <button type="button" class="btn btn-success mt-3" id="btn-import-upload"
-                            onclick="importFromUpload()" disabled>
-                            <i class="fa-solid fa-upload me-2"></i>Subir presentación
+                        <button type="button" class="sh-btn sh-btn-green mt-4" id="btn-import-upload" onclick="importFromUpload()" disabled
+                                style="background: var(--sh-green); border-color: var(--sh-green); color: var(--sh-deep);">
+                            <i class="fa-solid fa-upload"></i> Upload_Presentation
                         </button>
-                        <div id="upload-progress" class="mt-2 small text-slate-400 d-none">
-                            <i class="fa-solid fa-spinner fa-spin me-1"></i>Subiendo archivos…
+                        <div id="upload-progress" class="hidden mt-2 font-mono text-xs text-[var(--sh-text-3)]">
+                            <i class="fa-solid fa-spinner fa-spin mr-1"></i>Uploading files...
                         </div>
                     </div>
 
@@ -257,61 +204,57 @@
     </div>
 
     <script>
-        /* ── Tab switching ── */
         function showTab(tab) {
-            document.getElementById('panel-drive').classList.toggle('d-none', tab !== 'drive');
-            document.getElementById('panel-upload').classList.toggle('d-none', tab !== 'upload');
+            document.getElementById('panel-drive').classList.toggle('hidden', tab !== 'drive');
+            document.getElementById('panel-upload').classList.toggle('hidden', tab !== 'upload');
             document.getElementById('tab-drive').classList.toggle('active', tab === 'drive');
             document.getElementById('tab-upload').classList.toggle('active', tab === 'upload');
         }
 
-        /* ── Google Drive: cargar carpetas ── */
         let selectedFolderId = null, selectedFolderName = '';
 
         async function loadFolders() {
-            document.getElementById('folders-loading').classList.remove('d-none');
+            document.getElementById('folders-loading').classList.remove('hidden');
             document.getElementById('folders-list').innerHTML = '';
-            document.getElementById('images-section').classList.add('d-none');
+            document.getElementById('images-section').classList.add('hidden');
             selectedFolderId = null;
             document.getElementById('btn-import-drive').disabled = true;
 
             try {
                 const res = await fetch('/api/presentations/drive/folders');
                 const data = await res.json();
-                document.getElementById('folders-loading').classList.add('d-none');
-
-                if (!res.ok) { showError('drive-error', data.error || 'Error al cargar carpetas.'); return; }
+                document.getElementById('folders-loading').classList.add('hidden');
+                if (!res.ok) { showError('drive-error', data.error || 'Error loading folders.'); return; }
 
                 const list = document.getElementById('folders-list');
                 if (!data.folders || data.folders.length === 0) {
-                    list.innerHTML = '<span class="text-slate-400 small">No se encontraron carpetas en tu Drive.</span>';
+                    list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)">No folders found.</span>';
                     return;
                 }
                 data.folders.forEach(f => {
                     const el = document.createElement('button');
-                    el.className = 'btn btn-outline-secondary btn-sm folder-item';
-                    el.innerHTML = `<i class="fa-solid fa-folder me-1"></i>${escHtml(f.name)}`;
+                    el.className = 'folder-item';
+                    el.innerHTML = `<i class="fa-solid fa-folder mr-1"></i>${escHtml(f.name)}`;
                     el.onclick = () => selectFolder(f.id, f.name, el);
                     list.appendChild(el);
                 });
             } catch (e) {
-                document.getElementById('folders-loading').classList.add('d-none');
-                showError('drive-error', 'Error de red al cargar carpetas.');
+                document.getElementById('folders-loading').classList.add('hidden');
+                showError('drive-error', 'Network error loading folders.');
             }
         }
 
         async function selectFolder(folderId, folderName, el) {
-            document.querySelectorAll('#folders-list .folder-item').forEach(b => b.classList.remove('btn-primary', 'btn-outline-secondary'));
-            el.classList.add('btn-primary');
+            document.querySelectorAll('#folders-list .folder-item').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
             selectedFolderId = folderId;
             selectedFolderName = folderName;
             document.getElementById('btn-import-drive').disabled = false;
 
-            // Cargar preview de imágenes
             const section = document.getElementById('images-section');
             const list = document.getElementById('images-list');
-            section.classList.remove('d-none');
-            list.innerHTML = '<span class="text-slate-400 small"><i class="fa-solid fa-spinner fa-spin me-1"></i>Cargando…</span>';
+            section.classList.remove('hidden');
+            list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)"><i class="fa-solid fa-spinner fa-spin mr-1"></i>Loading...</span>';
 
             try {
                 const res = await fetch(`/api/presentations/drive/folders/${folderId}/images`);
@@ -321,27 +264,26 @@
                 if (data.images && data.images.length > 0) {
                     data.images.forEach(img => {
                         const span = document.createElement('span');
-                        span.className = 'badge bg-secondary image-item';
+                        span.className = 'sh-badge';
                         span.textContent = img.name;
                         list.appendChild(span);
                     });
                 } else {
-                    list.innerHTML = '<span class="text-slate-400 small">No se encontraron imágenes en esta carpeta.</span>';
+                    list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)">No images in this folder.</span>';
                     document.getElementById('btn-import-drive').disabled = true;
                 }
             } catch (e) {
-                list.innerHTML = '<span class="text-slate-400 small">Error al cargar imágenes.</span>';
+                list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)">Error loading images.</span>';
             }
         }
 
         async function importFromDrive() {
             const name = document.getElementById('drive-name').value.trim();
-            if (!name) { showError('drive-error', 'El nombre es obligatorio.'); return; }
-            if (!selectedFolderId) { showError('drive-error', 'Selecciona una carpeta de Drive.'); return; }
-
+            if (!name) { showError('drive-error', 'Name is required.'); return; }
+            if (!selectedFolderId) { showError('drive-error', 'Select a Drive folder.'); return; }
             hideError('drive-error');
             document.getElementById('btn-import-drive').disabled = true;
-            document.getElementById('drive-progress').classList.remove('d-none');
+            document.getElementById('drive-progress').classList.remove('hidden');
 
             const params = new URLSearchParams({
                 name,
@@ -358,22 +300,16 @@
                     body: params
                 });
                 const data = await res.json();
-                document.getElementById('drive-progress').classList.add('d-none');
-
-                if (res.ok && data.success) {
-                    window.location.reload();
-                } else {
-                    showError('drive-error', data.error || 'Error al importar.');
-                    document.getElementById('btn-import-drive').disabled = false;
-                }
+                document.getElementById('drive-progress').classList.add('hidden');
+                if (res.ok && data.success) { window.location.reload(); }
+                else { showError('drive-error', data.error || 'Import error.'); document.getElementById('btn-import-drive').disabled = false; }
             } catch (e) {
-                document.getElementById('drive-progress').classList.add('d-none');
-                showError('drive-error', 'Error de red.');
+                document.getElementById('drive-progress').classList.add('hidden');
+                showError('drive-error', 'Network error.');
                 document.getElementById('btn-import-drive').disabled = false;
             }
         }
 
-        /* ── Upload manual ── */
         let selectedFiles = [];
 
         function onFilesSelected(event) {
@@ -388,19 +324,17 @@
             selectedFiles.sort((a, b) => a.name.localeCompare(b.name));
             selectedFiles.forEach((f, i) => {
                 const span = document.createElement('span');
-                span.className = 'badge bg-secondary';
+                span.className = 'sh-badge';
                 span.textContent = `${i + 1}. ${f.name}`;
                 preview.appendChild(span);
             });
         }
 
-        // Drag & drop
         const dropZone = document.getElementById('upload-drop-zone');
         dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
         dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
         dropZone.addEventListener('drop', e => {
-            e.preventDefault();
-            dropZone.classList.remove('drag-over');
+            e.preventDefault(); dropZone.classList.remove('drag-over');
             selectedFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
             renderFilePreview();
             document.getElementById('btn-import-upload').disabled = selectedFiles.length === 0;
@@ -408,12 +342,11 @@
 
         async function importFromUpload() {
             const name = document.getElementById('upload-name').value.trim();
-            if (!name) { showError('upload-error', 'El nombre es obligatorio.'); return; }
-            if (selectedFiles.length === 0) { showError('upload-error', 'Selecciona al menos un archivo.'); return; }
-
+            if (!name) { showError('upload-error', 'Name is required.'); return; }
+            if (selectedFiles.length === 0) { showError('upload-error', 'Select at least one file.'); return; }
             hideError('upload-error');
             document.getElementById('btn-import-upload').disabled = true;
-            document.getElementById('upload-progress').classList.remove('d-none');
+            document.getElementById('upload-progress').classList.remove('hidden');
 
             const formData = new FormData();
             formData.append('name', name);
@@ -422,36 +355,25 @@
             selectedFiles.forEach(f => formData.append('files', f));
 
             try {
-                const res = await fetch('/api/presentations/create-from-upload', {
-                    method: 'POST',
-                    body: formData
-                });
+                const res = await fetch('/api/presentations/create-from-upload', { method: 'POST', body: formData });
                 const data = await res.json();
-                document.getElementById('upload-progress').classList.add('d-none');
-
-                if (res.ok && data.success) {
-                    window.location.reload();
-                } else {
-                    showError('upload-error', data.error || 'Error al subir archivos.');
-                    document.getElementById('btn-import-upload').disabled = false;
-                }
+                document.getElementById('upload-progress').classList.add('hidden');
+                if (res.ok && data.success) { window.location.reload(); }
+                else { showError('upload-error', data.error || 'Upload error.'); document.getElementById('btn-import-upload').disabled = false; }
             } catch (e) {
-                document.getElementById('upload-progress').classList.add('d-none');
-                showError('upload-error', 'Error de red.');
+                document.getElementById('upload-progress').classList.add('hidden');
+                showError('upload-error', 'Network error.');
                 document.getElementById('btn-import-upload').disabled = false;
             }
         }
 
-        /* ── Helpers ── */
         function showError(id, msg) {
             const el = document.getElementById(id);
-            el.textContent = msg;
-            el.classList.remove('d-none');
+            el.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-2"></i>' + msg;
+            el.classList.remove('hidden');
         }
-        function hideError(id) { document.getElementById(id).classList.add('d-none'); }
-        function escHtml(str) {
-            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        }
+        function hideError(id) { document.getElementById(id).classList.add('hidden'); }
+        function escHtml(str) { return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
     </script>
 </body>
 
