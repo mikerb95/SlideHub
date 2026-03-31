@@ -1,5 +1,6 @@
 package com.brixo.slidehub.ui.service;
 
+import com.brixo.slidehub.ui.model.DriveContents;
 import com.brixo.slidehub.ui.model.DriveFile;
 import com.brixo.slidehub.ui.model.DriveFolder;
 import org.slf4j.Logger;
