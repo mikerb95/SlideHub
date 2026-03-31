@@ -5,13 +5,16 @@ import com.brixo.slidehub.ui.model.User;
 import com.brixo.slidehub.ui.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +27,9 @@ import java.util.UUID;
  * Procesa login OIDC (Google). Complementa CustomOAuth2UserService que
  * maneja proveedores OAuth2 no-OIDC (GitHub).
  *
- * Misma estrategia "merge by email" que CustomOAuth2UserService.
+ * Soporta dos flujos:
+ * - Login: crea cuenta nueva o reutiliza existente (merge by email).
+ * - Linking: si ya hay usuario autenticado, vincula Google a esa cuenta.
  */
 @Service
 public class CustomOidcUserService extends OidcUserService {
@@ -72,7 +77,17 @@ public class CustomOidcUserService extends OidcUserService {
             return userRepository.save(existing);
         }
 
-        // 2. Existe usuario con este email?
+        // 2. Linking: si hay usuario autenticado, vincular Google a esa cuenta
+        Optional<User> authenticated = findAuthenticatedUser();
+        if (authenticated.isPresent()) {
+            User existing = authenticated.get();
+            existing.setGoogleId(googleId);
+            existing.setGoogleEmail(googleEmail);
+            log.info("Google OIDC: vinculado a usuario autenticado ({})", existing.getUsername());
+            return userRepository.save(existing);
+        }
+
+        // 3. Existe usuario con este email?
         if (googleEmail != null) {
             Optional<User> byEmail = userRepository.findByEmail(googleEmail);
             if (byEmail.isPresent()) {
@@ -84,7 +99,7 @@ public class CustomOidcUserService extends OidcUserService {
             }
         }
 
-        // 3. Crear cuenta nueva
+        // 4. Crear cuenta nueva
         String baseUsername = (googleEmail != null)
                 ? googleEmail.split("@")[0]
                 : "google_" + googleId.substring(0, 8);
@@ -104,6 +119,28 @@ public class CustomOidcUserService extends OidcUserService {
         newUser.setCreatedAt(LocalDateTime.now());
         log.info("Google OIDC login: nueva cuenta creada para {} ({})", resolvedUsername, resolvedEmail);
         return userRepository.save(newUser);
+    }
+
+    /**
+     * Busca al usuario actualmente autenticado en la base de datos.
+     * Soporta sesiones iniciadas via form login, GitHub OAuth2 o Google OIDC.
+     */
+    private Optional<User> findAuthenticatedUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+            return Optional.empty();
+        }
+        if (auth.getPrincipal() instanceof OAuth2User oauth2) {
+            Object githubId = oauth2.getAttribute("id");
+            if (githubId != null) {
+                return userRepository.findByGithubId(githubId.toString());
+            }
+            Object googleId = oauth2.getAttribute("sub");
+            if (googleId != null) {
+                return userRepository.findByGoogleId(googleId.toString());
+            }
+        }
+        return userRepository.findByUsername(auth.getName());
     }
 
     private String resolveUniqueUsername(String base) {
