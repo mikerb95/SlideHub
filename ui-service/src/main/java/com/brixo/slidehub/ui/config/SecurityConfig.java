@@ -91,7 +91,7 @@ public class SecurityConfig {
                                 // Login OAuth2 (GitHub y Google)
                                 .oauth2Login(oauth -> oauth
                                                 .loginPage("/auth/login")
-                                                .defaultSuccessUrl("/presentations", true)
+                                                .successHandler(oauth2SuccessHandler())
                                                 .failureUrl("/auth/login?error=oauth2")
                                                 .userInfoEndpoint(userInfo -> userInfo
                                                                 .userService(oAuth2UserService)
@@ -116,6 +116,23 @@ public class SecurityConfig {
                 DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
                 provider.setPasswordEncoder(passwordEncoder());
                 return provider;
+        }
+
+        /**
+         * Success handler para OAuth2: si el flujo viene de /auth/link/{provider},
+         * redirige al perfil; si no, redirige a /presentations (login normal).
+         */
+        @Bean
+        public AuthenticationSuccessHandler oauth2SuccessHandler() {
+                return (request, response, authentication) -> {
+                        HttpSession session = request.getSession(false);
+                        String returnUrl = null;
+                        if (session != null) {
+                                returnUrl = (String) session.getAttribute("oauth2_link_return");
+                                session.removeAttribute("oauth2_link_return");
+                        }
+                        response.sendRedirect(returnUrl != null ? returnUrl : "/presentations");
+                };
         }
 
         @Bean

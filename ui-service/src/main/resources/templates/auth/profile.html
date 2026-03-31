@@ -87,7 +87,7 @@
                     <span th:if="${githubLinked}" class="sh-badge-green">
                         <i class="fa-solid fa-link text-[0.55rem]"></i> Linked
                     </span>
-                    <a th:unless="${githubLinked}" href="/oauth2/authorization/github" class="sh-btn text-xs py-1 px-2.5">
+                    <a th:unless="${githubLinked}" th:href="@{/auth/link/github}" class="sh-btn text-xs py-1 px-2.5">
                         Link
                     </a>
                 </div>
