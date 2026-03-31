@@ -1,6 +1,7 @@
 package com.brixo.slidehub.ui.config;
 
 import com.brixo.slidehub.ui.service.CustomOAuth2UserService;
+import com.brixo.slidehub.ui.service.CustomOidcUserService;
 import com.brixo.slidehub.ui.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
