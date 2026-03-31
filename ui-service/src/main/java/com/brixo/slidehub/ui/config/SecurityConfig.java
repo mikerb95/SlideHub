@@ -91,7 +91,8 @@ public class SecurityConfig {
                                                 .defaultSuccessUrl("/presentations", true)
                                                 .failureUrl("/auth/login?error=oauth2")
                                                 .userInfoEndpoint(userInfo -> userInfo
-                                                                .userService(oAuth2UserService)))
+                                                                .userService(oAuth2UserService)
+                                                .oidcUserService(oidcUserService)))
                                 .logout(logout -> logout
                                                 .logoutUrl("/auth/logout")
                                                 .logoutSuccessUrl("/auth/login?logout=true")
