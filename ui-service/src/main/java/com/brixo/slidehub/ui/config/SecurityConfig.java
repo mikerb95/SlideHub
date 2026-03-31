@@ -25,11 +25,14 @@ public class SecurityConfig {
 
         private final CustomUserDetailsService userDetailsService;
         private final CustomOAuth2UserService oAuth2UserService;
+        private final CustomOidcUserService oidcUserService;
 
         public SecurityConfig(CustomUserDetailsService userDetailsService,
-                        CustomOAuth2UserService oAuth2UserService) {
+                        CustomOAuth2UserService oAuth2UserService,
+                        CustomOidcUserService oidcUserService) {
                 this.userDetailsService = userDetailsService;
                 this.oAuth2UserService = oAuth2UserService;
+                this.oidcUserService = oidcUserService;
         }
 
         @Bean
