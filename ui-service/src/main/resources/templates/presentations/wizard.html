@@ -151,31 +151,53 @@
                     </div>
                 </div>
 
-                <!-- Drive Panel -->
+                <!-- Drive Panel — File Explorer -->
                 <div id="panel-drive" class="hidden">
                     <div th:if="${!hasGoogleToken}" class="sh-alert sh-alert-warn mb-4">
                         <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
-                        <span>Vincula tu <a href="/oauth2/authorization/google" class="underline">cuenta de Google</a> para acceder a Drive.</span>
+                        <span>Vincula tu <a th:href="@{/auth/link/google}" class="underline">cuenta de Google</a> para acceder a Drive.</span>
                     </div>
                     <div th:if="${hasGoogleToken}">
-                        <div class="flex items-center gap-2 mb-3">
-                            <label class="sh-input-label mb-0">Carpeta de Drive *</label>
-                            <button type="button" class="sh-btn text-xs py-0.5 px-2" onclick="loadFolders()">
-                                <i class="fa-solid fa-arrows-rotate"></i> Cargar
+                        <!-- Breadcrumb -->
+                        <nav id="drive-breadcrumb" class="flex items-center gap-1 mb-3 font-mono text-xs text-[var(--sh-text-3)] flex-wrap">
+                            <button class="hover:text-[var(--sh-blue)] transition-colors cursor-pointer bg-transparent border-none p-0"
+                                    onclick="browseDrive('root')">
+                                <i class="fa-solid fa-hard-drive mr-0.5"></i>Mi Drive
                             </button>
+                        </nav>
+
+                        <!-- Loading -->
+                        <div id="drive-loading" class="hidden font-mono text-xs text-[var(--sh-text-3)] mb-3 py-8 text-center">
+                            <i class="fa-solid fa-spinner fa-spin mr-1"></i>Cargando...
                         </div>
-                        <div id="folders-loading" class="hidden font-mono text-xs text-[var(--sh-text-3)] mb-2">
-                            <i class="fa-solid fa-spinner fa-spin mr-1"></i>Cargando carpetas...
-                        </div>
-                        <div id="folders-list" class="flex flex-wrap gap-2 mb-4"></div>
-                        <div id="images-section" class="hidden mb-4">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="sh-input-label mb-0">Imagenes</span>
-                                <span id="images-count" class="sh-badge text-[0.6rem]">0</span>
+
+                        <!-- Explorer grid -->
+                        <div id="drive-explorer" class="border border-[var(--sh-border)] rounded-tech overflow-hidden mb-4" style="min-height:120px">
+                            <!-- Empty state (before first load) -->
+                            <div id="drive-empty" class="flex flex-col items-center justify-center py-10 text-[var(--sh-text-3)]">
+                                <i class="fa-brands fa-google-drive text-2xl mb-2 opacity-40"></i>
+                                <span class="text-sm">Haz clic en la pestaña para explorar tu Drive</span>
                             </div>
-                            <div id="images-list" class="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto"></div>
+                            <!-- Folder/file items rendered here -->
+                            <div id="drive-items" class="hidden"></div>
                         </div>
+
+                        <!-- Selected folder info -->
+                        <div id="drive-selection" class="hidden mb-4 p-3 rounded-tech bg-[var(--sh-blue-dim)] border border-[rgba(88,166,255,0.25)]">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid fa-folder-open text-[var(--sh-blue)]"></i>
+                                    <span class="font-mono text-sm text-[var(--sh-text-1)]" id="drive-sel-name"></span>
+                                    <span class="sh-badge text-[0.6rem]" id="drive-sel-count">0 imagenes</span>
+                                </div>
+                                <button type="button" class="sh-btn text-xs py-0.5 px-2" onclick="confirmDriveFolder()">
+                                    <i class="fa-solid fa-check mr-1"></i>Seleccionar
+                                </button>
+                            </div>
+                        </div>
+
                         <div id="drive-error" class="sh-alert sh-alert-error hidden mb-3"></div>
+
                         <button type="button" class="sh-btn sh-btn-primary" id="btn-import-drive" onclick="doDriveImport()" disabled>
                             <i class="fa-solid fa-download mr-1"></i> Importar desde Drive
                         </button>
