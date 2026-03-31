@@ -551,65 +551,134 @@
             }
         }
 
-        async function loadFolders() {
-            document.getElementById('folders-loading').classList.remove('hidden');
-            document.getElementById('folders-list').innerHTML = '';
-            document.getElementById('images-section').classList.add('hidden');
+        // ── Drive File Explorer ──
+        let driveBreadcrumb = [{ id: 'root', name: 'Mi Drive' }];
+        let driveLoaded = false;
+        let currentFolderImages = [];
+
+        async function browseDrive(parentId) {
+            hideError('drive-error');
+            document.getElementById('drive-loading').classList.remove('hidden');
+            document.getElementById('drive-items').classList.add('hidden');
+            document.getElementById('drive-empty').classList.add('hidden');
+            document.getElementById('drive-selection').classList.add('hidden');
             selectedFolderId = null;
+            selectedFolderName = null;
+            currentFolderImages = [];
             document.getElementById('btn-import-drive').disabled = true;
+
             try {
-                const res = await fetch('/api/presentations/drive/folders');
+                const res = await fetch('/api/presentations/drive/browse?parentId=' + encodeURIComponent(parentId));
                 const data = await res.json();
-                document.getElementById('folders-loading').classList.add('hidden');
-                if (!res.ok) { showError('drive-error', data.error || 'Error cargando carpetas.'); return; }
-                const list = document.getElementById('folders-list');
-                if (!data.folders || data.folders.length === 0) {
-                    list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)">No se encontraron carpetas.</span>';
+                document.getElementById('drive-loading').classList.add('hidden');
+
+                if (!res.ok) {
+                    showError('drive-error', data.error || 'Error accediendo a Drive.');
                     return;
                 }
-                data.folders.forEach(f => {
-                    const el = document.createElement('button');
-                    el.className = 'folder-item';
-                    el.innerHTML = '<i class="fa-solid fa-folder mr-1"></i>' + escHtml(f.name);
-                    el.onclick = () => selectFolder(f.id, f.name, el);
-                    list.appendChild(el);
+
+                const items = document.getElementById('drive-items');
+                items.innerHTML = '';
+                items.classList.remove('hidden');
+
+                const folders = data.folders || [];
+                const files = data.files || [];
+                currentFolderImages = files;
+
+                if (folders.length === 0 && files.length === 0) {
+                    items.innerHTML = '<div class="flex flex-col items-center justify-center py-8 text-[var(--sh-text-3)]">'
+                        + '<i class="fa-solid fa-folder-open text-xl mb-2 opacity-40"></i>'
+                        + '<span class="text-sm">Carpeta vacia</span></div>';
+                    return;
+                }
+
+                // Render folders
+                folders.forEach(f => {
+                    const row = document.createElement('div');
+                    row.className = 'flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-[var(--sh-hover)] transition-colors border-b border-[var(--sh-border)]';
+                    row.innerHTML = '<i class="fa-solid fa-folder text-[var(--sh-amber)] text-sm w-5 text-center"></i>'
+                        + '<span class="text-sm text-[var(--sh-text-1)] flex-1 truncate">' + escHtml(f.name) + '</span>'
+                        + '<i class="fa-solid fa-chevron-right text-[0.6rem] text-[var(--sh-text-3)]"></i>';
+                    row.onclick = () => navigateToFolder(f.id, f.name);
+                    items.appendChild(row);
                 });
+
+                // Render image files
+                files.forEach(img => {
+                    const row = document.createElement('div');
+                    row.className = 'flex items-center gap-3 px-4 py-2 border-b border-[var(--sh-border)] last:border-b-0';
+                    const ext = img.name.split('.').pop().toUpperCase();
+                    row.innerHTML = '<i class="fa-solid fa-image text-[var(--sh-blue)] text-sm w-5 text-center opacity-60"></i>'
+                        + '<span class="text-sm text-[var(--sh-text-2)] flex-1 truncate">' + escHtml(img.name) + '</span>'
+                        + '<span class="font-mono text-[0.6rem] text-[var(--sh-text-3)]">' + escHtml(ext) + '</span>';
+                    items.appendChild(row);
+                });
+
+                // If this folder has images, show selection prompt
+                if (files.length > 0) {
+                    const sel = document.getElementById('drive-selection');
+                    const crumb = driveBreadcrumb[driveBreadcrumb.length - 1];
+                    document.getElementById('drive-sel-name').textContent = crumb.name;
+                    document.getElementById('drive-sel-count').textContent = files.length + ' imagen' + (files.length !== 1 ? 'es' : '');
+                    sel.classList.remove('hidden');
+                }
+
             } catch (e) {
-                document.getElementById('folders-loading').classList.add('hidden');
-                showError('drive-error', 'Error de red.');
+                document.getElementById('drive-loading').classList.add('hidden');
+                showError('drive-error', 'Error de conexion con Drive.');
             }
         }
 
-        async function selectFolder(folderId, folderName, el) {
-            document.querySelectorAll('#folders-list .folder-item').forEach(b => b.classList.remove('selected'));
-            el.classList.add('selected');
-            selectedFolderId = folderId;
-            selectedFolderName = folderName;
+        function navigateToFolder(folderId, folderName) {
+            // Update breadcrumb
+            const existingIdx = driveBreadcrumb.findIndex(b => b.id === folderId);
+            if (existingIdx >= 0) {
+                driveBreadcrumb = driveBreadcrumb.slice(0, existingIdx + 1);
+            } else {
+                driveBreadcrumb.push({ id: folderId, name: folderName });
+            }
+            renderBreadcrumb();
+            browseDrive(folderId);
+        }
+
+        function renderBreadcrumb() {
+            const nav = document.getElementById('drive-breadcrumb');
+            nav.innerHTML = '';
+            driveBreadcrumb.forEach((crumb, i) => {
+                if (i > 0) {
+                    const sep = document.createElement('span');
+                    sep.className = 'text-[var(--sh-text-3)] mx-0.5';
+                    sep.textContent = '/';
+                    nav.appendChild(sep);
+                }
+                const btn = document.createElement('button');
+                btn.className = 'bg-transparent border-none p-0 cursor-pointer transition-colors font-mono text-xs '
+                    + (i === driveBreadcrumb.length - 1
+                        ? 'text-[var(--sh-text-1)]'
+                        : 'text-[var(--sh-text-3)] hover:text-[var(--sh-blue)]');
+                if (i === 0) {
+                    btn.innerHTML = '<i class="fa-solid fa-hard-drive mr-0.5"></i>' + escHtml(crumb.name);
+                } else {
+                    btn.textContent = crumb.name;
+                }
+                btn.onclick = () => navigateToFolder(crumb.id, crumb.name);
+                nav.appendChild(btn);
+            });
+        }
+
+        function confirmDriveFolder() {
+            const crumb = driveBreadcrumb[driveBreadcrumb.length - 1];
+            selectedFolderId = crumb.id;
+            selectedFolderName = crumb.name;
             document.getElementById('btn-import-drive').disabled = false;
 
-            const section = document.getElementById('images-section');
-            const list = document.getElementById('images-list');
-            section.classList.remove('hidden');
-            list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)"><i class="fa-solid fa-spinner fa-spin mr-1"></i>Cargando...</span>';
-            try {
-                const res = await fetch('/api/presentations/drive/folders/' + folderId + '/images');
-                const data = await res.json();
-                list.innerHTML = '';
-                document.getElementById('images-count').textContent = data.images ? data.images.length : 0;
-                if (data.images && data.images.length > 0) {
-                    data.images.forEach(img => {
-                        const span = document.createElement('span');
-                        span.className = 'sh-badge';
-                        span.textContent = img.name;
-                        list.appendChild(span);
-                    });
-                } else {
-                    list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)">No hay imagenes.</span>';
-                    document.getElementById('btn-import-drive').disabled = true;
-                }
-            } catch (e) {
-                list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)">Error cargando imagenes.</span>';
-            }
+            // Visual confirmation
+            const sel = document.getElementById('drive-selection');
+            sel.innerHTML = '<div class="flex items-center gap-2">'
+                + '<i class="fa-solid fa-circle-check text-[var(--sh-green)]"></i>'
+                + '<span class="font-mono text-sm text-[var(--sh-text-1)]">' + escHtml(selectedFolderName) + '</span>'
+                + '<span class="sh-badge-green text-[0.6rem]">' + currentFolderImages.length + ' imagen' + (currentFolderImages.length !== 1 ? 'es' : '') + ' — listo</span>'
+                + '</div>';
         }
 
         async function doDriveImport() {
