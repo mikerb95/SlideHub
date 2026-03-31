@@ -5,7 +5,9 @@ import com.brixo.slidehub.ui.model.User;
 import com.brixo.slidehub.ui.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -21,12 +23,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Procesa el login via GitHub y Google (PLAN-EXPANSION.md Fase 1, tareas 9-12).
+ * Procesa el login via GitHub (PLAN-EXPANSION.md Fase 1, tareas 9-12).
  *
- * Estrategia "merge by email":
- * 1. Si ya existe usuario con ese githubId/googleId → actualiza tokens.
- * 2. Si existe usuario con mismo email → vincula proveedor a esa cuenta.
- * 3. Si no existe → crea cuenta nueva con rol PRESENTER.
+ * Soporta dos flujos:
+ * - Login: crea cuenta nueva o reutiliza existente (merge by email).
+ * - Linking: si ya hay usuario autenticado, vincula GitHub a esa cuenta.
  */
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
@@ -48,7 +49,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         try {
             User user = switch (registrationId) {
                 case "github" -> processGithubUser(request, oauth2User);
-                case "google" -> processGoogleUser(oauth2User);
                 default -> throw new OAuth2AuthenticationException(
                         new OAuth2Error("unsupported_provider"),
                         "Proveedor OAuth2 no soportado: " + registrationId);
@@ -66,7 +66,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         } catch (OAuth2AuthenticationException ex) {
             throw ex;
         } catch (Exception ex) {
-            log.error("Error procesando usuario OAuth2 ({})): {}", registrationId, ex.getMessage(), ex);
+            log.error("Error procesando usuario OAuth2 ({}): {}", registrationId, ex.getMessage(), ex);
             throw new OAuth2AuthenticationException(
                     new OAuth2Error("oauth2_processing_error"), ex.getMessage(), ex);
         }
@@ -90,7 +90,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             return userRepository.save(existing);
         }
 
-        // 2. ¿Existe usuario con este email?
+        // 2. Linking: si hay usuario autenticado, vincular GitHub a esa cuenta
+        Optional<User> authenticated = findAuthenticatedUser();
+        if (authenticated.isPresent()) {
+            User existing = authenticated.get();
+            existing.setGithubId(githubId);
+            existing.setGithubUsername(githubUsername);
+            existing.setGithubAccessToken(accessToken);
+            log.info("GitHub: vinculado a usuario autenticado ({})", existing.getUsername());
+            return userRepository.save(existing);
+        }
+
+        // 3. ¿Existe usuario con este email?
         if (email != null) {
             Optional<User> byEmail = userRepository.findByEmail(email);
             if (byEmail.isPresent()) {
@@ -103,7 +114,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             }
         }
 
-        // 3. Crear cuenta nueva
+        // 4. Crear cuenta nueva
         String resolvedUsername = resolveUniqueUsername(githubUsername, "gh");
         String resolvedEmail = email != null ? email : resolvedUsername + "@github.oauth.placeholder";
 
@@ -121,61 +132,30 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return userRepository.save(newUser);
     }
 
-    // ── Google ────────────────────────────────────────────────────────────────
-
-    private User processGoogleUser(OAuth2User oauth2User) {
-        String googleId = oauth2User.getAttribute("sub");
-        String googleEmail = oauth2User.getAttribute("email");
-        String name = oauth2User.getAttribute("name");
-
-        // 1. ¿Existe usuario con este googleId?
-        Optional<User> byGoogleId = userRepository.findByGoogleId(googleId);
-        if (byGoogleId.isPresent()) {
-            User existing = byGoogleId.get();
-            existing.setGoogleEmail(googleEmail);
-            log.debug("Google login: usuario existente vinculado ({})", existing.getUsername());
-            return userRepository.save(existing);
-        }
-
-        // 2. ¿Existe usuario con este email?
-        if (googleEmail != null) {
-            Optional<User> byEmail = userRepository.findByEmail(googleEmail);
-            if (byEmail.isPresent()) {
-                User existing = byEmail.get();
-                existing.setGoogleId(googleId);
-                existing.setGoogleEmail(googleEmail);
-                log.info("Google login: vinculado a cuenta existente por email ({})", googleEmail);
-                return userRepository.save(existing);
-            }
-        }
-
-        // 3. Crear cuenta nueva
-        String baseUsername = (googleEmail != null)
-                ? googleEmail.split("@")[0]
-                : "google_" + googleId.substring(0, 8);
-        String resolvedUsername = resolveUniqueUsername(baseUsername, "g");
-        String resolvedEmail = googleEmail != null
-                ? googleEmail
-                : resolvedUsername + "@google.oauth.placeholder";
-
-        User newUser = new User();
-        newUser.setId(UUID.randomUUID().toString());
-        newUser.setUsername(resolvedUsername);
-        newUser.setEmail(resolvedEmail);
-        newUser.setRole(Role.PRESENTER);
-        newUser.setEmailVerified(true); // Google siempre verifica el email
-        newUser.setGoogleId(googleId);
-        newUser.setGoogleEmail(googleEmail);
-        newUser.setCreatedAt(LocalDateTime.now());
-        log.info("Google login: nueva cuenta creada para {} ({})", resolvedUsername, resolvedEmail);
-        return userRepository.save(newUser);
-    }
-
     // ── Utilidades ────────────────────────────────────────────────────────────
 
     /**
-     * Genera un username único: si 'base' ya está ocupado, prueba 'base_<prefix>N'.
+     * Busca al usuario actualmente autenticado en la base de datos.
+     * Soporta sesiones iniciadas via form login, GitHub OAuth2 o Google OIDC.
      */
+    private Optional<User> findAuthenticatedUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+            return Optional.empty();
+        }
+        if (auth.getPrincipal() instanceof OAuth2User oauth2) {
+            Object githubId = oauth2.getAttribute("id");
+            if (githubId != null) {
+                return userRepository.findByGithubId(githubId.toString());
+            }
+            Object googleId = oauth2.getAttribute("sub");
+            if (googleId != null) {
+                return userRepository.findByGoogleId(googleId.toString());
+            }
+        }
+        return userRepository.findByUsername(auth.getName());
+    }
+
     private String resolveUniqueUsername(String base, String prefix) {
         if (base == null || base.isBlank())
             base = prefix + "_user";
