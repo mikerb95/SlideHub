@@ -483,6 +483,11 @@
             document.getElementById('panel-drive').classList.toggle('hidden', tab !== 'drive');
             document.getElementById('tab-upload').classList.toggle('active', tab === 'upload');
             document.getElementById('tab-drive').classList.toggle('active', tab === 'drive');
+            // Auto-load Drive root on first tab activation
+            if (tab === 'drive' && !driveLoaded) {
+                driveLoaded = true;
+                browseDrive('root');
+            }
         }
 
         let selectedFiles = [];
