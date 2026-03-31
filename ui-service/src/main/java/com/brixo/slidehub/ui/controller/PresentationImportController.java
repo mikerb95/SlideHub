@@ -8,6 +8,7 @@ import com.brixo.slidehub.ui.model.PresentationSummary;
 import com.brixo.slidehub.ui.model.SlideInfo;
 import com.brixo.slidehub.ui.model.User;
 import com.brixo.slidehub.ui.repository.UserRepository;
+import com.brixo.slidehub.ui.service.GoogleDriveService;
 import com.brixo.slidehub.ui.service.PresentationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,13 +49,16 @@ public class PresentationImportController {
     private final PresentationService presentationService;
     private final UserRepository userRepository;
     private final OAuth2AuthorizedClientService authorizedClientService;
+    private final GoogleDriveService googleDriveService;
 
     public PresentationImportController(PresentationService presentationService,
             UserRepository userRepository,
-            OAuth2AuthorizedClientService authorizedClientService) {
+            OAuth2AuthorizedClientService authorizedClientService,
+            GoogleDriveService googleDriveService) {
         this.presentationService = presentationService;
         this.userRepository = userRepository;
         this.authorizedClientService = authorizedClientService;
+        this.googleDriveService = googleDriveService;
     }
 
     // ── Vistas MVC ────────────────────────────────────────────────────────────
