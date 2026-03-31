@@ -130,6 +130,29 @@ public class PresentationImportController {
     }
 
     /**
+     * Explora una carpeta de Google Drive: subcarpetas + imágenes.
+     * Navegación jerárquica estilo file explorer.
+     *
+     * @param parentId ID de la carpeta a explorar ("root" para My Drive)
+     */
+    @GetMapping("/api/presentations/drive/browse")
+    @ResponseBody
+    public ResponseEntity<?> browseDrive(
+            @RequestParam(defaultValue = "root") String parentId,
+            Authentication authentication) {
+        String accessToken = resolveGoogleAccessToken(authentication);
+        if (accessToken == null) {
+            return ResponseEntity.status(401)
+                    .body(Map.of("error", "No hay token de Google. Vincula tu cuenta de Google para acceder a Drive."));
+        }
+        DriveContents contents = googleDriveService.listContents(parentId, accessToken);
+        return ResponseEntity.ok(Map.of(
+                "parentId", parentId,
+                "folders", contents.folders(),
+                "files", contents.files()));
+    }
+
+    /**
      * Lista las carpetas de Google Drive del usuario.
      * Requiere que el usuario haya iniciado sesión con Google (token OAuth2
      * disponible).
