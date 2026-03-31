@@ -116,6 +116,7 @@ public class CustomOidcUserService extends OidcUserService {
         newUser.setEmailVerified(true);
         newUser.setGoogleId(googleId);
         newUser.setGoogleEmail(googleEmail);
+        newUser.setProfileCompleted(false);
         newUser.setCreatedAt(LocalDateTime.now());
         log.info("Google OIDC login: nueva cuenta creada para {} ({})", resolvedUsername, resolvedEmail);
         return userRepository.save(newUser);

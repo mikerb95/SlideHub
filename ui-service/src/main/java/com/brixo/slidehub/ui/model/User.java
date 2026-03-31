@@ -201,6 +201,14 @@ public class User {
         this.googleRefreshToken = googleRefreshToken;
     }
 
+    public boolean isProfileCompleted() {
+        return profileCompleted;
+    }
+
+    public void setProfileCompleted(boolean profileCompleted) {
+        this.profileCompleted = profileCompleted;
+    }
+
     public String getDefaultDriveFolderId() {
         return defaultDriveFolderId;
     }

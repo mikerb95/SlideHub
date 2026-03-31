@@ -127,6 +127,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         newUser.setGithubId(githubId);
         newUser.setGithubUsername(githubUsername);
         newUser.setGithubAccessToken(accessToken);
+        newUser.setProfileCompleted(false);
         newUser.setCreatedAt(LocalDateTime.now());
         log.info("GitHub login: nueva cuenta creada para {} ({})", resolvedUsername, resolvedEmail);
         return userRepository.save(newUser);
