@@ -113,6 +113,60 @@ public class GoogleDriveService {
     }
 
     /**
+     * Explora el contenido de una carpeta de Drive: subcarpetas + imágenes.
+     * Usa "root" como parentId para explorar la raíz (My Drive).
+     *
+     * @param parentId    ID de la carpeta padre, o "root" para la raíz
+     * @param accessToken OAuth2 access token del usuario
+     * @return contenido separado en carpetas e imágenes
+     */
+    public DriveContents listContents(String parentId, String accessToken) {
+        String query = "'" + parentId + "' in parents and trashed=false";
+        try {
+            Map<?, ?> response = driveClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/files")
+                            .queryParam("q", query)
+                            .queryParam("fields", "files(id,name,mimeType)")
+                            .queryParam("orderBy", "folder,name")
+                            .queryParam("pageSize", "200")
+                            .build())
+                    .header("Authorization", "Bearer " + accessToken)
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
+
+            if (response == null) {
+                return new DriveContents(Collections.emptyList(), Collections.emptyList());
+            }
+
+            @SuppressWarnings("unchecked")
+            List<Map<String, String>> files = (List<Map<String, String>>) response.get("files");
+            if (files == null) {
+                return new DriveContents(Collections.emptyList(), Collections.emptyList());
+            }
+
+            List<DriveFolder> folders = files.stream()
+                    .filter(f -> "application/vnd.google-apps.folder".equals(f.get("mimeType")))
+                    .map(f -> new DriveFolder(f.get("id"), f.get("name")))
+                    .toList();
+
+            List<DriveFile> images = files.stream()
+                    .filter(f -> {
+                        String mime = f.get("mimeType");
+                        return mime != null && mime.startsWith("image/");
+                    })
+                    .map(f -> new DriveFile(f.get("id"), f.get("name"), f.get("mimeType")))
+                    .toList();
+
+            return new DriveContents(folders, images);
+        } catch (Exception e) {
+            log.error("Error explorando carpeta {} de Drive: {}", parentId, e.getMessage());
+            return new DriveContents(Collections.emptyList(), Collections.emptyList());
+        }
+    }
+
+    /**
      * Descarga el contenido binario de un archivo de Drive.
      *
      * @param fileId      ID del archivo en Drive
