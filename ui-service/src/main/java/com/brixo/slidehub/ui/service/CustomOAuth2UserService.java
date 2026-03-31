@@ -75,7 +75,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     // ── GitHub ────────────────────────────────────────────────────────────────
 
     private User processGithubUser(OAuth2UserRequest request, OAuth2User oauth2User) {
-        String githubId = String.valueOf(oauth2User.getAttribute("id"));
+        String githubId = oauth2User.getAttribute("id").toString();
         String githubUsername = oauth2User.getAttribute("login");
         String email = oauth2User.getAttribute("email"); // puede ser null (email privado)
         String accessToken = request.getAccessToken().getTokenValue();
