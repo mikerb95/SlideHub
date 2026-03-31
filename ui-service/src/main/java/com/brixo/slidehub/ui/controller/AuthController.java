@@ -129,6 +129,18 @@ public class AuthController {
         return "auth/login";
     }
 
+    // ── Vinculación de proveedores OAuth ─────────────────────────────────────
+
+    /**
+     * Inicia el flujo OAuth2 para vincular un proveedor al usuario autenticado.
+     * Guarda un flag en sesión para redirigir al perfil tras completar.
+     */
+    @GetMapping("/link/{provider}")
+    public String linkProvider(@PathVariable String provider, HttpSession session) {
+        session.setAttribute("oauth2_link_return", "/auth/profile");
+        return "redirect:/oauth2/authorization/" + provider;
+    }
+
     // ── Perfil / vinculación OAuth ────────────────────────────────────────────
 
     /**
