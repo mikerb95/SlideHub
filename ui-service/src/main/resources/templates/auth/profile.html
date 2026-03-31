@@ -108,7 +108,7 @@
                     <span th:if="${googleLinked}" class="sh-badge-green">
                         <i class="fa-solid fa-link text-[0.55rem]"></i> Linked
                     </span>
-                    <a th:unless="${googleLinked}" href="/oauth2/authorization/google" class="sh-btn text-xs py-1 px-2.5">
+                    <a th:unless="${googleLinked}" th:href="@{/auth/link/google}" class="sh-btn text-xs py-1 px-2.5">
                         Link
                     </a>
                 </div>
