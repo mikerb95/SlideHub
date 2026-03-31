@@ -130,6 +130,87 @@ public class AuthController {
         return "auth/login";
     }
 
+    // ── Completar perfil (usuarios OAuth2 nuevos) ─────────────────────────────
+
+    /**
+     * Muestra el formulario para completar el perfil tras el primer login OAuth2.
+     * Pre-llena username y email desde los datos del proveedor.
+     */
+    @GetMapping("/complete-profile")
+    public String completeProfilePage(Authentication authentication, Model model) {
+        if (!isAuthenticated(authentication)) {
+            return "redirect:/auth/login";
+        }
+        User user = findCurrentUser(authentication);
+        if (user == null || user.isProfileCompleted()) {
+            return "redirect:/presentations";
+        }
+        model.addAttribute("user", user);
+        return "auth/complete-profile";
+    }
+
+    /**
+     * Procesa el formulario de completar perfil: actualiza username y email,
+     * marca profileCompleted = true y redirige a /presentations.
+     */
+    @PostMapping("/complete-profile")
+    public String completeProfile(Authentication authentication,
+            @RequestParam String username,
+            @RequestParam String email,
+            Model model) {
+        if (!isAuthenticated(authentication)) {
+            return "redirect:/auth/login";
+        }
+        User user = findCurrentUser(authentication);
+        if (user == null) {
+            return "redirect:/auth/login";
+        }
+        if (user.isProfileCompleted()) {
+            return "redirect:/presentations";
+        }
+
+        // Validar username
+        if (username == null || username.isBlank() || username.length() < 3 || username.length() > 50) {
+            model.addAttribute("user", user);
+            model.addAttribute("errorMessage", "El username debe tener entre 3 y 50 caracteres.");
+            return "auth/complete-profile";
+        }
+
+        // Validar email
+        if (email == null || email.isBlank() || !email.contains("@")) {
+            model.addAttribute("user", user);
+            model.addAttribute("errorMessage", "Ingresa un email válido.");
+            return "auth/complete-profile";
+        }
+
+        // Verificar unicidad del username (si cambió)
+        if (!username.equals(user.getUsername())) {
+            Optional<User> existing = userRepository.findByUsername(username);
+            if (existing.isPresent()) {
+                model.addAttribute("user", user);
+                model.addAttribute("errorMessage", "Ese username ya está en uso. Elige otro.");
+                return "auth/complete-profile";
+            }
+        }
+
+        // Verificar unicidad del email (si cambió)
+        if (!email.equals(user.getEmail())) {
+            Optional<User> existing = userRepository.findByEmail(email);
+            if (existing.isPresent()) {
+                model.addAttribute("user", user);
+                model.addAttribute("errorMessage", "Ese email ya está registrado.");
+                return "auth/complete-profile";
+            }
+        }
+
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setProfileCompleted(true);
+        userRepository.save(user);
+
+        return "redirect:/presentations";
+    }
+
     // ── Vinculación de proveedores OAuth ─────────────────────────────────────
 
     /**
@@ -171,9 +252,27 @@ public class AuthController {
                 && !"anonymousUser".equals(auth.getPrincipal());
     }
 
+    /**
+     * Resuelve el User de BD a partir de la autenticación actual.
+     * Soporta OAuth2 (GitHub/Google) y login local.
+     */
+    private User findCurrentUser(Authentication authentication) {
+        if (authentication.getPrincipal() instanceof org.springframework.security.oauth2.core.oidc.user.OidcUser oidc) {
+            String googleId = oidc.getSubject();
+            if (googleId != null) {
+                return userRepository.findByGoogleId(googleId).orElse(null);
+            }
+        } else if (authentication.getPrincipal() instanceof OAuth2User oAuth2User) {
+            Object githubId = oAuth2User.getAttribute("id");
+            if (githubId != null) {
+                return userRepository.findByGithubId(githubId.toString()).orElse(null);
+            }
+        }
+        return userRepository.findByUsername(authentication.getName()).orElse(null);
+    }
+
     private String resolveUsername(Authentication authentication) {
         if (authentication.getPrincipal() instanceof OAuth2User oAuth2User) {
-            // Para OAuth2, el atributo varía según el proveedor
             Object login = oAuth2User.getAttribute("login"); // GitHub
             Object email = oAuth2User.getAttribute("email"); // Google
             if (login != null)

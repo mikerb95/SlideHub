@@ -1,5 +1,7 @@
 package com.brixo.slidehub.ui.config;
 
+import com.brixo.slidehub.ui.model.User;
+import com.brixo.slidehub.ui.repository.UserRepository;
 import com.brixo.slidehub.ui.service.CustomOAuth2UserService;
 import com.brixo.slidehub.ui.service.CustomOidcUserService;
 import com.brixo.slidehub.ui.service.CustomUserDetailsService;
@@ -10,11 +12,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 
 import jakarta.servlet.http.HttpSession;
+import java.util.Optional;
 
 /**
  * Configuración de seguridad de ui-service (CLAUDE.md §11).
@@ -29,13 +34,16 @@ public class SecurityConfig {
         private final CustomUserDetailsService userDetailsService;
         private final CustomOAuth2UserService oAuth2UserService;
         private final CustomOidcUserService oidcUserService;
+        private final UserRepository userRepository;
 
         public SecurityConfig(CustomUserDetailsService userDetailsService,
                         CustomOAuth2UserService oAuth2UserService,
-                        CustomOidcUserService oidcUserService) {
+                        CustomOidcUserService oidcUserService,
+                        UserRepository userRepository) {
                 this.userDetailsService = userDetailsService;
                 this.oAuth2UserService = oAuth2UserService;
                 this.oidcUserService = oidcUserService;
+                this.userRepository = userRepository;
         }
 
         @Bean
@@ -120,7 +128,8 @@ public class SecurityConfig {
 
         /**
          * Success handler para OAuth2: si el flujo viene de /auth/link/{provider},
-         * redirige al perfil; si no, redirige a /presentations (login normal).
+         * redirige al perfil; si no, verifica si el usuario completó su perfil.
+         * Usuarios nuevos (profileCompleted=false) van a /auth/complete-profile.
          */
         @Bean
         public AuthenticationSuccessHandler oauth2SuccessHandler() {
@@ -131,8 +140,34 @@ public class SecurityConfig {
                                 returnUrl = (String) session.getAttribute("oauth2_link_return");
                                 session.removeAttribute("oauth2_link_return");
                         }
-                        response.sendRedirect(returnUrl != null ? returnUrl : "/presentations");
+                        if (returnUrl != null) {
+                                response.sendRedirect(returnUrl);
+                                return;
+                        }
+
+                        // Verificar si el usuario completó su perfil
+                        Optional<User> user = resolveUserFromAuth(authentication);
+                        if (user.isPresent() && !user.get().isProfileCompleted()) {
+                                response.sendRedirect("/auth/complete-profile");
+                                return;
+                        }
+                        response.sendRedirect("/presentations");
                 };
+        }
+
+        private Optional<User> resolveUserFromAuth(org.springframework.security.core.Authentication auth) {
+                if (auth.getPrincipal() instanceof OidcUser oidc) {
+                        String googleId = oidc.getSubject();
+                        if (googleId != null) {
+                                return userRepository.findByGoogleId(googleId);
+                        }
+                } else if (auth.getPrincipal() instanceof OAuth2User oauth2) {
+                        Object githubId = oauth2.getAttribute("id");
+                        if (githubId != null) {
+                                return userRepository.findByGithubId(githubId.toString());
+                        }
+                }
+                return userRepository.findByUsername(auth.getName());
         }
 
         @Bean
