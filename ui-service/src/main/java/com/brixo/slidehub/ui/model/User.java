@@ -67,6 +67,15 @@ public class User {
     @Column(name = "google_refresh_token", columnDefinition = "TEXT")
     private String googleRefreshToken;
 
+    // ── Perfil ────────────────────────────────────────────────────────────────
+
+    /**
+     * Indica si el usuario completó su perfil tras el primer login OAuth2.
+     * Los usuarios locales siempre lo tienen en true (lo completan al registrarse).
+     */
+    @Column(name = "profile_completed", nullable = false)
+    private boolean profileCompleted = true;
+
     // ── Preferencias ──────────────────────────────────────────────────────────
 
     /**
