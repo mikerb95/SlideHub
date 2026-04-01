@@ -2,11 +2,13 @@ package com.brixo.slidehub.ui.config;
 
 import com.brixo.slidehub.ui.model.User;
 import com.brixo.slidehub.ui.repository.UserRepository;
+import com.brixo.slidehub.ui.service.AuthenticatedSessionTracker;
 import com.brixo.slidehub.ui.service.CustomOAuth2UserService;
 import com.brixo.slidehub.ui.service.CustomOidcUserService;
 import com.brixo.slidehub.ui.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -190,5 +192,11 @@ public class SecurityConfig {
         @Bean
         public PasswordEncoder passwordEncoder() {
                 return new BCryptPasswordEncoder();
+        }
+
+        @Bean
+        public ServletListenerRegistrationBean<AuthenticatedSessionTracker> authenticatedSessionTrackerListener(
+                        AuthenticatedSessionTracker authenticatedSessionTracker) {
+                return new ServletListenerRegistrationBean<>(authenticatedSessionTracker);
         }
 }

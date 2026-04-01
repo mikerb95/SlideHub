@@ -25,6 +25,7 @@ public class KeepAliveService {
     private static final Logger log = LoggerFactory.getLogger(KeepAliveService.class);
 
     private final PresentationSessionRepository sessionRepository;
+    private final AuthenticatedSessionTracker authenticatedSessionTracker;
     private final UserActivityTracker userActivityTracker;
     private final WebClient stateClient;
     private final WebClient aiClient;
@@ -32,28 +33,33 @@ public class KeepAliveService {
 
     public KeepAliveService(
             PresentationSessionRepository sessionRepository,
+            AuthenticatedSessionTracker authenticatedSessionTracker,
             UserActivityTracker userActivityTracker,
             @Value("${slidehub.state-service.url}") String stateUrl,
             @Value("${slidehub.ai-service.url}") String aiUrl,
             @Value("${slidehub.keep-alive.user-activity-window-ms:300000}") long userActivityWindowMs) {
         this.sessionRepository = sessionRepository;
+        this.authenticatedSessionTracker = authenticatedSessionTracker;
         this.userActivityTracker = userActivityTracker;
         this.stateClient = WebClient.builder().baseUrl(stateUrl).build();
         this.aiClient = WebClient.builder().baseUrl(aiUrl).build();
         this.userActivityWindowMs = userActivityWindowMs;
     }
 
-    @Scheduled(fixedDelay = 5 * 60 * 1000)
+    @Scheduled(
+            fixedDelayString = "${slidehub.keep-alive.interval-ms:120000}",
+            initialDelayString = "${slidehub.keep-alive.initial-delay-ms:60000}")
     public void ping() {
         boolean hasActivePresentationSession = sessionRepository.existsByActiveTrue();
+        boolean hasAuthenticatedUiSession = authenticatedSessionTracker.hasAuthenticatedSessions();
         boolean hasRecentUserActivity = userActivityTracker.hasRecentActivity(userActivityWindowMs);
 
-        if (!hasActivePresentationSession && !hasRecentUserActivity) {
+        if (!hasActivePresentationSession && !hasAuthenticatedUiSession && !hasRecentUserActivity) {
             return;
         }
 
-        log.debug("Keep-alive: trigger activo (presentación={}, usuarioReciente={}), enviando pings",
-                hasActivePresentationSession, hasRecentUserActivity);
+        log.debug("Keep-alive: trigger activo (presentación={}, sesiónUI={}, usuarioReciente={}), enviando pings",
+                hasActivePresentationSession, hasAuthenticatedUiSession, hasRecentUserActivity);
 
         stateClient.get().uri("/actuator/health")
                 .retrieve().bodyToMono(Void.class)
