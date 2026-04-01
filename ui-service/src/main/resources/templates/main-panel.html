@@ -154,11 +154,10 @@
 
         <!-- ── Slide Grid Area ── -->
         <div class="flex-1 overflow-y-auto p-4">
-            <div id="slide-grid"
-                 class="grid gap-3"
-                 style="grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));">
+            <div id="slide-grid" class="grid gap-3"
+                style="grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));">
                 <div style="grid-column: 1 / -1;"
-                     class="flex flex-col items-center justify-center py-12 text-[var(--sh-text-3)]">
+                    class="flex flex-col items-center justify-center py-12 text-[var(--sh-text-3)]">
                     <i class="fa-solid fa-spinner fa-spin text-2xl mb-3"></i>
                     <span class="sh-label">CARGANDO SLIDES</span>
                 </div>
@@ -166,7 +165,8 @@
         </div>
 
         <!-- ── Sidebar ── -->
-        <div class="w-[300px] min-w-[260px] bg-sh-card border-l border-[var(--sh-border)] flex flex-col overflow-y-auto">
+        <div
+            class="w-[300px] min-w-[260px] bg-sh-card border-l border-[var(--sh-border)] flex flex-col overflow-y-auto">
 
             <!-- DEMO MODE -->
             <div class="p-4 border-b border-[var(--sh-border-subtle)]">
@@ -181,8 +181,7 @@
                     </button>
                 </div>
                 <div class="flex gap-1">
-                    <input type="url" class="sh-input text-xs" id="demo-url-input"
-                           placeholder="https://demo-url.app">
+                    <input type="url" class="sh-input text-xs" id="demo-url-input" placeholder="https://demo-url.app">
                     <button class="sh-btn sh-btn-blue text-xs px-2 flex-shrink-0" id="btn-demo-url">
                         <i class="fa-solid fa-arrow-up-right-from-square"></i>
                     </button>
@@ -195,8 +194,8 @@
                 <div class="sh-label mb-3">
                     <i class="fa-solid fa-users mr-1"></i>SESIÓN DE REUNIÓN
                 </div>
-                <div id="meeting-missing-presentation"
-                     class="text-[var(--sh-text-3)] text-xs font-mono" style="display:none;">
+                <div id="meeting-missing-presentation" class="text-[var(--sh-text-3)] text-xs font-mono"
+                    style="display:none;">
                     Open with <code class="text-[var(--sh-blue)]">?presentationId=...</code> to enable sessions.
                 </div>
 
@@ -206,7 +205,7 @@
                         <div class="flex justify-between items-center mb-2">
                             <span class="font-mono text-xs text-[var(--sh-text-2)]">ACCESO QR</span>
                             <button class="sh-btn text-xs py-0.5 px-2" id="btn-start-session"
-                                    style="font-size: 0.7rem;">
+                                style="font-size: 0.7rem;">
                                 <i class="fa-solid fa-qrcode"></i>
                                 Generate
                             </button>
@@ -230,9 +229,9 @@
                         <div class="font-mono text-xs text-[var(--sh-text-2)] mb-2">PARTICIPANTES</div>
                         <div class="flex gap-1 mb-2">
                             <input id="participant-name" class="sh-input text-xs" maxlength="120"
-                                   placeholder="Nombre del participante">
+                                placeholder="Nombre del participante">
                             <button id="btn-add-participant" class="sh-btn sh-btn-blue text-xs px-2 flex-shrink-0"
-                                    type="button">
+                                type="button">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
                         </div>
@@ -262,9 +261,9 @@
                 </div>
                 <div class="bg-[var(--sh-deep)] border border-[var(--sh-border)] rounded-tech p-3">
                     <input id="quick-slide-title" type="text" class="sh-input text-xs mb-2" maxlength="120"
-                           placeholder="Título del slide">
+                        placeholder="Título del slide">
                     <textarea id="quick-slide-body" class="sh-textarea text-xs mb-2" rows="3" maxlength="500"
-                              placeholder="Contenido del slide" style="min-height: 60px;"></textarea>
+                        placeholder="Contenido del slide" style="min-height: 60px;"></textarea>
                     <button id="btn-generate-quick-slide" class="sh-btn sh-btn-primary text-xs w-full justify-center">
                         <i class="fa-solid fa-plus"></i>
                         Crear slide
@@ -281,34 +280,33 @@
                     <div class="sh-label">
                         <i class="fa-solid fa-bolt mr-1"></i>LINKS RÁPIDOS
                     </div>
-                    <button th:if="${presentationId != ''}"
-                            class="sh-btn sh-btn-ghost text-xs py-0.5 px-2"
-                            onclick="openLinksModal()">
+                    <button th:if="${presentationId != ''}" class="sh-btn sh-btn-ghost text-xs py-0.5 px-2"
+                        onclick="openLinksModal()">
                         <i class="fa-solid fa-pencil"></i>
                     </button>
                 </div>
 
                 <div id="quick-links-list">
                     <div th:if="${quickLinks.isEmpty()}"
-                         class="text-center py-4 text-[var(--sh-text-3)] text-xs font-mono">
+                        class="text-center py-4 text-[var(--sh-text-3)] text-xs font-mono">
                         <span th:if="${presentationId == ''}">
                             Open with <code class="text-[var(--sh-blue)]">?presentationId=...</code>
                         </span>
                         <span th:if="${presentationId != ''}">
                             No links configured.
                             <a href="#" onclick="openLinksModal(); return false;"
-                               class="text-[var(--sh-blue)] hover:underline">Add</a>
+                                class="text-[var(--sh-blue)] hover:underline">Add</a>
                         </span>
                     </div>
 
                     <button th:each="link : ${quickLinks}" th:data-url="${link.url}" th:data-title="${link.title}"
-                            class="quick-link-btn mb-2" onclick="activateDemoLink(this.dataset.url, this.dataset.title)">
+                        class="quick-link-btn mb-2" onclick="activateDemoLink(this.dataset.url, this.dataset.title)">
                         <i th:if="${link.icon != null}" th:class="${link.icon} + ' fa-fw'"></i>
                         <i th:if="${link.icon == null}" class="fa-solid fa-link fa-fw"></i>
                         <span>
                             <span th:text="${link.title}">Title</span>
                             <span th:if="${link.description != null}" th:text="${link.description}"
-                                  class="link-desc"></span>
+                                class="link-desc"></span>
                         </span>
                     </button>
                 </div>
@@ -348,10 +346,8 @@
                 <input type="url" class="sh-input text-xs" id="new-link-url" placeholder="URL *">
             </div>
             <div class="grid grid-cols-[1fr_2fr] gap-2 mb-4">
-                <input type="text" class="sh-input text-xs" id="new-link-icon"
-                       placeholder="FA icon class">
-                <input type="text" class="sh-input text-xs" id="new-link-desc"
-                       placeholder="Description (optional)">
+                <input type="text" class="sh-input text-xs" id="new-link-icon" placeholder="FA icon class">
+                <input type="text" class="sh-input text-xs" id="new-link-desc" placeholder="Description (optional)">
             </div>
 
             <!-- Footer -->
