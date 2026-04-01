@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SlideHub — Login</title>
+    <title>SlideHub — Iniciar sesión</title>
     <th:block th:replace="~{fragments/head :: assets}"></th:block>
 </head>
 
@@ -32,18 +32,18 @@
                 <span th:text="${logoutMessage}">Sesion cerrada</span>
             </div>
 
-            <!-- Login Form -->
+            <!-- Formulario de inicio de sesión -->
             <form method="post" th:action="@{/auth/login}">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf}">
 
                 <div class="mb-4">
-                    <label for="username" class="sh-input-label">Username</label>
+                    <label for="username" class="sh-input-label">Usuario</label>
                     <input type="text" class="sh-input" id="username" name="username"
                            autocomplete="username" placeholder="system_user" required autofocus>
                 </div>
 
                 <div class="mb-5">
-                    <label for="password" class="sh-input-label">Password</label>
+                    <label for="password" class="sh-input-label">Contraseña</label>
                     <input type="password" class="sh-input" id="password" name="password"
                            autocomplete="current-password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required>
                 </div>

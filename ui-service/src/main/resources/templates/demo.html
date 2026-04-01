@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SlideHub — Demo</title>
+    <title>SlideHub — Vista demo</title>
     <th:block th:replace="~{fragments/head :: assets}"></th:block>
     <style>
         body { overflow: hidden; }
@@ -40,7 +40,7 @@
 
     <button id="btn-return" onclick="returnToSlide()">
         <i class="fa-solid fa-arrow-left"></i>
-        <span id="return-label">Volver a slides</span>
+        <span id="return-label">Volver a diapositivas</span>
     </button>
 
     <script th:inline="javascript">
@@ -67,7 +67,7 @@
             for (let i = 1; i <= total; i++) {
                 const img = document.createElement('img');
                 const url = slideUrls[i - 1] || `/presentation/Slide${i}.PNG`;
-                img.src = url; img.alt = `Slide ${i}`;
+                img.src = url; img.alt = `Diapositiva ${i}`;
                 img.className = 'slide'; img.id = `demo-slide-${i}`;
                 slideView.appendChild(img);
             }
@@ -108,7 +108,7 @@
                         iframe.src = demo.url;
                     }
                     const rs = demo.returnSlide;
-                    returnLabel.textContent = rs ? `Volver al slide ${rs}` : 'Volver a slides';
+                    returnLabel.textContent = rs ? `Volver a la diapositiva ${rs}` : 'Volver a diapositivas';
                     btnReturn.classList.add('visible');
                 } else {
                     btnReturn.classList.remove('visible');

@@ -29,10 +29,10 @@
             </div>
             <div th:if="${successMessage}" class="sh-alert sh-alert-success mb-4">
                 <i class="fa-solid fa-circle-check mt-0.5"></i>
-                <span th:text="${successMessage}">Success</span>
+                <span th:text="${successMessage}">Éxito</span>
             </div>
 
-            <!-- Register Form -->
+            <!-- Formulario de registro -->
             <form method="post" th:action="@{/auth/register}" th:unless="${successMessage}">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf}">
 
