@@ -547,7 +547,7 @@
             selectedFiles.forEach(f => formData.append('files', f));
 
             try {
-                const res = await fetch('/api/presentations/create-from-upload', { method: 'POST', body: formData });
+                const res = await fetch('/api/presentations/create-from-upload', { method: 'POST', body: formData, headers: csrfHeaders() });
                 const data = await res.json();
                 document.getElementById('upload-progress').classList.add('hidden');
                 if (res.ok && data.success) {
