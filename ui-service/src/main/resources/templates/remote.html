@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SlideHub — Remote</title>
+    <title>SlideHub — Control remoto</title>
     <th:block th:replace="~{fragments/head :: assets}"></th:block>
     <style>
         body {
@@ -333,45 +333,45 @@
 
 <body class="sh bg-sh-deep antialiased h-screen flex flex-col items-center justify-center">
 
-    <!-- Return to slide (visible in URL mode) -->
+    <!-- Volver a diapositiva (visible en modo URL) -->
     <button id="btn-return-slide" onclick="returnToSlide()">
         <i class="fa-solid fa-arrow-left"></i>
-        <span id="return-label">Return_Slide</span>
+        <span id="return-label">Volver_Diapositiva</span>
     </button>
 
-    <!-- Slide indicator -->
+    <!-- Indicador de diapositiva -->
     <div id="slide-indicator" class="font-mono text-lg text-[var(--sh-text-3)] mb-8">
-        Slide &mdash; / &mdash;
+        Diapositiva &mdash; / &mdash;
     </div>
 
-    <!-- Navigation controls -->
+    <!-- Controles de navegación -->
     <div class="flex gap-12 items-center">
-        <button class="remote-btn" id="btn-prev" disabled aria-label="Previous">
+        <button class="remote-btn" id="btn-prev" disabled aria-label="Anterior">
             <i class="fa-solid fa-chevron-left"></i>
         </button>
-        <button class="remote-btn" id="btn-next" disabled aria-label="Next">
+        <button class="remote-btn" id="btn-next" disabled aria-label="Siguiente">
             <i class="fa-solid fa-chevron-right"></i>
         </button>
     </div>
 
-    <!-- Swipe hint -->
+    <!-- Ayuda de deslizamiento -->
     <div class="mt-10 font-mono text-xs text-[var(--sh-text-3)] opacity-50">
-        &larr; swipe &rarr;
+        &larr; desliza &rarr;
     </div>
 
     <!-- Help FAB -->
     <button id="help-btn" class="fab" type="button" onclick="requestHelp()">
         <i class="fa-solid fa-life-ring"></i>
-        Help
+        Ayuda
     </button>
 
     <!-- Mic FAB -->
-    <button id="mic-btn" class="fab" type="button" title="Hold to ask">
+    <button id="mic-btn" class="fab" type="button" title="Mantén para preguntar">
         <i class="fa-solid fa-microphone"></i>
-        Mic
+        Voz
     </button>
 
-    <!-- Assist card -->
+    <!-- Tarjeta de asistencia -->
     <div id="assist-card">
         <div class="title">AI_ASSIST</div>
         <div class="content" id="assist-answer-text"></div>
@@ -389,7 +389,7 @@
     <div id="bottom-sheet">
         <div class="w-10 h-1 bg-[var(--sh-text-3)] rounded-full mx-auto mt-3 mb-1 opacity-40"></div>
         <div class="text-center py-2 border-b border-[var(--sh-border)] sh-label">
-            <i class="fa-solid fa-globe mr-1"></i>QUICK_LINKS
+            <i class="fa-solid fa-globe mr-1"></i>LINKS_RÁPIDOS
         </div>
         <div class="overflow-y-auto p-3 flex-1" id="sheet-links-container">
             <button th:each="link : ${quickLinks}" th:data-url="${link.url}" class="demo-link-btn"
@@ -397,29 +397,29 @@
                 <i th:if="${link.icon != null}" th:class="${link.icon} + ' fa-fw'"></i>
                 <i th:if="${link.icon == null}" class="fa-solid fa-link fa-fw"></i>
                 <span>
-                    <span th:text="${link.title}">Title</span>
+                    <span th:text="${link.title}">Título</span>
                     <span th:if="${link.description != null}" th:text="${link.description}"
                         class="demo-link-desc"></span>
                 </span>
             </button>
             <div th:if="${quickLinks.isEmpty()}" class="text-center py-8 font-mono text-xs text-[var(--sh-text-3)]">
-                No demo links configured.
+                No hay links de demo configurados.
             </div>
         </div>
     </div>
 
-    <!-- Join overlay -->
+    <!-- Overlay para unirse -->
     <div id="join-overlay">
         <div class="sh-card p-5 w-full max-w-[420px]">
             <div class="sh-label mb-3">
-                <i class="fa-solid fa-qrcode mr-1"></i>JOIN_MEETING
+                <i class="fa-solid fa-qrcode mr-1"></i>UNIRSE_REUNIÓN
             </div>
             <select id="join-participant-select" class="sh-select text-sm mb-3"></select>
             <input id="join-custom-name" type="text" class="sh-input text-sm mb-3" maxlength="120"
-                placeholder="Other name (optional)">
+                placeholder="Otro nombre (opcional)">
             <button type="button" class="sh-btn sh-btn-blue w-full justify-center" onclick="submitJoin()">
                 <i class="fa-solid fa-arrow-right-to-bracket"></i>
-                Join
+                Unirse
             </button>
         </div>
     </div>
@@ -467,7 +467,7 @@
         // ── Slide state ───────────────────────────────────────────────────────
 
         function updateUI() {
-            indicator.textContent = `Slide ${currentSlide} / ${totalSlides}`;
+            indicator.textContent = `Diapositiva ${currentSlide} / ${totalSlides}`;
             btnPrev.disabled = currentSlide <= 1;
             btnNext.disabled = currentSlide >= totalSlides;
         }
@@ -502,7 +502,7 @@
             demoMode = demo.mode;
             returnSlide = demo.returnSlide ?? null;
             if (demo.mode === 'url') {
-                const label = returnSlide ? `Return_Slide_${returnSlide}` : 'Return_Slides';
+                const label = returnSlide ? `Volver_Diapositiva_${returnSlide}` : 'Volver_Diapositivas';
                 returnLabel.textContent = label;
                 btnReturn.classList.add('visible');
             } else {
@@ -564,7 +564,7 @@
                 }
                 const data = await res.json();
                 if (data.vibrate) {
-                    triggerHaptic(data.pattern || 'single', data.message || 'Your slide is active');
+                    triggerHaptic(data.pattern || 'single', data.message || 'Tu diapositiva está activa');
                 }
             } catch (_) { }
         }
@@ -576,7 +576,7 @@
                     return;
                 }
                 const event = await res.json();
-                triggerHaptic(event.pattern || 'single', event.message || 'Notification');
+                triggerHaptic(event.pattern || 'single', event.message || 'Notificación');
             } catch (_) { }
         }
 
@@ -711,9 +711,9 @@
                 mediaRecorder.start();
                 recording = true;
                 micBtn.classList.add('recording');
-                showNotice('Recording question...');
+                showNotice('Grabando pregunta...');
             } catch (_) {
-                showNotice('Could not activate microphone');
+                showNotice('No se pudo activar el micrófono');
             }
         }
 
@@ -738,25 +738,25 @@
             formData.append('audio', blob, 'question.webm');
 
             try {
-                showNotice('Processing with AI...');
+                showNotice('Procesando con IA...');
                 const res = await fetch(`/api/presentations/${PRESENTATION_ID}/meeting/assist/audio`, {
                     method: 'POST',
                     body: formData
                 });
                 if (!res.ok) {
-                    showNotice('Could not process question');
+                    showNotice('No se pudo procesar la pregunta');
                     return;
                 }
                 const data = await res.json();
                 if (!data.success) {
-                    showNotice('AI error: ' + (data.errorMessage || 'no details'));
+                    showNotice('Error de IA: ' + (data.errorMessage || 'sin detalles'));
                     return;
                 }
-                const answer = data.answer || 'No answer';
+                const answer = data.answer || 'Sin respuesta';
                 const transcription = data.transcription || '';
-                showAssistCard(`Q: ${transcription}\n\nA: ${answer}`);
+                showAssistCard(`P: ${transcription}\n\nR: ${answer}`);
             } catch (_) {
-                showNotice('Network error sending audio');
+                showNotice('Error de red al enviar audio');
             }
         }
 
