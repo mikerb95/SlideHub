@@ -925,7 +925,7 @@
             try {
                 const res = await fetch('/api/presentations/' + W.presentationId + '/meeting/session/start', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: { 'Content-Type': 'application/json', ...csrfHeaders() }
                 });
                 if (res.ok) {
                     const session = await res.json();
