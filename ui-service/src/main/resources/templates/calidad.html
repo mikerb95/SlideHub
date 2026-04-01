@@ -160,12 +160,13 @@
                 <div class="sh-label mb-3 text-xs">ÍNDICE</div>
                 <nav class="space-y-0.5">
                     <a href="#resumen" class="toc-link">1. Resumen</a>
-                    <a href="#matriz" class="toc-link">2. Matriz semáforo</a>
-                    <a href="#evidencia" class="toc-link">3. Evidencia</a>
-                    <a href="#pdca" class="toc-link">4. PDCA</a>
-                    <a href="#psp" class="toc-link">5. PSP</a>
-                    <a href="#backlog" class="toc-link">6. Backlog</a>
-                    <a href="#kpis" class="toc-link">7. KPIs</a>
+                    <a href="#madurez" class="toc-link">2. Madurez de código</a>
+                    <a href="#matriz" class="toc-link">3. Matriz semáforo</a>
+                    <a href="#evidencia" class="toc-link">4. Evidencia</a>
+                    <a href="#pdca" class="toc-link">5. PDCA</a>
+                    <a href="#psp" class="toc-link">6. PSP</a>
+                    <a href="#backlog" class="toc-link">7. Backlog</a>
+                    <a href="#kpis" class="toc-link">8. KPIs</a>
                 </nav>
             </div>
         </aside>
@@ -185,6 +186,39 @@
                         <strong>Riesgo prioritario actual:</strong> tokens OAuth2 almacenados en texto claro en base de
                         datos.
                         Esto impacta directamente la postura de seguridad frente a ISO/IEC 27001 y se mantiene como P0.
+                    </div>
+                </div>
+            </section>
+
+            <section id="madurez" class="guide-section">
+                <div class="sh-card p-6 space-y-4">
+                    <div class="sh-label"><i class="fa-solid fa-layer-group mr-1"></i>MADUREZ DEL CÓDIGO</div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="sh-badge-blue text-xs">Nivel actual: Intermedio</span>
+                        <span class="sh-badge text-xs">Escala interna M0–M4: M2</span>
+                    </div>
+                    <p class="text-sm text-[var(--sh-text-2)] leading-relaxed">
+                        El código mantiene una base estable para evolución: arquitectura por microservicios,
+                        convenciones claras y cobertura funcional en pruebas. Aún faltan prácticas de madurez más
+                        altas en seguridad de datos sensibles y estandarización formal de calidad por release.
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="phase-card">
+                            <div class="mini-title">Fortalezas vigentes</div>
+                            <ul class="text-xs text-[var(--sh-text-2)] leading-relaxed space-y-1 list-none">
+                                <li><i class="fa-solid fa-check mr-1 text-[var(--sh-blue)]"></i>Separación por servicio y responsabilidades técnicas definidas.</li>
+                                <li><i class="fa-solid fa-check mr-1 text-[var(--sh-blue)]"></i>Endpoints de health, smoke E2E y suites de test por módulo.</li>
+                                <li><i class="fa-solid fa-check mr-1 text-[var(--sh-blue)]"></i>Trazabilidad funcional mediante historias y documentación activa.</li>
+                            </ul>
+                        </div>
+                        <div class="phase-card">
+                            <div class="mini-title">Brechas para subir a M3</div>
+                            <ul class="text-xs text-[var(--sh-text-2)] leading-relaxed space-y-1 list-none">
+                                <li><i class="fa-solid fa-angle-right mr-1 text-[var(--sh-amber)]"></i>Cifrado obligatorio de tokens OAuth2 persistidos.</li>
+                                <li><i class="fa-solid fa-angle-right mr-1 text-[var(--sh-amber)]"></i>Definir umbrales de calidad y criterio de aprobación por release.</li>
+                                <li><i class="fa-solid fa-angle-right mr-1 text-[var(--sh-amber)]"></i>Auditoría periódica de deuda técnica y acciones cerradas.</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </section>
