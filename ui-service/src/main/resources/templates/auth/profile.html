@@ -68,7 +68,7 @@
 
         <!-- ── Linked Providers ── -->
         <div class="sh-card p-5 mb-4">
-            <div class="sh-label mb-3">LINKED_PROVIDERS</div>
+            <div class="sh-label mb-3">PROVEEDORES VINCULADOS</div>
 
             <div class="flex flex-col gap-3">
                 <!-- GitHub -->
@@ -85,10 +85,10 @@
                         </div>
                     </div>
                     <span th:if="${githubLinked}" class="sh-badge-green">
-                        <i class="fa-solid fa-link text-[0.55rem]"></i> Linked
+                        <i class="fa-solid fa-link text-[0.55rem]"></i> Vinculado
                     </span>
                     <a th:unless="${githubLinked}" th:href="@{/auth/link/github}" class="sh-btn text-xs py-1 px-2.5">
-                        Link
+                        Vincular
                     </a>
                 </div>
 
@@ -106,10 +106,10 @@
                         </div>
                     </div>
                     <span th:if="${googleLinked}" class="sh-badge-green">
-                        <i class="fa-solid fa-link text-[0.55rem]"></i> Linked
+                        <i class="fa-solid fa-link text-[0.55rem]"></i> Vinculado
                     </span>
                     <a th:unless="${googleLinked}" th:href="@{/auth/link/google}" class="sh-btn text-xs py-1 px-2.5">
-                        Link
+                        Vincular
                     </a>
                 </div>
             </div>
