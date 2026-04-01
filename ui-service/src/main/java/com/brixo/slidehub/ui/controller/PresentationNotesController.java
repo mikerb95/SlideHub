@@ -1,7 +1,6 @@
 package com.brixo.slidehub.ui.controller;
 
 import com.brixo.slidehub.ui.model.Presentation;
-import com.brixo.slidehub.ui.model.Slide;
 import com.brixo.slidehub.ui.model.User;
 import com.brixo.slidehub.ui.repository.UserRepository;
 import com.brixo.slidehub.ui.service.NotesBridgeService;

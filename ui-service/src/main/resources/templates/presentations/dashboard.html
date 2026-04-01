@@ -34,13 +34,13 @@
     <div class="max-w-5xl mx-auto px-4 pt-16 pb-8">
 
         <!-- ── Header + New button ── -->
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
             <div>
                 <h1 class="text-lg font-medium text-[var(--sh-text-1)]">Mis Presentaciones</h1>
                 <p class="font-mono text-xs text-[var(--sh-text-3)] mt-1"
                     th:text="${#lists.size(presentations)} + ' presentaciones'">0 presentaciones</p>
             </div>
-            <a href="/presentations/new" class="sh-btn sh-btn-primary text-sm">
+            <a href="/presentations/new" class="sh-btn sh-btn-primary text-sm w-full sm:w-auto justify-center sm:justify-start">
                 <i class="fa-solid fa-plus mr-1"></i> Nueva Presentacion
             </a>
         </div>
@@ -97,17 +97,17 @@
                     th:text="${#temporals.format(p.createdAt(), 'dd MMM yyyy')}">01 Jan 2026</div>
 
                 <!-- Actions -->
-                <div class="flex gap-1.5 flex-wrap mt-auto pt-2 border-t border-[var(--sh-border)]">
+                <div class="flex gap-2 flex-wrap mt-auto pt-2 border-t border-[var(--sh-border)]">
                     <a th:href="@{/presenter(presentationId=${p.id()})}"
-                        class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
+                        class="sh-btn sh-btn-ghost text-[0.7rem] py-1 px-2.5">
                         <i class="fa-solid fa-chalkboard"></i> Presentar
                     </a>
                     <a th:href="@{/main-panel(presentationId=${p.id()})}"
-                        class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
+                        class="sh-btn sh-btn-ghost text-[0.7rem] py-1 px-2.5">
                         <i class="fa-solid fa-table-cells-large"></i> Panel
                     </a>
                     <a th:href="@{/presentations/{id}/generate-notes(id=${p.id()})}"
-                        class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
+                        class="sh-btn sh-btn-ghost text-[0.7rem] py-1 px-2.5">
                         <i class="fa-solid fa-robot"></i> Notas IA
                     </a>
                     <form th:action="@{/presentations/{id}/delete(id=${p.id()})}" method="post" class="inline">
@@ -115,7 +115,7 @@
                             th:if="${_csrf}">
                         <button type="button" th:attr="data-presentation-name=${p.name()}"
                             onclick="openDeleteModal(this)"
-                            class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2 text-[var(--sh-red)]">
+                            class="sh-btn sh-btn-ghost text-[0.7rem] py-1 px-2.5 text-[var(--sh-red)]">
                             <i class="fa-solid fa-trash"></i> Eliminar
                         </button>
                     </form>

@@ -8,35 +8,62 @@
     <th:block th:replace="~{fragments/head :: assets}"></th:block>
     <style>
         .slide-thumb {
-            width: 120px; height: 80px; object-fit: cover;
-            border-radius: var(--sh-r-md); border: 2px solid var(--sh-border);
-            cursor: pointer; transition: border-color var(--sh-t-fast);
+            width: 120px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: var(--sh-r-md);
+            border: 2px solid var(--sh-border);
+            cursor: pointer;
+            transition: border-color var(--sh-t-fast);
         }
-        .slide-thumb:hover { border-color: var(--sh-blue); }
+
+        .slide-thumb:hover {
+            border-color: var(--sh-blue);
+        }
 
         .slide-card {
-            background: var(--sh-deep); border: 1px solid var(--sh-border);
-            border-radius: var(--sh-r-md); padding: 1rem;
+            background: var(--sh-deep);
+            border: 1px solid var(--sh-border);
+            border-radius: var(--sh-r-md);
+            padding: 1rem;
         }
+
         .note-card {
-            background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.15);
-            border-radius: var(--sh-r-md); padding: 1rem;
+            background: rgba(88, 166, 255, 0.06);
+            border: 1px solid rgba(88, 166, 255, 0.15);
+            border-radius: var(--sh-r-md);
+            padding: 1rem;
         }
+
         .key-phrase {
-            background: rgba(88,166,255,0.2); border-radius: var(--sh-r-md);
-            padding: 2px 8px; font-size: 0.75rem; font-family: var(--sh-font-mono);
+            background: rgba(88, 166, 255, 0.2);
+            border-radius: var(--sh-r-md);
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            font-family: var(--sh-font-mono);
             color: var(--sh-blue);
         }
+
         .demo-tag {
-            background: rgba(63,185,80,0.2); border-radius: var(--sh-r-md);
-            padding: 2px 8px; font-size: 0.75rem; font-family: var(--sh-font-mono);
+            background: rgba(63, 185, 80, 0.2);
+            border-radius: var(--sh-r-md);
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            font-family: var(--sh-font-mono);
             color: var(--sh-green);
         }
+
         .progress-track {
-            height: 4px; background: var(--sh-border); border-radius: 2px; overflow: hidden;
+            height: 4px;
+            background: var(--sh-border);
+            border-radius: 2px;
+            overflow: hidden;
         }
+
         .progress-fill {
-            height: 100%; background: var(--sh-blue); border-radius: 2px;
+            height: 100%;
+            background: var(--sh-blue);
+            border-radius: 2px;
             transition: width 0.3s ease;
         }
     </style>
@@ -49,7 +76,8 @@
         <div class="sh-nav-inner">
             <div class="flex items-center gap-3">
                 <span class="font-brand text-base tracking-tight">Notas IA</span>
-                <span class="font-mono text-xs text-[var(--sh-text-3)]" th:text="${presentation.name}">Presentation</span>
+                <span class="font-mono text-xs text-[var(--sh-text-3)]"
+                    th:text="${presentation.name}">Presentation</span>
             </div>
             <div class="flex items-center gap-2">
                 <a href="/presentations" class="sh-btn sh-btn-ghost text-xs">
@@ -77,11 +105,13 @@
 
                     <div class="mb-4">
                         <span class="sh-badge mb-2"
-                              th:classappend="${presentation.sourceType.name() == 'DRIVE'} ? 'sh-badge-blue' : 'sh-badge-green'"
-                              th:text="${presentation.sourceType.name() == 'DRIVE' ? 'Google Drive' : 'Carga manual'}">
+                            th:classappend="${presentation.sourceType.name() == 'DRIVE'} ? 'sh-badge-blue' : 'sh-badge-green'"
+                            th:text="${presentation.sourceType.name() == 'DRIVE' ? 'Google Drive' : 'Carga manual'}">
                         </span>
-                        <div class="text-[var(--sh-text-1)] font-semibold mt-1" th:text="${presentation.name}">Name</div>
-                        <div class="text-[var(--sh-text-3)] text-xs font-mono" th:text="${totalSlides} + ' slides'">0 slides</div>
+                        <div class="text-[var(--sh-text-1)] font-semibold mt-1" th:text="${presentation.name}">Name
+                        </div>
+                        <div class="text-[var(--sh-text-3)] text-xs font-mono" th:text="${totalSlides} + ' slides'">0
+                            slides</div>
                     </div>
 
                     <!-- Repo URL -->
@@ -90,7 +120,7 @@
                             <i class="fa-brands fa-github mr-1"></i>URL DEL REPOSITORIO
                         </label>
                         <input type="url" id="repo-url" class="sh-input w-full"
-                               placeholder="https://github.com/user/repo" th:value="${presentation.repoUrl}">
+                            placeholder="https://github.com/user/repo" th:value="${presentation.repoUrl}">
                         <div class="text-[var(--sh-text-3)] text-xs mt-1">
                             Gemini analiza el repositorio para notas más precisas.
                         </div>
@@ -113,7 +143,8 @@
                     </div>
 
                     <!-- Generate button -->
-                    <button type="button" class="sh-btn sh-btn-primary w-full" id="btn-generate" onclick="generateAllNotes()">
+                    <button type="button" class="sh-btn sh-btn-primary w-full" id="btn-generate"
+                        onclick="generateAllNotes()">
                         <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Generar todas las notas
                     </button>
                     <div class="text-[var(--sh-text-3)] text-xs font-mono mt-1.5 text-center">
@@ -131,7 +162,8 @@
                     <div class="progress-track mb-2">
                         <div class="progress-fill" id="progress-bar" style="width: 0%"></div>
                     </div>
-                    <div id="progress-text" class="text-xs font-mono text-[var(--sh-text-3)]">Iniciando pipeline de IA…</div>
+                    <div id="progress-text" class="text-xs font-mono text-[var(--sh-text-3)]">Iniciando pipeline de IA…
+                    </div>
                 </div>
 
                 <!-- Result card -->
@@ -157,19 +189,18 @@
             <div class="flex-1 min-w-0">
                 <div id="slides-container" class="space-y-3">
                     <div th:if="${#lists.isEmpty(presentation.slides)}"
-                         class="text-center py-12 text-[var(--sh-text-3)]">
+                        class="text-center py-12 text-[var(--sh-text-3)]">
                         <i class="fa-solid fa-image text-2xl mb-3 block opacity-40"></i>
                         <p class="text-xs font-mono">No slides in this presentation yet.</p>
                     </div>
 
-                    <div th:each="slide : ${presentation.slides}" th:id="${'slide-' + slide.number}"
-                         class="slide-card">
+                    <div th:each="slide : ${presentation.slides}" th:id="${'slide-' + slide.number}" class="slide-card">
                         <div class="flex gap-4">
 
                             <!-- Thumbnail -->
                             <div class="flex-shrink-0">
-                                <img th:src="${slide.s3Url}" th:alt="${'Slide ' + slide.number}"
-                                     class="slide-thumb" loading="lazy" onerror="this.style.display='none'">
+                                <img th:src="${slide.s3Url}" th:alt="${'Slide ' + slide.number}" class="slide-thumb"
+                                    loading="lazy" onerror="this.style.display='none'">
                             </div>
 
                             <!-- Note content -->
@@ -177,35 +208,38 @@
                                 <div class="flex items-center gap-2 mb-2">
                                     <span class="sh-badge" th:text="${'Slide ' + slide.number}">Slide N</span>
                                     <span th:each="note : ${existingNotes}"
-                                          th:if="${note.get('slideNumber') == slide.number}"
-                                          class="sh-badge-green text-xs">
+                                        th:if="${note.get('slideNumber') == slide.number}"
+                                        class="sh-badge-green text-xs">
                                         <i class="fa-solid fa-robot mr-1"></i>Nota IA
                                     </span>
                                 </div>
 
                                 <!-- Existing note -->
                                 <div th:each="note : ${existingNotes}"
-                                     th:if="${note.get('slideNumber') == slide.number}"
-                                     th:id="${'note-content-' + slide.number}" class="note-card">
-                                    <div class="font-semibold text-sm text-[var(--sh-text-1)] mb-2" th:text="${note.get('title')}">Title</div>
+                                    th:if="${note.get('slideNumber') == slide.number}"
+                                    th:id="${'note-content-' + slide.number}" class="note-card">
+                                    <div class="font-semibold text-sm text-[var(--sh-text-1)] mb-2"
+                                        th:text="${note.get('title')}">Title</div>
                                     <ul class="mb-2 pl-4 space-y-1 text-sm text-[var(--sh-text-2)]">
                                         <li th:each="point : ${note.get('points')}" th:text="${point}"></li>
                                     </ul>
                                     <div class="flex flex-wrap gap-1 mb-1">
-                                        <span th:each="kp : ${note.get('keyPhrases')}" th:text="${kp}" class="key-phrase"></span>
+                                        <span th:each="kp : ${note.get('keyPhrases')}" th:text="${kp}"
+                                            class="key-phrase"></span>
                                     </div>
                                     <div class="flex flex-wrap gap-1">
-                                        <span th:each="tag : ${note.get('demoTags')}" th:text="${tag}" class="demo-tag"></span>
+                                        <span th:each="tag : ${note.get('demoTags')}" th:text="${tag}"
+                                            class="demo-tag"></span>
                                     </div>
                                     <div class="text-[var(--sh-text-3)] text-xs font-mono mt-2"
-                                         th:if="${note.get('suggestedTime') != null}"
-                                         th:text="'⏱ ' + ${note.get('suggestedTime')}"></div>
+                                        th:if="${note.get('suggestedTime') != null}"
+                                        th:text="'⏱ ' + ${note.get('suggestedTime')}"></div>
                                 </div>
 
                                 <!-- Placeholder -->
                                 <div th:if="${#lists.isEmpty(existingNotes) || !#lists.contains(existingNotes.![get('slideNumber')], slide.number)}"
-                                     th:id="${'note-placeholder-' + slide.number}"
-                                     class="text-[var(--sh-text-3)] text-xs font-mono italic py-2">
+                                    th:id="${'note-placeholder-' + slide.number}"
+                                    class="text-[var(--sh-text-3)] text-xs font-mono italic py-2">
                                     No note for this slide. Generate with AI.
                                 </div>
                             </div>
