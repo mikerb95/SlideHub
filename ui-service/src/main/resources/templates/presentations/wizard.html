@@ -750,7 +750,7 @@
             document.getElementById('repo-result').classList.add('hidden');
 
             try {
-                const res = await fetch('/api/presentations/' + W.presentationId + '/analyze-repo?repoUrl=' + encodeURIComponent(repoUrl), { method: 'POST' });
+                const res = await fetch('/api/presentations/' + W.presentationId + '/analyze-repo?repoUrl=' + encodeURIComponent(repoUrl), { method: 'POST', headers: csrfHeaders() });
                 const data = await res.json();
                 document.getElementById('repo-progress').classList.add('hidden');
                 document.getElementById('btn-analyze-repo').disabled = false;
