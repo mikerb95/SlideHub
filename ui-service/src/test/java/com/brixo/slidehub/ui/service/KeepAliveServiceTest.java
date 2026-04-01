@@ -54,10 +54,10 @@ class KeepAliveServiceTest {
 
         KeepAliveService service = new KeepAliveService(
                 sessionRepository,
-            userActivityTracker,
+                userActivityTracker,
                 baseUrl(stateServer),
-            baseUrl(aiServer),
-            300000);
+                baseUrl(aiServer),
+                300000);
 
         service.ping();
         Thread.sleep(250);
@@ -80,10 +80,10 @@ class KeepAliveServiceTest {
 
         KeepAliveService service = new KeepAliveService(
                 sessionRepository,
-            userActivityTracker,
+                userActivityTracker,
                 baseUrl(stateServer),
-            baseUrl(aiServer),
-            300000);
+                baseUrl(aiServer),
+                300000);
 
         service.ping();
 
