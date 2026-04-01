@@ -6,18 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Status — SlideHub</title>
     <th:block th:replace="~{fragments/head :: assets}"></th:block>
+    <style>
+        @media (max-width: 640px) {
+            .status-nav {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                justify-content: flex-start;
+            }
+
+            .status-nav-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+    </style>
 </head>
 
 <body class="sh bg-sh-deep antialiased min-h-screen">
 <nav class="sh-nav" style="position: sticky;">
-    <div class="sh-nav-inner">
-        <div class="flex items-center gap-3">
+    <div class="sh-nav-inner status-nav">
+        <div class="flex items-center gap-2 sm:gap-3">
             <span class="font-brand text-base tracking-tight">System_Status</span>
             <div class="sh-status ml-1 hidden sm:inline-flex">
                 <i class="fa-solid fa-wave-square text-xs" style="color: var(--sh-blue);"></i>
             </div>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="status-nav-actions flex items-center gap-2">
             <a href="/presenter" class="sh-btn sh-btn-ghost text-xs">
                 <i class="fa-solid fa-chalkboard"></i>
                 <span class="hidden sm:inline">Presenter</span>

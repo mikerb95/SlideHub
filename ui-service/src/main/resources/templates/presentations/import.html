@@ -45,6 +45,23 @@
             border-color: var(--sh-blue);
             background: var(--sh-blue-dim);
         }
+
+        @media (max-width: 640px) {
+            .import-nav {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                justify-content: flex-start;
+            }
+
+            .import-nav-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            #upload-drop-zone {
+                padding: 1.5rem 1rem;
+            }
+        }
     </style>
 </head>
 
@@ -52,15 +69,15 @@
 
     <!-- ═══ Nav ═══ -->
     <nav class="sh-nav">
-        <div class="sh-nav-inner">
-            <div class="flex items-center gap-3">
+        <div class="sh-nav-inner import-nav">
+            <div class="flex items-center gap-2 sm:gap-3">
                 <a href="/presenter" class="flex items-center gap-3 no-underline text-[var(--sh-text-1)]">
 
                     <span class="font-brand text-base tracking-tight">SlideHub</span>
                 </a>
                 <span class="sh-badge ml-1">IMPORTAR</span>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="import-nav-actions flex items-center gap-2">
                 <a href="/main-panel" class="sh-btn sh-btn-ghost text-xs">
                     <i class="fa-solid fa-table-cells-large"></i> Panel
                 </a>
@@ -114,15 +131,15 @@
                             </div>
                             <div class="flex gap-1.5 flex-wrap">
                                 <a th:href="@{/main-panel(presentationId=${p.id()})}"
-                                    class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
+                                    class="sh-btn sh-btn-ghost text-[0.7rem] py-1 px-2.5">
                                     <i class="fa-solid fa-table-cells-large"></i> Panel
                                 </a>
                                 <a th:href="@{/presenter(presentationId=${p.id()})}"
-                                    class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
+                                    class="sh-btn sh-btn-ghost text-[0.7rem] py-1 px-2.5">
                                     <i class="fa-solid fa-chalkboard"></i> Presentar
                                 </a>
                                 <a th:href="@{/presentations/{id}/generate-notes(id=${p.id()})}"
-                                    class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
+                                    class="sh-btn sh-btn-ghost text-[0.7rem] py-1 px-2.5">
                                     <i class="fa-solid fa-robot"></i> Notas_IA
                                 </a>
                                 <form th:action="@{/presentations/{id}/delete(id=${p.id()})}" method="post"
@@ -131,7 +148,7 @@
                                         th:if="${_csrf}">
                                     <button type="button" th:attr="data-presentation-name=${p.name()}"
                                         onclick="openDeleteModal(this)"
-                                        class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2 text-[var(--sh-red)]">
+                                        class="sh-btn sh-btn-ghost text-[0.7rem] py-1 px-2.5 text-[var(--sh-red)]">
                                         <i class="fa-solid fa-trash"></i> Eliminar
                                     </button>
                                 </form>
@@ -206,7 +223,7 @@
 
                             <div id="drive-error" class="sh-alert sh-alert-error hidden mb-3"></div>
 
-                            <button type="button" class="sh-btn sh-btn-primary" id="btn-import-drive"
+                            <button type="button" class="sh-btn sh-btn-primary w-full sm:w-auto justify-center" id="btn-import-drive"
                                 onclick="importFromDrive()" disabled>
                                 <i class="fa-solid fa-download"></i> Importar_desde_Drive
                             </button>
@@ -247,7 +264,7 @@
                         <div id="file-preview" class="mt-3 flex flex-wrap gap-2"></div>
                         <div id="upload-error" class="sh-alert sh-alert-error hidden mt-2"></div>
 
-                        <button type="button" class="sh-btn sh-btn-green mt-4" id="btn-import-upload"
+                        <button type="button" class="sh-btn sh-btn-green mt-4 w-full sm:w-auto justify-center" id="btn-import-upload"
                             onclick="importFromUpload()" disabled
                             style="background: var(--sh-green); border-color: var(--sh-green); color: var(--sh-deep);">
                             <i class="fa-solid fa-upload"></i> Subir_presentación

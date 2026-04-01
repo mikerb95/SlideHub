@@ -40,6 +40,30 @@
             padding: 1rem; font-family: var(--sh-font-mono);
             margin: 0;
         }
+
+        @media (max-width: 640px) {
+            .deploy-nav {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                justify-content: flex-start;
+            }
+
+            .deploy-nav-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .result-head {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .result-head-actions {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+        }
     </style>
 </head>
 
@@ -47,14 +71,14 @@
 
     <!-- ═══ Topbar ═══ -->
     <nav class="sh-nav" style="position: sticky;">
-        <div class="sh-nav-inner">
-            <div class="flex items-center gap-3">
+        <div class="sh-nav-inner deploy-nav">
+            <div class="flex items-center gap-2 sm:gap-3">
                 <span class="font-brand text-base tracking-tight">Deploy_Tutor</span>
                 <div class="sh-status ml-1 hidden sm:inline-flex">
                     <i class="fa-solid fa-rocket text-xs" style="color: var(--sh-blue);"></i>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="deploy-nav-actions flex items-center gap-2">
                 <a href="/presenter" class="sh-btn sh-btn-ghost text-xs">
                     <i class="fa-solid fa-chalkboard"></i>
                     <span class="hidden sm:inline">Presenter</span>
@@ -89,11 +113,11 @@
                     </select>
                 </div>
             </div>
-            <div class="mt-4 flex items-center gap-3">
-                <button id="btn-generate" class="sh-btn sh-btn-primary" onclick="runPipeline(false)">
+            <div class="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+                <button id="btn-generate" class="sh-btn sh-btn-primary w-full sm:w-auto justify-center" onclick="runPipeline(false)">
                     <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Analyze_&_Generate
                 </button>
-                <button id="btn-refresh" class="sh-btn text-xs hidden" onclick="runPipeline(true)">
+                <button id="btn-refresh" class="sh-btn text-xs hidden w-full sm:w-auto justify-center" onclick="runPipeline(true)">
                     <i class="fa-solid fa-rotate-right mr-1"></i>Regenerate
                 </button>
                 <span id="global-error" class="text-xs font-mono hidden" style="color: var(--sh-red);"></span>
@@ -183,11 +207,11 @@
 
             <!-- Dockerfile card -->
             <div class="sh-card overflow-hidden">
-                <div class="flex items-center justify-between p-4 border-b border-[var(--sh-border)]">
+                <div class="result-head flex items-center justify-between p-4 border-b border-[var(--sh-border)]">
                     <div class="sh-label">
                         <i class="fa-brands fa-docker mr-1" style="color:#1d63ed;"></i>DOCKERFILE
                     </div>
-                    <div class="flex gap-2">
+                    <div class="result-head-actions flex gap-2">
                         <button class="sh-btn sh-btn-ghost text-xs" onclick="copyEl('dockerfile-output', this)">
                             <i class="fa-regular fa-copy mr-1"></i>Copy
                         </button>
@@ -201,12 +225,12 @@
 
             <!-- Deployment guide card -->
             <div class="sh-card overflow-hidden">
-                <div class="flex items-center justify-between p-4 border-b border-[var(--sh-border)]">
+                <div class="result-head flex items-center justify-between p-4 border-b border-[var(--sh-border)]">
                     <div class="sh-label">
                         <i class="fa-solid fa-map mr-1" style="color:#f78166;"></i>DEPLOY_GUIDE —
                         <span id="platform-label" class="uppercase"></span>
                     </div>
-                    <div class="flex gap-2">
+                    <div class="result-head-actions flex gap-2">
                         <button class="sh-btn sh-btn-ghost text-xs" onclick="copyEl('guide-output', this)">
                             <i class="fa-regular fa-copy mr-1"></i>Copy
                         </button>
@@ -230,11 +254,11 @@
 
             <!-- .env example card -->
             <div class="sh-card overflow-hidden hidden" id="env-card">
-                <div class="flex items-center justify-between p-4 border-b border-[var(--sh-border)]">
+                <div class="result-head flex items-center justify-between p-4 border-b border-[var(--sh-border)]">
                     <div class="sh-label">
                         <i class="fa-solid fa-key mr-1" style="color:var(--sh-green);"></i>ENV_VARIABLES
                     </div>
-                    <div class="flex gap-2">
+                    <div class="result-head-actions flex gap-2">
                         <button class="sh-btn sh-btn-ghost text-xs" onclick="copyEl('env-output', this)">
                             <i class="fa-regular fa-copy mr-1"></i>Copy
                         </button>
