@@ -45,6 +45,19 @@
             </a>
         </div>
 
+        <div th:if="${deleted}" class="sh-alert sh-alert-success mb-4">
+            <i class="fa-solid fa-circle-check mt-0.5"></i>
+            <span>Presentación eliminada correctamente.</span>
+        </div>
+        <div th:if="${notFound}" class="sh-alert sh-alert-warn mb-4">
+            <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+            <span>La presentación ya no existe o no tienes permisos.</span>
+        </div>
+        <div th:if="${deleteError}" class="sh-alert sh-alert-error mb-4">
+            <i class="fa-solid fa-circle-exclamation mt-0.5"></i>
+            <span>No se pudo eliminar la presentación. Inténtalo nuevamente.</span>
+        </div>
+
         <!-- ── Empty state ── -->
         <div th:if="${#lists.isEmpty(presentations)}" class="sh-card p-12 text-center animate-fade-in">
             <i class="fa-solid fa-layer-group text-4xl text-[var(--sh-text-3)] mb-4"></i>
