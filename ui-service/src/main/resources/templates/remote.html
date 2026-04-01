@@ -29,11 +29,13 @@
             transition: background var(--sh-t-fast), border-color var(--sh-t-fast);
             -webkit-tap-highlight-color: transparent;
         }
+
         .remote-btn:active {
             background: var(--sh-hover);
             border-color: var(--sh-blue);
             transform: scale(0.95);
         }
+
         .remote-btn:disabled {
             opacity: 0.25;
             cursor: default;
@@ -56,19 +58,29 @@
             -webkit-tap-highlight-color: transparent;
             cursor: pointer;
         }
-        .fab:active { transform: scale(0.97); }
-        .fab.visible { display: flex; }
+
+        .fab:active {
+            transform: scale(0.97);
+        }
+
+        .fab.visible {
+            display: flex;
+        }
 
         #help-btn {
-            bottom: 2rem; left: 1.5rem;
+            bottom: 2rem;
+            left: 1.5rem;
             background: var(--sh-red);
             color: var(--sh-deep);
         }
+
         #mic-btn {
-            bottom: 2rem; left: 8.5rem;
+            bottom: 2rem;
+            left: 8.5rem;
             background: var(--sh-blue);
             color: var(--sh-deep);
         }
+
         #mic-btn.recording {
             background: var(--sh-red);
             animation: sh-pulse-ring 1s ease infinite;
@@ -77,12 +89,14 @@
         /* ── Demo FAB ── */
         #btn-demo-fab {
             position: fixed;
-            bottom: 2rem; right: 1.5rem;
+            bottom: 2rem;
+            right: 1.5rem;
             background: var(--sh-elevated);
             border: 1px solid var(--sh-border-active);
             color: var(--sh-blue);
             border-radius: 50%;
-            width: 56px; height: 56px;
+            width: 56px;
+            height: 56px;
             font-size: 1.3rem;
             display: flex;
             align-items: center;
@@ -92,12 +106,16 @@
             box-shadow: var(--sh-shadow-md);
             -webkit-tap-highlight-color: transparent;
         }
-        #btn-demo-fab:active { transform: scale(0.95); }
+
+        #btn-demo-fab:active {
+            transform: scale(0.95);
+        }
 
         /* ── Return button ── */
         #btn-return-slide {
             position: fixed;
-            top: 1rem; left: 50%;
+            top: 1rem;
+            left: 50%;
             transform: translateX(-50%);
             background: var(--sh-blue);
             color: var(--sh-deep);
@@ -114,7 +132,11 @@
             z-index: 200;
             -webkit-tap-highlight-color: transparent;
         }
-        #btn-return-slide.visible { display: flex; }
+
+        #btn-return-slide.visible {
+            display: flex;
+        }
+
         #btn-return-slide:active {
             transform: translateX(-50%) scale(0.97);
         }
@@ -122,7 +144,8 @@
         /* ── Assist card ── */
         #assist-card {
             position: fixed;
-            left: 0.8rem; right: 0.8rem;
+            left: 0.8rem;
+            right: 0.8rem;
             bottom: 5.8rem;
             background: var(--sh-card);
             border: 1px solid var(--sh-border-active);
@@ -131,7 +154,11 @@
             z-index: 500;
             display: none;
         }
-        #assist-card.visible { display: block; }
+
+        #assist-card.visible {
+            display: block;
+        }
+
         #assist-card .title {
             font-family: var(--sh-font-mono);
             font-size: 0.7rem;
@@ -141,6 +168,7 @@
             color: var(--sh-blue);
             margin-bottom: 0.35rem;
         }
+
         #assist-card .content {
             font-size: 0.8rem;
             line-height: 1.4;
@@ -151,7 +179,8 @@
         /* ── Notice toast ── */
         #notice {
             position: fixed;
-            top: 1rem; right: 1rem;
+            top: 1rem;
+            right: 1rem;
             background: var(--sh-card);
             border: 1px solid var(--sh-border-active);
             border-radius: var(--sh-r-md);
@@ -163,11 +192,15 @@
             display: none;
             max-width: 70vw;
         }
-        #notice.visible { display: block; }
+
+        #notice.visible {
+            display: block;
+        }
 
         /* ── Join overlay ── */
         #join-overlay {
-            position: fixed; inset: 0;
+            position: fixed;
+            inset: 0;
             background: rgba(0, 0, 0, 0.92);
             display: none;
             z-index: 500;
@@ -175,20 +208,29 @@
             justify-content: center;
             padding: 1rem;
         }
-        #join-overlay.visible { display: flex; }
+
+        #join-overlay.visible {
+            display: flex;
+        }
 
         /* ── Bottom sheet ── */
         #sheet-overlay {
-            position: fixed; inset: 0;
+            position: fixed;
+            inset: 0;
             background: rgba(0, 0, 0, 0.5);
             z-index: 250;
             display: none;
         }
-        #sheet-overlay.visible { display: block; }
+
+        #sheet-overlay.visible {
+            display: block;
+        }
 
         #bottom-sheet {
             position: fixed;
-            bottom: 0; left: 0; right: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
             background: var(--sh-card);
             border-top: 1px solid var(--sh-border-active);
             border-radius: var(--sh-r-lg) var(--sh-r-lg) 0 0;
@@ -199,7 +241,10 @@
             display: flex;
             flex-direction: column;
         }
-        #bottom-sheet.open { transform: translateY(0); }
+
+        #bottom-sheet.open {
+            transform: translateY(0);
+        }
 
         .demo-link-btn {
             display: flex;
@@ -219,10 +264,12 @@
             -webkit-tap-highlight-color: transparent;
             transition: background var(--sh-t-fast), border-color var(--sh-t-fast);
         }
+
         .demo-link-btn:active {
             background: var(--sh-hover);
             border-color: var(--sh-blue);
         }
+
         .demo-link-desc {
             font-size: 0.7rem;
             color: var(--sh-text-3);
@@ -231,9 +278,17 @@
         }
 
         @keyframes sh-pulse-ring {
-            0%   { box-shadow: 0 0 0 0 rgba(248,81,73,0.5); }
-            70%  { box-shadow: 0 0 0 10px rgba(248,81,73,0); }
-            100% { box-shadow: 0 0 0 0 rgba(248,81,73,0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.5);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(248, 81, 73, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(248, 81, 73, 0);
+            }
         }
 
         @media (max-width: 640px) {
@@ -323,8 +378,7 @@
     </div>
 
     <!-- Demo FAB -->
-    <button id="btn-demo-fab" th:style="${!hasQuickLinks} ? 'display:none' : ''"
-            onclick="openSheet()" title="Demos">
+    <button id="btn-demo-fab" th:style="${!hasQuickLinks} ? 'display:none' : ''" onclick="openSheet()" title="Demos">
         <i class="fa-solid fa-globe"></i>
     </button>
 
@@ -339,17 +393,16 @@
         </div>
         <div class="overflow-y-auto p-3 flex-1" id="sheet-links-container">
             <button th:each="link : ${quickLinks}" th:data-url="${link.url}" class="demo-link-btn"
-                    onclick="activateDemoLink(this.dataset.url)">
+                onclick="activateDemoLink(this.dataset.url)">
                 <i th:if="${link.icon != null}" th:class="${link.icon} + ' fa-fw'"></i>
                 <i th:if="${link.icon == null}" class="fa-solid fa-link fa-fw"></i>
                 <span>
                     <span th:text="${link.title}">Title</span>
                     <span th:if="${link.description != null}" th:text="${link.description}"
-                          class="demo-link-desc"></span>
+                        class="demo-link-desc"></span>
                 </span>
             </button>
-            <div th:if="${quickLinks.isEmpty()}"
-                 class="text-center py-8 font-mono text-xs text-[var(--sh-text-3)]">
+            <div th:if="${quickLinks.isEmpty()}" class="text-center py-8 font-mono text-xs text-[var(--sh-text-3)]">
                 No demo links configured.
             </div>
         </div>
@@ -363,7 +416,7 @@
             </div>
             <select id="join-participant-select" class="sh-select text-sm mb-3"></select>
             <input id="join-custom-name" type="text" class="sh-input text-sm mb-3" maxlength="120"
-                   placeholder="Other name (optional)">
+                placeholder="Other name (optional)">
             <button type="button" class="sh-btn sh-btn-blue w-full justify-center" onclick="submitJoin()">
                 <i class="fa-solid fa-arrow-right-to-bracket"></i>
                 Join

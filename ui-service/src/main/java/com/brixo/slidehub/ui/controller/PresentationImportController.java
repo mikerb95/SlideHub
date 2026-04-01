@@ -94,23 +94,8 @@ public class PresentationImportController {
      * Vista de importación (legacy, sigue accesible).
      */
     @GetMapping("/presentations/import")
-    public String importPage(Authentication authentication,
-            @RequestParam(required = false) String deleted,
-            @RequestParam(required = false) String deleteError,
-            @RequestParam(required = false) String notFound,
-            Model model) {
-        User user = resolveUser(authentication);
-        List<PresentationSummary> presentations = presentationService
-                .listPresentations(user.getId())
-                .stream()
-                .map(PresentationSummary::from)
-                .toList();
-        model.addAttribute("presentations", presentations);
-        model.addAttribute("hasGoogleToken", hasGoogleToken(authentication));
-        model.addAttribute("deleted", deleted != null);
-        model.addAttribute("deleteError", deleteError != null);
-        model.addAttribute("notFound", notFound != null);
-        return "presentations/import";
+    public String importPage() {
+        return "redirect:/presentations";
     }
 
     // ── API JSON ──────────────────────────────────────────────────────────────
