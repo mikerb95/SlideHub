@@ -1064,7 +1064,7 @@
                 document.getElementById('btn-analyze-repo').disabled = false;
                 if (res.ok) {
                     document.getElementById('repo-result').classList.remove('hidden');
-                    const summary = data.summary || data.language || 'Analisis completado';
+                    const summary = data.summary || data.language || 'Análisis completado';
                     const parts = [];
                     if (data.language) parts.push('Lenguaje: ' + data.language);
                     if (data.framework) parts.push('Framework: ' + data.framework);
@@ -1087,7 +1087,7 @@
         // ── STEP 3: Generate Notes ──
         async function generateNotes() {
             if (!hasPresentationContext()) {
-                showError('notes-error', 'Primero crea/importa la presentacion en el Paso 1.');
+                showError('notes-error', 'Primero crea/importa la presentación en el Paso 1.');
                 return;
             }
 
@@ -1254,7 +1254,7 @@
 
             const list = document.getElementById('participants-list');
             if (W.participants.length === 0) {
-                list.innerHTML = '<div class="text-xs font-mono text-[var(--sh-text-3)]">Sin participantes aun.</div>';
+                list.innerHTML = '<div class="text-xs font-mono text-[var(--sh-text-3)]">Sin participantes aún.</div>';
                 return;
             }
             list.innerHTML = W.participants.map(p =>
@@ -1282,7 +1282,7 @@
                         'https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=' + encodeURIComponent(session.joinUrl);
                     document.getElementById('session-join-url').value = session.joinUrl || '';
                 } else {
-                    showError('session-error', 'No se pudo iniciar la sesion.');
+                    showError('session-error', 'No se pudo iniciar la sesión.');
                 }
             } catch (e) {
                 showError('session-error', 'Error de conexion.');
