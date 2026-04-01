@@ -123,7 +123,8 @@
                         </span>
                         <div class="text-[var(--sh-text-1)] font-semibold mt-1" th:text="${presentation.name}">Name
                         </div>
-                        <div class="text-[var(--sh-text-3)] text-xs font-mono" th:text="${totalSlides} + ' diapositivas'">0
+                        <div class="text-[var(--sh-text-3)] text-xs font-mono"
+                            th:text="${totalSlides} + ' diapositivas'">0
                             diapositivas</div>
                     </div>
 
@@ -212,14 +213,15 @@
 
                             <!-- Thumbnail -->
                             <div class="flex-shrink-0">
-                                <img th:src="${slide.s3Url}" th:alt="${'Diapositiva ' + slide.number}" class="slide-thumb"
-                                    loading="lazy" onerror="this.style.display='none'">
+                                <img th:src="${slide.s3Url}" th:alt="${'Diapositiva ' + slide.number}"
+                                    class="slide-thumb" loading="lazy" onerror="this.style.display='none'">
                             </div>
 
                             <!-- Note content -->
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-2 mb-2">
-                                    <span class="sh-badge" th:text="${'Diapositiva ' + slide.number}">Diapositiva N</span>
+                                    <span class="sh-badge" th:text="${'Diapositiva ' + slide.number}">Diapositiva
+                                        N</span>
                                     <span th:each="note : ${existingNotes}"
                                         th:if="${note.get('slideNumber') == slide.number}"
                                         class="sh-badge-green text-xs">
