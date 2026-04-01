@@ -69,6 +69,8 @@ services:
         value: https://slidehub-ai.onrender.com
       - key: BASE_URL
         value: https://slide.lat
+      - key: GATEWAY_URL
+        value: https://slide.lat
       - key: DATABASE_URL
         sync: false  # Configurar en Dashboard con DSN de Aiven
       - key: DB_DRIVER

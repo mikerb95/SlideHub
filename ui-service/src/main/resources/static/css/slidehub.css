@@ -354,7 +354,13 @@ a { color: inherit; }
     border: 1px solid var(--sh-border);
     border-radius: var(--sh-r-md);
     outline: none;
-    transition: border-color var(--sh-t-fast), box-shadow var(--sh-t-fast);
+    transition: border-color var(--sh-t-fast), box-shadow var(--sh-t-fast), background-color var(--sh-t-fast);
+}
+
+.sh-input:hover {
+    border-color: var(--sh-border-focus);
+    background: var(--sh-surface);
+    box-shadow: 0 0 0 1px var(--sh-blue-dim), 0 0 16px rgba(88, 166, 255, 0.18);
 }
 
 .sh-input:focus {
@@ -410,7 +416,13 @@ a { color: inherit; }
     outline: none;
     resize: vertical;
     min-height: 80px;
-    transition: border-color var(--sh-t-fast), box-shadow var(--sh-t-fast);
+    transition: border-color var(--sh-t-fast), box-shadow var(--sh-t-fast), background-color var(--sh-t-fast);
+}
+
+.sh-textarea:hover {
+    border-color: var(--sh-border-focus);
+    background: var(--sh-surface);
+    box-shadow: 0 0 0 1px var(--sh-blue-dim), 0 0 16px rgba(88, 166, 255, 0.18);
 }
 
 .sh-textarea:focus {
