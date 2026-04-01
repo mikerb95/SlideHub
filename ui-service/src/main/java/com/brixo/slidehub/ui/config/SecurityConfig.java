@@ -85,12 +85,14 @@ public class SecurityConfig {
                                                 // Recursos estáticos (CSS, JS, imágenes)
                                                 .requestMatchers("/css/**", "/js/**", "/images/**", "/slides/**")
                                                 .permitAll()
+                                                // Documentación/calidad y checks de prueba públicos
+                                                .requestMatchers("/calidad", "/status", "/status/api/checks")
+                                                .permitAll()
                                                 // Panel del presentador, main panel y tutor de deployment — requiere
                                                 // PRESENTER
                                                 // o ADMIN
                                                 .requestMatchers("/presenter", "/main-panel", "/deploy-tutor",
-                                                                "/status", "/status/api/checks", "/ai-guide",
-                                                                "/calidad")
+                                                                "/ai-guide")
                                                 .hasAnyRole("PRESENTER", "ADMIN")
                                                 // Perfil del usuario — requiere estar autenticado
                                                 .requestMatchers("/auth/profile").authenticated()
