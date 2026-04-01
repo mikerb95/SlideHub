@@ -71,6 +71,15 @@
         <div class="sh-card p-5 mb-4">
             <div class="sh-label mb-3">PROVEEDORES VINCULADOS</div>
 
+            <div th:if="${providerMessage}" class="sh-alert sh-alert-success mb-3">
+                <i class="fa-solid fa-check mt-0.5"></i>
+                <span th:text="${providerMessage}">Operación completada</span>
+            </div>
+            <div th:if="${providerErrorMessage}" class="sh-alert sh-alert-error mb-3">
+                <i class="fa-solid fa-circle-exclamation mt-0.5"></i>
+                <span th:text="${providerErrorMessage}">Error</span>
+            </div>
+
             <div class="flex flex-col gap-3">
                 <!-- GitHub -->
                 <div
@@ -85,9 +94,15 @@
                                 th:text="'@' + ${user?.githubUsername}">@usuario</span>
                         </div>
                     </div>
-                    <span th:if="${githubLinked}" class="sh-badge-green">
-                        <i class="fa-solid fa-link text-[0.55rem]"></i> Vinculado
-                    </span>
+                    <form th:if="${githubLinked}" th:action="@{/auth/unlink/github}" method="post" class="flex items-center gap-2">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf}">
+                        <span class="sh-badge-green">
+                            <i class="fa-solid fa-link text-[0.55rem]"></i> Vinculado
+                        </span>
+                        <button type="submit" class="sh-btn sh-btn-danger text-xs py-1 px-2.5">
+                            Desvincular
+                        </button>
+                    </form>
                     <a th:unless="${githubLinked}" th:href="@{/auth/link/github}" class="sh-btn text-xs py-1 px-2.5">
                         Vincular
                     </a>
@@ -106,9 +121,15 @@
                                 th:text="${user?.googleEmail}">correo@gmail.com</span>
                         </div>
                     </div>
-                    <span th:if="${googleLinked}" class="sh-badge-green">
-                        <i class="fa-solid fa-link text-[0.55rem]"></i> Vinculado
-                    </span>
+                    <form th:if="${googleLinked}" th:action="@{/auth/unlink/google}" method="post" class="flex items-center gap-2">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf}">
+                        <span class="sh-badge-green">
+                            <i class="fa-solid fa-link text-[0.55rem]"></i> Vinculado
+                        </span>
+                        <button type="submit" class="sh-btn sh-btn-danger text-xs py-1 px-2.5">
+                            Desvincular
+                        </button>
+                    </form>
                     <a th:unless="${googleLinked}" th:href="@{/auth/link/google}" class="sh-btn text-xs py-1 px-2.5">
                         Vincular
                     </a>

@@ -269,12 +269,71 @@ public class AuthController {
         }
 
         String username = resolveUsername(authentication);
-        userRepository.findByUsername(username).ifPresent(user -> {
-            model.addAttribute("user", user);
-            model.addAttribute("githubLinked", user.getGithubId() != null);
-            model.addAttribute("googleLinked", user.getGoogleId() != null);
-        });
+        userRepository.findByUsername(username).ifPresent(user -> populateProfileModel(model, user));
 
+        return "auth/profile";
+    }
+
+    @PostMapping("/unlink/github")
+    public String unlinkGithub(Authentication authentication, Model model) {
+        if (!isAuthenticated(authentication)) {
+            return "redirect:/auth/login";
+        }
+        User user = findCurrentUser(authentication);
+        if (user == null) {
+            return "redirect:/auth/login";
+        }
+        if (user.getGithubId() == null) {
+            populateProfileModel(model, user);
+            model.addAttribute("providerMessage", "GitHub ya estaba desvinculado.");
+            return "auth/profile";
+        }
+        if (!canUnlinkProvider(user, "github")) {
+            populateProfileModel(model, user);
+            model.addAttribute("providerErrorMessage",
+                    "No puedes desvincular GitHub porque te quedarías sin método de acceso. Configura contraseña o vincula Google primero.");
+            return "auth/profile";
+        }
+
+        user.setGithubId(null);
+        user.setGithubUsername(null);
+        user.setGithubAccessToken(null);
+        userRepository.save(user);
+
+        populateProfileModel(model, user);
+        model.addAttribute("providerMessage", "Cuenta de GitHub desvinculada correctamente.");
+        return "auth/profile";
+    }
+
+    @PostMapping("/unlink/google")
+    public String unlinkGoogle(Authentication authentication, Model model) {
+        if (!isAuthenticated(authentication)) {
+            return "redirect:/auth/login";
+        }
+        User user = findCurrentUser(authentication);
+        if (user == null) {
+            return "redirect:/auth/login";
+        }
+        if (user.getGoogleId() == null) {
+            populateProfileModel(model, user);
+            model.addAttribute("providerMessage", "Google ya estaba desvinculado.");
+            return "auth/profile";
+        }
+        if (!canUnlinkProvider(user, "google")) {
+            populateProfileModel(model, user);
+            model.addAttribute("providerErrorMessage",
+                    "No puedes desvincular Google porque te quedarías sin método de acceso. Configura contraseña o vincula GitHub primero.");
+            return "auth/profile";
+        }
+
+        user.setGoogleId(null);
+        user.setGoogleEmail(null);
+        user.setGoogleRefreshToken(null);
+        user.setDefaultDriveFolderId(null);
+        userRepository.save(user);
+
+        populateProfileModel(model, user);
+        model.addAttribute("providerMessage", "Cuenta de Google desvinculada correctamente.");
         return "auth/profile";
     }
 
@@ -316,6 +375,27 @@ public class AuthController {
         return authentication.getName();
     }
 
+    private void populateProfileModel(Model model, User user) {
+        model.addAttribute("user", user);
+        model.addAttribute("githubLinked", user.getGithubId() != null);
+        model.addAttribute("googleLinked", user.getGoogleId() != null);
+    }
+
+    private boolean canUnlinkProvider(User user, String provider) {
+        boolean hasPassword = user.getPasswordHash() != null && !user.getPasswordHash().isBlank();
+        boolean githubLinked = user.getGithubId() != null;
+        boolean googleLinked = user.getGoogleId() != null;
+
+        if ("github".equals(provider)) {
+            githubLinked = false;
+        }
+        if ("google".equals(provider)) {
+            googleLinked = false;
+        }
+
+        return hasPassword || githubLinked || googleLinked;
+    }
+
     @PostMapping("/delete-account")
     public String deleteAccount(Authentication authentication,
             @RequestParam(name = "confirmation", required = false) String confirmation,
@@ -330,9 +410,7 @@ public class AuthController {
         if (confirmation == null || !"ELIMINAR".equals(confirmation.trim())) {
             User current = findCurrentUser(authentication);
             if (current != null) {
-                model.addAttribute("user", current);
-                model.addAttribute("githubLinked", current.getGithubId() != null);
-                model.addAttribute("googleLinked", current.getGoogleId() != null);
+                populateProfileModel(model, current);
             }
             model.addAttribute("deleteErrorMessage", "Para confirmar, escribe exactamente ELIMINAR.");
             return "auth/profile";
@@ -350,9 +428,7 @@ public class AuthController {
             return "redirect:/auth/login?accountDeleted=true";
         } catch (Exception ex) {
             log.error("Error eliminando cuenta para userId={}: {}", current.getId(), ex.getMessage(), ex);
-            model.addAttribute("user", current);
-            model.addAttribute("githubLinked", current.getGithubId() != null);
-            model.addAttribute("googleLinked", current.getGoogleId() != null);
+            populateProfileModel(model, current);
             model.addAttribute("deleteErrorMessage", "No se pudo eliminar la cuenta. Inténtalo nuevamente.");
             return "auth/profile";
         }
