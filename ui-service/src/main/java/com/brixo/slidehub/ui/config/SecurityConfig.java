@@ -85,7 +85,7 @@ public class SecurityConfig {
                                                 // PRESENTER
                                                 // o ADMIN
                                                 .requestMatchers("/presenter", "/main-panel", "/deploy-tutor",
-                                                                "/status", "/status/api/checks")
+                                                                "/status", "/status/api/checks", "/ai-guide")
                                                 .hasAnyRole("PRESENTER", "ADMIN")
                                                 // Perfil del usuario — requiere estar autenticado
                                                 .requestMatchers("/auth/profile").authenticated()

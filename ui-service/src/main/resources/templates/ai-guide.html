@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía del Microservicio IA — SlideHub</title>
+    <th:block th:replace="~{fragments/head :: assets}"></th:block>
+    <style>
+        .guide-section { scroll-margin-top: 64px; }
+        .pipeline-step {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 0.25rem; flex: 1; min-width: 0;
+        }
+        .pipeline-arrow {
+            color: var(--sh-text-3); font-size: 1.1rem;
+            flex-shrink: 0; padding: 0 0.25rem; padding-top: 0.6rem;
+        }
+        .pipeline-box {
+            width: 100%; border: 1px solid var(--sh-border);
+            border-radius: 6px; padding: 0.5rem 0.6rem;
+            background: var(--sh-deep); font-size: 0.72rem;
+            font-family: var(--sh-font-mono); text-align: center;
+            line-height: 1.4;
+        }
+        .pipeline-box.blue  { border-color: rgba(88,166,255,0.4); background: rgba(88,166,255,0.06); }
+        .pipeline-box.green { border-color: rgba(63,185,80,0.4);  background: rgba(63,185,80,0.06); }
+        .pipeline-box.amber { border-color: rgba(210,153,34,0.4); background: rgba(210,153,34,0.06); }
+        .pipeline-box.red   { border-color: rgba(248,81,73,0.4);  background: rgba(248,81,73,0.06); }
+        .pipeline-label {
+            font-size: 0.62rem; color: var(--sh-text-3);
+            font-family: var(--sh-font-mono); text-align: center;
+        }
+        .endpoint-row { border-bottom: 1px solid var(--sh-border-subtle); }
+        .endpoint-row:last-child { border-bottom: none; }
+        .method-post  { color: var(--sh-amber); }
+        .method-get   { color: var(--sh-green); }
+        .method-delete{ color: var(--sh-red); }
+        .toc-link {
+            display: block; padding: 0.25rem 0.5rem; border-radius: 4px;
+            font-size: 0.72rem; font-family: var(--sh-font-mono);
+            color: var(--sh-text-3); text-decoration: none;
+            transition: color 0.15s, background 0.15s;
+        }
+        .toc-link:hover { color: var(--sh-blue); background: rgba(88,166,255,0.06); }
+        .code-block {
+            background: var(--sh-deep); border: 1px solid var(--sh-border);
+            border-radius: 6px; padding: 0.75rem 1rem;
+            font-family: var(--sh-font-mono); font-size: 0.72rem;
+            color: var(--sh-text-2); white-space: pre; overflow-x: auto;
+            line-height: 1.6;
+        }
+        .note-callout {
+            background: rgba(88,166,255,0.07); border-left: 3px solid var(--sh-blue);
+            border-radius: 0 6px 6px 0; padding: 0.6rem 0.9rem;
+            font-size: 0.8rem; color: var(--sh-text-2); line-height: 1.6;
+        }
+        .tip-callout {
+            background: rgba(63,185,80,0.07); border-left: 3px solid var(--sh-green);
+            border-radius: 0 6px 6px 0; padding: 0.6rem 0.9rem;
+            font-size: 0.8rem; color: var(--sh-text-2); line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body class="sh antialiased">
+
+<!-- ── Navegación ── -->
+<nav class="sh-nav" style="position:sticky; top:0; z-index:50;">
+    <div class="sh-nav-inner">
+        <div class="flex items-center gap-3">
+            <a href="/presentations/import" class="sh-btn sh-btn-ghost text-xs">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <span class="font-brand text-base">SlideHub</span>
+            <span class="text-[var(--sh-text-3)] text-xs font-mono">/</span>
+            <span class="font-mono text-xs text-[var(--sh-text-2)]">Guía del microservicio IA</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="sh-badge-blue text-xs">ai-service</span>
+            <span class="sh-badge text-xs">puerto 8083</span>
+        </div>
+    </div>
+</nav>
+
+<div class="max-w-6xl mx-auto px-4 py-8 flex gap-8">
+
+    <!-- ── Sidebar: Índice ── -->
+    <aside class="hidden lg:block w-48 flex-shrink-0">
+        <div class="sticky top-20">
+            <div class="sh-label mb-3 text-xs">ÍNDICE</div>
+            <nav class="space-y-0.5">
+                <a href="#que-es"       class="toc-link">1. ¿Qué es?</a>
+                <a href="#arquitectura" class="toc-link">2. Arquitectura</a>
+                <a href="#modelos"      class="toc-link">3. Los modelos IA</a>
+                <a href="#notas"        class="toc-link">4. Notas del presentador</a>
+                <a href="#repo"         class="toc-link">5. Análisis de repositorio</a>
+                <a href="#deploy"       class="toc-link">6. Deploy Tutor</a>
+                <a href="#audio"        class="toc-link">7. Asistente de audio</a>
+                <a href="#mongodb"      class="toc-link">8. Base de datos</a>
+                <a href="#endpoints"    class="toc-link">9. Endpoints</a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- ── Contenido principal ── -->
+    <main class="flex-1 min-w-0 space-y-8">
+
+        <!-- HEADER -->
+        <div>
+            <div class="sh-label mb-2">GUÍA TÉCNICA PARA ESTUDIANTES</div>
+            <h1 class="font-brand text-3xl text-[var(--sh-text-1)] mb-3">ai-service</h1>
+            <p class="text-[var(--sh-text-2)] text-sm leading-relaxed max-w-2xl">
+                Este documento explica cómo funciona el microservicio de inteligencia artificial de SlideHub:
+                qué hace, por qué está separado, cómo fluye la información entre los modelos,
+                y cómo se guarda el resultado en la base de datos.
+            </p>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             SECCIÓN 1 — ¿Qué es?
+             ══════════════════════════════════════════ -->
+        <div id="que-es" class="guide-section sh-card p-6">
+            <div class="sh-label mb-4"><i class="fa-solid fa-circle-info mr-1"></i>¿QUÉ ES EL AI-SERVICE?</div>
+
+            <p class="text-sm text-[var(--sh-text-2)] leading-relaxed mb-4">
+                <code class="font-mono text-[var(--sh-blue)]">ai-service</code> es uno de los cuatro microservicios de SlideHub.
+                Su responsabilidad única es <strong class="text-[var(--sh-text-1)]">coordinar llamadas a modelos de IA externos</strong>
+                y persistir los resultados en MongoDB para que no haya que regenerarlos cada vez.
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                <div class="p-3 rounded-tech bg-[var(--sh-deep)] border border-[var(--sh-border)]">
+                    <div class="text-xs font-mono text-[var(--sh-blue)] mb-1">¿Qué recibe?</div>
+                    <ul class="text-xs text-[var(--sh-text-2)] space-y-1 leading-relaxed">
+                        <li>→ URLs de imágenes de slides (S3)</li>
+                        <li>→ URLs de repositorios GitHub</li>
+                        <li>→ Archivos de audio de participantes</li>
+                        <li>→ Plataforma de despliegue objetivo</li>
+                    </ul>
+                </div>
+                <div class="p-3 rounded-tech bg-[var(--sh-deep)] border border-[var(--sh-border)]">
+                    <div class="text-xs font-mono text-[var(--sh-green)] mb-1">¿Qué produce?</div>
+                    <ul class="text-xs text-[var(--sh-text-2)] space-y-1 leading-relaxed">
+                        <li>→ Notas estructuradas por slide</li>
+                        <li>→ Análisis técnico del repositorio</li>
+                        <li>→ Dockerfiles y guías de despliegue</li>
+                        <li>→ Respuestas a preguntas del público</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="note-callout">
+                <strong>¿Por qué un servicio separado?</strong><br>
+                Las llamadas a Gemini y Groq son lentas (2–15 segundos) y costosas.
+                Al separarlas en un servicio propio: (1) el resto de la app no se bloquea,
+                (2) se puede escalar independientemente, y (3) los resultados se cachean en MongoDB
+                para no volver a pagar por la misma generación.
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             SECCIÓN 2 — Arquitectura
+             ══════════════════════════════════════════ -->
+        <div id="arquitectura" class="guide-section sh-card p-6">
+            <div class="sh-label mb-4"><i class="fa-solid fa-diagram-project mr-1"></i>ARQUITECTURA</div>
+
+            <p class="text-sm text-[var(--sh-text-2)] leading-relaxed mb-5">
+                Todos los microservicios de SlideHub se comunican a través del
+                <code class="font-mono text-[var(--sh-amber)]">gateway-service</code> (puerto 8080),
+                que actúa como puerta única para el exterior. El <code class="font-mono text-[var(--sh-blue)]">ai-service</code>
+                nunca habla directamente con el navegador del usuario.
+            </p>
+
+            <!-- Diagrama de arquitectura en texto -->
+            <div class="code-block mb-4">Navegador / App
+     │
+     ▼
+┌─────────────────────────────────────────────────────────┐
+│  gateway-service  :8080   (enruta y aplica rate limit)  │
+└──────┬──────────────┬─────────────────┬─────────────────┘
+       │              │                 │
+       ▼              ▼                 ▼
+  ui-service     state-service      ai-service
+   :8082           :8081              :8083
+  (vistas,       (Redis: slide       (Gemini +
+  auth, S3)       actual, demo)      Groq + MongoDB)
