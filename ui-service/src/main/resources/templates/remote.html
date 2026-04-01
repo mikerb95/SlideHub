@@ -585,7 +585,7 @@
             if (navigator.vibrate) {
                 navigator.vibrate(sequence);
             }
-            showNotice(message || (pattern === 'triple' ? 'Help request' : 'Assigned turn'));
+            showNotice(message || (pattern === 'triple' ? 'Solicitud de ayuda' : 'Turno asignado'));
             if (message && message.startsWith('IA para')) {
                 showAssistCard(message);
             }
@@ -608,16 +608,16 @@
             try {
                 const res = await fetch(`/api/presentations/${PRESENTATION_ID}/meeting/join-options?joinToken=${encodeURIComponent(JOIN_TOKEN)}`);
                 if (!res.ok) {
-                    showNotice('Could not validate meeting session');
+                    showNotice('No se pudo validar la sesión de reunión');
                     return;
                 }
                 const data = await res.json();
                 const participants = data.participants || [];
-                participantSelect.innerHTML = '<option value="">Select your name</option>' +
+                participantSelect.innerHTML = '<option value="">Selecciona tu nombre</option>' +
                     participants.map(p => `<option value="${p.id}">${p.displayName}</option>`).join('');
                 joinOverlay.classList.add('visible');
             } catch (_) {
-                showNotice('Error loading meeting participants');
+                showNotice('Error cargando participantes de la reunión');
             }
         }
 
@@ -629,7 +629,7 @@
             };
 
             if (!payload.participantId && !payload.customName) {
-                showNotice('Select a name or type one');
+                showNotice('Selecciona un nombre o escribe uno');
                 return;
             }
 
@@ -640,7 +640,7 @@
                     body: JSON.stringify(payload)
                 });
                 if (!res.ok) {
-                    showNotice('Could not join meeting');
+                    showNotice('No se pudo unir a la reunión');
                     return;
                 }
                 const data = await res.json();
@@ -650,16 +650,16 @@
                     helpBtn.classList.add('visible');
                     micBtn.classList.add('visible');
                     joinOverlay.classList.remove('visible');
-                    showNotice(`Connected as ${data.displayName || 'participant'}`);
+                    showNotice(`Conectado como ${data.displayName || 'participante'}`);
                 }
             } catch (_) {
-                showNotice('Network error joining meeting');
+                showNotice('Error de red al unirse a la reunión');
             }
         }
 
         async function requestHelp() {
             if (!PRESENTATION_ID || !JOIN_TOKEN || !participantToken) {
-                showNotice('Join the meeting first');
+                showNotice('Únete primero a la reunión');
                 return;
             }
             try {
@@ -669,13 +669,13 @@
                     body: JSON.stringify({ joinToken: JOIN_TOKEN, participantToken })
                 });
                 if (!res.ok) {
-                    showNotice('Could not send help request');
+                    showNotice('No se pudo enviar la solicitud de ayuda');
                     return;
                 }
                 if (navigator.vibrate) navigator.vibrate([30, 40, 30]);
-                showNotice('Help request sent');
+                showNotice('Solicitud de ayuda enviada');
             } catch (_) {
-                showNotice('Error sending help request');
+                showNotice('Error al enviar la solicitud de ayuda');
             }
         }
 

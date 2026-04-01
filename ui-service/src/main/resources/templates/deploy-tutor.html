@@ -127,7 +127,7 @@
             <div class="deploy-nav-actions flex items-center gap-2">
                 <a href="/presenter" class="sh-btn sh-btn-ghost text-xs">
                     <i class="fa-solid fa-chalkboard"></i>
-                    <span class="hidden sm:inline">Presenter</span>
+                    <span class="hidden sm:inline">Presentador</span>
                 </a>
                 <a href="/main-panel" class="sh-btn sh-btn-ghost text-xs">
                     <i class="fa-solid fa-table-cells-large"></i>
@@ -142,7 +142,7 @@
         <!-- ═══ Config Card ═══ -->
         <div class="sh-card p-5" id="form-card">
             <div class="sh-label mb-4">
-                <i class="fa-brands fa-github mr-1"></i>CONFIGURATION
+                <i class="fa-brands fa-github mr-1"></i>CONFIGURACIÓN
             </div>
             <div class="flex flex-col md:flex-row gap-3">
                 <div class="flex-1">
@@ -161,11 +161,11 @@
             <div class="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
                 <button id="btn-generate" class="sh-btn sh-btn-primary w-full sm:w-auto justify-center"
                     onclick="runPipeline(false)">
-                    <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Analyze_&_Generate
+                    <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Analizar y generar
                 </button>
                 <button id="btn-refresh" class="sh-btn text-xs hidden w-full sm:w-auto justify-center"
                     onclick="runPipeline(true)">
-                    <i class="fa-solid fa-rotate-right mr-1"></i>Regenerate
+                    <i class="fa-solid fa-rotate-right mr-1"></i>Regenerar
                 </button>
                 <span id="global-error" class="text-xs font-mono hidden" style="color: var(--sh-red);"></span>
             </div>
@@ -174,13 +174,13 @@
         <!-- ═══ Progress Steps ═══ -->
         <div class="sh-card p-4 hidden" id="progress-card">
             <div class="sh-label mb-3">
-                <i class="fa-solid fa-list-check mr-1"></i>PIPELINE_PROGRESS
+                <i class="fa-solid fa-list-check mr-1"></i>PROGRESO DEL PIPELINE
             </div>
             <div class="step-row">
                 <span class="step-badge step-pending" id="s-analyze-badge">1</span>
                 <div class="flex-1">
                     <div class="text-sm font-semibold text-[var(--sh-text-1)]">Analyzing_Repository</div>
-                    <div class="text-xs text-[var(--sh-text-3)]">Detects language, framework, ports and dependencies
+                    <div class="text-xs text-[var(--sh-text-3)]">Detecta lenguaje, framework, puertos y dependencias
                     </div>
                 </div>
                 <i class="fa-solid fa-spinner fa-spin hidden" style="color:var(--sh-blue);" id="s-analyze-spin"></i>
@@ -191,7 +191,7 @@
                 <span class="step-badge step-pending" id="s-dockerfile-badge">2</span>
                 <div class="flex-1">
                     <div class="text-sm font-semibold text-[var(--sh-text-1)]">Generating_Dockerfile</div>
-                    <div class="text-xs text-[var(--sh-text-3)]">Multi-stage optimized with healthcheck</div>
+                    <div class="text-xs text-[var(--sh-text-3)]">Multi-stage optimizado con healthcheck</div>
                 </div>
                 <i class="fa-solid fa-spinner fa-spin hidden" style="color:var(--sh-blue);" id="s-dockerfile-spin"></i>
                 <i class="fa-solid fa-check hidden" style="color:var(--sh-green);" id="s-dockerfile-ok"></i>
@@ -201,7 +201,7 @@
                 <span class="step-badge step-pending" id="s-guide-badge">3</span>
                 <div class="flex-1">
                     <div class="text-sm font-semibold text-[var(--sh-text-1)]">Generating_Deploy_Guide</div>
-                    <div class="text-xs text-[var(--sh-text-3)]">Steps, environment variables and tips</div>
+                    <div class="text-xs text-[var(--sh-text-3)]">Pasos, variables de entorno y recomendaciones</div>
                 </div>
                 <i class="fa-solid fa-spinner fa-spin hidden" style="color:var(--sh-blue);" id="s-guide-spin"></i>
                 <i class="fa-solid fa-check hidden" style="color:var(--sh-green);" id="s-guide-ok"></i>
@@ -374,7 +374,7 @@
             const repoUrl = document.getElementById('repoUrl').value.trim();
             const platform = document.getElementById('platform').value;
             const errEl = document.getElementById('global-error');
-            if (!repoUrl) { errEl.textContent = 'Enter the repository URL.'; errEl.classList.remove('hidden'); return; }
+            if (!repoUrl) { errEl.textContent = 'Ingresa la URL del repositorio.'; errEl.classList.remove('hidden'); return; }
             errEl.classList.add('hidden');
 
             document.getElementById('progress-card').classList.remove('hidden');
@@ -397,7 +397,7 @@
                 renderAnalysis(analysis);
             } catch (e) {
                 stepFail('analyze');
-                errEl.textContent = 'Error analyzing repository: ' + e.message;
+                errEl.textContent = 'Error analizando el repositorio: ' + e.message;
                 errEl.classList.remove('hidden');
                 document.getElementById('btn-generate').disabled = false;
                 return;
@@ -419,7 +419,7 @@
                 stepDone('dockerfile');
             } catch (e) {
                 stepFail('dockerfile');
-                errEl.textContent = 'Error generating Dockerfile: ' + e.message;
+                errEl.textContent = 'Error generando el Dockerfile: ' + e.message;
                 errEl.classList.remove('hidden');
                 document.getElementById('btn-generate').disabled = false;
                 return;
@@ -440,7 +440,7 @@
                 renderGuide(g, platform);
             } catch (e) {
                 stepFail('guide');
-                errEl.textContent = 'Error generating guide: ' + e.message;
+                errEl.textContent = 'Error generando la guía: ' + e.message;
                 errEl.classList.remove('hidden');
                 document.getElementById('btn-generate').disabled = false;
                 return;
@@ -455,7 +455,7 @@
         function copyEl(id, btn) {
             navigator.clipboard.writeText(document.getElementById(id).textContent).then(() => {
                 const orig = btn.innerHTML;
-                btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i>Copied';
+                btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i>Copiado';
                 setTimeout(() => btn.innerHTML = orig, 1500);
             });
         }

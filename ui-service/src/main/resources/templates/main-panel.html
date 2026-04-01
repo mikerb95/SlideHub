@@ -159,11 +159,11 @@
                 </div>
                 <a href="/presentations" class="sh-btn sh-btn-ghost text-xs">
                     <i class="fa-solid fa-folder-open"></i>
-                    <span class="hidden sm:inline">Presentations</span>
+                    <span class="hidden sm:inline">Presentaciones</span>
                 </a>
                 <a href="/presenter" class="sh-btn sh-btn-ghost text-xs">
                     <i class="fa-solid fa-presentation-screen"></i>
-                    <span class="hidden sm:inline">Presenter</span>
+                    <span class="hidden sm:inline">Presentador</span>
                 </a>
                 <a href="/auth/profile" class="sh-btn sh-btn-ghost text-xs">
                     <i class="fa-solid fa-user"></i>
@@ -185,7 +185,7 @@
                 <div style="grid-column: 1 / -1;"
                     class="flex flex-col items-center justify-center py-12 text-[var(--sh-text-3)]">
                     <i class="fa-solid fa-spinner fa-spin text-2xl mb-3"></i>
-                    <span class="sh-label">CARGANDO SLIDES</span>
+                    <span class="sh-label">CARGANDO DIAPOSITIVAS</span>
                 </div>
             </div>
         </div>
@@ -203,7 +203,7 @@
                     <span id="demo-mode-badge" class="sh-badge">slides</span>
                     <button class="sh-btn text-xs py-1 px-2" id="btn-demo-slides">
                         <i class="fa-solid fa-images"></i>
-                        Slides
+                        Diapositivas
                     </button>
                 </div>
                 <div class="flex gap-1">
@@ -212,7 +212,7 @@
                         <i class="fa-solid fa-arrow-up-right-from-square"></i>
                     </button>
                 </div>
-                <div class="font-mono text-[0.65rem] text-[var(--sh-text-3)] mt-1.5">Custom URL → iframe</div>
+                <div class="font-mono text-[0.65rem] text-[var(--sh-text-3)] mt-1.5">URL personalizada → iframe</div>
             </div>
 
             <!-- MEETING -->
@@ -222,7 +222,7 @@
                 </div>
                 <div id="meeting-missing-presentation" class="text-[var(--sh-text-3)] text-xs font-mono"
                     style="display:none;">
-                    Open with <code class="text-[var(--sh-blue)]">?presentationId=...</code> to enable sessions.
+                    Abre con <code class="text-[var(--sh-blue)]">?presentationId=...</code> para habilitar sesiones.
                 </div>
 
                 <div id="meeting-controls">
@@ -233,11 +233,11 @@
                             <button class="sh-btn text-xs py-0.5 px-2" id="btn-start-session"
                                 style="font-size: 0.7rem;">
                                 <i class="fa-solid fa-qrcode"></i>
-                                Generate
+                                Generar
                             </button>
                         </div>
                         <div id="meeting-session-panel" style="display:none;">
-                            <img id="join-qr" alt="Meeting QR">
+                            <img id="join-qr" alt="QR de reunión">
                             <div class="flex gap-1 mt-2">
                                 <input id="join-url" type="text" class="sh-input text-xs" readonly>
                                 <button id="btn-copy-join-url" class="sh-btn text-xs px-2 flex-shrink-0" type="button">
@@ -245,7 +245,7 @@
                                 </button>
                             </div>
                             <div class="font-mono text-[0.6rem] text-[var(--sh-text-3)] mt-1">
-                                Share QR for team join via mobile.
+                                Comparte el QR para que el equipo se una desde móvil.
                             </div>
                         </div>
                     </div>
@@ -295,7 +295,7 @@
                         Crear slide
                     </button>
                     <div class="font-mono text-[0.6rem] text-[var(--sh-text-3)] mt-1.5">
-                        Uses active presentation color palette.
+                        Usa la paleta de color de la presentación activa.
                     </div>
                 </div>
             </div>
@@ -316,12 +316,12 @@
                     <div th:if="${quickLinks.isEmpty()}"
                         class="text-center py-4 text-[var(--sh-text-3)] text-xs font-mono">
                         <span th:if="${presentationId == ''}">
-                            Open with <code class="text-[var(--sh-blue)]">?presentationId=...</code>
+                            Abre con <code class="text-[var(--sh-blue)]">?presentationId=...</code>
                         </span>
                         <span th:if="${presentationId != ''}">
-                            No links configured.
+                            No hay links configurados.
                             <a href="#" onclick="openLinksModal(); return false;"
-                                class="text-[var(--sh-blue)] hover:underline">Add</a>
+                                class="text-[var(--sh-blue)] hover:underline">Añadir</a>
                         </span>
                     </div>
 
@@ -330,7 +330,7 @@
                         <i th:if="${link.icon != null}" th:class="${link.icon} + ' fa-fw'"></i>
                         <i th:if="${link.icon == null}" class="fa-solid fa-link fa-fw"></i>
                         <span>
-                            <span th:text="${link.title}">Title</span>
+                            <span th:text="${link.title}">Título</span>
                             <span th:if="${link.description != null}" th:text="${link.description}"
                                 class="link-desc"></span>
                         </span>
@@ -353,7 +353,7 @@
                     <div class="sh-icon sh-icon-sm sh-icon-blue">
                         <i class="fa-solid fa-bolt text-xs"></i>
                     </div>
-                    <h3 class="font-brand text-lg">Quick Links</h3>
+                    <h3 class="font-brand text-lg">Links rápidos</h3>
                 </div>
                 <button class="sh-btn sh-btn-ghost text-xs px-2 py-1" onclick="closeLinksModal()">
                     <i class="fa-solid fa-xmark"></i>
@@ -368,12 +368,12 @@
             <!-- New link form -->
             <div class="sh-label mb-3">AÑADIR LINK</div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
-                <input type="text" class="sh-input text-xs" id="new-link-title" placeholder="Title *">
+                <input type="text" class="sh-input text-xs" id="new-link-title" placeholder="Título *">
                 <input type="url" class="sh-input text-xs" id="new-link-url" placeholder="URL *">
             </div>
             <div class="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-2 mb-4">
-                <input type="text" class="sh-input text-xs" id="new-link-icon" placeholder="FA icon class">
-                <input type="text" class="sh-input text-xs" id="new-link-desc" placeholder="Description (optional)">
+                <input type="text" class="sh-input text-xs" id="new-link-icon" placeholder="Clase de ícono FA">
+                <input type="text" class="sh-input text-xs" id="new-link-desc" placeholder="Descripción (opcional)">
             </div>
 
             <!-- Footer -->
@@ -444,7 +444,7 @@
                 div.className = 'slide-thumb';
                 div.dataset.slide = i;
                 const url = slideUrls[i - 1] || `/presentation/Slide${i}.PNG`;
-                div.innerHTML = `<img src="${url}" alt="Slide ${i}" loading="lazy">
+                div.innerHTML = `<img src="${url}" alt="Diapositiva ${i}" loading="lazy">
                                  <div class="slide-num">${i}</div>`;
                 div.addEventListener('click', () => goToSlide(i));
                 grid.appendChild(div);
@@ -539,7 +539,7 @@
                     btn.classList.toggle('active-demo', btn.dataset.url === demo.url);
                 });
             } else {
-                demoModeBadge.textContent = 'slides';
+                demoModeBadge.textContent = 'diapositivas';
                 demoModeBadge.className = 'sh-badge';
                 document.querySelectorAll('.quick-link-btn').forEach(btn => btn.classList.remove('active-demo'));
             }
@@ -560,13 +560,13 @@
             const currentValue = assignmentSlideSelect.value;
             assignmentSlideSelect.innerHTML = '';
             if (totalSlides <= 0) {
-                assignmentSlideSelect.innerHTML = '<option value="">Slide</option>';
+                assignmentSlideSelect.innerHTML = '<option value="">Diapositiva</option>';
                 return;
             }
             for (let i = 1; i <= totalSlides; i++) {
                 const option = document.createElement('option');
                 option.value = String(i);
-                option.textContent = 'Slide ' + i;
+                option.textContent = 'Diapositiva ' + i;
                 assignmentSlideSelect.appendChild(option);
             }
             if (currentValue && Number(currentValue) <= totalSlides) {
@@ -579,8 +579,8 @@
 
         function renderParticipants() {
             if (participants.length === 0) {
-                participantsList.innerHTML = '<div class="font-mono text-[0.65rem]" style="color: var(--sh-text-3);">No participants yet.</div>';
-                assignmentParticipantSelect.innerHTML = '<option value="">Participant</option>';
+                participantsList.innerHTML = '<div class="font-mono text-[0.65rem]" style="color: var(--sh-text-3);">Sin participantes aún.</div>';
+                assignmentParticipantSelect.innerHTML = '<option value="">Participante</option>';
                 return;
             }
 
@@ -594,7 +594,7 @@
                 .join('');
 
             const selectedParticipant = assignmentParticipantSelect.value;
-            assignmentParticipantSelect.innerHTML = '<option value="">Participant</option>' +
+            assignmentParticipantSelect.innerHTML = '<option value="">Participante</option>' +
                 participants.map(participant =>
                     `<option value="${participant.id}">${participant.displayName}</option>`)
                     .join('');
@@ -605,7 +605,7 @@
 
         function renderAssignments() {
             if (assignments.length === 0) {
-                assignmentsList.innerHTML = '<div class="font-mono text-[0.65rem]" style="color: var(--sh-text-3);">No assignments yet.</div>';
+                assignmentsList.innerHTML = '<div class="font-mono text-[0.65rem]" style="color: var(--sh-text-3);">Sin asignaciones aún.</div>';
                 return;
             }
 
@@ -613,7 +613,7 @@
                 .sort((a, b) => a.slideNumber - b.slideNumber)
                 .map(assignment => `
                     <div class="meeting-item">
-                        <span>Slide ${assignment.slideNumber}</span>
+                        <span>Diapositiva ${assignment.slideNumber}</span>
                         <span style="color: var(--sh-blue);">${assignment.participantName}</span>
                     </div>
                 `)
@@ -685,7 +685,7 @@
                 headers: { 'Content-Type': 'application/json' }
             });
             if (!res.ok) {
-                showToast('Could not start meeting session.');
+                showToast('No se pudo iniciar la sesión de reunión.');
                 return;
             }
             const session = await res.json();
@@ -696,7 +696,7 @@
             if (!PRESENTATION_ID) return;
             const displayName = participantNameInput.value.trim();
             if (!displayName) {
-                showToast('Enter participant name.');
+                showToast('Ingresa el nombre del participante.');
                 return;
             }
             const res = await fetch(MEETING_API + '/participants', {
@@ -705,7 +705,7 @@
                 body: JSON.stringify({ displayName, presenter: true })
             });
             if (!res.ok) {
-                showToast('Could not add participant.');
+                showToast('No se pudo añadir el participante.');
                 return;
             }
             participantNameInput.value = '';
@@ -717,7 +717,7 @@
             const slideNumber = Number(assignmentSlideSelect.value);
             const participantId = assignmentParticipantSelect.value;
             if (!slideNumber || !participantId) {
-                showToast('Select slide and participant.');
+                showToast('Selecciona diapositiva y participante.');
                 return;
             }
             const res = await fetch(MEETING_API + '/assignments', {
@@ -726,7 +726,7 @@
                 body: JSON.stringify({ slideNumber, participantId })
             });
             if (!res.ok) {
-                showToast('Could not save assignment.');
+                showToast('No se pudo guardar la asignación.');
                 return;
             }
             await loadAssignments();
@@ -734,14 +734,14 @@
 
         async function generateQuickSlide() {
             if (!PRESENTATION_ID) {
-                showToast('Missing presentationId in URL');
+                showToast('Falta presentationId en la URL.');
                 return;
             }
 
             const title = quickSlideTitleInput.value.trim();
             const body = quickSlideBodyInput.value.trim();
             if (!title) {
-                showToast('Enter a slide title');
+                showToast('Ingresa un título para la diapositiva.');
                 return;
             }
 
@@ -756,14 +756,14 @@
             });
 
             if (!res.ok) {
-                showToast('Could not create quick slide');
+                showToast('No se pudo crear la diapositiva rápida.');
                 return;
             }
 
             const data = await res.json();
             quickSlideTitleInput.value = '';
             quickSlideBodyInput.value = '';
-            showToast(`Slide ${data.slideNumber} created`);
+            showToast(`Diapositiva ${data.slideNumber} creada`);
             await loadSlidesCatalog();
             await fetchState();
         }
@@ -811,9 +811,9 @@
             if (!joinUrl.value) return;
             try {
                 await navigator.clipboard.writeText(joinUrl.value);
-                showToast('Meeting URL copied.');
+                showToast('URL de reunión copiada.');
             } catch (_) {
-                showToast('Could not copy URL.');
+                showToast('No se pudo copiar la URL.');
             }
         });
 
@@ -825,7 +825,7 @@
             const links = res.ok ? await res.json() : [];
             const container = document.getElementById('links-list-modal');
             if (links.length === 0) {
-                container.innerHTML = '<p class="font-mono text-xs" style="color: var(--sh-text-3);">No links yet.</p>';
+                container.innerHTML = '<p class="font-mono text-xs" style="color: var(--sh-text-3);">Aún no hay links.</p>';
                 return;
             }
             container.innerHTML = links.map(l => `
@@ -847,7 +847,7 @@
             const url = document.getElementById('new-link-url').value.trim();
             const icon = document.getElementById('new-link-icon').value.trim() || null;
             const description = document.getElementById('new-link-desc').value.trim() || null;
-            if (!title || !url) { alert('Title and URL are required.'); return; }
+            if (!title || !url) { alert('Título y URL son obligatorios.'); return; }
             try {
                 const res = await fetch(LINKS_API, {
                     method: 'POST',
@@ -864,7 +864,7 @@
         }
 
         async function deleteLink(linkId) {
-            if (!confirm('Delete this link?')) return;
+            if (!confirm('¿Eliminar este link?')) return;
             try {
                 const res = await fetch(LINKS_API + '/' + linkId, { method: 'DELETE' });
                 if (res.ok) { await loadLinksModal(); location.reload(); }
