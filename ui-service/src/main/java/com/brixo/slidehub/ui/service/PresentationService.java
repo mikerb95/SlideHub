@@ -273,9 +273,6 @@ public class PresentationService {
                 continue;
             }
 
-            String originalFilename = file.getOriginalFilename() != null
-                    ? file.getOriginalFilename()
-                    : slideNumber + ".png";
             String contentType = file.getContentType() != null ? file.getContentType() : "image/png";
             String s3Key = "slides/%s/%d.png".formatted(presentation.getId(), slideNumber);
             String s3Url = slideUploadService.upload(s3Key, imageBytes, contentType);
