@@ -103,6 +103,43 @@
             transition: width 0.3s ease;
         }
 
+        .repo-assistant-panel {
+            background: rgba(88, 166, 255, 0.06);
+            border: 1px solid rgba(88, 166, 255, 0.2);
+            border-radius: var(--sh-r-md);
+            padding: 0.9rem;
+        }
+
+        .repo-assistant-title {
+            font-family: var(--sh-font-mono);
+            font-size: 0.75rem;
+            color: var(--sh-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-bottom: 0.45rem;
+        }
+
+        .repo-assistant-status {
+            font-size: 0.82rem;
+            color: var(--sh-text-2);
+            margin-bottom: 0.5rem;
+        }
+
+        .repo-assistant-tip {
+            font-size: 0.75rem;
+            color: var(--sh-text-3);
+            line-height: 1.35;
+            margin-top: 0.5rem;
+        }
+
+        .repo-assistant-meta {
+            font-family: var(--sh-font-mono);
+            font-size: 0.68rem;
+            color: var(--sh-text-3);
+            margin-top: 0.35rem;
+        }
+
         /* ── Note cards ── */
         .note-card {
             background: rgba(88, 166, 255, 0.06);
@@ -316,8 +353,19 @@
                 <button type="button" class="sh-btn sh-btn-primary" id="btn-analyze-repo" onclick="analyzeRepo()">
                     <i class="fa-solid fa-magnifying-glass-chart mr-1"></i> Analizar Repositorio
                 </button>
-                <div id="repo-progress" class="hidden mt-3 font-mono text-xs text-[var(--sh-text-3)]">
-                    <i class="fa-solid fa-spinner fa-spin mr-1"></i>Analizando repositorio con Gemini...
+                <div id="repo-progress" class="repo-assistant-panel hidden mt-3">
+                    <div class="repo-assistant-title">
+                        <i class="fa-solid fa-brain"></i>
+                        <span>Gemini está trabajando...</span>
+                    </div>
+                    <div id="repo-status-text" class="repo-assistant-status">Analizando estructura del repositorio...</div>
+                    <div class="progress-track">
+                        <div id="repo-progress-fill" class="progress-fill" style="width: 8%"></div>
+                    </div>
+                    <div id="repo-tip-text" class="repo-assistant-tip">
+                        Tip: un repositorio con README claro y estructura consistente mejora la calidad de las notas IA.
+                    </div>
+                    <div id="repo-meta-text" class="repo-assistant-meta">Iniciando...</div>
                 </div>
                 <div id="repo-result" class="hidden mt-3 note-card">
                     <div class="font-mono text-xs text-[var(--sh-green)] mb-2"><i
@@ -864,6 +912,47 @@
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
+        let repoTipTimer = null;
+        const repoTips = [
+            'Tip: usa nombres de slides descriptivos para facilitar la revisión posterior de notas.',
+            'Tip: puedes continuar al siguiente paso cuando el resumen técnico aparezca en verde.',
+            'Tip: si el servicio IA está iniciando, el sistema reintentará automáticamente.',
+            'Tip: agregar la URL del repo en este paso mejora mucho las notas del Paso 3.',
+            'Tip: después podrás editar y ajustar las notas generadas antes de presentar.'
+        ];
+
+        function updateRepoAssistantPanel(statusText, progressPct, metaText) {
+            const status = document.getElementById('repo-status-text');
+            const fill = document.getElementById('repo-progress-fill');
+            const meta = document.getElementById('repo-meta-text');
+            if (status) status.textContent = statusText;
+            if (fill) fill.style.width = Math.max(8, Math.min(98, progressPct)) + '%';
+            if (meta) meta.textContent = metaText;
+        }
+
+        function startRepoAssistantPanel() {
+            const panel = document.getElementById('repo-progress');
+            const tip = document.getElementById('repo-tip-text');
+            panel.classList.remove('hidden');
+            updateRepoAssistantPanel('Analizando estructura del repositorio...', 12, 'Preparando análisis...');
+            if (tip) tip.textContent = repoTips[0];
+            let tipIndex = 0;
+            if (repoTipTimer) clearInterval(repoTipTimer);
+            repoTipTimer = setInterval(() => {
+                tipIndex = (tipIndex + 1) % repoTips.length;
+                if (tip) tip.textContent = repoTips[tipIndex];
+            }, 6000);
+        }
+
+        function stopRepoAssistantPanel() {
+            const panel = document.getElementById('repo-progress');
+            panel.classList.add('hidden');
+            if (repoTipTimer) {
+                clearInterval(repoTipTimer);
+                repoTipTimer = null;
+            }
+        }
+
         // ── STEP 2: Repo Analysis ──
         async function analyzeRepo() {
             const repoUrl = document.getElementById('repo-url').value.trim();
@@ -871,8 +960,7 @@
             W.repoUrl = repoUrl;
             hideError('repo-error');
             document.getElementById('btn-analyze-repo').disabled = true;
-            document.getElementById('repo-progress').classList.remove('hidden');
-            document.getElementById('repo-progress').innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Analizando repositorio con Gemini...';
+            startRepoAssistantPanel();
             document.getElementById('repo-result').classList.add('hidden');
 
             try {
@@ -881,6 +969,7 @@
                 const maxAttempts = 3;
 
                 for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                    updateRepoAssistantPanel('Conectando con Gemini...', 25 + (attempt * 15), 'Intento ' + attempt + ' de ' + maxAttempts);
                     res = await fetch('/api/ai/analyze-repo', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', ...csrfHeaders() },
@@ -895,12 +984,16 @@
 
                     if (attempt < maxAttempts) {
                         const waitSeconds = attempt * 4;
-                        document.getElementById('repo-progress').innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Servicio IA iniciando en Render. Reintentando en ' + waitSeconds + 's...';
+                        updateRepoAssistantPanel(
+                            'Servicio IA iniciando en Render...',
+                            35 + (attempt * 10),
+                            'Reintentando en ' + waitSeconds + 's'
+                        );
                         await sleep(waitSeconds * 1000);
                     }
                 }
 
-                document.getElementById('repo-progress').classList.add('hidden');
+                stopRepoAssistantPanel();
                 document.getElementById('btn-analyze-repo').disabled = false;
                 if (res.ok) {
                     document.getElementById('repo-result').classList.remove('hidden');
@@ -918,7 +1011,7 @@
                     }
                 }
             } catch (e) {
-                document.getElementById('repo-progress').classList.add('hidden');
+                stopRepoAssistantPanel();
                 document.getElementById('btn-analyze-repo').disabled = false;
                 showError('repo-error', 'Error de conexion.');
             }
