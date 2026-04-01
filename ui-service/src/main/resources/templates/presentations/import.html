@@ -7,7 +7,8 @@
     <title>Importar presentación — SlideHub</title>
     <th:block th:replace="~{fragments/head :: assets}"></th:block>
     <style>
-        .folder-item, .image-item {
+        .folder-item,
+        .image-item {
             cursor: pointer;
             padding: 0.4rem 0.7rem;
             border-radius: var(--sh-r-md);
@@ -18,8 +19,18 @@
             font-size: 0.8rem;
             color: var(--sh-text-2);
         }
-        .folder-item:hover, .image-item:hover { border-color: var(--sh-blue); color: var(--sh-text-1); }
-        .folder-item.selected { background: var(--sh-blue-dim); border-color: var(--sh-blue); color: var(--sh-blue); }
+
+        .folder-item:hover,
+        .image-item:hover {
+            border-color: var(--sh-blue);
+            color: var(--sh-text-1);
+        }
+
+        .folder-item.selected {
+            background: var(--sh-blue-dim);
+            border-color: var(--sh-blue);
+            color: var(--sh-blue);
+        }
 
         #upload-drop-zone {
             border: 2px dashed var(--sh-border-active);
@@ -29,6 +40,7 @@
             transition: border-color var(--sh-t-fast), background var(--sh-t-fast);
             cursor: pointer;
         }
+
         #upload-drop-zone.drag-over {
             border-color: var(--sh-blue);
             background: var(--sh-blue-dim);
@@ -70,38 +82,43 @@
                     </div>
                     <div id="presentations-list" class="flex flex-col gap-2">
                         <div th:if="${#lists.isEmpty(presentations)}"
-                             class="text-center py-6 font-mono text-xs text-[var(--sh-text-3)]">
+                            class="text-center py-6 font-mono text-xs text-[var(--sh-text-3)]">
                             Aún no tienes presentaciones.
                         </div>
                         <div th:each="p : ${presentations}"
-                             class="bg-[var(--sh-deep)] border border-[var(--sh-border)] rounded-tech p-3">
+                            class="bg-[var(--sh-deep)] border border-[var(--sh-border)] rounded-tech p-3">
                             <div class="flex justify-between items-start mb-2">
                                 <div>
-                                                                        <div class="text-sm font-medium text-[var(--sh-text-1)]" th:text="${p.name()}">Nombre</div>
-                                                                        <div class="font-mono text-xs text-[var(--sh-text-3)]" th:text="${p.totalSlides()} + ' slides'">0 diapositivas</div>
+                                    <div class="text-sm font-medium text-[var(--sh-text-1)]" th:text="${p.name()}">
+                                        Nombre</div>
+                                    <div class="font-mono text-xs text-[var(--sh-text-3)]"
+                                        th:text="${p.totalSlides()} + ' slides'">0 diapositivas</div>
                                 </div>
                                 <span class="sh-badge text-[0.6rem]"
-                                      th:classappend="${p.sourceType() == 'DRIVE'} ? 'sh-badge-blue' : 'sh-badge-green'"
-                                                                            th:text="${p.sourceType() == 'DRIVE' ? 'Drive' : 'Subida'}">
+                                    th:classappend="${p.sourceType() == 'DRIVE'} ? 'sh-badge-blue' : 'sh-badge-green'"
+                                    th:text="${p.sourceType() == 'DRIVE' ? 'Drive' : 'Subida'}">
                                 </span>
                             </div>
                             <div class="flex gap-1.5 flex-wrap">
                                 <a th:href="@{/main-panel(presentationId=${p.id()})}"
-                                   class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
+                                    class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
                                     <i class="fa-solid fa-table-cells-large"></i> Panel
                                 </a>
                                 <a th:href="@{/presenter(presentationId=${p.id()})}"
-                                   class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
+                                    class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
                                     <i class="fa-solid fa-chalkboard"></i> Presentar
                                 </a>
                                 <a th:href="@{/presentations/{id}/generate-notes(id=${p.id()})}"
-                                   class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
+                                    class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
                                     <i class="fa-solid fa-robot"></i> Notas_IA
                                 </a>
-                                <form th:action="@{/presentations/{id}/delete(id=${p.id()})}" method="post" class="inline"
-                                      onsubmit="return confirm('¿Eliminar esta presentación? Esta acción no se puede deshacer.');">
-                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf}">
-                                    <button type="submit" class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2 text-[var(--sh-red)]">
+                                <form th:action="@{/presentations/{id}/delete(id=${p.id()})}" method="post"
+                                    class="inline"
+                                    onsubmit="return confirm('¿Eliminar esta presentación? Esta acción no se puede deshacer.');">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"
+                                        th:if="${_csrf}">
+                                    <button type="submit"
+                                        class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2 text-[var(--sh-red)]">
                                         <i class="fa-solid fa-trash"></i> Eliminar
                                     </button>
                                 </form>
@@ -133,7 +150,8 @@
                     <div id="panel-drive">
                         <div th:if="${!hasGoogleToken}" class="sh-alert sh-alert-warn mb-4">
                             <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
-                            <span>Vincula tu <a href="/oauth2/authorization/google" class="underline">cuenta de Google</a> para acceder a Drive.</span>
+                            <span>Vincula tu <a href="/oauth2/authorization/google" class="underline">cuenta de
+                                    Google</a> para acceder a Drive.</span>
                         </div>
 
                         <div th:if="${hasGoogleToken}">
@@ -144,11 +162,13 @@
                                 </div>
                                 <div>
                                     <label class="sh-input-label">Repositorio GitHub (opcional)</label>
-                                    <input type="url" id="drive-repo" class="sh-input" placeholder="https://github.com/...">
+                                    <input type="url" id="drive-repo" class="sh-input"
+                                        placeholder="https://github.com/...">
                                 </div>
                                 <div class="md:col-span-2">
                                     <label class="sh-input-label">Descripción</label>
-                                    <input type="text" id="drive-desc" class="sh-input" placeholder="Descripción opcional">
+                                    <input type="text" id="drive-desc" class="sh-input"
+                                        placeholder="Descripción opcional">
                                 </div>
                             </div>
 
@@ -173,7 +193,8 @@
 
                             <div id="drive-error" class="sh-alert sh-alert-error hidden mb-3"></div>
 
-                            <button type="button" class="sh-btn sh-btn-primary" id="btn-import-drive" onclick="importFromDrive()" disabled>
+                            <button type="button" class="sh-btn sh-btn-primary" id="btn-import-drive"
+                                onclick="importFromDrive()" disabled>
                                 <i class="fa-solid fa-download"></i> Importar_desde_Drive
                             </button>
                             <div id="drive-progress" class="hidden mt-2 font-mono text-xs text-[var(--sh-text-3)]">
@@ -191,7 +212,8 @@
                             </div>
                             <div>
                                 <label class="sh-input-label">Repositorio GitHub (opcional)</label>
-                                <input type="url" id="upload-repo" class="sh-input" placeholder="https://github.com/...">
+                                <input type="url" id="upload-repo" class="sh-input"
+                                    placeholder="https://github.com/...">
                             </div>
                             <div class="md:col-span-2">
                                 <label class="sh-input-label">Descripción</label>
@@ -201,17 +223,20 @@
 
                         <div id="upload-drop-zone" onclick="document.getElementById('file-input').click()">
                             <i class="fa-solid fa-cloud-arrow-up text-2xl mb-2 block text-[var(--sh-text-3)]"></i>
-                            <p class="text-sm text-[var(--sh-text-2)] mb-1">Arrastra imágenes aquí o haz clic para seleccionar</p>
-                            <p class="font-mono text-xs text-[var(--sh-text-3)]">PNG, JPG, GIF, WEBP — ordenadas por nombre</p>
+                            <p class="text-sm text-[var(--sh-text-2)] mb-1">Arrastra imágenes aquí o haz clic para
+                                seleccionar</p>
+                            <p class="font-mono text-xs text-[var(--sh-text-3)]">PNG, JPG, GIF, WEBP — ordenadas por
+                                nombre</p>
                             <input type="file" id="file-input" accept=".png,.jpg,.jpeg,.gif,.webp" multiple
-                                   class="hidden" onchange="onFilesSelected(event)">
+                                class="hidden" onchange="onFilesSelected(event)">
                         </div>
 
                         <div id="file-preview" class="mt-3 flex flex-wrap gap-2"></div>
                         <div id="upload-error" class="sh-alert sh-alert-error hidden mt-2"></div>
 
-                        <button type="button" class="sh-btn sh-btn-green mt-4" id="btn-import-upload" onclick="importFromUpload()" disabled
-                                style="background: var(--sh-green); border-color: var(--sh-green); color: var(--sh-deep);">
+                        <button type="button" class="sh-btn sh-btn-green mt-4" id="btn-import-upload"
+                            onclick="importFromUpload()" disabled
+                            style="background: var(--sh-green); border-color: var(--sh-green); color: var(--sh-deep);">
                             <i class="fa-solid fa-upload"></i> Subir_presentación
                         </button>
                         <div id="upload-progress" class="hidden mt-2 font-mono text-xs text-[var(--sh-text-3)]">
