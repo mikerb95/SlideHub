@@ -108,10 +108,11 @@
                                 th:text="'@' + ${user?.githubUsername}">@usuario</span>
                         </div>
                     </div>
-                      <form th:if="${githubLinked}" th:action="@{/auth/unlink/github}" method="post"
-                          class="provider-actions flex items-center gap-2"
-                          onsubmit="return confirm('¿Seguro que deseas desvincular GitHub?');">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf}">
+                    <form th:if="${githubLinked}" th:action="@{/auth/unlink/github}" method="post"
+                        class="provider-actions flex items-center gap-2"
+                        onsubmit="return confirm('¿Seguro que deseas desvincular GitHub?');">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"
+                            th:if="${_csrf}">
                         <span class="sh-badge-green">
                             <i class="fa-solid fa-link text-[0.55rem]"></i> Vinculado
                         </span>
@@ -119,7 +120,8 @@
                             Desvincular
                         </button>
                     </form>
-                    <a th:unless="${githubLinked}" th:href="@{/auth/link/github}" class="sh-btn text-xs py-1 px-2.5 provider-actions">
+                    <a th:unless="${githubLinked}" th:href="@{/auth/link/github}"
+                        class="sh-btn text-xs py-1 px-2.5 provider-actions">
                         Vincular
                     </a>
                 </div>
@@ -137,10 +139,11 @@
                                 th:text="${user?.googleEmail}">correo@gmail.com</span>
                         </div>
                     </div>
-                      <form th:if="${googleLinked}" th:action="@{/auth/unlink/google}" method="post"
-                          class="provider-actions flex items-center gap-2"
-                          onsubmit="return confirm('¿Seguro que deseas desvincular Google?');">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf}">
+                    <form th:if="${googleLinked}" th:action="@{/auth/unlink/google}" method="post"
+                        class="provider-actions flex items-center gap-2"
+                        onsubmit="return confirm('¿Seguro que deseas desvincular Google?');">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"
+                            th:if="${_csrf}">
                         <span class="sh-badge-green">
                             <i class="fa-solid fa-link text-[0.55rem]"></i> Vinculado
                         </span>
@@ -148,7 +151,8 @@
                             Desvincular
                         </button>
                     </form>
-                    <a th:unless="${googleLinked}" th:href="@{/auth/link/google}" class="sh-btn text-xs py-1 px-2.5 provider-actions">
+                    <a th:unless="${googleLinked}" th:href="@{/auth/link/google}"
+                        class="sh-btn text-xs py-1 px-2.5 provider-actions">
                         Vincular
                     </a>
                 </div>
