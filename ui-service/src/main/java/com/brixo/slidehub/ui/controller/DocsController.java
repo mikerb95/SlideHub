@@ -11,7 +11,7 @@ public class DocsController {
         return "ai-guide";
     }
 
-    @GetMapping({"/calidad", "/7calidad"})
+    @GetMapping({ "/calidad", "/7calidad" })
     public String qualityGuide() {
         return "calidad";
     }
