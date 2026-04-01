@@ -134,6 +134,35 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return userRepository.save(newUser);
     }
 
+    // ── Google Drive ──────────────────────────────────────────────────────────
+
+    /**
+     * Maneja la autorización de Google Drive (no es login: el usuario ya existe).
+     * Encuentra el usuario por sesión activa o por email; no crea cuentas nuevas.
+     */
+    private User processDriveUser(OAuth2User oauth2User) {
+        // Si hay sesión activa, reutilizar ese usuario
+        Optional<User> authenticated = findAuthenticatedUser();
+        if (authenticated.isPresent()) {
+            log.debug("Drive auth: usando usuario autenticado ({})", authenticated.get().getUsername());
+            return authenticated.get();
+        }
+
+        // Fallback: buscar por email del token de Drive
+        String email = oauth2User.getAttribute("email");
+        if (email != null) {
+            Optional<User> byEmail = userRepository.findByEmail(email);
+            if (byEmail.isPresent()) {
+                log.debug("Drive auth: usuario encontrado por email ({})", email);
+                return byEmail.get();
+            }
+        }
+
+        throw new OAuth2AuthenticationException(
+                new OAuth2Error("user_not_found"),
+                "Drive auth: no se encontró usuario para " + email);
+    }
+
     // ── Utilidades ────────────────────────────────────────────────────────────
 
     /**
