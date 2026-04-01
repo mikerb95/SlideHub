@@ -62,7 +62,7 @@ public class PresentationNotesController {
         Optional<Presentation> opt = presentationService.getPresentation(user.getId(), id);
 
         if (opt.isEmpty()) {
-            return "redirect:/presentations/import";
+            return "redirect:/presentations";
         }
 
         Presentation presentation = opt.get();
