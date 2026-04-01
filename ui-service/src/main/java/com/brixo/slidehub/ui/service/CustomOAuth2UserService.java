@@ -49,6 +49,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         try {
             User user = switch (registrationId) {
                 case "github" -> processGithubUser(request, oauth2User);
+                case "google-drive" -> processDriveUser(oauth2User);
                 default -> throw new OAuth2AuthenticationException(
                         new OAuth2Error("unsupported_provider"),
                         "Proveedor OAuth2 no soportado: " + registrationId);
