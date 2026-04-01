@@ -379,7 +379,8 @@ public class AuthController {
         userRepository.save(user);
 
         populateProfileModel(model, user);
-        model.addAttribute("providerMessage", "Contraseña creada correctamente. Ya puedes desvincular proveedores si lo deseas.");
+        model.addAttribute("providerMessage",
+                "Contraseña creada correctamente. Ya puedes desvincular proveedores si lo deseas.");
         return "auth/profile";
     }
 
