@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nueva Presentacion — SlideHub</title>
+    <title>Nueva presentación — SlideHub</title>
     <th:block th:replace="~{fragments/head :: assets}"></th:block>
     <meta name="_csrf" th:content="${_csrf.token}">
     <meta name="_csrf_header" th:content="${_csrf.headerName}">
@@ -220,7 +220,7 @@
         <div class="wizard-step active" id="step-1">
             <div class="sh-card p-6">
                 <div class="sh-label mb-1"><i class="fa-solid fa-upload mr-1"></i>PASO 1</div>
-                <h2 class="font-brand text-2xl mb-2 text-[var(--sh-text-1)]">Sube tu presentacion</h2>
+                <h2 class="font-brand text-2xl mb-2 text-[var(--sh-text-1)]">Sube tu presentación</h2>
                 <p class="text-sm text-[var(--sh-text-3)] mb-5">Importa las diapositivas desde Google Drive o sube los
                     archivos desde tu PC.</p>
 
@@ -228,10 +228,10 @@
                 <div class="grid md:grid-cols-2 gap-3 mb-5">
                     <div>
                         <label class="sh-input-label">Nombre *</label>
-                        <input type="text" id="pres-name" class="sh-input" placeholder="Mi presentacion">
+                        <input type="text" id="pres-name" class="sh-input" placeholder="Mi presentación">
                     </div>
                     <div>
-                        <label class="sh-input-label">Descripcion</label>
+                        <label class="sh-input-label">Descripción</label>
                         <input type="text" id="pres-desc" class="sh-input" placeholder="Opcional">
                     </div>
                 </div>
@@ -250,7 +250,7 @@
                 <div id="panel-upload">
                     <div id="upload-drop-zone" onclick="document.getElementById('file-input').click()">
                         <i class="fa-solid fa-cloud-arrow-up text-2xl mb-2 block text-[var(--sh-text-3)]"></i>
-                        <p class="text-sm text-[var(--sh-text-2)] mb-1">Arrastra imagenes aqui o haz clic</p>
+                        <p class="text-sm text-[var(--sh-text-2)] mb-1">Arrastra imágenes aquí o haz clic</p>
                         <p class="font-mono text-xs text-[var(--sh-text-3)]">PNG, JPG, GIF, WEBP</p>
                         <input type="file" id="file-input" accept=".png,.jpg,.jpeg,.gif,.webp" multiple class="hidden"
                             onchange="onFilesSelected(event)">
@@ -259,7 +259,7 @@
                     <div id="upload-error" class="sh-alert sh-alert-error hidden mt-2"></div>
                     <button type="button" class="sh-btn sh-btn-primary mt-4" id="btn-upload" onclick="doUpload()"
                         disabled>
-                        <i class="fa-solid fa-upload mr-1"></i> Subir Presentacion
+                        <i class="fa-solid fa-upload mr-1"></i> Subir presentación
                     </button>
                     <div id="upload-progress" class="hidden mt-2 font-mono text-xs text-[var(--sh-text-3)]">
                         <i class="fa-solid fa-spinner fa-spin mr-1"></i>Subiendo archivos...
@@ -311,7 +311,7 @@
                                 <div class="flex items-center gap-2">
                                     <i class="fa-solid fa-folder-open text-[var(--sh-blue)]"></i>
                                     <span class="font-mono text-sm text-[var(--sh-text-1)]" id="drive-sel-name"></span>
-                                    <span class="sh-badge text-[0.6rem]" id="drive-sel-count">0 imagenes</span>
+                                    <span class="sh-badge text-[0.6rem]" id="drive-sel-count">0 imágenes</span>
                                 </div>
                                 <button type="button" class="sh-btn text-xs py-0.5 px-2" onclick="confirmDriveFolder()">
                                     <i class="fa-solid fa-check mr-1"></i>Seleccionar
@@ -346,8 +346,8 @@
                 <div class="mb-4">
                     <label class="sh-input-label">URL del Repositorio</label>
                     <input type="url" id="repo-url" class="sh-input" placeholder="https://github.com/usuario/proyecto">
-                    <div class="text-xs text-[var(--sh-text-3)] mt-1">Gemini usara el codigo fuente para generar notas
-                        mas precisas.</div>
+                    <div class="text-xs text-[var(--sh-text-3)] mt-1">Gemini usará el código fuente para generar notas
+                        más precisas.</div>
                 </div>
 
                 <button type="button" class="sh-btn sh-btn-primary" id="btn-analyze-repo" onclick="analyzeRepo()">
@@ -388,7 +388,7 @@
         <div class="wizard-step" id="step-3">
             <div class="sh-card p-6">
                 <div class="sh-label mb-1"><i class="fa-solid fa-robot mr-1"></i>PASO 3</div>
-                <h2 class="font-brand text-2xl mb-2 text-[var(--sh-text-1)]">Analisis IA de diapositivas</h2>
+                <h2 class="font-brand text-2xl mb-2 text-[var(--sh-text-1)]">Análisis IA de diapositivas</h2>
                 <p class="text-sm text-[var(--sh-text-3)] mb-5">Gemini analiza visualmente cada diapositiva y Groq
                     genera notas de apoyo para el presentador.</p>
 
@@ -400,11 +400,11 @@
                     </div>
                     <div class="flex items-center gap-2 mb-1.5 text-[var(--sh-text-3)]">
                         <i class="fa-solid fa-code-branch" style="color: var(--sh-amber);"></i>
-                        <span>Gemini — extraccion de contexto del repositorio</span>
+                        <span>Gemini — extracción de contexto del repositorio</span>
                     </div>
                     <div class="flex items-center gap-2 text-[var(--sh-text-3)]">
                         <i class="fa-solid fa-bolt" style="color: var(--sh-green);"></i>
-                        <span>Groq — generacion de notas estructuradas</span>
+                        <span>Groq — generación de notas estructuradas</span>
                     </div>
                 </div>
 
@@ -477,7 +477,7 @@
                     </button>
                 </div>
                 <div id="participants-list" class="space-y-2">
-                    <div class="text-xs font-mono text-[var(--sh-text-3)]">Sin participantes aun.</div>
+                    <div class="text-xs font-mono text-[var(--sh-text-3)]">Sin participantes aún.</div>
                 </div>
                 <div id="participant-error" class="sh-alert sh-alert-error hidden mt-3"></div>
             </div>
@@ -490,11 +490,11 @@
             <div class="sh-card p-6 text-center">
                 <div class="sh-label mb-1"><i class="fa-solid fa-qrcode mr-1"></i>PASO 6</div>
                 <h2 class="font-brand text-2xl mb-2 text-[var(--sh-text-1)]">Listo para presentar</h2>
-                <p class="text-sm text-[var(--sh-text-3)] mb-5">Inicia la sesion y comparte el QR con tu equipo.</p>
+                <p class="text-sm text-[var(--sh-text-3)] mb-5">Inicia la sesión y comparte el QR con tu equipo.</p>
 
                 <div id="session-not-started">
                     <button type="button" class="sh-btn sh-btn-primary text-base px-8 py-3" onclick="startSession()">
-                        <i class="fa-solid fa-play mr-2"></i> Iniciar Sesion
+                        <i class="fa-solid fa-play mr-2"></i> Iniciar sesión
                     </button>
                 </div>
 
@@ -1004,10 +1004,26 @@
             }
         }
 
+        function normalizeRepoUrl(rawValue) {
+            if (!rawValue) {
+                return '';
+            }
+            const trimmed = rawValue.trim();
+            if (!trimmed) {
+                return '';
+            }
+            if (/^https?:\/\//i.test(trimmed)) {
+                return trimmed;
+            }
+            return 'https://' + trimmed;
+        }
+
         // ── STEP 2: Repo Analysis ──
         async function analyzeRepo() {
-            const repoUrl = document.getElementById('repo-url').value.trim();
+            const repoInput = document.getElementById('repo-url');
+            const repoUrl = normalizeRepoUrl(repoInput.value);
             if (!repoUrl) { showError('repo-error', 'Ingresa una URL de repositorio.'); return; }
+            repoInput.value = repoUrl;
             W.repoUrl = repoUrl;
             hideError('repo-error');
             document.getElementById('btn-analyze-repo').disabled = true;
@@ -1074,6 +1090,16 @@
                 showError('notes-error', 'Primero crea/importa la presentacion en el Paso 1.');
                 return;
             }
+
+            const repoInput = document.getElementById('repo-url');
+            if (repoInput) {
+                const normalizedRepo = normalizeRepoUrl(repoInput.value);
+                if (normalizedRepo) {
+                    repoInput.value = normalizedRepo;
+                    W.repoUrl = normalizedRepo;
+                }
+            }
+
             document.getElementById('btn-generate-notes').disabled = true;
             startNotesAssistantPanel();
             document.getElementById('notes-success').classList.add('hidden');

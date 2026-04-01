@@ -121,7 +121,7 @@
                             th:classappend="${presentation.sourceType.name() == 'DRIVE'} ? 'sh-badge-blue' : 'sh-badge-green'"
                             th:text="${presentation.sourceType.name() == 'DRIVE' ? 'Google Drive' : 'Carga manual'}">
                         </span>
-                        <div class="text-[var(--sh-text-1)] font-semibold mt-1" th:text="${presentation.name}">Name
+                        <div class="text-[var(--sh-text-1)] font-semibold mt-1" th:text="${presentation.name}">Nombre
                         </div>
                         <div class="text-[var(--sh-text-3)] text-xs font-mono"
                             th:text="${totalSlides} + ' diapositivas'">0
@@ -144,7 +144,7 @@
                     <div class="rounded p-3 mb-4" style="background: var(--sh-deep); font-size: 0.75rem;">
                         <div class="flex items-center gap-2 mb-1.5 text-[var(--sh-text-3)]">
                             <i class="fa-solid fa-eye" style="color: var(--sh-blue);"></i>
-                            <span>Gemini Vision — análisis visual de slides</span>
+                            <span>Gemini Vision — análisis visual de diapositivas</span>
                         </div>
                         <div class="flex items-center gap-2 mb-1.5 text-[var(--sh-text-3)]">
                             <i class="fa-solid fa-code-branch" style="color: var(--sh-amber);"></i>
