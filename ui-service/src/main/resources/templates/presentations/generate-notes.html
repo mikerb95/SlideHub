@@ -78,7 +78,7 @@
                     <div class="mb-4">
                         <span class="sh-badge mb-2"
                               th:classappend="${presentation.sourceType.name() == 'DRIVE'} ? 'sh-badge-blue' : 'sh-badge-green'"
-                              th:text="${presentation.sourceType.name() == 'DRIVE' ? 'Google_Drive' : 'Manual_Upload'}">
+                              th:text="${presentation.sourceType.name() == 'DRIVE' ? 'Google Drive' : 'Carga manual'}">
                         </span>
                         <div class="text-[var(--sh-text-1)] font-semibold mt-1" th:text="${presentation.name}">Name</div>
                         <div class="text-[var(--sh-text-3)] text-xs font-mono" th:text="${totalSlides} + ' slides'">0 slides</div>
@@ -87,12 +87,12 @@
                     <!-- Repo URL -->
                     <div class="mb-4">
                         <label class="block text-xs font-mono text-[var(--sh-text-3)] mb-1">
-                            <i class="fa-brands fa-github mr-1"></i>REPO_URL
+                            <i class="fa-brands fa-github mr-1"></i>URL DEL REPOSITORIO
                         </label>
                         <input type="url" id="repo-url" class="sh-input w-full"
                                placeholder="https://github.com/user/repo" th:value="${presentation.repoUrl}">
                         <div class="text-[var(--sh-text-3)] text-xs mt-1">
-                            Gemini analyzes the repo for more precise notes.
+                            Gemini analiza el repositorio para notas más precisas.
                         </div>
                     </div>
 
