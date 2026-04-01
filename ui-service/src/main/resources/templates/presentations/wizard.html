@@ -981,14 +981,31 @@
             const container = document.getElementById('notes-review-container');
             container.innerHTML = '<div class="text-center py-6 text-[var(--sh-text-3)] font-mono text-xs"><i class="fa-solid fa-spinner fa-spin mr-1"></i>Cargando notas...</div>';
 
+            if (!hasPresentationContext()) {
+                container.innerHTML = '<div class="text-center py-6 text-[var(--sh-text-3)] font-mono text-xs">Primero crea/importa la presentación en el Paso 1.</div>';
+                return;
+            }
+
             try {
                 // Load slides
                 const slidesRes = await fetch('/api/presentations/' + W.presentationId + '/slides');
-                const slides = slidesRes.ok ? await slidesRes.json() : [];
+                if (slidesRes.redirected && slidesRes.url.includes('/auth/login')) {
+                    container.innerHTML = '<div class="text-center py-6 text-[var(--sh-text-3)] font-mono text-xs">Tu sesión expiró. Inicia sesión nuevamente.</div>';
+                    return;
+                }
+                const slidesPayload = slidesRes.ok ? await readJsonSafe(slidesRes) : {};
+                const slides = Array.isArray(slidesPayload)
+                    ? slidesPayload
+                    : (Array.isArray(slidesPayload.slides) ? slidesPayload.slides : []);
 
                 // Load notes
                 const notesRes = await fetch('/api/presentations/' + W.presentationId + '/notes');
-                const notes = notesRes.ok ? await notesRes.json() : [];
+                if (notesRes.redirected && notesRes.url.includes('/auth/login')) {
+                    container.innerHTML = '<div class="text-center py-6 text-[var(--sh-text-3)] font-mono text-xs">Tu sesión expiró. Inicia sesión nuevamente.</div>';
+                    return;
+                }
+                const notesPayload = notesRes.ok ? await readJsonSafe(notesRes) : [];
+                const notes = Array.isArray(notesPayload) ? notesPayload : [];
 
                 if (slides.length === 0) {
                     container.innerHTML = '<div class="text-center py-6 text-[var(--sh-text-3)] font-mono text-xs">No hay diapositivas.</div>';
