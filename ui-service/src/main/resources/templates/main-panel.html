@@ -637,6 +637,25 @@
             renderSession(session);
         }
 
+        async function heartbeatSession() {
+            if (!PRESENTATION_ID || !activeSession) return;
+            try {
+                const res = await fetch(MEETING_API + '/session/heartbeat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (res.status === 204) {
+                    renderSession(null);
+                    return;
+                }
+                if (!res.ok) {
+                    return;
+                }
+                const session = await res.json();
+                renderSession(session);
+            } catch (_) { }
+        }
+
         async function startSession() {
             if (!PRESENTATION_ID) return;
             const res = await fetch(MEETING_API + '/session/start', {
@@ -838,6 +857,7 @@
             loadParticipants();
             loadAssignments();
             loadActiveSession();
+            setInterval(heartbeatSession, 30000);
         }
         loadSlidesCatalog().finally(fetchState);
         setInterval(fetchState, POLL_INTERVAL_MS);

@@ -103,6 +103,19 @@ public class MeetingController {
         }
     }
 
+    @PostMapping("/session/heartbeat")
+    public ResponseEntity<?> heartbeatSession(@PathVariable String presentationId,
+            Authentication authentication) {
+        try {
+            String userId = resolveUser(authentication).getId();
+            return meetingService.heartbeatSession(userId, presentationId)
+                    .<ResponseEntity<?>>map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.noContent().build());
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        }
+    }
+
     @GetMapping("/join-options")
     public ResponseEntity<?> joinOptions(@PathVariable String presentationId,
             @RequestParam("joinToken") String joinToken) {

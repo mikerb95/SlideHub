@@ -407,6 +407,24 @@
             sessionStarted: false
         };
 
+        function hasPresentationContext() {
+            return !!W.presentationId && W.presentationId !== 'null' && W.presentationId !== 'undefined';
+        }
+
+        function persistPresentationIdInUrl() {
+            if (!hasPresentationContext()) return;
+            const url = new URL(window.location.href);
+            url.searchParams.set('presentationId', W.presentationId);
+            history.replaceState(null, '', url.pathname + url.search + url.hash);
+        }
+
+        function restorePresentationIdFromUrl() {
+            const fromUrl = new URL(window.location.href).searchParams.get('presentationId');
+            if (fromUrl && fromUrl !== 'null' && fromUrl !== 'undefined') {
+                W.presentationId = fromUrl;
+            }
+        }
+
         // ── Step Navigation ──
         function goToStep(n) {
             if (n < 1 || n > W.totalSteps) return;
@@ -553,6 +571,7 @@
                 if (res.ok && data.success) {
                     W.presentationId = data.presentationId;
                     W.totalSlides = data.totalSlides || selectedFiles.length;
+                    persistPresentationIdInUrl();
                     onUploadComplete();
                 } else {
                     showError('upload-error', data.error || 'Error al subir.');
@@ -721,6 +740,7 @@
                 if (res.ok && data.success) {
                     W.presentationId = data.presentationId;
                     W.totalSlides = data.totalSlides || 0;
+                    persistPresentationIdInUrl();
                     onUploadComplete();
                 } else {
                     showError('drive-error', data.error || 'Error de importacion.');
@@ -750,7 +770,11 @@
             document.getElementById('repo-result').classList.add('hidden');
 
             try {
-                const res = await fetch('/api/presentations/' + W.presentationId + '/analyze-repo?repoUrl=' + encodeURIComponent(repoUrl), { method: 'POST', headers: csrfHeaders() });
+                const res = await fetch('/api/ai/analyze-repo', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...csrfHeaders() },
+                    body: JSON.stringify({ repoUrl })
+                });
                 const data = await res.json();
                 document.getElementById('repo-progress').classList.add('hidden');
                 document.getElementById('btn-analyze-repo').disabled = false;
@@ -966,6 +990,7 @@
 
         // ── Init ──
         (function init() {
+            restorePresentationIdFromUrl();
             showImportTab('upload');
             updateNavButtons();
 

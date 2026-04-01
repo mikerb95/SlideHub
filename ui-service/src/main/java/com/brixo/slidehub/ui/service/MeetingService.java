@@ -35,6 +35,9 @@ public class MeetingService {
     @Value("${slidehub.base-url:http://localhost:8080}")
     private String baseUrl;
 
+    @Value("${slidehub.meeting.session-ttl-minutes:120}")
+    private long sessionTtlMinutes;
+
     public MeetingService(PresentationRepository presentationRepository,
             PresentationParticipantRepository participantRepository,
             SlideAssignmentRepository assignmentRepository,
@@ -57,7 +60,7 @@ public class MeetingService {
     public record AssignmentItem(int slideNumber, String participantId, String participantName) {
     }
 
-    public record SessionInfo(String sessionId, String joinToken, String joinUrl) {
+    public record SessionInfo(String sessionId, String joinToken, String joinUrl, LocalDateTime expiresAt) {
     }
 
     public record JoinResult(String participantToken, String displayName) {
@@ -69,10 +72,29 @@ public class MeetingService {
     public Optional<SessionInfo> getActiveSession(String userId, String presentationId) {
         requireOwnedPresentation(userId, presentationId);
         return sessionRepository.findByPresentationIdAndActiveTrue(presentationId)
+            .filter(this::ensureNotExpired)
                 .map(session -> new SessionInfo(
                         session.getId(),
                         session.getJoinToken(),
-                        buildJoinUrl(presentationId, session.getJoinToken())));
+                buildJoinUrl(presentationId, session.getJoinToken()),
+                session.getExpiresAt()));
+        }
+
+        @Transactional
+        public Optional<SessionInfo> heartbeatSession(String userId, String presentationId) {
+        requireOwnedPresentation(userId, presentationId);
+        return sessionRepository.findByPresentationIdAndActiveTrue(presentationId)
+            .filter(this::ensureNotExpired)
+            .map(session -> {
+                session.setUpdatedAt(LocalDateTime.now());
+                session.setExpiresAt(nextExpiration());
+                PresentationSession renewed = sessionRepository.save(session);
+                return new SessionInfo(
+                    renewed.getId(),
+                    renewed.getJoinToken(),
+                    buildJoinUrl(presentationId, renewed.getJoinToken()),
+                    renewed.getExpiresAt());
+            });
     }
 
     @Transactional
@@ -163,9 +185,10 @@ public class MeetingService {
         session.setActive(true);
         session.setCreatedAt(LocalDateTime.now());
         session.setUpdatedAt(LocalDateTime.now());
+        session.setExpiresAt(nextExpiration());
 
         PresentationSession saved = sessionRepository.save(session);
-        return new SessionInfo(saved.getId(), joinToken, buildJoinUrl(presentationId, joinToken));
+        return new SessionInfo(saved.getId(), joinToken, buildJoinUrl(presentationId, joinToken), saved.getExpiresAt());
     }
 
     public Map<String, Object> getJoinOptions(String presentationId, String joinToken) {
@@ -279,8 +302,13 @@ public class MeetingService {
     }
 
     private PresentationSession requireActiveSession(String presentationId, String joinToken) {
-        return sessionRepository.findByPresentationIdAndJoinTokenAndActiveTrue(presentationId, joinToken)
+        PresentationSession session = sessionRepository.findByPresentationIdAndJoinTokenAndActiveTrue(presentationId,
+                joinToken)
                 .orElseThrow(() -> new IllegalArgumentException("Sesión inválida o expirada."));
+        if (!ensureNotExpired(session)) {
+            throw new IllegalArgumentException("Sesión inválida o expirada.");
+        }
+        return session;
     }
 
     private SessionMember requireActiveMember(String sessionId, String participantToken) {
@@ -336,6 +364,24 @@ public class MeetingService {
 
     private String buildJoinUrl(String presentationId, String joinToken) {
         return "%s/remote?presentationId=%s&joinToken=%s".formatted(baseUrl, presentationId, joinToken);
+    }
+
+    private LocalDateTime nextExpiration() {
+        return LocalDateTime.now().plusMinutes(sessionTtlMinutes);
+    }
+
+    private boolean ensureNotExpired(PresentationSession session) {
+        if (!session.isActive()) {
+            return false;
+        }
+        LocalDateTime expiresAt = session.getExpiresAt();
+        if (expiresAt != null && expiresAt.isAfter(LocalDateTime.now())) {
+            return true;
+        }
+        session.setActive(false);
+        session.setUpdatedAt(LocalDateTime.now());
+        sessionRepository.save(session);
+        return false;
     }
 
     private String trimMessage(String raw, int maxLength) {
