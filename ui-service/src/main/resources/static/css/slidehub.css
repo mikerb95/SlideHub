@@ -15,40 +15,43 @@
 
 :root {
     /* ── Depth Surfaces (dark → light) ── */
-    --sh-void:      #080b10;
-    --sh-deep:      #0d1117;
-    --sh-surface:   #111820;
-    --sh-card:      #151b23;
-    --sh-elevated:  #1c2333;
-    --sh-hover:     #21293a;
+    --sh-void: #080b10;
+    --sh-deep: #0d1117;
+    --sh-surface: #111820;
+    --sh-card: #151b23;
+    --sh-elevated: #1c2333;
+    --sh-hover: #21293a;
 
     /* ── Borders ── */
-    --sh-border:        rgba(255, 255, 255, 0.06);
+    --sh-border: rgba(255, 255, 255, 0.06);
     --sh-border-subtle: rgba(255, 255, 255, 0.04);
     --sh-border-active: rgba(255, 255, 255, 0.12);
-    --sh-border-focus:  rgba(88, 166, 255, 0.4);
+    --sh-border-focus: rgba(88, 166, 255, 0.4);
 
     /* ── Text Hierarchy ── */
-    --sh-text-1: #e6edf3;    /* primary   */
-    --sh-text-2: #8b949e;    /* secondary */
-    --sh-text-3: #484f58;    /* muted     */
+    --sh-text-1: #e6edf3;
+    /* primary   */
+    --sh-text-2: #8b949e;
+    /* secondary */
+    --sh-text-3: #484f58;
+    /* muted     */
 
     /* ── Signal Colors ── */
-    --sh-green:       #3fb950;
-    --sh-green-bright:#56d364;
-    --sh-green-dim:   rgba(63, 185, 80, 0.12);
-    --sh-blue:        #58a6ff;
+    --sh-green: #3fb950;
+    --sh-green-bright: #56d364;
+    --sh-green-dim: rgba(63, 185, 80, 0.12);
+    --sh-blue: #58a6ff;
     --sh-blue-bright: #79c0ff;
-    --sh-blue-dim:    rgba(88, 166, 255, 0.12);
-    --sh-amber:       #d29922;
-    --sh-amber-dim:   rgba(210, 153, 34, 0.12);
-    --sh-red:         #f85149;
-    --sh-red-dim:     rgba(248, 81, 73, 0.12);
+    --sh-blue-dim: rgba(88, 166, 255, 0.12);
+    --sh-amber: #d29922;
+    --sh-amber-dim: rgba(210, 153, 34, 0.12);
+    --sh-red: #f85149;
+    --sh-red-dim: rgba(248, 81, 73, 0.12);
 
     /* ── Typography ── */
     --sh-font-brand: 'Instrument Serif', Georgia, serif;
-    --sh-font-body:  'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --sh-font-mono:  'JetBrains Mono', 'Fira Code', monospace;
+    --sh-font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --sh-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
     /* ── Radii (technical, not playful) ── */
     --sh-r-xs: 2px;
@@ -57,7 +60,7 @@
     --sh-r-lg: 6px;
 
     /* ── Glass ── */
-    --sh-glass-bg:   rgba(13, 17, 23, 0.72);
+    --sh-glass-bg: rgba(13, 17, 23, 0.72);
     --sh-glass-blur: 12px;
 
     /* ── Shadows ── */
@@ -76,7 +79,9 @@
    2. BASE / RESET
    ═══════════════════════════════════════ */
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
 }
 
@@ -91,7 +96,9 @@ body.sh {
     -moz-osx-font-smoothing: grayscale;
 }
 
-a { color: inherit; }
+a {
+    color: inherit;
+}
 
 
 /* ═══════════════════════════════════════
@@ -322,22 +329,34 @@ a { color: inherit; }
 .sh-dot--idle {
     background: var(--sh-text-3);
 }
-.sh-dot--idle::after { display: none; }
+
+.sh-dot--idle::after {
+    display: none;
+}
 
 .sh-dot--warn {
     background: var(--sh-amber);
 }
-.sh-dot--warn::after { background: var(--sh-amber); }
+
+.sh-dot--warn::after {
+    background: var(--sh-amber);
+}
 
 .sh-dot--error {
     background: var(--sh-red);
 }
-.sh-dot--error::after { background: var(--sh-red); }
+
+.sh-dot--error::after {
+    background: var(--sh-red);
+}
 
 .sh-dot--blue {
     background: var(--sh-blue);
 }
-.sh-dot--blue::after { background: var(--sh-blue); }
+
+.sh-dot--blue::after {
+    background: var(--sh-blue);
+}
 
 
 /* ═══════════════════════════════════════
@@ -587,12 +606,10 @@ a { color: inherit; }
     inset: -1px;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(
-        135deg,
-        var(--sh-green-dim),
-        var(--sh-blue-dim),
-        var(--sh-green-dim)
-    );
+    background: linear-gradient(135deg,
+            var(--sh-green-dim),
+            var(--sh-blue-dim),
+            var(--sh-green-dim));
     background-size: 200% 200%;
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
@@ -718,45 +735,103 @@ a { color: inherit; }
    ═══════════════════════════════════════ */
 
 @keyframes sh-ping {
-    0%         { transform: scale(1);   opacity: 0.6; }
-    75%, 100%  { transform: scale(2.5); opacity: 0;   }
+    0% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+
+    75%,
+    100% {
+        transform: scale(2.5);
+        opacity: 0;
+    }
 }
 
 @keyframes sh-glow {
-    0%   { box-shadow: 0 0 4px var(--sh-green-dim); }
-    100% { box-shadow: 0 0 16px rgba(63, 185, 80, 0.25); }
+    0% {
+        box-shadow: 0 0 4px var(--sh-green-dim);
+    }
+
+    100% {
+        box-shadow: 0 0 16px rgba(63, 185, 80, 0.25);
+    }
 }
 
 @keyframes sh-glow-blue {
-    0%   { box-shadow: 0 0 4px var(--sh-blue-dim); }
-    100% { box-shadow: 0 0 16px rgba(88, 166, 255, 0.25); }
+    0% {
+        box-shadow: 0 0 4px var(--sh-blue-dim);
+    }
+
+    100% {
+        box-shadow: 0 0 16px rgba(88, 166, 255, 0.25);
+    }
 }
 
 @keyframes sh-fade-in {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0);   }
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes sh-fade-in-up {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0);    }
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes sh-gradient-shift {
-    0%   { background-position: 0% 50%; }
-    50%  { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 @keyframes sh-pulse-ring {
-    0%   { transform: scale(0.95); opacity: 1; }
-    70%  { transform: scale(1.05); opacity: 0.5; }
-    100% { transform: scale(0.95); opacity: 1; }
+    0% {
+        transform: scale(0.95);
+        opacity: 1;
+    }
+
+    70% {
+        transform: scale(1.05);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(0.95);
+        opacity: 1;
+    }
 }
 
 @keyframes sh-slide-up {
-    from { opacity: 0; transform: translateY(100%); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Utility classes */
@@ -769,15 +844,41 @@ a { color: inherit; }
 }
 
 /* Staggered entrance for children */
-.sh-stagger > * { animation: sh-fade-in 0.5s ease both; }
-.sh-stagger > *:nth-child(1) { animation-delay: 0.05s; }
-.sh-stagger > *:nth-child(2) { animation-delay: 0.10s; }
-.sh-stagger > *:nth-child(3) { animation-delay: 0.15s; }
-.sh-stagger > *:nth-child(4) { animation-delay: 0.20s; }
-.sh-stagger > *:nth-child(5) { animation-delay: 0.25s; }
-.sh-stagger > *:nth-child(6) { animation-delay: 0.30s; }
-.sh-stagger > *:nth-child(7) { animation-delay: 0.35s; }
-.sh-stagger > *:nth-child(8) { animation-delay: 0.40s; }
+.sh-stagger>* {
+    animation: sh-fade-in 0.5s ease both;
+}
+
+.sh-stagger>*:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.sh-stagger>*:nth-child(2) {
+    animation-delay: 0.10s;
+}
+
+.sh-stagger>*:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+.sh-stagger>*:nth-child(4) {
+    animation-delay: 0.20s;
+}
+
+.sh-stagger>*:nth-child(5) {
+    animation-delay: 0.25s;
+}
+
+.sh-stagger>*:nth-child(6) {
+    animation-delay: 0.30s;
+}
+
+.sh-stagger>*:nth-child(7) {
+    animation-delay: 0.35s;
+}
+
+.sh-stagger>*:nth-child(8) {
+    animation-delay: 0.40s;
+}
 
 
 /* ═══════════════════════════════════════
@@ -815,14 +916,43 @@ body.sh ::-webkit-scrollbar-thumb:hover {
     flex-shrink: 0;
 }
 
-.sh-icon-sm  { width: 28px; height: 28px; font-size: 0.75rem; }
-.sh-icon-md  { width: 36px; height: 36px; font-size: 0.9rem;  }
-.sh-icon-lg  { width: 44px; height: 44px; font-size: 1.1rem;  }
+.sh-icon-sm {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+}
 
-.sh-icon-green { background: var(--sh-green-dim); color: var(--sh-green); }
-.sh-icon-blue  { background: var(--sh-blue-dim);  color: var(--sh-blue);  }
-.sh-icon-amber { background: var(--sh-amber-dim); color: var(--sh-amber); }
-.sh-icon-red   { background: var(--sh-red-dim);   color: var(--sh-red);   }
+.sh-icon-md {
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+}
+
+.sh-icon-lg {
+    width: 44px;
+    height: 44px;
+    font-size: 1.1rem;
+}
+
+.sh-icon-green {
+    background: var(--sh-green-dim);
+    color: var(--sh-green);
+}
+
+.sh-icon-blue {
+    background: var(--sh-blue-dim);
+    color: var(--sh-blue);
+}
+
+.sh-icon-amber {
+    background: var(--sh-amber-dim);
+    color: var(--sh-amber);
+}
+
+.sh-icon-red {
+    background: var(--sh-red-dim);
+    color: var(--sh-red);
+}
 
 
 /* ═══════════════════════════════════════
@@ -875,10 +1005,21 @@ body.sh ::-webkit-scrollbar-thumb:hover {
     animation: sh-glow 2s ease-in-out infinite alternate;
 }
 
-.sh-layers:hover .sh-layer-4 { transform: translate(-50%, -50%) translate(44px, -52px); }
-.sh-layers:hover .sh-layer-3 { transform: translate(-50%, -50%) translate(30px, -35px); }
-.sh-layers:hover .sh-layer-2 { transform: translate(-50%, -50%) translate(15px, -17px); }
-.sh-layers:hover .sh-layer-1 { border-color: var(--sh-green); }
+.sh-layers:hover .sh-layer-4 {
+    transform: translate(-50%, -50%) translate(44px, -52px);
+}
+
+.sh-layers:hover .sh-layer-3 {
+    transform: translate(-50%, -50%) translate(30px, -35px);
+}
+
+.sh-layers:hover .sh-layer-2 {
+    transform: translate(-50%, -50%) translate(15px, -17px);
+}
+
+.sh-layers:hover .sh-layer-1 {
+    border-color: var(--sh-green);
+}
 
 
 /* ═══════════════════════════════════════
