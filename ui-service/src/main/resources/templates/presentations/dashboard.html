@@ -110,11 +110,10 @@
                         class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
                         <i class="fa-solid fa-robot"></i> Notas IA
                     </a>
-                    <form th:action="@{/presentations/{id}/delete(id=${p.id()})}" method="post" class="inline"
-                        onsubmit="return confirm('¿Eliminar esta presentación? Esta acción no se puede deshacer.');">
+                    <form th:action="@{/presentations/{id}/delete(id=${p.id()})}" method="post" class="inline">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"
                             th:if="${_csrf}">
-                        <button type="submit"
+                        <button type="button" th:attr="data-presentation-name=${p.name()}" onclick="openDeleteModal(this)"
                             class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2 text-[var(--sh-red)]">
                             <i class="fa-solid fa-trash"></i> Eliminar
                         </button>
@@ -123,6 +122,48 @@
             </div>
         </div>
     </div>
+
+    <div id="delete-modal" class="sh-overlay hidden" onclick="if(event.target===this)closeDeleteModal()">
+        <div class="sh-modal max-w-md w-[92%]">
+            <div class="flex items-center justify-between mb-4">
+                <div class="sh-label"><i class="fa-solid fa-triangle-exclamation mr-1"></i>CONFIRMAR_ELIMINACIÓN</div>
+                <button type="button" class="sh-btn sh-btn-ghost text-xs" onclick="closeDeleteModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <p class="text-sm text-[var(--sh-text-2)] mb-2">Vas a eliminar:</p>
+            <p id="delete-modal-name" class="font-mono text-xs text-[var(--sh-text-1)] mb-4"></p>
+            <p class="text-xs text-[var(--sh-text-3)] mb-5">Esta acción no se puede deshacer.</p>
+            <div class="flex justify-end gap-2">
+                <button type="button" class="sh-btn text-xs" onclick="closeDeleteModal()">Cancelar</button>
+                <button type="button" class="sh-btn sh-btn-danger text-xs" onclick="confirmDelete()">
+                    <i class="fa-solid fa-trash"></i> Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let deleteFormRef = null;
+
+        function openDeleteModal(button) {
+            deleteFormRef = button.closest('form');
+            const name = button.getAttribute('data-presentation-name') || 'Presentación';
+            document.getElementById('delete-modal-name').textContent = name;
+            document.getElementById('delete-modal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').classList.add('hidden');
+            deleteFormRef = null;
+        }
+
+        function confirmDelete() {
+            if (deleteFormRef) {
+                deleteFormRef.submit();
+            }
+        }
+    </script>
 </body>
 
 </html>
