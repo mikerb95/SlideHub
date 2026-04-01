@@ -316,8 +316,6 @@ public class AuthController {
         return authentication.getName();
     }
 
-}
-
     @PostMapping("/delete-account")
     public String deleteAccount(Authentication authentication,
             @RequestParam(name = "confirmation", required = false) String confirmation,
@@ -359,3 +357,5 @@ public class AuthController {
             return "auth/profile";
         }
     }
+
+}
