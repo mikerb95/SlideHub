@@ -115,6 +115,36 @@
             </div>
         </div>
 
+        <!-- ── Delete Account ── -->
+        <div class="sh-card p-5 mb-4 border border-[var(--sh-red)]/40">
+            <div class="sh-label mb-3" style="color: var(--sh-red);">
+                <i class="fa-solid fa-triangle-exclamation mr-1"></i>ZONA DE RIESGO
+            </div>
+            <p class="text-sm text-[var(--sh-text-2)] mb-3">
+                Esta acción elimina tu cuenta y tus presentaciones asociadas. No se puede deshacer.
+            </p>
+            <div th:if="${deleteErrorMessage}" class="sh-alert sh-alert-error mb-3">
+                <i class="fa-solid fa-circle-exclamation mt-0.5"></i>
+                <span th:text="${deleteErrorMessage}">Error</span>
+            </div>
+            <form th:action="@{/auth/delete-account}" method="post" class="space-y-3">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf}">
+                <div>
+                    <label for="delete-confirmation" class="sh-input-label">Escribe ELIMINAR para confirmar</label>
+                    <input id="delete-confirmation"
+                           name="confirmation"
+                           type="text"
+                           class="sh-input"
+                           placeholder="ELIMINAR"
+                           required>
+                </div>
+                <button type="submit" class="sh-btn sh-btn-danger text-xs">
+                    <i class="fa-solid fa-user-xmark"></i>
+                    Eliminar cuenta
+                </button>
+            </form>
+        </div>
+
         <!-- ── Actions ── -->
         <div class="flex items-center gap-3">
             <a th:href="@{/presenter}" class="sh-btn text-xs">

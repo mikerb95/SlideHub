@@ -3,10 +3,14 @@ package com.brixo.slidehub.ui.controller;
 import com.brixo.slidehub.ui.exception.UserAlreadyExistsException;
 import com.brixo.slidehub.ui.model.User;
 import com.brixo.slidehub.ui.repository.UserRepository;
+import com.brixo.slidehub.ui.service.AccountDeletionService;
 import com.brixo.slidehub.ui.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,16 +33,21 @@ import java.util.Optional;
 @RequestMapping("/auth")
 public class AuthController {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
+
     private final UserService userService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AccountDeletionService accountDeletionService;
 
     public AuthController(UserService userService,
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            AccountDeletionService accountDeletionService) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.accountDeletionService = accountDeletionService;
     }
 
     // ── Login ─────────────────────────────────────────────────────────────────
@@ -51,6 +60,7 @@ public class AuthController {
     public String loginPage(Authentication authentication,
             @RequestParam(required = false) String error,
             @RequestParam(required = false) String logout,
+            @RequestParam(required = false) String accountDeleted,
             Model model) {
         if (isAuthenticated(authentication)) {
             return "redirect:/presenter";
@@ -64,6 +74,9 @@ public class AuthController {
         }
         if (logout != null) {
             model.addAttribute("logoutMessage", "Sesión cerrada correctamente.");
+        }
+        if (accountDeleted != null) {
+            model.addAttribute("logoutMessage", "Cuenta eliminada correctamente.");
         }
         return "auth/login";
     }
@@ -303,3 +316,44 @@ public class AuthController {
         return authentication.getName();
     }
 }
+    @PostMapping("/delete-account")
+    public String deleteAccount(Authentication authentication,
+            @RequestParam(name = "confirmation", required = false) String confirmation,
+            HttpSession session,
+            jakarta.servlet.http.HttpServletRequest request,
+            jakarta.servlet.http.HttpServletResponse response,
+            Model model) {
+        if (!isAuthenticated(authentication)) {
+            return "redirect:/auth/login";
+        }
+
+        if (confirmation == null || !"ELIMINAR".equals(confirmation.trim())) {
+            User current = findCurrentUser(authentication);
+            if (current != null) {
+                model.addAttribute("user", current);
+                model.addAttribute("githubLinked", current.getGithubId() != null);
+                model.addAttribute("googleLinked", current.getGoogleId() != null);
+            }
+            model.addAttribute("deleteErrorMessage", "Para confirmar, escribe exactamente ELIMINAR.");
+            return "auth/profile";
+        }
+
+        User current = findCurrentUser(authentication);
+        if (current == null) {
+            return "redirect:/auth/login";
+        }
+
+        try {
+            accountDeletionService.deleteAccount(current.getId());
+            session.invalidate();
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
+            return "redirect:/auth/login?accountDeleted=true";
+        } catch (Exception ex) {
+            log.error("Error eliminando cuenta para userId={}: {}", current.getId(), ex.getMessage(), ex);
+            model.addAttribute("user", current);
+            model.addAttribute("githubLinked", current.getGithubId() != null);
+            model.addAttribute("googleLinked", current.getGoogleId() != null);
+            model.addAttribute("deleteErrorMessage", "No se pudo eliminar la cuenta. Inténtalo nuevamente.");
+            return "auth/profile";
+        }
+    }
