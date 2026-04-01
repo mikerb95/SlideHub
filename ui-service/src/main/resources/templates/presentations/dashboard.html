@@ -21,7 +21,8 @@
                 <a href="/auth/profile" class="sh-btn sh-btn-ghost text-xs">
                     <i class="fa-solid fa-user"></i>
                 </a>
-                <form action="/auth/logout" method="post" class="inline">
+                <form th:action="@{/auth/logout}" method="post" class="inline">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf}">
                     <button type="submit" class="sh-btn sh-btn-ghost text-xs">
                         <i class="fa-solid fa-right-from-bracket"></i>
                     </button>

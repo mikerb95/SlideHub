@@ -81,24 +81,6 @@ public class AuthController {
         return "auth/login";
     }
 
-    /**
-     * Logout por GET para navegación directa a /auth/logout.
-     * Evita 403 cuando el usuario abre la URL manualmente o desde enlaces.
-     */
-    @GetMapping("/logout")
-    public String logoutPage(Authentication authentication,
-            HttpSession session,
-            jakarta.servlet.http.HttpServletRequest request,
-            jakarta.servlet.http.HttpServletResponse response) {
-        if (session != null) {
-            session.invalidate();
-        }
-        if (authentication != null) {
-            new SecurityContextLogoutHandler().logout(request, response, authentication);
-        }
-        return "redirect:/auth/login?logout=true";
-    }
-
     // ── Registro ──────────────────────────────────────────────────────────────
 
     /**
