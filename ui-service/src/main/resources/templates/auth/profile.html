@@ -58,10 +58,10 @@
                     <span class="text-sm text-[var(--sh-text-2)]" th:text="${user?.email}">correo</span>
                 </div>
                 <span th:if="${user?.emailVerified}" class="sh-badge-green">
-                    <i class="fa-solid fa-check text-[0.6rem]"></i> Verified
+                    <i class="fa-solid fa-check text-[0.6rem]"></i> Verificado
                 </span>
                 <span th:unless="${user?.emailVerified}" class="sh-badge">
-                    Pending
+                    Pendiente
                 </span>
             </div>
         </div>
