@@ -25,25 +25,35 @@ public class KeepAliveService {
     private static final Logger log = LoggerFactory.getLogger(KeepAliveService.class);
 
     private final PresentationSessionRepository sessionRepository;
+    private final UserActivityTracker userActivityTracker;
     private final WebClient stateClient;
     private final WebClient aiClient;
+    private final long userActivityWindowMs;
 
     public KeepAliveService(
             PresentationSessionRepository sessionRepository,
+            UserActivityTracker userActivityTracker,
             @Value("${slidehub.state-service.url}") String stateUrl,
-            @Value("${slidehub.ai-service.url}") String aiUrl) {
+            @Value("${slidehub.ai-service.url}") String aiUrl,
+            @Value("${slidehub.keep-alive.user-activity-window-ms:300000}") long userActivityWindowMs) {
         this.sessionRepository = sessionRepository;
+        this.userActivityTracker = userActivityTracker;
         this.stateClient = WebClient.builder().baseUrl(stateUrl).build();
-        this.aiClient    = WebClient.builder().baseUrl(aiUrl).build();
+        this.aiClient = WebClient.builder().baseUrl(aiUrl).build();
+        this.userActivityWindowMs = userActivityWindowMs;
     }
 
     @Scheduled(fixedDelay = 5 * 60 * 1000)
     public void ping() {
-        if (!sessionRepository.existsByActiveTrue()) {
+        boolean hasActivePresentationSession = sessionRepository.existsByActiveTrue();
+        boolean hasRecentUserActivity = userActivityTracker.hasRecentActivity(userActivityWindowMs);
+
+        if (!hasActivePresentationSession && !hasRecentUserActivity) {
             return;
         }
 
-        log.debug("Keep-alive: sesión activa detectada, enviando pings a servicios");
+        log.debug("Keep-alive: trigger activo (presentación={}, usuarioReciente={}), enviando pings",
+                hasActivePresentationSession, hasRecentUserActivity);
 
         stateClient.get().uri("/actuator/health")
                 .retrieve().bodyToMono(Void.class)
