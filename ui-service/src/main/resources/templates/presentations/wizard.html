@@ -713,7 +713,7 @@
             try {
                 const res = await fetch('/api/presentations/create-from-drive', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', ...csrfHeaders() },
                     body: params
                 });
                 const data = await res.json();
