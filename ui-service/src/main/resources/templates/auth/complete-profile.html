@@ -22,7 +22,7 @@
         <div class="sh-card p-6">
 
             <p class="text-[var(--sh-text-2)] text-sm mb-5">
-                Almost there! Confirm your username and email to finish setting up your account.
+                ¡Ya casi! Confirma tu nombre de usuario y correo para terminar de configurar tu cuenta.
             </p>
 
             <!-- Alerts -->
@@ -36,7 +36,7 @@
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf}">
 
                 <div class="mb-4">
-                    <label for="username" class="sh-input-label">Username</label>
+                    <label for="username" class="sh-input-label">Nombre de usuario</label>
                     <input type="text" class="sh-input" id="username" name="username"
                            autocomplete="username" placeholder="system_user"
                            th:value="${user.username}"
