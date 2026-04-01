@@ -38,7 +38,7 @@
             <div>
                 <h1 class="text-lg font-medium text-[var(--sh-text-1)]">Mis Presentaciones</h1>
                 <p class="font-mono text-xs text-[var(--sh-text-3)] mt-1"
-                   th:text="${#lists.size(presentations)} + ' presentaciones'">0 presentaciones</p>
+                    th:text="${#lists.size(presentations)} + ' presentaciones'">0 presentaciones</p>
             </div>
             <a href="/presentations/new" class="sh-btn sh-btn-primary text-sm">
                 <i class="fa-solid fa-plus mr-1"></i> Nueva Presentacion
@@ -46,8 +46,7 @@
         </div>
 
         <!-- ── Empty state ── -->
-        <div th:if="${#lists.isEmpty(presentations)}"
-             class="sh-card p-12 text-center animate-fade-in">
+        <div th:if="${#lists.isEmpty(presentations)}" class="sh-card p-12 text-center animate-fade-in">
             <i class="fa-solid fa-layer-group text-4xl text-[var(--sh-text-3)] mb-4"></i>
             <p class="text-[var(--sh-text-2)] mb-1">No tienes presentaciones aun.</p>
             <p class="font-mono text-xs text-[var(--sh-text-3)] mb-6">Crea tu primera presentacion para comenzar.</p>
@@ -57,45 +56,45 @@
         </div>
 
         <!-- ── Grid ── -->
-        <div th:unless="${#lists.isEmpty(presentations)}"
-             class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div th:unless="${#lists.isEmpty(presentations)}" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
 
             <div th:each="p : ${presentations}"
-                 class="sh-card p-5 flex flex-col gap-3 animate-fade-in hover:border-[var(--sh-border-active)] transition-colors">
+                class="sh-card p-5 flex flex-col gap-3 animate-fade-in hover:border-[var(--sh-border-active)] transition-colors">
 
                 <!-- Header -->
                 <div class="flex justify-between items-start">
                     <div class="min-w-0">
-                        <div class="text-sm font-medium text-[var(--sh-text-1)] truncate" th:text="${p.name()}">Name</div>
+                        <div class="text-sm font-medium text-[var(--sh-text-1)] truncate" th:text="${p.name()}">Name
+                        </div>
                         <div class="font-mono text-xs text-[var(--sh-text-3)] mt-0.5"
-                             th:text="${p.totalSlides()} + ' slides'">0 slides</div>
+                            th:text="${p.totalSlides()} + ' slides'">0 slides</div>
                     </div>
                     <span class="sh-badge text-[0.6rem] shrink-0 ml-2"
-                          th:classappend="${p.sourceType() == 'DRIVE'} ? 'sh-badge-blue' : 'sh-badge-green'"
-                          th:text="${p.sourceType() == 'DRIVE' ? 'Drive' : 'Upload'}">
+                        th:classappend="${p.sourceType() == 'DRIVE'} ? 'sh-badge-blue' : 'sh-badge-green'"
+                        th:text="${p.sourceType() == 'DRIVE' ? 'Drive' : 'Upload'}">
                     </span>
                 </div>
 
                 <!-- Description -->
                 <p th:if="${p.description() != null and !p.description().isBlank()}"
-                   class="text-xs text-[var(--sh-text-2)] line-clamp-2" th:text="${p.description()}"></p>
+                    class="text-xs text-[var(--sh-text-2)] line-clamp-2" th:text="${p.description()}"></p>
 
                 <!-- Date -->
                 <div class="font-mono text-[0.65rem] text-[var(--sh-text-3)]"
-                     th:text="${#temporals.format(p.createdAt(), 'dd MMM yyyy')}">01 Jan 2026</div>
+                    th:text="${#temporals.format(p.createdAt(), 'dd MMM yyyy')}">01 Jan 2026</div>
 
                 <!-- Actions -->
                 <div class="flex gap-1.5 flex-wrap mt-auto pt-2 border-t border-[var(--sh-border)]">
                     <a th:href="@{/presenter(presentationId=${p.id()})}"
-                       class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
+                        class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
                         <i class="fa-solid fa-chalkboard"></i> Presentar
                     </a>
                     <a th:href="@{/main-panel(presentationId=${p.id()})}"
-                       class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
+                        class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
                         <i class="fa-solid fa-table-cells-large"></i> Panel
                     </a>
                     <a th:href="@{/presentations/{id}/generate-notes(id=${p.id()})}"
-                       class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
+                        class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
                         <i class="fa-solid fa-robot"></i> Notas IA
                     </a>
                 </div>
@@ -103,4 +102,5 @@
         </div>
     </div>
 </body>
+
 </html>
