@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -79,10 +80,10 @@ class AccountDeletionServiceTest {
 
         accountDeletionService.deleteAccount(userId);
 
-        verify(sessionMemberRepository, never()).deleteBySessionPresentationIdIn(List.of());
-        verify(slideAssignmentRepository, never()).deleteByPresentationIdIn(List.of());
-        verify(presentationParticipantRepository, never()).deleteByPresentationIdIn(List.of());
-        verify(presentationSessionRepository, never()).deleteByPresentationIdIn(List.of());
+        verify(sessionMemberRepository, never()).deleteBySessionPresentationIdIn(anyList());
+        verify(slideAssignmentRepository, never()).deleteByPresentationIdIn(anyList());
+        verify(presentationParticipantRepository, never()).deleteByPresentationIdIn(anyList());
+        verify(presentationSessionRepository, never()).deleteByPresentationIdIn(anyList());
         verify(presentationRepository, never()).deleteByUserId(userId);
         verify(userRepository).deleteById(userId);
     }

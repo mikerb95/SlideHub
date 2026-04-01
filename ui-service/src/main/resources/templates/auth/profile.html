@@ -39,8 +39,8 @@
                     <div class="sh-label mb-2">IDENTIDAD</div>
                     <h1 class="font-brand text-2xl text-[var(--sh-text-1)]"
                         th:text="${user?.username} ?: ${#authentication.name}">usuario</h1>
-                    <div class="font-mono text-sm text-[var(--sh-text-2)] mt-1"
-                         th:text="${user?.email}">email@ejemplo.com</div>
+                    <div class="font-mono text-sm text-[var(--sh-text-2)] mt-1" th:text="${user?.email}">
+                        email@ejemplo.com</div>
                 </div>
                 <span class="sh-badge-blue" th:text="${user?.role} ?: 'PRESENTER'">PRESENTER</span>
             </div>
@@ -50,7 +50,8 @@
         <div class="sh-card p-5 mb-4">
             <div class="sh-label mb-3">ESTADO DEL CORREO</div>
 
-            <div class="flex items-center justify-between p-3 rounded-tech bg-[var(--sh-deep)] border border-[var(--sh-border)]">
+            <div
+                class="flex items-center justify-between p-3 rounded-tech bg-[var(--sh-deep)] border border-[var(--sh-border)]">
                 <div class="flex items-center gap-3">
                     <div class="sh-icon sh-icon-sm sh-icon-blue">
                         <i class="fa-solid fa-envelope text-xs"></i>
@@ -72,16 +73,16 @@
 
             <div class="flex flex-col gap-3">
                 <!-- GitHub -->
-                <div class="flex items-center justify-between p-3 rounded-tech bg-[var(--sh-deep)] border border-[var(--sh-border)]">
+                <div
+                    class="flex items-center justify-between p-3 rounded-tech bg-[var(--sh-deep)] border border-[var(--sh-border)]">
                     <div class="flex items-center gap-3">
                         <div class="sh-icon sh-icon-sm" style="background: var(--sh-surface); color: var(--sh-text-1);">
                             <i class="fa-brands fa-github text-sm"></i>
                         </div>
                         <div>
                             <span class="text-sm text-[var(--sh-text-1)]">GitHub</span>
-                            <span th:if="${githubLinked}"
-                                  class="font-mono text-xs text-[var(--sh-text-3)] ml-2"
-                                  th:text="'@' + ${user?.githubUsername}">@usuario</span>
+                            <span th:if="${githubLinked}" class="font-mono text-xs text-[var(--sh-text-3)] ml-2"
+                                th:text="'@' + ${user?.githubUsername}">@usuario</span>
                         </div>
                     </div>
                     <span th:if="${githubLinked}" class="sh-badge-green">
@@ -93,16 +94,16 @@
                 </div>
 
                 <!-- Google -->
-                <div class="flex items-center justify-between p-3 rounded-tech bg-[var(--sh-deep)] border border-[var(--sh-border)]">
+                <div
+                    class="flex items-center justify-between p-3 rounded-tech bg-[var(--sh-deep)] border border-[var(--sh-border)]">
                     <div class="flex items-center gap-3">
                         <div class="sh-icon sh-icon-sm" style="background: var(--sh-surface); color: var(--sh-text-1);">
                             <i class="fa-brands fa-google text-sm"></i>
                         </div>
                         <div>
                             <span class="text-sm text-[var(--sh-text-1)]">Google</span>
-                            <span th:if="${googleLinked}"
-                                  class="font-mono text-xs text-[var(--sh-text-3)] ml-2"
-                                  th:text="${user?.googleEmail}">correo@gmail.com</span>
+                            <span th:if="${googleLinked}" class="font-mono text-xs text-[var(--sh-text-3)] ml-2"
+                                th:text="${user?.googleEmail}">correo@gmail.com</span>
                         </div>
                     </div>
                     <span th:if="${googleLinked}" class="sh-badge-green">
@@ -131,12 +132,8 @@
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf}">
                 <div>
                     <label for="delete-confirmation" class="sh-input-label">Escribe ELIMINAR para confirmar</label>
-                    <input id="delete-confirmation"
-                           name="confirmation"
-                           type="text"
-                           class="sh-input"
-                           placeholder="ELIMINAR"
-                           required>
+                    <input id="delete-confirmation" name="confirmation" type="text" class="sh-input"
+                        placeholder="ELIMINAR" required>
                 </div>
                 <button type="submit" class="sh-btn sh-btn-danger text-xs">
                     <i class="fa-solid fa-user-xmark"></i>
