@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
 import jakarta.servlet.http.HttpSession;
@@ -36,15 +37,18 @@ public class SecurityConfig {
         private final CustomOAuth2UserService oAuth2UserService;
         private final CustomOidcUserService oidcUserService;
         private final UserRepository userRepository;
+        private final UserActivityTrackingFilter userActivityTrackingFilter;
 
         public SecurityConfig(CustomUserDetailsService userDetailsService,
                         CustomOAuth2UserService oAuth2UserService,
                         CustomOidcUserService oidcUserService,
-                        UserRepository userRepository) {
+                        UserRepository userRepository,
+                        UserActivityTrackingFilter userActivityTrackingFilter) {
                 this.userDetailsService = userDetailsService;
                 this.oAuth2UserService = oAuth2UserService;
                 this.oidcUserService = oidcUserService;
                 this.userRepository = userRepository;
+                this.userActivityTrackingFilter = userActivityTrackingFilter;
         }
 
         @Bean
@@ -110,7 +114,8 @@ public class SecurityConfig {
                                 .logout(logout -> logout
                                                 .logoutUrl("/auth/logout")
                                                 .logoutSuccessUrl("/auth/login?logout=true")
-                                                .invalidateHttpSession(true));
+                                                .invalidateHttpSession(true))
+                                .addFilterAfter(userActivityTrackingFilter, UsernamePasswordAuthenticationFilter.class);
                 return http.build();
         }
 
