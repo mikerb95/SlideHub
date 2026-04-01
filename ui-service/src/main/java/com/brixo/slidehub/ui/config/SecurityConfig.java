@@ -84,7 +84,8 @@ public class SecurityConfig {
                                                 // Panel del presentador, main panel y tutor de deployment — requiere
                                                 // PRESENTER
                                                 // o ADMIN
-                                                .requestMatchers("/presenter", "/main-panel", "/deploy-tutor", "/status", "/status/api/checks")
+                                                .requestMatchers("/presenter", "/main-panel", "/deploy-tutor",
+                                                                "/status", "/status/api/checks")
                                                 .hasAnyRole("PRESENTER", "ADMIN")
                                                 // Perfil del usuario — requiere estar autenticado
                                                 .requestMatchers("/auth/profile").authenticated()
@@ -104,7 +105,7 @@ public class SecurityConfig {
                                                 .failureUrl("/auth/login?error=oauth2")
                                                 .userInfoEndpoint(userInfo -> userInfo
                                                                 .userService(oAuth2UserService)
-                                                .oidcUserService(oidcUserService)))
+                                                                .oidcUserService(oidcUserService)))
                                 .logout(logout -> logout
                                                 .logoutUrl("/auth/logout")
                                                 .logoutSuccessUrl("/auth/login?logout=true")
