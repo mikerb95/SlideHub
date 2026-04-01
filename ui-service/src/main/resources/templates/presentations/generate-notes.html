@@ -175,11 +175,11 @@
                             <!-- Note content -->
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-2 mb-2">
-                                    <span class="sh-badge" th:text="${'Slide_' + slide.number}">Slide N</span>
+                                    <span class="sh-badge" th:text="${'Slide ' + slide.number}">Slide N</span>
                                     <span th:each="note : ${existingNotes}"
                                           th:if="${note.get('slideNumber') == slide.number}"
                                           class="sh-badge-green text-xs">
-                                        <i class="fa-solid fa-robot mr-1"></i>AI_Note
+                                        <i class="fa-solid fa-robot mr-1"></i>Nota IA
                                     </span>
                                 </div>
 
