@@ -381,7 +381,9 @@ public class PresentationService {
             String marker = "amazonaws.com/";
             int index = slide.getS3Url().indexOf(marker);
             if (index >= 0) {
-                return slide.getS3Url().substring(index + marker.length());
+                String rawKey = slide.getS3Url().substring(index + marker.length());
+                int queryIndex = rawKey.indexOf('?');
+                return queryIndex >= 0 ? rawKey.substring(0, queryIndex) : rawKey;
             }
         }
         return slideUploadService.buildSlideKey(presentationId, slide.getNumber());
