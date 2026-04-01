@@ -19,46 +19,47 @@
                 justify-content: flex-start;
             }
         }
+
+        .diag-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.8rem;
+        }
+
+        .diag-card {
+            background: var(--sh-deep);
+            border: 1px solid var(--sh-border);
+            border-radius: var(--sh-r-md);
+            padding: 0.75rem;
+        }
+
+        .diag-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.75rem;
+            font-size: 0.78rem;
+            font-family: var(--sh-font-mono);
+            color: var(--sh-text-2);
+            border-bottom: 1px solid var(--sh-border-subtle);
+            padding: 0.35rem 0;
+            word-break: break-word;
+        }
+
+        .diag-item:last-child {
+            border-bottom: none;
+        }
+
+        .diag-item strong {
+            color: var(--sh-text-3);
+            font-weight: 500;
+            min-width: 130px;
+        }
+
+        @media (min-width: 768px) {
             .diag-grid {
-                display: grid;
-                grid-template-columns: 1fr;
-                gap: 0.8rem;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
-
-            .diag-card {
-                background: var(--sh-deep);
-                border: 1px solid var(--sh-border);
-                border-radius: var(--sh-r-md);
-                padding: 0.75rem;
-            }
-
-            .diag-item {
-                display: flex;
-                justify-content: space-between;
-                gap: 0.75rem;
-                font-size: 0.78rem;
-                font-family: var(--sh-font-mono);
-                color: var(--sh-text-2);
-                border-bottom: 1px solid var(--sh-border-subtle);
-                padding: 0.35rem 0;
-                word-break: break-word;
-            }
-
-            .diag-item:last-child {
-                border-bottom: none;
-            }
-
-            .diag-item strong {
-                color: var(--sh-text-3);
-                font-weight: 500;
-                min-width: 130px;
-            }
-
-            @media (min-width: 768px) {
-                .diag-grid {
-                    grid-template-columns: repeat(2, minmax(0, 1fr));
-                }
-            }
+        }
     </style>
 </head>
 
@@ -120,7 +121,8 @@
         </div>
     </main>
 
-    <div id="diagnostic-modal" class="sh-overlay hidden" onclick="if(event.target===this)window.closeStatusDiagnostic()">
+    <div id="diagnostic-modal" class="sh-overlay hidden"
+        onclick="if(event.target===this)window.closeStatusDiagnostic()">
         <div class="sh-modal max-w-3xl w-[95%]">
             <div class="flex items-center justify-between mb-4">
                 <div>
