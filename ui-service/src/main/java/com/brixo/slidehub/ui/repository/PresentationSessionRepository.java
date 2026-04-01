@@ -7,6 +7,8 @@ import java.util.Optional;
 
 public interface PresentationSessionRepository extends JpaRepository<PresentationSession, String> {
 
+    boolean existsByActiveTrue();
+
     Optional<PresentationSession> findByPresentationIdAndActiveTrue(String presentationId);
 
     Optional<PresentationSession> findByPresentationIdAndJoinTokenAndActiveTrue(String presentationId,
