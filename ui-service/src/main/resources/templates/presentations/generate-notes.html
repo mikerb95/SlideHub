@@ -90,7 +90,7 @@
             <div class="flex items-center gap-2 sm:gap-3">
                 <span class="font-brand text-base tracking-tight">Notas IA</span>
                 <span class="font-mono text-xs text-[var(--sh-text-3)]"
-                    th:text="${presentation.name}">Presentation</span>
+                    th:text="${presentation.name}">Presentación</span>
             </div>
             <div class="notes-nav-actions flex items-center gap-2">
                 <a href="/presentations" class="sh-btn sh-btn-ghost text-xs">
@@ -123,8 +123,8 @@
                         </span>
                         <div class="text-[var(--sh-text-1)] font-semibold mt-1" th:text="${presentation.name}">Name
                         </div>
-                        <div class="text-[var(--sh-text-3)] text-xs font-mono" th:text="${totalSlides} + ' slides'">0
-                            slides</div>
+                        <div class="text-[var(--sh-text-3)] text-xs font-mono" th:text="${totalSlides} + ' diapositivas'">0
+                            diapositivas</div>
                     </div>
 
                     <!-- Repo URL -->
@@ -147,11 +147,11 @@
                         </div>
                         <div class="flex items-center gap-2 mb-1.5 text-[var(--sh-text-3)]">
                             <i class="fa-solid fa-code-branch" style="color: var(--sh-amber);"></i>
-                            <span>Gemini — repo context extraction</span>
+                            <span>Gemini — extracción de contexto del repositorio</span>
                         </div>
                         <div class="flex items-center gap-2 text-[var(--sh-text-3)]">
                             <i class="fa-solid fa-bolt" style="color: var(--sh-green);"></i>
-                            <span>Groq — structured note generation</span>
+                            <span>Groq — generación de notas estructuradas</span>
                         </div>
                     </div>
 
@@ -161,8 +161,8 @@
                         <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Generar todas las notas
                     </button>
                     <div class="text-[var(--sh-text-3)] text-xs font-mono mt-1.5 text-center">
-                        ~<span th:text="${totalSlides * 5}">30</span>s for
-                        <span th:text="${totalSlides}">N</span> slides
+                        ~<span th:text="${totalSlides * 5}">30</span>s para
+                        <span th:text="${totalSlides}">N</span> diapositivas
                     </div>
                 </div>
 
@@ -204,7 +204,7 @@
                     <div th:if="${#lists.isEmpty(presentation.slides)}"
                         class="text-center py-12 text-[var(--sh-text-3)]">
                         <i class="fa-solid fa-image text-2xl mb-3 block opacity-40"></i>
-                        <p class="text-xs font-mono">No slides in this presentation yet.</p>
+                        <p class="text-xs font-mono">Aún no hay diapositivas en esta presentación.</p>
                     </div>
 
                     <div th:each="slide : ${presentation.slides}" th:id="${'slide-' + slide.number}" class="slide-card">
@@ -212,14 +212,14 @@
 
                             <!-- Thumbnail -->
                             <div class="flex-shrink-0">
-                                <img th:src="${slide.s3Url}" th:alt="${'Slide ' + slide.number}" class="slide-thumb"
+                                <img th:src="${slide.s3Url}" th:alt="${'Diapositiva ' + slide.number}" class="slide-thumb"
                                     loading="lazy" onerror="this.style.display='none'">
                             </div>
 
                             <!-- Note content -->
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-2 mb-2">
-                                    <span class="sh-badge" th:text="${'Slide ' + slide.number}">Slide N</span>
+                                    <span class="sh-badge" th:text="${'Diapositiva ' + slide.number}">Diapositiva N</span>
                                     <span th:each="note : ${existingNotes}"
                                         th:if="${note.get('slideNumber') == slide.number}"
                                         class="sh-badge-green text-xs">
@@ -232,7 +232,7 @@
                                     th:if="${note.get('slideNumber') == slide.number}"
                                     th:id="${'note-content-' + slide.number}" class="note-card">
                                     <div class="font-semibold text-sm text-[var(--sh-text-1)] mb-2"
-                                        th:text="${note.get('title')}">Title</div>
+                                        th:text="${note.get('title')}">Título</div>
                                     <ul class="mb-2 pl-4 space-y-1 text-sm text-[var(--sh-text-2)]">
                                         <li th:each="point : ${note.get('points')}" th:text="${point}"></li>
                                     </ul>
@@ -253,7 +253,7 @@
                                 <div th:if="${#lists.isEmpty(existingNotes) || !#lists.contains(existingNotes.![get('slideNumber')], slide.number)}"
                                     th:id="${'note-placeholder-' + slide.number}"
                                     class="text-[var(--sh-text-3)] text-xs font-mono italic py-2">
-                                    No note for this slide. Generate with AI.
+                                    No hay nota para esta diapositiva. Genera una con IA.
                                 </div>
                             </div>
                         </div>
@@ -277,14 +277,14 @@
             document.getElementById('generation-result').classList.add('hidden');
             document.getElementById('result-success').classList.add('hidden');
             document.getElementById('result-error').classList.add('hidden');
-            updateProgress(0, 'Connecting to AI pipeline…');
+            updateProgress(0, 'Conectando con el pipeline de IA…');
 
             let fakePct = 5;
             const fakeTimer = setInterval(() => {
                 if (fakePct < 90) {
                     fakePct += Math.random() * 3;
                     const slideEst = Math.floor((fakePct / 100) * totalSlides);
-                    updateProgress(fakePct, `Analyzing slide ~${slideEst + 1} of ${totalSlides}…`);
+                    updateProgress(fakePct, `Analizando diapositiva ~${slideEst + 1} de ${totalSlides}…`);
                 }
             }, INTER_SLIDE_MS);
 
@@ -299,18 +299,18 @@
                 clearInterval(fakeTimer);
                 const data = await res.json();
 
-                updateProgress(100, 'Complete!');
+                updateProgress(100, '¡Completado!');
                 document.getElementById('generation-result').classList.remove('hidden');
 
                 if (res.ok && data.success !== false) {
                     document.getElementById('result-success').classList.remove('hidden');
                     document.getElementById('result-count').textContent =
-                        `${data.notesGenerated} of ${data.totalSlides || totalSlides} notes generated.`;
+                        `${data.notesGenerated} de ${data.totalSlides || totalSlides} notas generadas.`;
                     setTimeout(() => window.location.reload(), 2000);
                 } else {
                     document.getElementById('result-error').classList.remove('hidden');
                     document.getElementById('error-message').textContent =
-                        data.error || data.errorMessage || 'Unknown error.';
+                        data.error || data.errorMessage || 'Error desconocido.';
                     btn.disabled = false;
                 }
             } catch (e) {
@@ -318,7 +318,7 @@
                 document.getElementById('generation-result').classList.remove('hidden');
                 document.getElementById('result-error').classList.remove('hidden');
                 document.getElementById('error-message').textContent =
-                    'Connection error: ' + e.message;
+                    'Error de conexión: ' + e.message;
                 btn.disabled = false;
             }
         }
