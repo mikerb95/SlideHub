@@ -860,6 +860,10 @@
             setTimeout(() => nextStep(), 600);
         }
 
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
         // ── STEP 2: Repo Analysis ──
         async function analyzeRepo() {
             const repoUrl = document.getElementById('repo-url').value.trim();
@@ -868,15 +872,34 @@
             hideError('repo-error');
             document.getElementById('btn-analyze-repo').disabled = true;
             document.getElementById('repo-progress').classList.remove('hidden');
+            document.getElementById('repo-progress').innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Analizando repositorio con Gemini...';
             document.getElementById('repo-result').classList.add('hidden');
 
             try {
-                const res = await fetch('/api/ai/analyze-repo', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', ...csrfHeaders() },
-                    body: JSON.stringify({ repoUrl })
-                });
-                const data = await readJsonSafe(res);
+                let res = null;
+                let data = {};
+                const maxAttempts = 3;
+
+                for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                    res = await fetch('/api/ai/analyze-repo', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', ...csrfHeaders() },
+                        body: JSON.stringify({ repoUrl })
+                    });
+
+                    data = await readJsonSafe(res);
+
+                    if (res.status !== 429) {
+                        break;
+                    }
+
+                    if (attempt < maxAttempts) {
+                        const waitSeconds = attempt * 4;
+                        document.getElementById('repo-progress').innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Servicio IA iniciando en Render. Reintentando en ' + waitSeconds + 's...';
+                        await sleep(waitSeconds * 1000);
+                    }
+                }
+
                 document.getElementById('repo-progress').classList.add('hidden');
                 document.getElementById('btn-analyze-repo').disabled = false;
                 if (res.ok) {
@@ -888,7 +911,11 @@
                     if (data.technologies && data.technologies.length) parts.push('Tech: ' + data.technologies.join(', '));
                     document.getElementById('repo-summary').textContent = parts.length ? parts.join(' | ') : summary;
                 } else {
-                    showError('repo-error', data.error || 'Error analizando repositorio.');
+                    if (res.status === 429) {
+                        showError('repo-error', 'El servicio de IA está iniciando o saturado (429). Espera unos segundos e inténtalo de nuevo.');
+                    } else {
+                        showError('repo-error', data.error || 'Error analizando repositorio.');
+                    }
                 }
             } catch (e) {
                 document.getElementById('repo-progress').classList.add('hidden');
