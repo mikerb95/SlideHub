@@ -91,7 +91,29 @@
             </div>
             <div th:if="${providerErrorMessage}" class="sh-alert sh-alert-error mb-3">
                 <i class="fa-solid fa-circle-exclamation mt-0.5"></i>
-                <span th:text="${providerErrorMessage}">Error</span>
+                <div class="w-full">
+                    <span th:text="${providerErrorMessage}">Error</span>
+
+                    <div th:if="${!hasPasswordConfigured}" class="mt-3 p-3 rounded-tech border border-[var(--sh-border)] bg-[var(--sh-deep)]">
+                        <div class="font-mono text-[0.7rem] text-[var(--sh-text-3)] mb-2">SUGERENCIA</div>
+                        <div class="text-xs text-[var(--sh-text-2)] mb-3">
+                            Crea una contraseña local para poder desvincular tu cuenta OAuth sin perder acceso.
+                        </div>
+                        <form th:action="@{/auth/password/create}" method="post" class="space-y-2">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf}">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <input name="newPassword" type="password" class="sh-input text-xs" minlength="8"
+                                    placeholder="Nueva contraseña" required>
+                                <input name="confirmNewPassword" type="password" class="sh-input text-xs" minlength="8"
+                                    placeholder="Confirmar contraseña" required>
+                            </div>
+                            <button type="submit" class="sh-btn sh-btn-blue text-xs py-1.5 px-3">
+                                <i class="fa-solid fa-key"></i>
+                                Crear contraseña
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
 
             <div class="flex flex-col gap-3">

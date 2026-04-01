@@ -337,6 +337,52 @@ public class AuthController {
         return "auth/profile";
     }
 
+    @PostMapping("/password/create")
+    public String createPasswordFromProfile(
+            Authentication authentication,
+            @RequestParam(name = "newPassword", required = false) String newPassword,
+            @RequestParam(name = "confirmNewPassword", required = false) String confirmNewPassword,
+            Model model) {
+        if (!isAuthenticated(authentication)) {
+            return "redirect:/auth/login";
+        }
+
+        User user = findCurrentUser(authentication);
+        if (user == null) {
+            return "redirect:/auth/login";
+        }
+
+        populateProfileModel(model, user);
+
+        if (user.getPasswordHash() != null && !user.getPasswordHash().isBlank()) {
+            model.addAttribute("providerMessage", "Ya tienes contraseña configurada para acceso local.");
+            return "auth/profile";
+        }
+
+        String password = newPassword != null ? newPassword.trim() : "";
+        String confirmation = confirmNewPassword != null ? confirmNewPassword.trim() : "";
+
+        if (password.isBlank() || confirmation.isBlank()) {
+            model.addAttribute("providerErrorMessage", "Debes completar ambos campos para crear tu contraseña.");
+            return "auth/profile";
+        }
+        if (!password.equals(confirmation)) {
+            model.addAttribute("providerErrorMessage", "Las contraseñas no coinciden.");
+            return "auth/profile";
+        }
+        if (password.length() < 8) {
+            model.addAttribute("providerErrorMessage", "La contraseña debe tener al menos 8 caracteres.");
+            return "auth/profile";
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(password));
+        userRepository.save(user);
+
+        populateProfileModel(model, user);
+        model.addAttribute("providerMessage", "Contraseña creada correctamente. Ya puedes desvincular proveedores si lo deseas.");
+        return "auth/profile";
+    }
+
     // ── Utilidades ────────────────────────────────────────────────────────────
 
     private boolean isAuthenticated(Authentication auth) {
@@ -379,6 +425,8 @@ public class AuthController {
         model.addAttribute("user", user);
         model.addAttribute("githubLinked", user.getGithubId() != null);
         model.addAttribute("googleLinked", user.getGoogleId() != null);
+        model.addAttribute("hasPasswordConfigured",
+                user.getPasswordHash() != null && !user.getPasswordHash().isBlank());
     }
 
     private boolean canUnlinkProvider(User user, String provider) {
