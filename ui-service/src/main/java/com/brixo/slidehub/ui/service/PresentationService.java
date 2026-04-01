@@ -133,6 +133,17 @@ public class PresentationService {
                 .orElse(List.of());
     }
 
+    public Optional<byte[]> getSlideImage(String presentationId, int slideNumber) {
+        return presentationRepository.findById(presentationId)
+                .flatMap(presentation -> presentation.getSlides().stream()
+                        .filter(slide -> slide.getNumber() == slideNumber)
+                        .findFirst()
+                        .map(slide -> {
+                            String key = extractS3Key(slide, presentationId);
+                            return slideUploadService.download(key);
+                        }));
+    }
+
     // ── Importación desde Google Drive ────────────────────────────────────────
 
     /**

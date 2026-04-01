@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 /**
@@ -65,6 +66,20 @@ public class SlideUploadService {
                         .key(key)
                         .build());
         log.info("Archivo eliminado de S3: {}", key);
+    }
+
+    /**
+     * Descarga un archivo de S3 y devuelve su contenido en bytes.
+     *
+     * @param key clave S3 del archivo
+     * @return bytes del objeto
+     */
+    public byte[] download(String key) {
+        return s3.getObjectAsBytes(
+                GetObjectRequest.builder()
+                        .bucket(bucket)
+                        .key(key)
+                        .build()).asByteArray();
     }
 
     /**

@@ -13,6 +13,8 @@ import com.brixo.slidehub.ui.service.PresentationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -126,6 +128,17 @@ public class PresentationImportController {
                 "totalSlides", slides.size(),
                 "slides", slides));
     }
+
+            @GetMapping("/api/presentations/{id}/slides/{slideNumber}/image")
+            @ResponseBody
+            public ResponseEntity<byte[]> getSlideImage(@PathVariable String id, @PathVariable int slideNumber) {
+            return presentationService.getSlideImage(id, slideNumber)
+                .map(bytes -> ResponseEntity.ok()
+                    .header(HttpHeaders.CACHE_CONTROL, "public, max-age=300")
+                    .contentType(MediaType.IMAGE_PNG)
+                    .body(bytes))
+                .orElse(ResponseEntity.notFound().build());
+            }
 
     /**
      * Explora una carpeta de Google Drive: subcarpetas + imágenes.
