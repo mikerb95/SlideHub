@@ -71,7 +71,7 @@
                     <div class="sh-label mb-2">IDENTIDAD</div>
                     <h1 class="font-brand text-2xl text-[var(--sh-text-1)]"
                         th:text="${user?.username} ?: ${#authentication.name}">usuario</h1>
-                    <div class="font-mono text-sm text-[var(--sh-text-2)] mt-1" th:text="${user?.email}">
+                    <div class="font-mono text-sm text-[var(--sh-text-2)] mt-1" th:text="${profileIdentitySubtitle}">
                         email@ejemplo.com</div>
                 </div>
                 <span class="sh-badge-blue" th:text="${user?.role} ?: 'PRESENTER'">PRESENTER</span>

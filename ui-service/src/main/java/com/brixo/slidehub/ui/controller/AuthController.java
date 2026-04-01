@@ -428,6 +428,30 @@ public class AuthController {
         model.addAttribute("googleLinked", user.getGoogleId() != null);
         model.addAttribute("hasPasswordConfigured",
                 user.getPasswordHash() != null && !user.getPasswordHash().isBlank());
+        model.addAttribute("profileIdentitySubtitle", buildProfileIdentitySubtitle(user));
+    }
+
+    private String buildProfileIdentitySubtitle(User user) {
+        String email = user.getEmail();
+        if (email == null || email.isBlank()) {
+            return "Cuenta sin correo configurado";
+        }
+
+        if (email.endsWith("@github.oauth.placeholder")) {
+            String githubUser = user.getGithubUsername() != null && !user.getGithubUsername().isBlank()
+                    ? user.getGithubUsername()
+                    : user.getUsername();
+            return "Cuenta creada con GitHub (@" + githubUser + ")";
+        }
+
+        if (email.endsWith("@google.oauth.placeholder")) {
+            String googleIdentity = user.getGoogleEmail() != null && !user.getGoogleEmail().isBlank()
+                    ? user.getGoogleEmail()
+                    : user.getUsername();
+            return "Cuenta creada con Google (" + googleIdentity + ")";
+        }
+
+        return email;
     }
 
     private boolean canUnlinkProvider(User user, String provider) {
