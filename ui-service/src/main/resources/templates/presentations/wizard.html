@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nueva Presentacion — SlideHub</title>
     <th:block th:replace="~{fragments/head :: assets}"></th:block>
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <style>
         /* ── Wizard step indicator ── */
         .step-dot {
