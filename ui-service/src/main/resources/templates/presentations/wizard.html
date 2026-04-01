@@ -794,7 +794,7 @@
             if (W.repoUrl) params.append('repoUrl', W.repoUrl);
 
             try {
-                const res = await fetch('/api/presentations/' + W.presentationId + '/generate-notes?' + params, { method: 'POST' });
+                const res = await fetch('/api/presentations/' + W.presentationId + '/generate-notes?' + params, { method: 'POST', headers: csrfHeaders() });
                 clearInterval(fakeTimer);
                 const data = await res.json();
 
@@ -886,7 +886,7 @@
             try {
                 const res = await fetch('/api/presentations/' + W.presentationId + '/meeting/participants', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', ...csrfHeaders() },
                     body: JSON.stringify({ displayName: name, presenter: true })
                 });
                 if (res.ok) {
