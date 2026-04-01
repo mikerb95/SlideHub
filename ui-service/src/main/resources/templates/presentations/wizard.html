@@ -155,7 +155,7 @@
                 <div id="panel-drive" class="hidden">
                     <div th:if="${!hasGoogleToken}" class="sh-alert sh-alert-warn mb-4">
                         <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
-                        <span>Vincula tu <a th:href="@{/auth/link/google}" class="underline">cuenta de Google</a> para acceder a Drive.</span>
+                        <span>Conecta tu <a href="/oauth2/authorization/google-drive" class="underline">cuenta de Google Drive</a> para acceder a tus archivos.</span>
                     </div>
                     <div th:if="${hasGoogleToken}">
                         <!-- Breadcrumb -->
