@@ -65,7 +65,11 @@ public class PresentationImportController {
 
     /** Dashboard de presentaciones — landing post-login. */
     @GetMapping("/presentations")
-    public String dashboard(Authentication authentication, Model model) {
+    public String dashboard(Authentication authentication,
+            @RequestParam(required = false) String deleted,
+            @RequestParam(required = false) String deleteError,
+            @RequestParam(required = false) String notFound,
+            Model model) {
         User user = resolveUser(authentication);
         List<PresentationSummary> presentations = presentationService
                 .listPresentations(user.getId())
@@ -73,6 +77,9 @@ public class PresentationImportController {
                 .map(PresentationSummary::from)
                 .toList();
         model.addAttribute("presentations", presentations);
+        model.addAttribute("deleted", deleted != null);
+        model.addAttribute("deleteError", deleteError != null);
+        model.addAttribute("notFound", notFound != null);
         return "presentations/dashboard";
     }
 
@@ -87,7 +94,11 @@ public class PresentationImportController {
      * Vista de importación (legacy, sigue accesible).
      */
     @GetMapping("/presentations/import")
-    public String importPage(Authentication authentication, Model model) {
+    public String importPage(Authentication authentication,
+            @RequestParam(required = false) String deleted,
+            @RequestParam(required = false) String deleteError,
+            @RequestParam(required = false) String notFound,
+            Model model) {
         User user = resolveUser(authentication);
         List<PresentationSummary> presentations = presentationService
                 .listPresentations(user.getId())
@@ -96,6 +107,9 @@ public class PresentationImportController {
                 .toList();
         model.addAttribute("presentations", presentations);
         model.addAttribute("hasGoogleToken", hasGoogleToken(authentication));
+        model.addAttribute("deleted", deleted != null);
+        model.addAttribute("deleteError", deleteError != null);
+        model.addAttribute("notFound", notFound != null);
         return "presentations/import";
     }
 
@@ -288,8 +302,16 @@ public class PresentationImportController {
             @PathVariable String id,
             Authentication authentication) {
         User user = resolveUser(authentication);
-        presentationService.deletePresentation(user.getId(), id);
-        return "redirect:/presentations";
+        try {
+            boolean deleted = presentationService.deletePresentation(user.getId(), id);
+            if (!deleted) {
+                return "redirect:/presentations?notFound=1";
+            }
+            return "redirect:/presentations?deleted=1";
+        } catch (Exception ex) {
+            log.error("Error eliminando presentación {}: {}", id, ex.getMessage());
+            return "redirect:/presentations?deleteError=1";
+        }
     }
 
     @PostMapping("/api/presentations/{id}/delete")
