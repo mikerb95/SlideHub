@@ -147,10 +147,15 @@ public class StatusChecksService {
                     ok ? "ok" : "down",
                     latencyMs,
                     timestamp,
-                    "HTTP " + response.statusCode());
+                    "GET " + compactTarget(url) + " -> HTTP " + response.statusCode());
         } catch (Exception ex) {
             long latencyMs = Duration.between(start, Instant.now()).toMillis();
-            return new StatusCheckItem(name, "down", latencyMs > 0 ? latencyMs : null, timestamp, sanitize(ex));
+                return new StatusCheckItem(
+                    name,
+                    "down",
+                    latencyMs > 0 ? latencyMs : null,
+                    timestamp,
+                    "GET " + compactTarget(url) + " -> " + sanitize(ex));
         }
     }
 
@@ -159,10 +164,15 @@ public class StatusChecksService {
         try (Socket socket = new Socket()) {
             socket.connect(new InetSocketAddress(host, port), (int) checkTimeout.toMillis());
             long latencyMs = Duration.between(start, Instant.now()).toMillis();
-            return new StatusCheckItem(name, "ok", latencyMs, timestamp, "TCP connected");
+            return new StatusCheckItem(name, "ok", latencyMs, timestamp, "TCP " + host + ":" + port + " connected");
         } catch (IOException ex) {
             long latencyMs = Duration.between(start, Instant.now()).toMillis();
-            return new StatusCheckItem(name, "down", latencyMs > 0 ? latencyMs : null, timestamp, sanitize(ex));
+            return new StatusCheckItem(
+                    name,
+                    "down",
+                    latencyMs > 0 ? latencyMs : null,
+                    timestamp,
+                    "TCP " + host + ":" + port + " -> " + sanitize(ex));
         }
     }
 
@@ -178,6 +188,16 @@ public class StatusChecksService {
         }
         int cut = Math.min(msg.length(), 120);
         return simple + ": " + msg.substring(0, cut);
+    }
+
+    private String compactTarget(String url) {
+        try {
+            URI uri = URI.create(url);
+            String path = uri.getPath() == null ? "" : uri.getPath();
+            return uri.getHost() + path;
+        } catch (Exception ignored) {
+            return url;
+        }
     }
 
     private String normalizeBaseUrl(String url) {

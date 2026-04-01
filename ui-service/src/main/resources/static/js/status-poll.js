@@ -42,14 +42,39 @@
         }).join('');
     }
 
+    function sanitizeText(value) {
+        return String(value || '')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    function snippet(value, max = 160) {
+        const clean = sanitizeText(value);
+        return clean.length > max ? clean.slice(0, max) + '…' : clean;
+    }
+
     async function loadChecks() {
         try {
             errorBox.classList.add('hidden');
             const response = await fetch('/status/api/checks', { cache: 'no-store' });
+            const contentType = response.headers.get('content-type') || 'unknown';
+            const responseText = await response.text();
+
             if (!response.ok) {
-                throw new Error('HTTP ' + response.status);
+                throw new Error(`HTTP ${response.status} · content-type=${contentType} · body=${snippet(responseText)}`);
             }
-            const payload = await response.json();
+
+            if (!contentType.toLowerCase().includes('application/json')) {
+                throw new Error(`Expected JSON but got ${contentType} · body=${snippet(responseText)}`);
+            }
+
+            let payload;
+            try {
+                payload = JSON.parse(responseText);
+            } catch (parseError) {
+                throw new Error(`Invalid JSON (${parseError.message}) · body=${snippet(responseText)}`);
+            }
+
             renderRows(payload.checks || []);
             lastUpdatedText.textContent = formatDate(payload.generatedAt);
         } catch (err) {
