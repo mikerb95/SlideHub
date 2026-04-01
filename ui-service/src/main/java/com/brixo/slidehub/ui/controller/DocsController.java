@@ -10,4 +10,9 @@ public class DocsController {
     public String aiGuide() {
         return "ai-guide";
     }
+
+    @GetMapping("/calidad")
+    public String qualityGuide() {
+        return "calidad";
+    }
 }

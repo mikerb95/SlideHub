@@ -111,6 +111,7 @@ public class RoutesConfig {
                                                                 .or(RequestPredicates.path("/demo"))
                                                                 .or(RequestPredicates.path("/showcase"))
                                                                 .or(RequestPredicates.path("/deploy-tutor"))
+                                                                .or(RequestPredicates.path("/calidad"))
                                                                 .or(RequestPredicates.path("/presentations/**"))
                                                                 .or(RequestPredicates.path("/css/**"))
                                                                 .or(RequestPredicates.path("/js/**"))
