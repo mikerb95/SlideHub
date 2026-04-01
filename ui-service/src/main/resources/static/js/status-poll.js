@@ -118,51 +118,85 @@
         const detail = (check.detail || '').toLowerCase();
         const causes = [];
         const fixes = [];
+        let severity = 'info';
+        let impact = 'Sin impacto operativo detectado.';
 
         if (detail.includes('not configured')) {
             causes.push('La variable de entorno requerida no está definida en este servicio.');
             fixes.push(`Configura ${expectedEnvByService(check.name)} y reinicia el servicio.`);
-            return { causes, fixes };
+            severity = 'warn';
+            impact = 'Monitoreo incompleto: este check no puede validar conectividad real.';
+            return { causes, fixes, severity, impact };
         }
 
         if (detail.includes('http 429')) {
             causes.push('Rate limit del proveedor externo o servicio temporalmente saturado.');
             fixes.push('Reintentar con backoff (ya implementado) y validar cuota del proveedor.');
             fixes.push('Usar token/API key con mayor cuota si aplica.');
+            severity = 'warn';
+            impact = 'Degradación parcial: operaciones con IA o API externa pueden fallar intermitentemente.';
         }
 
         if (detail.includes('connectexception')) {
             causes.push('El host está caído, dormido o la URL/puerto no es alcanzable.');
             fixes.push('Verifica URL/puerto y que el servicio esté levantado.');
             fixes.push('En Render free tier, confirma keep-alive y tráfico reciente.');
+            severity = 'error';
+            impact = 'Impacto alto: dependencia no alcanzable; funcionalidades relacionadas están caídas.';
         }
 
         if (detail.includes('unknownhostexception')) {
             causes.push('Hostname inválido o DNS no resolvible desde el contenedor.');
             fixes.push('Corrige el hostname en variables de entorno y vuelve a desplegar.');
+            severity = 'error';
+            impact = 'Impacto alto: resolución DNS fallida; no hay conexión posible al servicio.';
         }
 
         if (detail.includes('timedout') || detail.includes('timeout')) {
             causes.push('Tiempo de respuesta excedido por latencia de red o servicio lento.');
             fixes.push('Aumenta timeout de health-check o reduce carga del servicio destino.');
+            if (severity !== 'error') {
+                severity = 'warn';
+            }
+            impact = 'Impacto medio: lentitud o fallos por timeout en operaciones dependientes.';
         }
 
         if (detail.includes('http 5')) {
             causes.push('El servicio respondió error interno (5xx).');
             fixes.push('Revisar logs del servicio destino para stacktrace y dependencia fallida.');
+            severity = 'error';
+            impact = 'Impacto alto: el servicio destino está fallando internamente.';
         }
 
         if (check.status === 'ok') {
             causes.push('Conectividad y respuesta correctas para el objetivo.');
             fixes.push('Sin acción requerida. Monitorear tendencia de latencia.');
+            severity = 'info';
+            impact = 'Sin impacto actual. Servicio operativo.';
+
+            if (check.latencyMs !== null && check.latencyMs !== undefined && check.latencyMs > 1200) {
+                severity = 'warn';
+                impact = 'Servicio disponible pero con latencia alta; podría afectar UX.';
+                causes.push('Latencia superior al umbral recomendado (>1200 ms).');
+                fixes.push('Revisar región, red y carga del servicio para bajar latencia.');
+            }
         }
 
         if (causes.length === 0) {
             causes.push('Fallo no clasificado automáticamente.');
             fixes.push('Inspeccionar logs del servicio y validar variables de entorno asociadas.');
+            severity = check.status === 'ok' ? 'info' : 'warn';
+            impact = check.status === 'ok'
+                ? 'Sin impacto observable por ahora.'
+                : 'Impacto indeterminado hasta revisar logs detallados.';
         }
 
-        return { causes, fixes };
+        if (check.status !== 'ok' && severity === 'info') {
+            severity = 'warn';
+            impact = 'Servicio en estado DOWN; revisar causa raíz en logs.';
+        }
+
+        return { causes, fixes, severity, impact };
     }
 
     function rowItem(label, value) {
@@ -186,6 +220,8 @@
         const latency = document.getElementById('diag-latency');
         const causes = document.getElementById('diag-causes');
         const fixes = document.getElementById('diag-fixes');
+        const severityBadge = document.getElementById('diag-severity');
+        const impactText = document.getElementById('diag-impact');
 
         const props = parseConnectionProps(check);
         const analysis = deriveDiagnosis(check);
@@ -206,6 +242,21 @@
             rowItem('Last Check', formatDate(check.lastCheckedAt)),
             rowItem('Detail', check.detail || '--')
         ].join('');
+
+        const severityClass = analysis.severity === 'error'
+            ? 'diag-severity diag-severity-error'
+            : analysis.severity === 'warn'
+                ? 'diag-severity diag-severity-warn'
+                : 'diag-severity diag-severity-info';
+
+        if (severityBadge) {
+            severityBadge.className = severityClass;
+            severityBadge.textContent = analysis.severity.toUpperCase();
+        }
+
+        if (impactText) {
+            impactText.textContent = analysis.impact;
+        }
 
         causes.innerHTML = analysis.causes.map((c) => `<li>${escapeHtml(c)}</li>`).join('');
         fixes.innerHTML = analysis.fixes.map((f) => `<li>${escapeHtml(f)}</li>`).join('');
