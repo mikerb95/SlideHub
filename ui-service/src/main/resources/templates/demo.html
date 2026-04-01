@@ -40,7 +40,7 @@
 
     <button id="btn-return" onclick="returnToSlide()">
         <i class="fa-solid fa-arrow-left"></i>
-        <span id="return-label">Return_Slides</span>
+        <span id="return-label">Volver a slides</span>
     </button>
 
     <script th:inline="javascript">
@@ -108,7 +108,7 @@
                         iframe.src = demo.url;
                     }
                     const rs = demo.returnSlide;
-                    returnLabel.textContent = rs ? `Return_Slide_${rs}` : 'Return_Slides';
+                    returnLabel.textContent = rs ? `Volver al slide ${rs}` : 'Volver a slides';
                     btnReturn.classList.add('visible');
                 } else {
                     btnReturn.classList.remove('visible');
