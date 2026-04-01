@@ -112,6 +112,32 @@
             background: #fff;
             object-fit: contain;
         }
+
+        @media (max-width: 1024px) {
+            #panel-layout {
+                flex-direction: column;
+                height: auto !important;
+                min-height: calc(100vh - 48px);
+            }
+
+            #panel-grid-area {
+                min-height: 52vh;
+            }
+
+            #panel-sidebar {
+                width: 100%;
+                min-width: 0;
+                border-left: 0;
+                border-top: 1px solid var(--sh-border);
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 640px) {
+            #slide-grid {
+                grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)) !important;
+            }
+        }
     </style>
 </head>
 
@@ -150,10 +176,10 @@
     <!-- ═══════════════════════════════════
          LAYOUT — Grid + Sidebar
          ═══════════════════════════════════ -->
-    <div class="flex" style="margin-top: 48px; height: calc(100vh - 48px);">
+    <div id="panel-layout" class="flex" style="margin-top: 48px; height: calc(100vh - 48px);">
 
         <!-- ── Slide Grid Area ── -->
-        <div class="flex-1 overflow-y-auto p-4">
+        <div id="panel-grid-area" class="flex-1 overflow-y-auto p-3 sm:p-4">
             <div id="slide-grid" class="grid gap-3"
                 style="grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));">
                 <div style="grid-column: 1 / -1;"
@@ -165,7 +191,7 @@
         </div>
 
         <!-- ── Sidebar ── -->
-        <div
+        <div id="panel-sidebar"
             class="w-[300px] min-w-[260px] bg-sh-card border-l border-[var(--sh-border)] flex flex-col overflow-y-auto">
 
             <!-- DEMO MODE -->
@@ -241,7 +267,7 @@
                     <!-- Assignments -->
                     <div class="bg-[var(--sh-deep)] border border-[var(--sh-border)] rounded-tech p-3">
                         <div class="font-mono text-xs text-[var(--sh-text-2)] mb-2">ASIGNACIÓN DE SLIDE</div>
-                        <div class="grid grid-cols-[1fr_2fr] gap-2 mb-2">
+                        <div class="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-2 mb-2">
                             <select id="assign-slide" class="sh-select text-xs py-1"></select>
                             <select id="assign-participant" class="sh-select text-xs py-1"></select>
                         </div>
@@ -341,11 +367,11 @@
 
             <!-- New link form -->
             <div class="sh-label mb-3">AÑADIR LINK</div>
-            <div class="grid grid-cols-2 gap-2 mb-2">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
                 <input type="text" class="sh-input text-xs" id="new-link-title" placeholder="Title *">
                 <input type="url" class="sh-input text-xs" id="new-link-url" placeholder="URL *">
             </div>
-            <div class="grid grid-cols-[1fr_2fr] gap-2 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-2 mb-4">
                 <input type="text" class="sh-input text-xs" id="new-link-icon" placeholder="FA icon class">
                 <input type="text" class="sh-input text-xs" id="new-link-desc" placeholder="Description (optional)">
             </div>

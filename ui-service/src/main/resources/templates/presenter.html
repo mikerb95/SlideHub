@@ -19,7 +19,7 @@
     </style>
 </head>
 
-<body class="sh bg-sh-deep antialiased h-screen flex flex-col overflow-hidden">
+<body class="sh bg-sh-deep antialiased min-h-screen lg:h-screen flex flex-col overflow-y-auto lg:overflow-hidden">
 
     <!-- ═══ Topbar ═══ -->
     <nav class="sh-nav" style="position: sticky;">
@@ -61,15 +61,15 @@
     </nav>
 
     <!-- ═══ Content: Slide + Notes ═══ -->
-    <div class="flex flex-1 overflow-hidden">
+    <div class="flex flex-1 flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
 
         <!-- Slide Preview -->
-        <div class="slide-preview flex-1 bg-black flex items-center justify-center relative" id="slide-area">
+        <div class="slide-preview flex-1 min-h-[42vh] lg:min-h-0 bg-black flex items-center justify-center relative" id="slide-area">
             <!-- Slides injected by JS -->
         </div>
 
         <!-- Notes Panel -->
-        <div class="w-[380px] min-w-[280px] bg-sh-card border-l border-[var(--sh-border)] overflow-y-auto p-5"
+        <div class="w-full lg:w-[380px] lg:min-w-[280px] bg-sh-card border-t lg:border-t-0 lg:border-l border-[var(--sh-border)] overflow-y-auto p-4 sm:p-5"
              id="notes-panel">
             <div class="sh-label mb-4">
                 <i class="fa-solid fa-note-sticky mr-1"></i>PRESENTER_NOTES
