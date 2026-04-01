@@ -25,6 +25,8 @@ class KeepAliveServiceTest {
     @Mock
     private PresentationSessionRepository sessionRepository;
 
+    private UserActivityTracker userActivityTracker;
+
     private HttpServer stateServer;
     private HttpServer aiServer;
 
@@ -48,10 +50,14 @@ class KeepAliveServiceTest {
 
         given(sessionRepository.existsByActiveTrue()).willReturn(false);
 
+        userActivityTracker = new UserActivityTracker();
+
         KeepAliveService service = new KeepAliveService(
                 sessionRepository,
+            userActivityTracker,
                 baseUrl(stateServer),
-                baseUrl(aiServer));
+            baseUrl(aiServer),
+            300000);
 
         service.ping();
         Thread.sleep(250);
@@ -70,15 +76,46 @@ class KeepAliveServiceTest {
 
         given(sessionRepository.existsByActiveTrue()).willReturn(true);
 
+        userActivityTracker = new UserActivityTracker();
+
         KeepAliveService service = new KeepAliveService(
                 sessionRepository,
+            userActivityTracker,
                 baseUrl(stateServer),
-                baseUrl(aiServer));
+            baseUrl(aiServer),
+            300000);
 
         service.ping();
 
         boolean bothCalled = waitUntil(() -> stateCalls.get() >= 1 && aiCalls.get() >= 1, 2000);
         assertTrue(bothCalled, "Los pings a state-service y ai-service no se ejecutaron en el tiempo esperado");
+    }
+
+    @Test
+    void ping_whenRecentUserActivity_callsStateAndAiHealthEndpointsWithoutActivePresentation() throws Exception {
+        AtomicInteger stateCalls = new AtomicInteger(0);
+        AtomicInteger aiCalls = new AtomicInteger(0);
+
+        stateServer = startHealthServer(stateCalls);
+        aiServer = startHealthServer(aiCalls);
+
+        given(sessionRepository.existsByActiveTrue()).willReturn(false);
+
+        userActivityTracker = new UserActivityTracker();
+        userActivityTracker.markActivityNow();
+
+        KeepAliveService service = new KeepAliveService(
+                sessionRepository,
+                userActivityTracker,
+                baseUrl(stateServer),
+                baseUrl(aiServer),
+                300000);
+
+        service.ping();
+
+        boolean bothCalled = waitUntil(() -> stateCalls.get() >= 1 && aiCalls.get() >= 1, 2000);
+        assertTrue(bothCalled,
+                "Con actividad reciente de usuario también debe ejecutar keep-alive aunque no haya sesión de presentación");
     }
 
     private HttpServer startHealthServer(AtomicInteger calls) throws IOException {

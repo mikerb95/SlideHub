@@ -525,6 +525,9 @@
         // ── Step Navigation ──
         function goToStep(n) {
             if (n < 1 || n > W.totalSteps) return;
+            if (n >= 3 && !hasPresentationContext()) {
+                n = 1;
+            }
             document.querySelectorAll('.wizard-step').forEach(el => el.classList.remove('active'));
             document.getElementById('step-' + n).classList.add('active');
 
@@ -540,7 +543,8 @@
             });
 
             W.step = n;
-            history.replaceState(null, '', '#step-' + n);
+            const url = new URL(window.location.href);
+            history.replaceState(null, '', url.pathname + url.search + '#step-' + n);
             updateNavButtons();
             onStepEnter(n);
         }
@@ -872,7 +876,7 @@
                     headers: { 'Content-Type': 'application/json', ...csrfHeaders() },
                     body: JSON.stringify({ repoUrl })
                 });
-                const data = await res.json();
+                const data = await readJsonSafe(res);
                 document.getElementById('repo-progress').classList.add('hidden');
                 document.getElementById('btn-analyze-repo').disabled = false;
                 if (res.ok) {
@@ -895,6 +899,10 @@
 
         // ── STEP 3: Generate Notes ──
         async function generateNotes() {
+            if (!hasPresentationContext()) {
+                showError('notes-error', 'Primero crea/importa la presentacion en el Paso 1.');
+                return;
+            }
             document.getElementById('btn-generate-notes').disabled = true;
             document.getElementById('notes-progress').classList.remove('hidden');
             document.getElementById('notes-success').classList.add('hidden');
@@ -917,7 +925,7 @@
             try {
                 const res = await fetch('/api/presentations/' + W.presentationId + '/generate-notes?' + params, { method: 'POST', headers: csrfHeaders() });
                 clearInterval(fakeTimer);
-                const data = await res.json();
+                const data = await readJsonSafe(res);
 
                 document.getElementById('notes-progress-bar').style.width = '100%';
                 document.getElementById('notes-progress-text').textContent = 'Completado!';
@@ -1081,6 +1089,17 @@
             const el = document.getElementById(id);
             if (el) el.classList.add('hidden');
         }
+
+        async function readJsonSafe(res) {
+            const raw = await res.text();
+            if (!raw) return {};
+            try {
+                return JSON.parse(raw);
+            } catch (_) {
+                return {};
+            }
+        }
+
         function escHtml(str) {
             return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
@@ -1098,7 +1117,7 @@
 
             // Restore step from hash
             const hash = window.location.hash;
-            if (hash && hash.startsWith('#step-')) {
+            if (hash && (hash.startsWith('#step-') || hash.startsWith('#step='))) {
                 const n = parseInt(hash.substring(6));
                 if (n >= 1 && n <= W.totalSteps) goToStep(n);
             }
