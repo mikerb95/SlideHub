@@ -204,7 +204,7 @@
                     <!-- QR Access -->
                     <div class="bg-[var(--sh-deep)] border border-[var(--sh-border)] rounded-tech p-3 mb-3">
                         <div class="flex justify-between items-center mb-2">
-                            <span class="font-mono text-xs text-[var(--sh-text-2)]">QR_ACCESS</span>
+                            <span class="font-mono text-xs text-[var(--sh-text-2)]">ACCESO QR</span>
                             <button class="sh-btn text-xs py-0.5 px-2" id="btn-start-session"
                                     style="font-size: 0.7rem;">
                                 <i class="fa-solid fa-qrcode"></i>
@@ -227,10 +227,10 @@
 
                     <!-- Participants -->
                     <div class="bg-[var(--sh-deep)] border border-[var(--sh-border)] rounded-tech p-3 mb-3">
-                        <div class="font-mono text-xs text-[var(--sh-text-2)] mb-2">PARTICIPANTS</div>
+                        <div class="font-mono text-xs text-[var(--sh-text-2)] mb-2">PARTICIPANTES</div>
                         <div class="flex gap-1 mb-2">
                             <input id="participant-name" class="sh-input text-xs" maxlength="120"
-                                   placeholder="Participant name">
+                                   placeholder="Nombre del participante">
                             <button id="btn-add-participant" class="sh-btn sh-btn-blue text-xs px-2 flex-shrink-0"
                                     type="button">
                                 <i class="fa-solid fa-plus"></i>
@@ -241,14 +241,14 @@
 
                     <!-- Assignments -->
                     <div class="bg-[var(--sh-deep)] border border-[var(--sh-border)] rounded-tech p-3">
-                        <div class="font-mono text-xs text-[var(--sh-text-2)] mb-2">SLIDE_ASSIGNMENT</div>
+                        <div class="font-mono text-xs text-[var(--sh-text-2)] mb-2">ASIGNACIÓN DE SLIDE</div>
                         <div class="grid grid-cols-[1fr_2fr] gap-2 mb-2">
                             <select id="assign-slide" class="sh-select text-xs py-1"></select>
                             <select id="assign-participant" class="sh-select text-xs py-1"></select>
                         </div>
                         <button id="btn-assign-slide" class="sh-btn sh-btn-blue text-xs w-full justify-center">
                             <i class="fa-solid fa-user-check"></i>
-                            Save_Assignment
+                            Guardar asignación
                         </button>
                         <div class="max-h-[132px] overflow-y-auto mt-2" id="assignments-list"></div>
                     </div>
@@ -258,16 +258,16 @@
             <!-- QUICK SLIDE -->
             <div class="p-4 border-b border-[var(--sh-border-subtle)]">
                 <div class="sh-label mb-3">
-                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>QUICK_SLIDE
+                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>SLIDE RÁPIDO
                 </div>
                 <div class="bg-[var(--sh-deep)] border border-[var(--sh-border)] rounded-tech p-3">
                     <input id="quick-slide-title" type="text" class="sh-input text-xs mb-2" maxlength="120"
-                           placeholder="Slide title">
+                           placeholder="Título del slide">
                     <textarea id="quick-slide-body" class="sh-textarea text-xs mb-2" rows="3" maxlength="500"
-                              placeholder="Slide body text" style="min-height: 60px;"></textarea>
+                              placeholder="Contenido del slide" style="min-height: 60px;"></textarea>
                     <button id="btn-generate-quick-slide" class="sh-btn sh-btn-primary text-xs w-full justify-center">
                         <i class="fa-solid fa-plus"></i>
-                        Create_Slide
+                        Crear slide
                     </button>
                     <div class="font-mono text-[0.6rem] text-[var(--sh-text-3)] mt-1.5">
                         Uses active presentation color palette.
@@ -279,7 +279,7 @@
             <div class="p-4 flex-grow">
                 <div class="flex justify-between items-center mb-3">
                     <div class="sh-label">
-                        <i class="fa-solid fa-bolt mr-1"></i>QUICK_LINKS
+                        <i class="fa-solid fa-bolt mr-1"></i>LINKS RÁPIDOS
                     </div>
                     <button th:if="${presentationId != ''}"
                             class="sh-btn sh-btn-ghost text-xs py-0.5 px-2"
@@ -342,7 +342,7 @@
             <hr class="sh-divider">
 
             <!-- New link form -->
-            <div class="sh-label mb-3">ADD_LINK</div>
+            <div class="sh-label mb-3">AÑADIR LINK</div>
             <div class="grid grid-cols-2 gap-2 mb-2">
                 <input type="text" class="sh-input text-xs" id="new-link-title" placeholder="Title *">
                 <input type="url" class="sh-input text-xs" id="new-link-url" placeholder="URL *">
@@ -356,10 +356,10 @@
 
             <!-- Footer -->
             <div class="flex justify-end gap-2">
-                <button class="sh-btn text-xs" onclick="closeLinksModal()">Close</button>
+                <button class="sh-btn text-xs" onclick="closeLinksModal()">Cerrar</button>
                 <button class="sh-btn sh-btn-primary text-xs" onclick="addQuickLink()">
                     <i class="fa-solid fa-plus"></i>
-                    Add_Link
+                    Añadir link
                 </button>
             </div>
         </div>
@@ -511,7 +511,7 @@
 
         function updateDemoBadge(demo) {
             if (demo.mode === 'url') {
-                demoModeBadge.textContent = 'URL_ACTIVE';
+                demoModeBadge.textContent = 'URL ACTIVA';
                 demoModeBadge.className = 'sh-badge-amber';
                 document.querySelectorAll('.quick-link-btn').forEach(btn => {
                     btn.classList.toggle('active-demo', btn.dataset.url === demo.url);
