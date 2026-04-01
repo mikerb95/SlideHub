@@ -150,7 +150,7 @@ public class StatusChecksService {
                     "GET " + compactTarget(url) + " -> HTTP " + response.statusCode());
         } catch (Exception ex) {
             long latencyMs = Duration.between(start, Instant.now()).toMillis();
-                return new StatusCheckItem(
+            return new StatusCheckItem(
                     name,
                     "down",
                     latencyMs > 0 ? latencyMs : null,
