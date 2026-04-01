@@ -33,7 +33,8 @@ public class GitHubRepoContextService {
     @Value("${slidehub.github.max-files-for-context:120}")
     private int maxFilesForContext;
 
-    public GitHubRepoContextService(@Value("${slidehub.github.api-base-url:https://api.github.com}") String apiBaseUrl) {
+    public GitHubRepoContextService(
+            @Value("${slidehub.github.api-base-url:https://api.github.com}") String apiBaseUrl) {
         this.gitHubClient = WebClient.builder()
                 .baseUrl(apiBaseUrl)
                 .defaultHeader(HttpHeaders.ACCEPT, "application/vnd.github+json")

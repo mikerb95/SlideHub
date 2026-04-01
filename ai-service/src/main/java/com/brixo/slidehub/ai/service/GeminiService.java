@@ -126,7 +126,7 @@ public class GeminiService {
      *         buildSystem, summary, structure, deploymentHints, dockerfile)
      */
     public Map<String, Object> analyzeRepo(String repoUrl) {
-                String prompt = buildRepoAnalysisPrompt(repoUrl, null);
+        String prompt = buildRepoAnalysisPrompt(repoUrl, null);
 
         var requestBody = Map.of(
                 "contents", List.of(Map.of(
@@ -158,11 +158,11 @@ public class GeminiService {
      * Devuelve la respuesta cruda como texto (JSON o texto según generationConfig).
      */
     public String analyzeRepoRaw(String repoUrl) {
-                return analyzeRepoRaw(repoUrl, null);
-        }
+        return analyzeRepoRaw(repoUrl, null);
+    }
 
-        public String analyzeRepoRaw(String repoUrl, String repositoryContext) {
-                String prompt = buildRepoAnalysisPrompt(repoUrl, repositoryContext);
+    public String analyzeRepoRaw(String repoUrl, String repositoryContext) {
+        String prompt = buildRepoAnalysisPrompt(repoUrl, repositoryContext);
 
         var requestBody = Map.of(
                 "contents", List.of(Map.of(
@@ -233,49 +233,49 @@ public class GeminiService {
         return text.strip();
     }
 
-        private String buildRepoAnalysisPrompt(String repoUrl, String repositoryContext) {
-                if (repositoryContext == null || repositoryContext.isBlank()) {
-                        return """
-                                        Analiza el repositorio de GitHub en %s y responde SOLO con un objeto JSON
-                                        con exactamente estas claves (sin texto adicional antes ni después):
-                                        {
-                                            "language": "Lenguaje principal (Java, PHP, JavaScript, TypeScript, Python, etc.)",
-                                            "framework": "Framework principal (Spring Boot, Laravel, Next.js, Django, etc.)",
-                                            "technologies": ["lista", "de", "tecnologías", "y", "librerías"],
-                                            "buildSystem": "Maven | Gradle | npm | Composer | pip | etc.",
-                                            "ports": [8080],
-                                            "environment": ["DATABASE_URL", "REDIS_HOST"],
-                                            "databases": ["PostgreSQL", "Redis"],
-                                            "summary": "Resumen de 1-2 oraciones del propósito del proyecto.",
-                                            "structure": "Descripción de la arquitectura (microservicios, MVC, monolito, etc.).",
-                                            "deploymentHints": "Recomendaciones para desplegar en Render, Vercel o Railway.",
-                                            "dockerfile": "Contenido completo de un Dockerfile apropiado para este proyecto."
-                                        }
-                                        """.formatted(repoUrl);
-                }
-
-                return """
-                                Eres un analista técnico de repositorios. Debes inferir el stack del proyecto
-                                usando el snapshot de GitHub API provisto, sin inventar archivos fuera del listado.
-
-                                URL del repositorio: %s
-
-                                %s
-
-                                Responde SOLO con un objeto JSON con exactamente estas claves:
-                                {
-                                    "language": "Lenguaje principal (Java, PHP, JavaScript, TypeScript, Python, etc.)",
-                                    "framework": "Framework principal (Spring Boot, Laravel, Next.js, Django, etc.)",
-                                    "technologies": ["lista", "de", "tecnologías", "y", "librerías"],
-                                    "buildSystem": "Maven | Gradle | npm | Composer | pip | etc.",
-                                    "ports": [8080],
-                                    "environment": ["DATABASE_URL", "REDIS_HOST"],
-                                    "databases": ["PostgreSQL", "Redis"],
-                                    "summary": "Resumen de 1-2 oraciones del propósito del proyecto.",
-                                    "structure": "Descripción de la arquitectura (microservicios, MVC, monolito, etc.).",
-                                    "deploymentHints": "Recomendaciones para desplegar en Render / Vercel / Railway.",
-                                    "dockerfile": "Contenido completo de un Dockerfile apropiado para este proyecto."
-                                }
-                                """.formatted(repoUrl, repositoryContext);
+    private String buildRepoAnalysisPrompt(String repoUrl, String repositoryContext) {
+        if (repositoryContext == null || repositoryContext.isBlank()) {
+            return """
+                    Analiza el repositorio de GitHub en %s y responde SOLO con un objeto JSON
+                    con exactamente estas claves (sin texto adicional antes ni después):
+                    {
+                        "language": "Lenguaje principal (Java, PHP, JavaScript, TypeScript, Python, etc.)",
+                        "framework": "Framework principal (Spring Boot, Laravel, Next.js, Django, etc.)",
+                        "technologies": ["lista", "de", "tecnologías", "y", "librerías"],
+                        "buildSystem": "Maven | Gradle | npm | Composer | pip | etc.",
+                        "ports": [8080],
+                        "environment": ["DATABASE_URL", "REDIS_HOST"],
+                        "databases": ["PostgreSQL", "Redis"],
+                        "summary": "Resumen de 1-2 oraciones del propósito del proyecto.",
+                        "structure": "Descripción de la arquitectura (microservicios, MVC, monolito, etc.).",
+                        "deploymentHints": "Recomendaciones para desplegar en Render, Vercel o Railway.",
+                        "dockerfile": "Contenido completo de un Dockerfile apropiado para este proyecto."
+                    }
+                    """.formatted(repoUrl);
         }
+
+        return """
+                Eres un analista técnico de repositorios. Debes inferir el stack del proyecto
+                usando el snapshot de GitHub API provisto, sin inventar archivos fuera del listado.
+
+                URL del repositorio: %s
+
+                %s
+
+                Responde SOLO con un objeto JSON con exactamente estas claves:
+                {
+                    "language": "Lenguaje principal (Java, PHP, JavaScript, TypeScript, Python, etc.)",
+                    "framework": "Framework principal (Spring Boot, Laravel, Next.js, Django, etc.)",
+                    "technologies": ["lista", "de", "tecnologías", "y", "librerías"],
+                    "buildSystem": "Maven | Gradle | npm | Composer | pip | etc.",
+                    "ports": [8080],
+                    "environment": ["DATABASE_URL", "REDIS_HOST"],
+                    "databases": ["PostgreSQL", "Redis"],
+                    "summary": "Resumen de 1-2 oraciones del propósito del proyecto.",
+                    "structure": "Descripción de la arquitectura (microservicios, MVC, monolito, etc.).",
+                    "deploymentHints": "Recomendaciones para desplegar en Render / Vercel / Railway.",
+                    "dockerfile": "Contenido completo de un Dockerfile apropiado para este proyecto."
+                }
+                """.formatted(repoUrl, repositoryContext);
+    }
 }

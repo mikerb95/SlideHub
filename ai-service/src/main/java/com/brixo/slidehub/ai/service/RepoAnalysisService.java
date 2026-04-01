@@ -53,8 +53,8 @@ public class RepoAnalysisService {
      * @return análisis técnico del repositorio
      */
     public RepoAnalysis analyze(String repoUrl) {
-        Optional<GitHubRepoContextService.RepositorySnapshot> snapshotOpt =
-                gitHubRepoContextService.resolveSnapshot(repoUrl);
+        Optional<GitHubRepoContextService.RepositorySnapshot> snapshotOpt = gitHubRepoContextService
+                .resolveSnapshot(repoUrl);
 
         String normalizedRepoUrl = snapshotOpt
                 .map(GitHubRepoContextService.RepositorySnapshot::normalizedRepoUrl)
