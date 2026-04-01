@@ -58,7 +58,7 @@ class KeepAliveServiceTest {
 
         KeepAliveService service = new KeepAliveService(
                 sessionRepository,
-            authenticatedSessionTracker,
+                authenticatedSessionTracker,
                 userActivityTracker,
                 baseUrl(stateServer),
                 baseUrl(aiServer),
@@ -86,7 +86,7 @@ class KeepAliveServiceTest {
 
         KeepAliveService service = new KeepAliveService(
                 sessionRepository,
-            authenticatedSessionTracker,
+                authenticatedSessionTracker,
                 userActivityTracker,
                 baseUrl(stateServer),
                 baseUrl(aiServer),
@@ -114,7 +114,7 @@ class KeepAliveServiceTest {
 
         KeepAliveService service = new KeepAliveService(
                 sessionRepository,
-            authenticatedSessionTracker,
+                authenticatedSessionTracker,
                 userActivityTracker,
                 baseUrl(stateServer),
                 baseUrl(aiServer),
@@ -127,20 +127,20 @@ class KeepAliveServiceTest {
                 "Con actividad reciente de usuario también debe ejecutar keep-alive aunque no haya sesión de presentación");
     }
 
-            @Test
-            void ping_whenAuthenticatedUiSession_callsStateAndAiHealthEndpoints() throws Exception {
-            AtomicInteger stateCalls = new AtomicInteger(0);
-            AtomicInteger aiCalls = new AtomicInteger(0);
+    @Test
+    void ping_whenAuthenticatedUiSession_callsStateAndAiHealthEndpoints() throws Exception {
+        AtomicInteger stateCalls = new AtomicInteger(0);
+        AtomicInteger aiCalls = new AtomicInteger(0);
 
-            stateServer = startHealthServer(stateCalls);
-            aiServer = startHealthServer(aiCalls);
+        stateServer = startHealthServer(stateCalls);
+        aiServer = startHealthServer(aiCalls);
 
-            given(sessionRepository.existsByActiveTrue()).willReturn(false);
-            given(authenticatedSessionTracker.hasAuthenticatedSessions()).willReturn(true);
+        given(sessionRepository.existsByActiveTrue()).willReturn(false);
+        given(authenticatedSessionTracker.hasAuthenticatedSessions()).willReturn(true);
 
-            userActivityTracker = new UserActivityTracker();
+        userActivityTracker = new UserActivityTracker();
 
-            KeepAliveService service = new KeepAliveService(
+        KeepAliveService service = new KeepAliveService(
                 sessionRepository,
                 authenticatedSessionTracker,
                 userActivityTracker,
@@ -148,12 +148,12 @@ class KeepAliveServiceTest {
                 baseUrl(aiServer),
                 300000);
 
-            service.ping();
+        service.ping();
 
-            boolean bothCalled = waitUntil(() -> stateCalls.get() >= 1 && aiCalls.get() >= 1, 2000);
-            assertTrue(bothCalled,
+        boolean bothCalled = waitUntil(() -> stateCalls.get() >= 1 && aiCalls.get() >= 1, 2000);
+        assertTrue(bothCalled,
                 "Con sesión autenticada abierta también debe ejecutar keep-alive aunque no haya actividad reciente");
-            }
+    }
 
     private HttpServer startHealthServer(AtomicInteger calls) throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(0), 0);

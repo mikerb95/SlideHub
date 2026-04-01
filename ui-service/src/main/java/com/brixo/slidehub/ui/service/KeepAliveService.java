@@ -46,9 +46,7 @@ public class KeepAliveService {
         this.userActivityWindowMs = userActivityWindowMs;
     }
 
-    @Scheduled(
-            fixedDelayString = "${slidehub.keep-alive.interval-ms:120000}",
-            initialDelayString = "${slidehub.keep-alive.initial-delay-ms:60000}")
+    @Scheduled(fixedDelayString = "${slidehub.keep-alive.interval-ms:120000}", initialDelayString = "${slidehub.keep-alive.initial-delay-ms:60000}")
     public void ping() {
         boolean hasActivePresentationSession = sessionRepository.existsByActiveTrue();
         boolean hasAuthenticatedUiSession = authenticatedSessionTracker.hasAuthenticatedSessions();
