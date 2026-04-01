@@ -84,7 +84,7 @@ public class SecurityConfig {
                                                 // Panel del presentador, main panel y tutor de deployment — requiere
                                                 // PRESENTER
                                                 // o ADMIN
-                                                .requestMatchers("/presenter", "/main-panel", "/deploy-tutor")
+                                                .requestMatchers("/presenter", "/main-panel", "/deploy-tutor", "/status", "/status/api/checks")
                                                 .hasAnyRole("PRESENTER", "ADMIN")
                                                 // Perfil del usuario — requiere estar autenticado
                                                 .requestMatchers("/auth/profile").authenticated()
