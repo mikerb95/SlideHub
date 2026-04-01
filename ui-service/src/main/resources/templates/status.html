@@ -33,6 +33,34 @@
             padding: 0.75rem;
         }
 
+        .diag-chart-wrap {
+            position: relative;
+            width: 100%;
+            height: 190px;
+            border-radius: var(--sh-r-md);
+            border: 1px solid var(--sh-border-subtle);
+            background: linear-gradient(180deg, rgba(22, 27, 34, 0.9) 0%, rgba(13, 17, 23, 0.95) 100%);
+            overflow: hidden;
+        }
+
+        .diag-chart-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .diag-chart-empty {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--sh-font-mono);
+            font-size: 0.72rem;
+            color: var(--sh-text-3);
+            pointer-events: none;
+        }
+
         .diag-item {
             display: flex;
             justify-content: space-between;
@@ -169,6 +197,17 @@
             <div class="diag-card mb-3">
                 <div class="sh-label mb-2">IMPACT</div>
                 <div id="diag-impact" class="text-sm text-[var(--sh-text-2)]">--</div>
+            </div>
+
+            <div class="diag-card mb-3">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="sh-label">LATENCY TREND</div>
+                    <div id="diag-chart-meta" class="text-[0.68rem] font-mono text-[var(--sh-text-3)]">--</div>
+                </div>
+                <div class="diag-chart-wrap">
+                    <canvas id="diag-latency-chart" class="diag-chart-canvas" aria-label="Latency chart"></canvas>
+                    <div id="diag-chart-empty" class="diag-chart-empty">Sin suficientes datos de latencia</div>
+                </div>
             </div>
 
             <div class="diag-grid mb-3">

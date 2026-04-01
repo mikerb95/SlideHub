@@ -391,6 +391,45 @@ a {
     color: var(--sh-text-3);
 }
 
+/* Password visibility toggle */
+.sh-password-wrap {
+    position: relative;
+    width: 100%;
+}
+
+.sh-password-wrap .sh-password-input {
+    padding-right: 2.6rem;
+}
+
+.sh-password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 0.45rem;
+    transform: translateY(-50%);
+    border: 1px solid var(--sh-border-subtle);
+    background: var(--sh-surface);
+    color: var(--sh-text-2);
+    border-radius: var(--sh-r-sm);
+    width: 1.9rem;
+    height: 1.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color var(--sh-t-fast), color var(--sh-t-fast), background var(--sh-t-fast);
+}
+
+.sh-password-toggle:hover {
+    border-color: var(--sh-border-focus);
+    color: var(--sh-blue);
+    background: var(--sh-elevated);
+}
+
+.sh-password-toggle:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--sh-blue-dim);
+}
+
 .sh-input-label {
     display: block;
     font-family: var(--sh-font-mono);

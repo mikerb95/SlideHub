@@ -5,8 +5,14 @@
     const pollText = document.getElementById('poll-interval');
     const lastUpdatedText = document.getElementById('last-updated');
     const diagnosticModal = document.getElementById('diagnostic-modal');
+    const latencyChartCanvas = document.getElementById('diag-latency-chart');
+    const latencyChartEmpty = document.getElementById('diag-chart-empty');
+    const latencyChartMeta = document.getElementById('diag-chart-meta');
 
     let checksCache = [];
+    let activeDiagnosticService = null;
+    const latencyHistoryByService = new Map();
+    const HISTORY_LIMIT = 36;
 
     pollText.textContent = String(POLL_MS);
 
@@ -30,6 +36,7 @@
             return;
         }
 
+        updateLatencyHistory(checks);
         checksCache = checks;
 
         tbody.innerHTML = checks.map((check) => {
@@ -54,6 +61,150 @@
                 </tr>
             `;
         }).join('');
+
+        if (activeDiagnosticService && diagnosticModal && !diagnosticModal.classList.contains('hidden')) {
+            const current = checksCache.find((item) => item.name === activeDiagnosticService);
+            if (current) {
+                openDiagnostic(current);
+            }
+        }
+    }
+
+    function updateLatencyHistory(checks) {
+        checks.forEach((check) => {
+            const serviceName = check.name || '--';
+            const latency = Number(check.latencyMs);
+            const validLatency = Number.isFinite(latency) ? latency : null;
+            const timestamp = check.lastCheckedAt ? new Date(check.lastCheckedAt).getTime() : Date.now();
+
+            const current = latencyHistoryByService.get(serviceName) || [];
+            current.push({
+                latencyMs: validLatency,
+                status: check.status || '--',
+                time: Number.isFinite(timestamp) ? timestamp : Date.now()
+            });
+
+            if (current.length > HISTORY_LIMIT) {
+                current.splice(0, current.length - HISTORY_LIMIT);
+            }
+
+            latencyHistoryByService.set(serviceName, current);
+        });
+    }
+
+    function resizeCanvasToDisplaySize(canvas) {
+        if (!canvas) return;
+        const ratio = window.devicePixelRatio || 1;
+        const displayWidth = Math.max(1, Math.floor(canvas.clientWidth));
+        const displayHeight = Math.max(1, Math.floor(canvas.clientHeight));
+        const width = Math.floor(displayWidth * ratio);
+        const height = Math.floor(displayHeight * ratio);
+
+        if (canvas.width !== width || canvas.height !== height) {
+            canvas.width = width;
+            canvas.height = height;
+        }
+    }
+
+    function drawLatencyChart(serviceName) {
+        if (!latencyChartCanvas) {
+            return;
+        }
+
+        resizeCanvasToDisplaySize(latencyChartCanvas);
+
+        const ctx = latencyChartCanvas.getContext('2d');
+        if (!ctx) {
+            return;
+        }
+
+        const history = latencyHistoryByService.get(serviceName) || [];
+        const points = history.filter((entry) => Number.isFinite(entry.latencyMs));
+
+        if (latencyChartEmpty) {
+            latencyChartEmpty.style.display = points.length >= 2 ? 'none' : 'flex';
+        }
+
+        if (latencyChartMeta) {
+            if (points.length === 0) {
+                latencyChartMeta.textContent = 'Sin muestras';
+            } else {
+                const max = Math.max(...points.map((p) => p.latencyMs));
+                const min = Math.min(...points.map((p) => p.latencyMs));
+                latencyChartMeta.textContent = `min ${Math.round(min)}ms · max ${Math.round(max)}ms · ${points.length} muestras`;
+            }
+        }
+
+        const width = latencyChartCanvas.width;
+        const height = latencyChartCanvas.height;
+        const ratio = window.devicePixelRatio || 1;
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, width, height);
+        ctx.scale(ratio, ratio);
+
+        const drawWidth = width / ratio;
+        const drawHeight = height / ratio;
+        const padding = { top: 16, right: 10, bottom: 22, left: 36 };
+        const chartWidth = Math.max(1, drawWidth - padding.left - padding.right);
+        const chartHeight = Math.max(1, drawHeight - padding.top - padding.bottom);
+
+        ctx.strokeStyle = 'rgba(110, 118, 129, 0.22)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 4; i += 1) {
+            const y = padding.top + (chartHeight / 4) * i;
+            ctx.beginPath();
+            ctx.moveTo(padding.left, y);
+            ctx.lineTo(padding.left + chartWidth, y);
+            ctx.stroke();
+        }
+
+        if (points.length < 2) {
+            return;
+        }
+
+        const maxLatency = Math.max(...points.map((p) => p.latencyMs), 1);
+        const minLatency = Math.min(...points.map((p) => p.latencyMs), 0);
+        const latencyRange = Math.max(1, maxLatency - minLatency);
+
+        const xy = points.map((entry, index) => {
+            const x = padding.left + (chartWidth * index) / Math.max(1, points.length - 1);
+            const normalized = (entry.latencyMs - minLatency) / latencyRange;
+            const y = padding.top + chartHeight - normalized * chartHeight;
+            return { x, y, latencyMs: entry.latencyMs };
+        });
+
+        const areaGradient = ctx.createLinearGradient(0, padding.top, 0, padding.top + chartHeight);
+        areaGradient.addColorStop(0, 'rgba(88, 166, 255, 0.28)');
+        areaGradient.addColorStop(1, 'rgba(88, 166, 255, 0.02)');
+
+        ctx.beginPath();
+        ctx.moveTo(xy[0].x, padding.top + chartHeight);
+        xy.forEach((point) => ctx.lineTo(point.x, point.y));
+        ctx.lineTo(xy[xy.length - 1].x, padding.top + chartHeight);
+        ctx.closePath();
+        ctx.fillStyle = areaGradient;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(xy[0].x, xy[0].y);
+        for (let i = 1; i < xy.length; i += 1) {
+            ctx.lineTo(xy[i].x, xy[i].y);
+        }
+        ctx.strokeStyle = 'rgba(88, 166, 255, 0.95)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        const lastPoint = xy[xy.length - 1];
+        ctx.beginPath();
+        ctx.arc(lastPoint.x, lastPoint.y, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(88, 166, 255, 1)';
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(201, 209, 217, 0.85)';
+        ctx.font = '11px var(--sh-font-mono)';
+        ctx.fillText(`${Math.round(maxLatency)}ms`, 4, padding.top + 4);
+        ctx.fillText(`${Math.round(minLatency)}ms`, 4, padding.top + chartHeight);
     }
 
     function escapeHtmlAttr(value) {
@@ -215,6 +366,8 @@
             return;
         }
 
+        activeDiagnosticService = check.name || null;
+
         const title = document.getElementById('diag-title');
         const connection = document.getElementById('diag-connection');
         const latency = document.getElementById('diag-latency');
@@ -261,6 +414,8 @@
         causes.innerHTML = analysis.causes.map((c) => `<li>${escapeHtml(c)}</li>`).join('');
         fixes.innerHTML = analysis.fixes.map((f) => `<li>${escapeHtml(f)}</li>`).join('');
 
+        drawLatencyChart(check.name);
+
         diagnosticModal.classList.remove('hidden');
     }
 
@@ -268,6 +423,7 @@
         if (diagnosticModal) {
             diagnosticModal.classList.add('hidden');
         }
+        activeDiagnosticService = null;
     }
 
     tbody.addEventListener('click', (event) => {
