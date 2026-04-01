@@ -22,7 +22,7 @@
         <div class="sh-card p-6">
 
             <p class="text-[var(--sh-text-2)] text-sm mb-5">
-                ¡Ya casi! Confirma tu nombre de usuario y correo para terminar de configurar tu cuenta.
+                ¡Ya casi! Confirma tu nombre de usuario, correo y crea una contraseña para terminar de configurar tu cuenta.
             </p>
 
             <!-- Alerts -->
@@ -43,11 +43,25 @@
                            minlength="3" maxlength="50" required>
                 </div>
 
-                <div class="mb-5">
+                <div class="mb-4">
                     <label for="email" class="sh-input-label">Correo electrónico</label>
                     <input type="email" class="sh-input" id="email" name="email"
                            autocomplete="email" placeholder="user@node.io"
                            th:value="${user.email}" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="password" class="sh-input-label">Contraseña</label>
+                    <input type="password" class="sh-input" id="password" name="password"
+                           autocomplete="new-password" placeholder="Mínimo 8 caracteres"
+                           minlength="8" required>
+                </div>
+
+                <div class="mb-5">
+                    <label for="confirmPassword" class="sh-input-label">Confirmar contraseña</label>
+                    <input type="password" class="sh-input" id="confirmPassword" name="confirmPassword"
+                           autocomplete="new-password" placeholder="Repite la contraseña"
+                           minlength="8" required>
                 </div>
 
                 <button type="submit" class="sh-btn sh-btn-blue w-full justify-center">

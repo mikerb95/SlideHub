@@ -4,6 +4,7 @@ import com.brixo.slidehub.ui.exception.UserAlreadyExistsException;
 import com.brixo.slidehub.ui.model.User;
 import com.brixo.slidehub.ui.repository.UserRepository;
 import com.brixo.slidehub.ui.service.UserService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
@@ -30,10 +31,14 @@ public class AuthController {
 
     private final UserService userService;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthController(UserService userService, UserRepository userRepository) {
+    public AuthController(UserService userService,
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // ── Login ─────────────────────────────────────────────────────────────────
@@ -157,6 +162,8 @@ public class AuthController {
     public String completeProfile(Authentication authentication,
             @RequestParam String username,
             @RequestParam String email,
+            @RequestParam String password,
+            @RequestParam("confirmPassword") String confirmPassword,
             Model model) {
         if (!isAuthenticated(authentication)) {
             return "redirect:/auth/login";
@@ -183,6 +190,18 @@ public class AuthController {
             return "auth/complete-profile";
         }
 
+        // Validar contraseña requerida para cuentas OAuth2
+        if (password == null || password.length() < 8) {
+            model.addAttribute("user", user);
+            model.addAttribute("errorMessage", "La contraseña debe tener al menos 8 caracteres.");
+            return "auth/complete-profile";
+        }
+        if (!password.equals(confirmPassword)) {
+            model.addAttribute("user", user);
+            model.addAttribute("errorMessage", "Las contraseñas no coinciden.");
+            return "auth/complete-profile";
+        }
+
         // Verificar unicidad del username (si cambió)
         if (!username.equals(user.getUsername())) {
             Optional<User> existing = userRepository.findByUsername(username);
@@ -205,6 +224,7 @@ public class AuthController {
 
         user.setUsername(username);
         user.setEmail(email);
+        user.setPasswordHash(passwordEncoder.encode(password));
         user.setProfileCompleted(true);
         userRepository.save(user);
 
