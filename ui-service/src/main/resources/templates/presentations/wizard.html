@@ -419,6 +419,10 @@
                     </div>
                     <div id="notes-progress-text" class="text-xs font-mono text-[var(--sh-text-3)]">Iniciando pipeline
                         IA...</div>
+                    <div id="notes-tip-text" class="repo-assistant-tip mt-2">
+                        Tip: mientras se generan notas, puedes revisar el repo y preparar tus puntos clave de demo.
+                    </div>
+                    <div id="notes-meta-text" class="repo-assistant-meta">Preparando pipeline IA...</div>
                 </div>
 
                 <!-- Success -->
@@ -913,12 +917,19 @@
         }
 
         let repoTipTimer = null;
+        let notesTipTimer = null;
         const repoTips = [
             'Tip: usa nombres de slides descriptivos para facilitar la revisión posterior de notas.',
             'Tip: puedes continuar al siguiente paso cuando el resumen técnico aparezca en verde.',
             'Tip: si el servicio IA está iniciando, el sistema reintentará automáticamente.',
             'Tip: agregar la URL del repo en este paso mejora mucho las notas del Paso 3.',
             'Tip: después podrás editar y ajustar las notas generadas antes de presentar.'
+        ];
+        const notesTips = [
+            'Tip: cuando termine, revisa las notas del Paso 4 y ajusta frases clave a tu estilo.',
+            'Tip: usa las notas IA como guía, no como guion rígido; prioriza claridad para la audiencia.',
+            'Tip: si hay demos en vivo, anota checkpoints para volver rápido en caso de fallos.',
+            'Tip: al asignar participantes en el Paso 5, distribuye slides por tema para mayor fluidez.'
         ];
 
         function updateRepoAssistantPanel(statusText, progressPct, metaText) {
@@ -950,6 +961,36 @@
             if (repoTipTimer) {
                 clearInterval(repoTipTimer);
                 repoTipTimer = null;
+            }
+        }
+
+        function updateNotesAssistantPanel(statusText, progressPct, metaText) {
+            const status = document.getElementById('notes-progress-text');
+            const fill = document.getElementById('notes-progress-bar');
+            const meta = document.getElementById('notes-meta-text');
+            if (status) status.textContent = statusText;
+            if (fill) fill.style.width = Math.max(5, Math.min(100, progressPct)) + '%';
+            if (meta) meta.textContent = metaText;
+        }
+
+        function startNotesAssistantPanel() {
+            const panel = document.getElementById('notes-progress');
+            const tip = document.getElementById('notes-tip-text');
+            panel.classList.remove('hidden');
+            updateNotesAssistantPanel('Iniciando pipeline IA...', 5, 'Preparando análisis visual y contextual...');
+            if (tip) tip.textContent = notesTips[0];
+            let tipIndex = 0;
+            if (notesTipTimer) clearInterval(notesTipTimer);
+            notesTipTimer = setInterval(() => {
+                tipIndex = (tipIndex + 1) % notesTips.length;
+                if (tip) tip.textContent = notesTips[tipIndex];
+            }, 7000);
+        }
+
+        function stopNotesAssistantPanel() {
+            if (notesTipTimer) {
+                clearInterval(notesTipTimer);
+                notesTipTimer = null;
             }
         }
 
@@ -1024,7 +1065,7 @@
                 return;
             }
             document.getElementById('btn-generate-notes').disabled = true;
-            document.getElementById('notes-progress').classList.remove('hidden');
+            startNotesAssistantPanel();
             document.getElementById('notes-success').classList.add('hidden');
             hideError('notes-error');
 
@@ -1033,9 +1074,11 @@
                 if (fakePct < 90) {
                     fakePct += Math.random() * 3;
                     const slideEst = Math.floor((fakePct / 100) * W.totalSlides);
-                    document.getElementById('notes-progress-bar').style.width = fakePct + '%';
-                    document.getElementById('notes-progress-text').textContent =
-                        'Analizando slide ~' + (slideEst + 1) + ' de ' + W.totalSlides + '...';
+                    updateNotesAssistantPanel(
+                        'Analizando slide ~' + (slideEst + 1) + ' de ' + W.totalSlides + '...',
+                        fakePct,
+                        'Gemini Vision + Gemini Repo + Groq en ejecución'
+                    );
                 }
             }, 1500);
 
@@ -1047,8 +1090,8 @@
                 clearInterval(fakeTimer);
                 const data = await readJsonSafe(res);
 
-                document.getElementById('notes-progress-bar').style.width = '100%';
-                document.getElementById('notes-progress-text').textContent = 'Completado!';
+                updateNotesAssistantPanel('Completado!', 100, 'Notas listas para revisión en el Paso 4');
+                stopNotesAssistantPanel();
 
                 if (res.ok && data.success !== false) {
                     W.notesGenerated = true;
@@ -1064,6 +1107,7 @@
                 }
             } catch (e) {
                 clearInterval(fakeTimer);
+                stopNotesAssistantPanel();
                 showError('notes-error', 'Error de conexion: ' + e.message);
                 document.getElementById('btn-generate-notes').disabled = false;
             }

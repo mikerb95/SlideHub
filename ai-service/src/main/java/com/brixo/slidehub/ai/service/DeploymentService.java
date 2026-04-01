@@ -3,7 +3,6 @@ package com.brixo.slidehub.ai.service;
 import com.brixo.slidehub.ai.model.DeploymentGuide;
 import com.brixo.slidehub.ai.model.RepoAnalysis;
 import com.brixo.slidehub.ai.repository.DeploymentGuideRepository;
-import com.brixo.slidehub.ai.repository.RepoAnalysisRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -30,16 +29,13 @@ public class DeploymentService {
     private static final Logger log = LoggerFactory.getLogger(DeploymentService.class);
 
     private final RepoAnalysisService repoAnalysisService;
-    private final RepoAnalysisRepository repoAnalysisRepository;
     private final DeploymentGuideRepository deploymentGuideRepository;
     private final GroqService groqService;
 
     public DeploymentService(RepoAnalysisService repoAnalysisService,
-            RepoAnalysisRepository repoAnalysisRepository,
             DeploymentGuideRepository deploymentGuideRepository,
             GroqService groqService) {
         this.repoAnalysisService = repoAnalysisService;
-        this.repoAnalysisRepository = repoAnalysisRepository;
         this.deploymentGuideRepository = deploymentGuideRepository;
         this.groqService = groqService;
     }
@@ -76,13 +72,7 @@ public class DeploymentService {
         log.info("Generando Dockerfile para {} ({}/{})", repoUrl, language, framework);
 
         String dockerfile = groqService.generateDockerfile(language, framework, ports, environment);
-
-        // Persistir en RepoAnalysis para futuras consultas
-        repoAnalysisRepository.findByRepoUrl(repoUrl).ifPresent(analysis -> {
-            analysis.setDockerfile(dockerfile);
-            repoAnalysisRepository.save(analysis);
-            log.debug("Dockerfile actualizado en RepoAnalysis para {}", repoUrl);
-        });
+        repoAnalysisService.updateDockerfile(repoUrl, dockerfile);
 
         return dockerfile;
     }

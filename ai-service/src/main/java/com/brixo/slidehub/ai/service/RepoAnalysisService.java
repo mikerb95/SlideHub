@@ -29,13 +29,16 @@ public class RepoAnalysisService {
     private static final Logger log = LoggerFactory.getLogger(RepoAnalysisService.class);
 
     private final GeminiService geminiService;
+    private final GitHubRepoContextService gitHubRepoContextService;
     private final RepoAnalysisRepository repository;
     private final ObjectMapper objectMapper;
 
     public RepoAnalysisService(GeminiService geminiService,
+            GitHubRepoContextService gitHubRepoContextService,
             RepoAnalysisRepository repository,
             ObjectMapper objectMapper) {
         this.geminiService = geminiService;
+        this.gitHubRepoContextService = gitHubRepoContextService;
         this.repository = repository;
         this.objectMapper = objectMapper;
     }
@@ -50,22 +53,47 @@ public class RepoAnalysisService {
      * @return análisis técnico del repositorio
      */
     public RepoAnalysis analyze(String repoUrl) {
-        // ── Cache hit ──────────────────────────────────────────────────────
-        Optional<RepoAnalysis> cached = repository.findByRepoUrl(repoUrl);
+        Optional<GitHubRepoContextService.RepositorySnapshot> snapshotOpt =
+                gitHubRepoContextService.resolveSnapshot(repoUrl);
+
+        String normalizedRepoUrl = snapshotOpt
+                .map(GitHubRepoContextService.RepositorySnapshot::normalizedRepoUrl)
+                .orElse(repoUrl);
+
+        Optional<RepoAnalysis> cached = repository.findByRepoUrl(normalizedRepoUrl);
         if (cached.isPresent()) {
-            log.debug("Análisis de repo encontrado en cache: {}", repoUrl);
-            return cached.get();
+            RepoAnalysis cachedAnalysis = cached.get();
+            if (snapshotOpt.isEmpty()) {
+                log.debug("Análisis de repo encontrado en cache (sin snapshot): {}", normalizedRepoUrl);
+                return cachedAnalysis;
+            }
+
+            String incomingHead = snapshotOpt.get().headCommitSha();
+            if (incomingHead != null && incomingHead.equals(cachedAnalysis.getSourceCommitSha())) {
+                log.debug("Cache hit por commit SHA para {}: {}", normalizedRepoUrl, incomingHead);
+                return cachedAnalysis;
+            }
+
+            log.info("Cache inválida por cambio de commit en {}. previo={}, nuevo={}",
+                    normalizedRepoUrl, cachedAnalysis.getSourceCommitSha(), incomingHead);
         }
 
         // ── Cache miss — llamar a Gemini ───────────────────────────────────
-        log.info("Analizando repositorio con Gemini: {}", repoUrl);
-        String rawJson = geminiService.analyzeRepoRaw(repoUrl);
-        RepoAnalysis analysis = parseGeminiResponse(rawJson, repoUrl);
-        analysis.setRepoUrl(repoUrl);
+        log.info("Analizando repositorio con Gemini: {}", normalizedRepoUrl);
+        String rawJson = geminiService.analyzeRepoRaw(
+                normalizedRepoUrl,
+                snapshotOpt.map(GitHubRepoContextService.RepositorySnapshot::contextText).orElse(null));
+
+        RepoAnalysis analysis = parseGeminiResponse(rawJson, normalizedRepoUrl);
+        analysis.setRepoUrl(normalizedRepoUrl);
+        snapshotOpt.ifPresent(snapshot -> {
+            analysis.setSourceBranch(snapshot.defaultBranch());
+            analysis.setSourceCommitSha(snapshot.headCommitSha());
+        });
         analysis.setAnalyzedAt(LocalDateTime.now());
 
         RepoAnalysis saved = repository.save(analysis);
-        log.info("Análisis de repo guardado en MongoDB: {} ({})", repoUrl, saved.getId());
+        log.info("Análisis de repo guardado en MongoDB: {} ({})", normalizedRepoUrl, saved.getId());
         return saved;
     }
 
@@ -78,8 +106,27 @@ public class RepoAnalysisService {
      */
     public RepoAnalysis reanalyze(String repoUrl) {
         // Eliminar análisis previo si existe
-        repository.findByRepoUrl(repoUrl).ifPresent(existing -> repository.delete(existing));
+        String normalizedRepoUrl = normalizeRepoUrl(repoUrl);
+        repository.findByRepoUrl(normalizedRepoUrl).ifPresent(repository::delete);
         return analyze(repoUrl);
+    }
+
+    public Optional<RepoAnalysis> findByRepoUrl(String repoUrl) {
+        return repository.findByRepoUrl(normalizeRepoUrl(repoUrl));
+    }
+
+    public void updateDockerfile(String repoUrl, String dockerfile) {
+        findByRepoUrl(repoUrl).ifPresent(analysis -> {
+            analysis.setDockerfile(dockerfile);
+            repository.save(analysis);
+            log.debug("Dockerfile actualizado en RepoAnalysis para {}", analysis.getRepoUrl());
+        });
+    }
+
+    public String normalizeRepoUrl(String repoUrl) {
+        return gitHubRepoContextService.resolveSnapshot(repoUrl)
+                .map(GitHubRepoContextService.RepositorySnapshot::normalizedRepoUrl)
+                .orElse(repoUrl);
     }
 
     // ── Helpers privados ──────────────────────────────────────────────────────

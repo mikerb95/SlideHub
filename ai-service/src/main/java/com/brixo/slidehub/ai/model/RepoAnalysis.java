@@ -26,6 +26,12 @@ public class RepoAnalysis {
 
     private String repoUrl;
 
+    /** Branch usada para generar el snapshot desde GitHub API. */
+    private String sourceBranch;
+
+    /** Commit HEAD del branch usado al momento del análisis. */
+    private String sourceCommitSha;
+
     private LocalDateTime analyzedAt;
 
     /** Lenguaje principal detectado (Java, PHP, JavaScript, TypeScript, etc.). */
@@ -90,6 +96,22 @@ public class RepoAnalysis {
 
     public void setAnalyzedAt(LocalDateTime analyzedAt) {
         this.analyzedAt = analyzedAt;
+    }
+
+    public String getSourceBranch() {
+        return sourceBranch;
+    }
+
+    public void setSourceBranch(String sourceBranch) {
+        this.sourceBranch = sourceBranch;
+    }
+
+    public String getSourceCommitSha() {
+        return sourceCommitSha;
+    }
+
+    public void setSourceCommitSha(String sourceCommitSha) {
+        this.sourceCommitSha = sourceCommitSha;
     }
 
     public String getLanguage() {
