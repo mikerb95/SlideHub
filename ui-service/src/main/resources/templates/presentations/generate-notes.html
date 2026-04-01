@@ -100,7 +100,7 @@
                     <div class="rounded p-3 mb-4" style="background: var(--sh-deep); font-size: 0.75rem;">
                         <div class="flex items-center gap-2 mb-1.5 text-[var(--sh-text-3)]">
                             <i class="fa-solid fa-eye" style="color: var(--sh-blue);"></i>
-                            <span>Gemini_Vision — visual slide analysis</span>
+                            <span>Gemini Vision — análisis visual de slides</span>
                         </div>
                         <div class="flex items-center gap-2 mb-1.5 text-[var(--sh-text-3)]">
                             <i class="fa-solid fa-code-branch" style="color: var(--sh-amber);"></i>
@@ -114,7 +114,7 @@
 
                     <!-- Generate button -->
                     <button type="button" class="sh-btn sh-btn-primary w-full" id="btn-generate" onclick="generateAllNotes()">
-                        <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Generate_All_Notes
+                        <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Generar todas las notas
                     </button>
                     <div class="text-[var(--sh-text-3)] text-xs font-mono mt-1.5 text-center">
                         ~<span th:text="${totalSlides * 5}">30</span>s for
@@ -126,7 +126,7 @@
                 <div id="generation-progress" class="sh-card p-4 hidden">
                     <div class="flex items-center gap-2 mb-3">
                         <i class="fa-solid fa-spinner fa-spin" style="color: var(--sh-blue);"></i>
-                        <span class="font-mono text-sm text-[var(--sh-text-1)]">Generating_Notes…</span>
+                        <span class="font-mono text-sm text-[var(--sh-text-1)]">Generando notas…</span>
                     </div>
                     <div class="progress-track mb-2">
                         <div class="progress-fill" id="progress-bar" style="width: 0%"></div>
