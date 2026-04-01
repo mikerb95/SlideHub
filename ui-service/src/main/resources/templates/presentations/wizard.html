@@ -388,6 +388,13 @@
     <script th:inline="javascript">
         const hasGoogleToken = /*[[${hasGoogleToken}]]*/ false;
 
+        // ── CSRF ──
+        function csrfHeaders() {
+            const header = document.querySelector('meta[name="_csrf_header"]')?.content;
+            const token  = document.querySelector('meta[name="_csrf"]')?.content;
+            return header && token ? { [header]: token } : {};
+        }
+
         // ── Wizard State ──
         const W = {
             step: 1,
