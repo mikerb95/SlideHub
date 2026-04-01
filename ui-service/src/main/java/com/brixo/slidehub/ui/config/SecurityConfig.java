@@ -135,6 +135,13 @@ public class SecurityConfig {
         @Bean
         public AuthenticationSuccessHandler oauth2SuccessHandler() {
                 return (request, response, authentication) -> {
+                        // Drive auth: redirige al wizard, no hace login normal
+                        if (authentication instanceof OAuth2AuthenticationToken oauthToken
+                                        && "google-drive".equals(oauthToken.getAuthorizedClientRegistrationId())) {
+                                response.sendRedirect("/presentations/wizard?tab=drive");
+                                return;
+                        }
+
                         HttpSession session = request.getSession(false);
                         String returnUrl = null;
                         if (session != null) {
