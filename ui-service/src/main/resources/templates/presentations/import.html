@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Importar Presentacion — SlideHub</title>
+    <title>Importar presentación — SlideHub</title>
     <th:block th:replace="~{fragments/head :: assets}"></th:block>
     <style>
         .folder-item, .image-item {
@@ -46,7 +46,7 @@
 
                     <span class="font-brand text-base tracking-tight">SlideHub</span>
                 </a>
-                <span class="sh-badge ml-1">IMPORT</span>
+                <span class="sh-badge ml-1">IMPORTAR</span>
             </div>
             <div class="flex items-center gap-2">
                 <a href="/main-panel" class="sh-btn sh-btn-ghost text-xs">
@@ -66,23 +66,23 @@
             <div>
                 <div class="sh-card p-5">
                     <div class="sh-label mb-3">
-                        <i class="fa-solid fa-layer-group mr-1"></i>MY_PRESENTATIONS
+                        <i class="fa-solid fa-layer-group mr-1"></i>MIS_PRESENTACIONES
                     </div>
                     <div id="presentations-list" class="flex flex-col gap-2">
                         <div th:if="${#lists.isEmpty(presentations)}"
                              class="text-center py-6 font-mono text-xs text-[var(--sh-text-3)]">
-                            No presentations yet.
+                            Aún no tienes presentaciones.
                         </div>
                         <div th:each="p : ${presentations}"
                              class="bg-[var(--sh-deep)] border border-[var(--sh-border)] rounded-tech p-3">
                             <div class="flex justify-between items-start mb-2">
                                 <div>
-                                    <div class="text-sm font-medium text-[var(--sh-text-1)]" th:text="${p.name()}">Name</div>
-                                    <div class="font-mono text-xs text-[var(--sh-text-3)]" th:text="${p.totalSlides()} + ' slides'">0 slides</div>
+                                                                        <div class="text-sm font-medium text-[var(--sh-text-1)]" th:text="${p.name()}">Nombre</div>
+                                                                        <div class="font-mono text-xs text-[var(--sh-text-3)]" th:text="${p.totalSlides()} + ' slides'">0 diapositivas</div>
                                 </div>
                                 <span class="sh-badge text-[0.6rem]"
                                       th:classappend="${p.sourceType() == 'DRIVE'} ? 'sh-badge-blue' : 'sh-badge-green'"
-                                      th:text="${p.sourceType() == 'DRIVE' ? 'Drive' : 'Upload'}">
+                                                                            th:text="${p.sourceType() == 'DRIVE' ? 'Drive' : 'Subida'}">
                                 </span>
                             </div>
                             <div class="flex gap-1.5 flex-wrap">
@@ -92,11 +92,11 @@
                                 </a>
                                 <a th:href="@{/presenter(presentationId=${p.id()})}"
                                    class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
-                                    <i class="fa-solid fa-chalkboard"></i> Present
+                                    <i class="fa-solid fa-chalkboard"></i> Presentar
                                 </a>
                                 <a th:href="@{/presentations/{id}/generate-notes(id=${p.id()})}"
                                    class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
-                                    <i class="fa-solid fa-robot"></i> AI_Notes
+                                    <i class="fa-solid fa-robot"></i> Notas_IA
                                 </a>
                             </div>
                         </div>
@@ -108,9 +108,9 @@
             <div>
                 <div class="sh-card p-6">
                     <div class="sh-label mb-1">
-                        <i class="fa-solid fa-download mr-1"></i>IMPORT_PRESENTATION
+                        <i class="fa-solid fa-download mr-1"></i>IMPORTAR_PRESENTACIÓN
                     </div>
-                    <h2 class="font-brand text-2xl mb-5 text-[var(--sh-text-1)]">Import</h2>
+                    <h2 class="font-brand text-2xl mb-5 text-[var(--sh-text-1)]">Importar</h2>
 
                     <!-- Tabs -->
                     <div class="sh-tabs mb-6">
@@ -118,7 +118,7 @@
                             <i class="fa-brands fa-google-drive mr-1"></i> Google Drive
                         </button>
                         <button class="sh-tab" id="tab-upload" onclick="showTab('upload')">
-                            <i class="fa-solid fa-upload mr-1"></i> Manual Upload
+                            <i class="fa-solid fa-upload mr-1"></i> Subida manual
                         </button>
                     </div>
 
@@ -126,39 +126,39 @@
                     <div id="panel-drive">
                         <div th:if="${!hasGoogleToken}" class="sh-alert sh-alert-warn mb-4">
                             <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
-                            <span>Link your <a href="/oauth2/authorization/google" class="underline">Google account</a> to access Drive.</span>
+                            <span>Vincula tu <a href="/oauth2/authorization/google" class="underline">cuenta de Google</a> para acceder a Drive.</span>
                         </div>
 
                         <div th:if="${hasGoogleToken}">
                             <div class="grid md:grid-cols-2 gap-3 mb-4">
                                 <div>
-                                    <label class="sh-input-label">Name *</label>
-                                    <input type="text" id="drive-name" class="sh-input" placeholder="My presentation">
+                                    <label class="sh-input-label">Nombre *</label>
+                                    <input type="text" id="drive-name" class="sh-input" placeholder="Mi presentación">
                                 </div>
                                 <div>
-                                    <label class="sh-input-label">GitHub Repo (optional)</label>
+                                    <label class="sh-input-label">Repositorio GitHub (opcional)</label>
                                     <input type="url" id="drive-repo" class="sh-input" placeholder="https://github.com/...">
                                 </div>
                                 <div class="md:col-span-2">
-                                    <label class="sh-input-label">Description</label>
-                                    <input type="text" id="drive-desc" class="sh-input" placeholder="Optional description">
+                                    <label class="sh-input-label">Descripción</label>
+                                    <input type="text" id="drive-desc" class="sh-input" placeholder="Descripción opcional">
                                 </div>
                             </div>
 
                             <div class="flex items-center gap-2 mb-3">
-                                <label class="sh-input-label mb-0">Drive Folder *</label>
+                                <label class="sh-input-label mb-0">Carpeta de Drive *</label>
                                 <button type="button" class="sh-btn text-xs py-0.5 px-2" onclick="loadFolders()">
-                                    <i class="fa-solid fa-arrows-rotate"></i> Load
+                                    <i class="fa-solid fa-arrows-rotate"></i> Cargar
                                 </button>
                             </div>
                             <div id="folders-loading" class="hidden font-mono text-xs text-[var(--sh-text-3)] mb-2">
-                                <i class="fa-solid fa-spinner fa-spin mr-1"></i>Loading folders...
+                                <i class="fa-solid fa-spinner fa-spin mr-1"></i>Cargando carpetas...
                             </div>
                             <div id="folders-list" class="flex flex-wrap gap-2 mb-4"></div>
 
                             <div id="images-section" class="hidden mb-4">
                                 <div class="flex items-center gap-2 mb-2">
-                                    <span class="sh-input-label mb-0">Images</span>
+                                    <span class="sh-input-label mb-0">Imágenes</span>
                                     <span id="images-count" class="sh-badge text-[0.6rem]">0</span>
                                 </div>
                                 <div id="images-list" class="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto"></div>
@@ -167,10 +167,10 @@
                             <div id="drive-error" class="sh-alert sh-alert-error hidden mb-3"></div>
 
                             <button type="button" class="sh-btn sh-btn-primary" id="btn-import-drive" onclick="importFromDrive()" disabled>
-                                <i class="fa-solid fa-download"></i> Import_From_Drive
+                                <i class="fa-solid fa-download"></i> Importar_desde_Drive
                             </button>
                             <div id="drive-progress" class="hidden mt-2 font-mono text-xs text-[var(--sh-text-3)]">
-                                <i class="fa-solid fa-spinner fa-spin mr-1"></i>Importing...
+                                <i class="fa-solid fa-spinner fa-spin mr-1"></i>Importando...
                             </div>
                         </div>
                     </div>
@@ -179,23 +179,23 @@
                     <div id="panel-upload" class="hidden">
                         <div class="grid md:grid-cols-2 gap-3 mb-4">
                             <div>
-                                <label class="sh-input-label">Name *</label>
-                                <input type="text" id="upload-name" class="sh-input" placeholder="My presentation">
+                                <label class="sh-input-label">Nombre *</label>
+                                <input type="text" id="upload-name" class="sh-input" placeholder="Mi presentación">
                             </div>
                             <div>
-                                <label class="sh-input-label">GitHub Repo (optional)</label>
+                                <label class="sh-input-label">Repositorio GitHub (opcional)</label>
                                 <input type="url" id="upload-repo" class="sh-input" placeholder="https://github.com/...">
                             </div>
                             <div class="md:col-span-2">
-                                <label class="sh-input-label">Description</label>
-                                <input type="text" id="upload-desc" class="sh-input" placeholder="Optional description">
+                                <label class="sh-input-label">Descripción</label>
+                                <input type="text" id="upload-desc" class="sh-input" placeholder="Descripción opcional">
                             </div>
                         </div>
 
                         <div id="upload-drop-zone" onclick="document.getElementById('file-input').click()">
                             <i class="fa-solid fa-cloud-arrow-up text-2xl mb-2 block text-[var(--sh-text-3)]"></i>
-                            <p class="text-sm text-[var(--sh-text-2)] mb-1">Drag images here or click to select</p>
-                            <p class="font-mono text-xs text-[var(--sh-text-3)]">PNG, JPG, GIF, WEBP — sorted by name</p>
+                            <p class="text-sm text-[var(--sh-text-2)] mb-1">Arrastra imágenes aquí o haz clic para seleccionar</p>
+                            <p class="font-mono text-xs text-[var(--sh-text-3)]">PNG, JPG, GIF, WEBP — ordenadas por nombre</p>
                             <input type="file" id="file-input" accept=".png,.jpg,.jpeg,.gif,.webp" multiple
                                    class="hidden" onchange="onFilesSelected(event)">
                         </div>
@@ -205,10 +205,10 @@
 
                         <button type="button" class="sh-btn sh-btn-green mt-4" id="btn-import-upload" onclick="importFromUpload()" disabled
                                 style="background: var(--sh-green); border-color: var(--sh-green); color: var(--sh-deep);">
-                            <i class="fa-solid fa-upload"></i> Upload_Presentation
+                            <i class="fa-solid fa-upload"></i> Subir_presentación
                         </button>
                         <div id="upload-progress" class="hidden mt-2 font-mono text-xs text-[var(--sh-text-3)]">
-                            <i class="fa-solid fa-spinner fa-spin mr-1"></i>Uploading files...
+                            <i class="fa-solid fa-spinner fa-spin mr-1"></i>Subiendo archivos...
                         </div>
                     </div>
 
@@ -238,11 +238,11 @@
                 const res = await fetch('/api/presentations/drive/folders');
                 const data = await res.json();
                 document.getElementById('folders-loading').classList.add('hidden');
-                if (!res.ok) { showError('drive-error', data.error || 'Error loading folders.'); return; }
+                if (!res.ok) { showError('drive-error', data.error || 'Error al cargar carpetas.'); return; }
 
                 const list = document.getElementById('folders-list');
                 if (!data.folders || data.folders.length === 0) {
-                    list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)">No folders found.</span>';
+                    list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)">No se encontraron carpetas.</span>';
                     return;
                 }
                 data.folders.forEach(f => {
@@ -254,7 +254,7 @@
                 });
             } catch (e) {
                 document.getElementById('folders-loading').classList.add('hidden');
-                showError('drive-error', 'Network error loading folders.');
+                showError('drive-error', 'Error de red al cargar carpetas.');
             }
         }
 
@@ -268,7 +268,7 @@
             const section = document.getElementById('images-section');
             const list = document.getElementById('images-list');
             section.classList.remove('hidden');
-            list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)"><i class="fa-solid fa-spinner fa-spin mr-1"></i>Loading...</span>';
+            list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)"><i class="fa-solid fa-spinner fa-spin mr-1"></i>Cargando...</span>';
 
             try {
                 const res = await fetch(`/api/presentations/drive/folders/${folderId}/images`);
@@ -283,18 +283,18 @@
                         list.appendChild(span);
                     });
                 } else {
-                    list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)">No images in this folder.</span>';
+                    list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)">No hay imágenes en esta carpeta.</span>';
                     document.getElementById('btn-import-drive').disabled = true;
                 }
             } catch (e) {
-                list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)">Error loading images.</span>';
+                list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)">Error al cargar imágenes.</span>';
             }
         }
 
         async function importFromDrive() {
             const name = document.getElementById('drive-name').value.trim();
-            if (!name) { showError('drive-error', 'Name is required.'); return; }
-            if (!selectedFolderId) { showError('drive-error', 'Select a Drive folder.'); return; }
+            if (!name) { showError('drive-error', 'El nombre es obligatorio.'); return; }
+            if (!selectedFolderId) { showError('drive-error', 'Selecciona una carpeta de Drive.'); return; }
             hideError('drive-error');
             document.getElementById('btn-import-drive').disabled = true;
             document.getElementById('drive-progress').classList.remove('hidden');
@@ -316,10 +316,10 @@
                 const data = await res.json();
                 document.getElementById('drive-progress').classList.add('hidden');
                 if (res.ok && data.success) { window.location.reload(); }
-                else { showError('drive-error', data.error || 'Import error.'); document.getElementById('btn-import-drive').disabled = false; }
+                else { showError('drive-error', data.error || 'Error al importar.'); document.getElementById('btn-import-drive').disabled = false; }
             } catch (e) {
                 document.getElementById('drive-progress').classList.add('hidden');
-                showError('drive-error', 'Network error.');
+                showError('drive-error', 'Error de red.');
                 document.getElementById('btn-import-drive').disabled = false;
             }
         }
@@ -356,8 +356,8 @@
 
         async function importFromUpload() {
             const name = document.getElementById('upload-name').value.trim();
-            if (!name) { showError('upload-error', 'Name is required.'); return; }
-            if (selectedFiles.length === 0) { showError('upload-error', 'Select at least one file.'); return; }
+            if (!name) { showError('upload-error', 'El nombre es obligatorio.'); return; }
+            if (selectedFiles.length === 0) { showError('upload-error', 'Selecciona al menos un archivo.'); return; }
             hideError('upload-error');
             document.getElementById('btn-import-upload').disabled = true;
             document.getElementById('upload-progress').classList.remove('hidden');
@@ -373,10 +373,10 @@
                 const data = await res.json();
                 document.getElementById('upload-progress').classList.add('hidden');
                 if (res.ok && data.success) { window.location.reload(); }
-                else { showError('upload-error', data.error || 'Upload error.'); document.getElementById('btn-import-upload').disabled = false; }
+                else { showError('upload-error', data.error || 'Error de subida.'); document.getElementById('btn-import-upload').disabled = false; }
             } catch (e) {
                 document.getElementById('upload-progress').classList.add('hidden');
-                showError('upload-error', 'Network error.');
+                showError('upload-error', 'Error de red.');
                 document.getElementById('btn-import-upload').disabled = false;
             }
         }
