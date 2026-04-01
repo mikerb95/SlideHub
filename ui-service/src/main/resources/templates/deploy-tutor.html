@@ -179,7 +179,7 @@
             <div class="step-row">
                 <span class="step-badge step-pending" id="s-analyze-badge">1</span>
                 <div class="flex-1">
-                    <div class="text-sm font-semibold text-[var(--sh-text-1)]">Analyzing_Repository</div>
+                    <div class="text-sm font-semibold text-[var(--sh-text-1)]">Analizando_Repositorio</div>
                     <div class="text-xs text-[var(--sh-text-3)]">Detecta lenguaje, framework, puertos y dependencias
                     </div>
                 </div>
@@ -190,7 +190,7 @@
             <div class="step-row">
                 <span class="step-badge step-pending" id="s-dockerfile-badge">2</span>
                 <div class="flex-1">
-                    <div class="text-sm font-semibold text-[var(--sh-text-1)]">Generating_Dockerfile</div>
+                    <div class="text-sm font-semibold text-[var(--sh-text-1)]">Generando_Dockerfile</div>
                     <div class="text-xs text-[var(--sh-text-3)]">Multi-stage optimizado con healthcheck</div>
                 </div>
                 <i class="fa-solid fa-spinner fa-spin hidden" style="color:var(--sh-blue);" id="s-dockerfile-spin"></i>
@@ -200,7 +200,7 @@
             <div class="step-row">
                 <span class="step-badge step-pending" id="s-guide-badge">3</span>
                 <div class="flex-1">
-                    <div class="text-sm font-semibold text-[var(--sh-text-1)]">Generating_Deploy_Guide</div>
+                    <div class="text-sm font-semibold text-[var(--sh-text-1)]">Generando_Guía_Despliegue</div>
                     <div class="text-xs text-[var(--sh-text-3)]">Pasos, variables de entorno y recomendaciones</div>
                 </div>
                 <i class="fa-solid fa-spinner fa-spin hidden" style="color:var(--sh-blue);" id="s-guide-spin"></i>
@@ -220,7 +220,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="space-y-2">
                         <div class="flex justify-between text-sm">
-                            <span class="text-[var(--sh-text-3)] font-mono text-xs">Language</span>
+                            <span class="text-[var(--sh-text-3)] font-mono text-xs">Lenguaje</span>
                             <span id="a-language" class="font-semibold" style="color:var(--sh-blue);"></span>
                         </div>
                         <div class="flex justify-between text-sm">
@@ -232,23 +232,23 @@
                             <span id="a-build" style="color:#d2a8ff;"></span>
                         </div>
                         <div class="flex justify-between text-sm">
-                            <span class="text-[var(--sh-text-3)] font-mono text-xs">Ports</span>
+                            <span class="text-[var(--sh-text-3)] font-mono text-xs">Puertos</span>
                             <span id="a-ports" style="color:var(--sh-amber);"></span>
                         </div>
                     </div>
                     <div>
-                        <div class="text-xs font-mono text-[var(--sh-text-3)] mb-1">Technologies</div>
+                        <div class="text-xs font-mono text-[var(--sh-text-3)] mb-1">Tecnologías</div>
                         <div id="a-technologies" class="mb-2"></div>
-                        <div class="text-xs font-mono text-[var(--sh-text-3)] mb-1">Databases</div>
+                        <div class="text-xs font-mono text-[var(--sh-text-3)] mb-1">Bases de datos</div>
                         <div id="a-databases"></div>
                     </div>
                 </div>
                 <div class="mt-3">
-                    <div class="text-xs font-mono text-[var(--sh-text-3)] mb-1">Summary</div>
+                    <div class="text-xs font-mono text-[var(--sh-text-3)] mb-1">Resumen</div>
                     <div id="a-summary" class="text-sm text-[var(--sh-text-2)]"></div>
                 </div>
                 <div id="a-hints-row" class="mt-2 hidden">
-                    <div class="text-xs font-mono text-[var(--sh-text-3)] mb-1">Deployment_Hints</div>
+                    <div class="text-xs font-mono text-[var(--sh-text-3)] mb-1">Pistas_Despliegue</div>
                     <div id="a-hints" class="text-sm text-[var(--sh-text-2)]"></div>
                 </div>
             </div>
@@ -261,10 +261,10 @@
                     </div>
                     <div class="result-head-actions flex gap-2">
                         <button class="sh-btn sh-btn-ghost text-xs" onclick="copyEl('dockerfile-output', this)">
-                            <i class="fa-regular fa-copy mr-1"></i>Copy
+                            <i class="fa-regular fa-copy mr-1"></i>Copiar
                         </button>
                         <button class="sh-btn sh-btn-ghost text-xs" onclick="dlText('dockerfile-output','Dockerfile')">
-                            <i class="fa-solid fa-download mr-1"></i>Download
+                            <i class="fa-solid fa-download mr-1"></i>Descargar
                         </button>
                     </div>
                 </div>
@@ -280,7 +280,7 @@
                     </div>
                     <div class="result-head-actions flex gap-2">
                         <button class="sh-btn sh-btn-ghost text-xs" onclick="copyEl('guide-output', this)">
-                            <i class="fa-regular fa-copy mr-1"></i>Copy
+                            <i class="fa-regular fa-copy mr-1"></i>Copiar
                         </button>
                         <button class="sh-btn sh-btn-ghost text-xs" onclick="dlText('guide-output','DEPLOY_GUIDE.md')">
                             <i class="fa-solid fa-download mr-1"></i>.md
@@ -296,7 +296,7 @@
             <!-- Tips card -->
             <div class="sh-card p-5 hidden" id="tips-card">
                 <div class="sh-label mb-3">
-                    <i class="fa-solid fa-lightbulb mr-1" style="color:var(--sh-amber);"></i>TIPS
+                    <i class="fa-solid fa-lightbulb mr-1" style="color:var(--sh-amber);"></i>CONSEJOS
                 </div>
                 <ul id="tips-list" class="space-y-1"></ul>
             </div>
@@ -309,7 +309,7 @@
                     </div>
                     <div class="result-head-actions flex gap-2">
                         <button class="sh-btn sh-btn-ghost text-xs" onclick="copyEl('env-output', this)">
-                            <i class="fa-regular fa-copy mr-1"></i>Copy
+                            <i class="fa-regular fa-copy mr-1"></i>Copiar
                         </button>
                         <button class="sh-btn sh-btn-ghost text-xs" onclick="dlText('env-output','.env.example')">
                             <i class="fa-solid fa-download mr-1"></i>.env.example

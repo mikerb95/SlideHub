@@ -362,10 +362,16 @@
                     <div class="progress-track">
                         <div id="repo-progress-fill" class="progress-fill" style="width: 8%"></div>
                     </div>
+                    <div id="repo-meta-text" class="repo-assistant-meta">Iniciando...</div>
+                </div>
+                <div id="repo-tips-panel" class="repo-assistant-panel hidden mt-2">
+                    <div class="repo-assistant-title">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <span>Tips de uso</span>
+                    </div>
                     <div id="repo-tip-text" class="repo-assistant-tip">
                         Tip: un repositorio con README claro y estructura consistente mejora la calidad de las notas IA.
                     </div>
-                    <div id="repo-meta-text" class="repo-assistant-meta">Iniciando...</div>
                 </div>
                 <div id="repo-result" class="hidden mt-3 note-card">
                     <div class="font-mono text-xs text-[var(--sh-green)] mb-2"><i
@@ -943,8 +949,10 @@
 
         function startRepoAssistantPanel() {
             const panel = document.getElementById('repo-progress');
+            const tipsPanel = document.getElementById('repo-tips-panel');
             const tip = document.getElementById('repo-tip-text');
             panel.classList.remove('hidden');
+            tipsPanel.classList.remove('hidden');
             updateRepoAssistantPanel('Analizando estructura del repositorio...', 12, 'Preparando análisis...');
             if (tip) tip.textContent = repoTips[0];
             let tipIndex = 0;
@@ -957,7 +965,9 @@
 
         function stopRepoAssistantPanel() {
             const panel = document.getElementById('repo-progress');
+            const tipsPanel = document.getElementById('repo-tips-panel');
             panel.classList.add('hidden');
+            tipsPanel.classList.add('hidden');
             if (repoTipTimer) {
                 clearInterval(repoTipTimer);
                 repoTipTimer = null;
