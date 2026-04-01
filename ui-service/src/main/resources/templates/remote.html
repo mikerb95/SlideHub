@@ -336,7 +336,7 @@
     <!-- Volver a diapositiva (visible en modo URL) -->
     <button id="btn-return-slide" onclick="returnToSlide()">
         <i class="fa-solid fa-arrow-left"></i>
-        <span id="return-label">Volver_Diapositiva</span>
+        <span id="return-label">Volver diapositiva</span>
     </button>
 
     <!-- Indicador de diapositiva -->
@@ -373,7 +373,7 @@
 
     <!-- Tarjeta de asistencia -->
     <div id="assist-card">
-        <div class="title">AI_ASSIST</div>
+        <div class="title">AI ASSIST</div>
         <div class="content" id="assist-answer-text"></div>
     </div>
 
@@ -389,7 +389,7 @@
     <div id="bottom-sheet">
         <div class="w-10 h-1 bg-[var(--sh-text-3)] rounded-full mx-auto mt-3 mb-1 opacity-40"></div>
         <div class="text-center py-2 border-b border-[var(--sh-border)] sh-label">
-            <i class="fa-solid fa-globe mr-1"></i>LINKS_RÁPIDOS
+            <i class="fa-solid fa-globe mr-1"></i>LINKS RÁPIDOS
         </div>
         <div class="overflow-y-auto p-3 flex-1" id="sheet-links-container">
             <button th:each="link : ${quickLinks}" th:data-url="${link.url}" class="demo-link-btn"
@@ -412,7 +412,7 @@
     <div id="join-overlay">
         <div class="sh-card p-5 w-full max-w-[420px]">
             <div class="sh-label mb-3">
-                <i class="fa-solid fa-qrcode mr-1"></i>UNIRSE_REUNIÓN
+                <i class="fa-solid fa-qrcode mr-1"></i>UNIRSE REUNIÓN
             </div>
             <select id="join-participant-select" class="sh-select text-sm mb-3"></select>
             <input id="join-custom-name" type="text" class="sh-input text-sm mb-3" maxlength="120"
@@ -502,7 +502,7 @@
             demoMode = demo.mode;
             returnSlide = demo.returnSlide ?? null;
             if (demo.mode === 'url') {
-                const label = returnSlide ? `Volver_Diapositiva_${returnSlide}` : 'Volver_Diapositivas';
+                const label = returnSlide ? `Volver diapositiva ${returnSlide}` : 'Volver diapositivas';
                 returnLabel.textContent = label;
                 btnReturn.classList.add('visible');
             } else {

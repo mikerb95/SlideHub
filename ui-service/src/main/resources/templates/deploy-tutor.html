@@ -119,7 +119,7 @@
     <nav class="sh-nav" style="position: sticky;">
         <div class="sh-nav-inner deploy-nav">
             <div class="flex items-center gap-2 sm:gap-3">
-                <span class="font-brand text-base tracking-tight">Deploy_Tutor</span>
+                <span class="font-brand text-base tracking-tight">Deploy Tutor</span>
                 <div class="sh-status ml-1 hidden sm:inline-flex">
                     <i class="fa-solid fa-rocket text-xs" style="color: var(--sh-blue);"></i>
                 </div>
@@ -146,7 +146,7 @@
             </div>
             <div class="flex flex-col md:flex-row gap-3">
                 <div class="flex-1">
-                    <label class="block text-xs font-mono text-[var(--sh-text-3)] mb-1">REPO_URL</label>
+                    <label class="block text-xs font-mono text-[var(--sh-text-3)] mb-1">REPO URL</label>
                     <input type="url" class="sh-input w-full" id="repoUrl" placeholder="https://github.com/user/repo">
                 </div>
                 <div class="w-full md:w-48">
@@ -179,7 +179,7 @@
             <div class="step-row">
                 <span class="step-badge step-pending" id="s-analyze-badge">1</span>
                 <div class="flex-1">
-                    <div class="text-sm font-semibold text-[var(--sh-text-1)]">Analizando_Repositorio</div>
+                    <div class="text-sm font-semibold text-[var(--sh-text-1)]">Analizando repositorio</div>
                     <div class="text-xs text-[var(--sh-text-3)]">Detecta lenguaje, framework, puertos y dependencias
                     </div>
                 </div>
@@ -190,7 +190,7 @@
             <div class="step-row">
                 <span class="step-badge step-pending" id="s-dockerfile-badge">2</span>
                 <div class="flex-1">
-                    <div class="text-sm font-semibold text-[var(--sh-text-1)]">Generando_Dockerfile</div>
+                    <div class="text-sm font-semibold text-[var(--sh-text-1)]">Generando Dockerfile</div>
                     <div class="text-xs text-[var(--sh-text-3)]">Multi-stage optimizado con healthcheck</div>
                 </div>
                 <i class="fa-solid fa-spinner fa-spin hidden" style="color:var(--sh-blue);" id="s-dockerfile-spin"></i>
@@ -200,7 +200,7 @@
             <div class="step-row">
                 <span class="step-badge step-pending" id="s-guide-badge">3</span>
                 <div class="flex-1">
-                    <div class="text-sm font-semibold text-[var(--sh-text-1)]">Generando_Guía_Despliegue</div>
+                    <div class="text-sm font-semibold text-[var(--sh-text-1)]">Generando guía de despliegue</div>
                     <div class="text-xs text-[var(--sh-text-3)]">Pasos, variables de entorno y recomendaciones</div>
                 </div>
                 <i class="fa-solid fa-spinner fa-spin hidden" style="color:var(--sh-blue);" id="s-guide-spin"></i>
@@ -215,7 +215,7 @@
             <!-- Analysis card -->
             <div class="sh-card p-5">
                 <div class="sh-label mb-4">
-                    <i class="fa-solid fa-magnifying-glass-chart mr-1"></i>REPO_ANALYSIS
+                    <i class="fa-solid fa-magnifying-glass-chart mr-1"></i>ANÁLISIS DEL REPOSITORIO
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="space-y-2">
@@ -248,7 +248,7 @@
                     <div id="a-summary" class="text-sm text-[var(--sh-text-2)]"></div>
                 </div>
                 <div id="a-hints-row" class="mt-2 hidden">
-                    <div class="text-xs font-mono text-[var(--sh-text-3)] mb-1">Pistas_Despliegue</div>
+                    <div class="text-xs font-mono text-[var(--sh-text-3)] mb-1">Pistas de despliegue</div>
                     <div id="a-hints" class="text-sm text-[var(--sh-text-2)]"></div>
                 </div>
             </div>
@@ -275,14 +275,14 @@
             <div class="sh-card overflow-hidden">
                 <div class="result-head flex items-center justify-between p-4 border-b border-[var(--sh-border)]">
                     <div class="sh-label">
-                        <i class="fa-solid fa-map mr-1" style="color:#f78166;"></i>DEPLOY_GUIDE —
+                        <i class="fa-solid fa-map mr-1" style="color:#f78166;"></i>GUÍA DE DESPLIEGUE —
                         <span id="platform-label" class="uppercase"></span>
                     </div>
                     <div class="result-head-actions flex gap-2">
                         <button class="sh-btn sh-btn-ghost text-xs" onclick="copyEl('guide-output', this)">
                             <i class="fa-regular fa-copy mr-1"></i>Copiar
                         </button>
-                        <button class="sh-btn sh-btn-ghost text-xs" onclick="dlText('guide-output','DEPLOY_GUIDE.md')">
+                        <button class="sh-btn sh-btn-ghost text-xs" onclick="dlText('guide-output','GUIA_DESPLIEGUE.md')">
                             <i class="fa-solid fa-download mr-1"></i>.md
                         </button>
                     </div>
@@ -305,7 +305,7 @@
             <div class="sh-card overflow-hidden hidden" id="env-card">
                 <div class="result-head flex items-center justify-between p-4 border-b border-[var(--sh-border)]">
                     <div class="sh-label">
-                        <i class="fa-solid fa-key mr-1" style="color:var(--sh-green);"></i>ENV_VARIABLES
+                        <i class="fa-solid fa-key mr-1" style="color:var(--sh-green);"></i>VARIABLES DE ENTORNO
                     </div>
                     <div class="result-head-actions flex gap-2">
                         <button class="sh-btn sh-btn-ghost text-xs" onclick="copyEl('env-output', this)">

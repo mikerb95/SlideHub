@@ -108,7 +108,7 @@
             <div>
                 <div class="sh-card p-5">
                     <div class="sh-label mb-3">
-                        <i class="fa-solid fa-layer-group mr-1"></i>MIS_PRESENTACIONES
+                        <i class="fa-solid fa-layer-group mr-1"></i>MIS PRESENTACIONES
                     </div>
                     <div id="presentations-list" class="flex flex-col gap-2">
                         <div th:if="${#lists.isEmpty(presentations)}"
@@ -140,7 +140,7 @@
                                 </a>
                                 <a th:href="@{/presentations/{id}/generate-notes(id=${p.id()})}"
                                     class="sh-btn sh-btn-ghost text-[0.7rem] py-1 px-2.5">
-                                    <i class="fa-solid fa-robot"></i> Notas_IA
+                                    <i class="fa-solid fa-robot"></i> Notas IA
                                 </a>
                                 <form th:action="@{/presentations/{id}/delete(id=${p.id()})}" method="post"
                                     class="inline">
@@ -162,7 +162,7 @@
             <div>
                 <div class="sh-card p-6">
                     <div class="sh-label mb-1">
-                        <i class="fa-solid fa-download mr-1"></i>IMPORTAR_PRESENTACIÓN
+                        <i class="fa-solid fa-download mr-1"></i>IMPORTAR PRESENTACIÓN
                     </div>
                     <h2 class="font-brand text-2xl mb-5 text-[var(--sh-text-1)]">Importar</h2>
 
@@ -225,7 +225,7 @@
 
                             <button type="button" class="sh-btn sh-btn-primary w-full sm:w-auto justify-center"
                                 id="btn-import-drive" onclick="importFromDrive()" disabled>
-                                <i class="fa-solid fa-download"></i> Importar_desde_Drive
+                                <i class="fa-solid fa-download"></i> Importar desde Drive
                             </button>
                             <div id="drive-progress" class="hidden mt-2 font-mono text-xs text-[var(--sh-text-3)]">
                                 <i class="fa-solid fa-spinner fa-spin mr-1"></i>Importando...
@@ -267,7 +267,7 @@
                         <button type="button" class="sh-btn sh-btn-green mt-4 w-full sm:w-auto justify-center"
                             id="btn-import-upload" onclick="importFromUpload()" disabled
                             style="background: var(--sh-green); border-color: var(--sh-green); color: var(--sh-deep);">
-                            <i class="fa-solid fa-upload"></i> Subir_presentación
+                            <i class="fa-solid fa-upload"></i> Subir presentación
                         </button>
                         <div id="upload-progress" class="hidden mt-2 font-mono text-xs text-[var(--sh-text-3)]">
                             <i class="fa-solid fa-spinner fa-spin mr-1"></i>Subiendo archivos...
@@ -282,7 +282,7 @@
     <div id="delete-modal" class="sh-overlay hidden" onclick="if(event.target===this)closeDeleteModal()">
         <div class="sh-modal max-w-md w-[92%]">
             <div class="flex items-center justify-between mb-4">
-                <div class="sh-label"><i class="fa-solid fa-triangle-exclamation mr-1"></i>CONFIRMAR_ELIMINACIÓN</div>
+                <div class="sh-label"><i class="fa-solid fa-triangle-exclamation mr-1"></i>CONFIRMAR ELIMINACIÓN</div>
                 <button type="button" class="sh-btn sh-btn-ghost text-xs" onclick="closeDeleteModal()">
                     <i class="fa-solid fa-xmark"></i>
                 </button>

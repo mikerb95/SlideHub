@@ -98,7 +98,7 @@
     <nav class="sh-nav" style="position: sticky;">
         <div class="sh-nav-inner status-nav">
             <div class="flex items-center gap-2 sm:gap-3">
-                <span class="font-brand text-base tracking-tight">System_Status</span>
+                <span class="font-brand text-base tracking-tight">System Status</span>
                 <div class="sh-status ml-1 hidden sm:inline-flex">
                     <i class="fa-solid fa-wave-square text-xs" style="color: var(--sh-blue);"></i>
                 </div>
@@ -134,7 +134,7 @@
                         <tr style="border-bottom: 1px solid var(--sh-border);">
                             <th class="text-left py-2 text-xs font-mono text-[var(--sh-text-3)]">OBJETIVO</th>
                             <th class="text-left py-2 text-xs font-mono text-[var(--sh-text-3)]">STATUS</th>
-                            <th class="text-left py-2 text-xs font-mono text-[var(--sh-text-3)]">LATENCIA_MS</th>
+                            <th class="text-left py-2 text-xs font-mono text-[var(--sh-text-3)]">LATENCIA (MS)</th>
                             <th class="text-left py-2 text-xs font-mono text-[var(--sh-text-3)]">ÚLTIMA_VERIFICACIÓN
                             </th>
                             <th class="text-left py-2 text-xs font-mono text-[var(--sh-text-3)]">DETALLE</th>
@@ -157,7 +157,7 @@
         <div class="sh-modal max-w-3xl w-[95%]">
             <div class="flex items-center justify-between mb-4">
                 <div>
-                    <div class="sh-label mb-1">SERVICE_DIAGNOSTIC</div>
+                    <div class="sh-label mb-1">SERVICE DIAGNOSTIC</div>
                     <h3 id="diag-title" class="font-brand text-xl text-[var(--sh-text-1)]">--</h3>
                 </div>
                 <div id="diag-severity" class="diag-severity diag-severity-info">INFO</div>
@@ -173,22 +173,22 @@
 
             <div class="diag-grid mb-3">
                 <div class="diag-card">
-                    <div class="sh-label mb-2">CONNECTION_PROPERTIES</div>
+                    <div class="sh-label mb-2">CONNECTION PROPERTIES</div>
                     <div id="diag-connection"></div>
                 </div>
                 <div class="diag-card">
-                    <div class="sh-label mb-2">LATENCY_AND_ERRORS</div>
+                    <div class="sh-label mb-2">LATENCY AND ERRORS</div>
                     <div id="diag-latency"></div>
                 </div>
             </div>
 
             <div class="diag-card mb-3">
-                <div class="sh-label mb-2">POSSIBLE_CAUSES</div>
+                <div class="sh-label mb-2">POSSIBLE CAUSES</div>
                 <ul id="diag-causes" class="text-sm text-[var(--sh-text-2)] list-disc pl-5 space-y-1"></ul>
             </div>
 
             <div class="diag-card">
-                <div class="sh-label mb-2">POSSIBLE_FIX</div>
+                <div class="sh-label mb-2">POSSIBLE FIX</div>
                 <ul id="diag-fixes" class="text-sm text-[var(--sh-text-2)] list-disc pl-5 space-y-1"></ul>
             </div>
         </div>
