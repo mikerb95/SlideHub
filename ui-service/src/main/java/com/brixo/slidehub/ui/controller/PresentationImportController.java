@@ -283,6 +283,28 @@ public class PresentationImportController {
         }
     }
 
+    @PostMapping("/presentations/{id}/delete")
+    public String deletePresentation(
+            @PathVariable String id,
+            Authentication authentication) {
+        User user = resolveUser(authentication);
+        presentationService.deletePresentation(user.getId(), id);
+        return "redirect:/presentations";
+    }
+
+    @PostMapping("/api/presentations/{id}/delete")
+    @ResponseBody
+    public ResponseEntity<?> deletePresentationApi(
+            @PathVariable String id,
+            Authentication authentication) {
+        User user = resolveUser(authentication);
+        boolean deleted = presentationService.deletePresentation(user.getId(), id);
+        if (!deleted) {
+            return ResponseEntity.status(404).body(Map.of("error", "Presentación no encontrada."));
+        }
+        return ResponseEntity.ok(Map.of("success", true));
+    }
+
     // ── Helpers privados ──────────────────────────────────────────────────────
 
     /**

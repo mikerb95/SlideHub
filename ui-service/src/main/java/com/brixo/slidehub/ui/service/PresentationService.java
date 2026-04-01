@@ -7,7 +7,11 @@ import com.brixo.slidehub.ui.model.Slide;
 import com.brixo.slidehub.ui.model.SlideInfo;
 import com.brixo.slidehub.ui.model.SourceType;
 import com.brixo.slidehub.ui.model.User;
+import com.brixo.slidehub.ui.repository.PresentationParticipantRepository;
 import com.brixo.slidehub.ui.repository.PresentationRepository;
+import com.brixo.slidehub.ui.repository.PresentationSessionRepository;
+import com.brixo.slidehub.ui.repository.SessionMemberRepository;
+import com.brixo.slidehub.ui.repository.SlideAssignmentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -45,14 +49,26 @@ public class PresentationService {
     private static final Logger log = LoggerFactory.getLogger(PresentationService.class);
 
     private final PresentationRepository presentationRepository;
+    private final SessionMemberRepository sessionMemberRepository;
+    private final SlideAssignmentRepository slideAssignmentRepository;
+    private final PresentationParticipantRepository presentationParticipantRepository;
+    private final PresentationSessionRepository presentationSessionRepository;
     private final GoogleDriveService googleDriveService;
     private final SlideUploadService slideUploadService;
     private final WebClient imageDownloadClient;
 
     public PresentationService(PresentationRepository presentationRepository,
+            SessionMemberRepository sessionMemberRepository,
+            SlideAssignmentRepository slideAssignmentRepository,
+            PresentationParticipantRepository presentationParticipantRepository,
+            PresentationSessionRepository presentationSessionRepository,
             GoogleDriveService googleDriveService,
             SlideUploadService slideUploadService) {
         this.presentationRepository = presentationRepository;
+        this.sessionMemberRepository = sessionMemberRepository;
+        this.slideAssignmentRepository = slideAssignmentRepository;
+        this.presentationParticipantRepository = presentationParticipantRepository;
+        this.presentationSessionRepository = presentationSessionRepository;
         this.googleDriveService = googleDriveService;
         this.slideUploadService = slideUploadService;
         this.imageDownloadClient = WebClient.builder()
@@ -75,6 +91,37 @@ public class PresentationService {
      */
     public Optional<Presentation> getPresentation(String userId, String presentationId) {
         return presentationRepository.findByIdAndUserId(presentationId, userId);
+    }
+
+    @Transactional
+    public boolean deletePresentation(String userId, String presentationId) {
+        Optional<Presentation> presentationOpt = presentationRepository.findByIdAndUserId(presentationId, userId);
+        if (presentationOpt.isEmpty()) {
+            return false;
+        }
+
+        Presentation presentation = presentationOpt.get();
+
+        for (Slide slide : presentation.getSlides()) {
+            String s3Key = extractS3Key(slide, presentation.getId());
+            if (s3Key == null || s3Key.isBlank()) {
+                continue;
+            }
+            try {
+                slideUploadService.delete(s3Key);
+            } catch (Exception ex) {
+                log.warn("No se pudo eliminar objeto S3 {}: {}", s3Key, ex.getMessage());
+            }
+        }
+
+        List<String> presentationIds = List.of(presentationId);
+        sessionMemberRepository.deleteBySessionPresentationIdIn(presentationIds);
+        slideAssignmentRepository.deleteByPresentationIdIn(presentationIds);
+        presentationParticipantRepository.deleteByPresentationIdIn(presentationIds);
+        presentationSessionRepository.deleteByPresentationIdIn(presentationIds);
+
+        presentationRepository.delete(presentation);
+        return true;
     }
 
     public List<SlideInfo> getSlidesForPlayback(String presentationId) {
@@ -319,6 +366,17 @@ public class PresentationService {
             case "image/webp" -> "image/webp";
             default -> "image/png";
         };
+    }
+
+    private String extractS3Key(Slide slide, String presentationId) {
+        if (slide.getS3Url() != null && slide.getS3Url().contains("amazonaws.com/")) {
+            String marker = "amazonaws.com/";
+            int index = slide.getS3Url().indexOf(marker);
+            if (index >= 0) {
+                return slide.getS3Url().substring(index + marker.length());
+            }
+        }
+        return slideUploadService.buildSlideKey(presentationId, slide.getNumber());
     }
 
     private Color detectPrimaryColor(Presentation presentation) {
