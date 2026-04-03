@@ -39,8 +39,8 @@ class SlideControllerTest {
         given(slideStateService.setSlide(3, 12)).willReturn(new SlideStateResponse(3, 12));
 
         mockMvc.perform(post("/api/slide")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"slide\":3,\"totalSlides\":12}"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"slide\":3,\"totalSlides\":12}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.slide").value(3))
                 .andExpect(jsonPath("$.totalSlides").value(12));
