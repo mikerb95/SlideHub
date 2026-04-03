@@ -243,6 +243,16 @@
             };
         }
 
+        if (detail.startsWith('LOCAL ')) {
+            const target = detail.replace('LOCAL ', '').trim();
+            return {
+                protocol: 'LOCAL',
+                target,
+                host: 'in-process',
+                env: expectedEnvByService(check.name)
+            };
+        }
+
         return {
             protocol: '--',
             target: '--',
@@ -253,9 +263,7 @@
 
     function expectedEnvByService(serviceName) {
         const map = {
-            'state-service': 'STATE_SERVICE_URL',
-            'ai-service': 'AI_SERVICE_URL',
-            gateway: 'GATEWAY_URL',
+            monolith: 'PORT / BASE_URL',
             render: 'RENDER_SERVICE_URL',
             redis: 'REDIS_HOST / REDIS_PORT',
             mongodb: 'MONGODB_URI',

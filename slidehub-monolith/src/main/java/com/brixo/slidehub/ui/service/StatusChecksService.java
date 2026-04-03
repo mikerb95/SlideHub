@@ -20,9 +20,7 @@ import java.util.List;
 @Service
 public class StatusChecksService {
 
-    private final String stateServiceUrl;
-    private final String aiServiceUrl;
-    private final String gatewayUrl;
+    private final String applicationName;
     private final String renderUrl;
     private final String redisHost;
     private final int redisPort;
@@ -36,9 +34,7 @@ public class StatusChecksService {
     private volatile CachedResponse cachedResponse;
 
     public StatusChecksService(
-            @Value("${slidehub.state-service.url:http://localhost:8081}") String stateServiceUrl,
-            @Value("${slidehub.ai-service.url:http://localhost:8083}") String aiServiceUrl,
-            @Value("${slidehub.gateway.url:http://localhost:8080}") String gatewayUrl,
+            @Value("${spring.application.name:slidehub-monolith}") String applicationName,
             @Value("${slidehub.render.url:}") String renderUrl,
             @Value("${slidehub.redis.host:${REDIS_HOST:}}") String redisHost,
             @Value("${slidehub.redis.port:${REDIS_PORT:6379}}") int redisPort,
@@ -48,9 +44,7 @@ public class StatusChecksService {
             @Value("${aws.s3.region:${AWS_REGION:us-east-1}}") String s3Region,
             @Value("${slidehub.status.check.timeout-ms:2500}") long timeoutMs,
             @Value("${slidehub.status.cache-ttl-ms:1000}") long cacheTtlMs) {
-        this.stateServiceUrl = stateServiceUrl;
-        this.aiServiceUrl = aiServiceUrl;
-        this.gatewayUrl = gatewayUrl;
+        this.applicationName = applicationName;
         this.renderUrl = renderUrl;
         this.redisHost = redisHost;
         this.redisPort = redisPort;
@@ -85,9 +79,7 @@ public class StatusChecksService {
     StatusChecksResponse buildChecks(Instant timestamp) {
         List<StatusCheckItem> checks = new ArrayList<>();
 
-        checks.add(checkHttp("state-service", normalizeBaseUrl(stateServiceUrl) + "/actuator/health", timestamp));
-        checks.add(checkHttp("ai-service", normalizeBaseUrl(aiServiceUrl) + "/api/ai/notes/health", timestamp));
-        checks.add(checkHttp("gateway", normalizeBaseUrl(gatewayUrl) + "/actuator/health", timestamp));
+        checks.add(localAppCheck(timestamp));
 
         if (isConfigured(renderUrl)) {
             checks.add(checkHttp("render", normalizeBaseUrl(renderUrl), timestamp));
@@ -123,6 +115,15 @@ public class StatusChecksService {
         }
 
         return new StatusChecksResponse(timestamp, checks);
+    }
+
+    private StatusCheckItem localAppCheck(Instant timestamp) {
+        return new StatusCheckItem(
+                "monolith",
+                "ok",
+                0L,
+                timestamp,
+                "LOCAL " + applicationName + " running");
     }
 
     StatusCheckItem checkHttp(String name, String url, Instant timestamp) {
