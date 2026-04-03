@@ -22,16 +22,16 @@ public class AssistBridgeService {
             int slideNumber,
             String slideContext) {
         AssistService.AssistResult result = assistService.processAudio(
-            audio,
-            filename,
-            contentType,
-            repoUrl,
-            slideNumber,
-            slideContext);
+                audio,
+                filename,
+                contentType,
+                repoUrl,
+                slideNumber,
+                slideContext);
 
         return Map.of(
-            "success", true,
-            "transcription", result.transcription(),
-            "answer", result.answer());
+                "success", true,
+                "transcription", result.transcription(),
+                "answer", result.answer());
     }
 }
