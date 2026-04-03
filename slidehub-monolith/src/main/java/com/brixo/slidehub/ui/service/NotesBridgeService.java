@@ -88,7 +88,7 @@ public class NotesBridgeService {
                     .findByPresentationIdOrderBySlideNumberAsc(presentationId);
 
             return notes.stream()
-                .map(note -> (Map<String, Object>) objectMapper.convertValue(note, Map.class))
+                    .map(note -> (Map<String, Object>) objectMapper.convertValue(note, Map.class))
                     .toList();
         } catch (Exception e) {
             log.error("Error obteniendo notas para {}: {}",
