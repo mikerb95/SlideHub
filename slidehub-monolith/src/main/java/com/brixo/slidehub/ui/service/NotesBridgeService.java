@@ -45,7 +45,7 @@ public class NotesBridgeService {
     // ── Generación de notas ───────────────────────────────────────────────────
 
     /**
-    * Genera notas para todos los slides de una
+     * Genera notas para todos los slides de una
      * presentación.
      *
      * @param presentationId ID de la presentación
@@ -96,7 +96,7 @@ public class NotesBridgeService {
     }
 
     /**
-    * Ejecuta un análisis técnico del repositorio.
+     * Ejecuta un análisis técnico del repositorio.
      *
      * @param repoUrl URL del repositorio GitHub
      * @return mapa con los campos del análisis (language, framework, technologies,

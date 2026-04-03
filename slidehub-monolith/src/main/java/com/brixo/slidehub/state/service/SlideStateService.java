@@ -115,6 +115,8 @@ public class SlideStateService {
         addCandidate(candidates, slidesDirectory);
         addCandidate(candidates, "./slides");
         addCandidate(candidates, "./static/slides");
+        addCandidate(candidates, "./src/main/resources/static/slides");
+        addCandidate(candidates, "./slidehub-monolith/src/main/resources/static/slides");
         addCandidate(candidates, "./ui-service/src/main/resources/static/slides");
         addCandidate(candidates, "../ui-service/src/main/resources/static/slides");
         return new ArrayList<>(candidates);
