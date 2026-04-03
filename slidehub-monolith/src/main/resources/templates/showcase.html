@@ -530,16 +530,16 @@
             <div class="text-center mb-20 reveal">
                 <div class="sh-label mb-4">SYSTEM ARCHITECTURE</div>
                 <h2 class="font-brand text-4xl lg:text-5xl text-[var(--sh-text-1)] mb-4">
-                    Cuatro servicios.<br>
-                    <span class="text-[var(--sh-text-3)]">Un sistema.</span>
+                    Un monolito modular.<br>
+                    <span class="text-[var(--sh-text-3)]">Múltiples capacidades.</span>
                 </h2>
                 <p class="text-[var(--sh-text-2)] text-base max-w-lg mx-auto">
-                    Cada nodo opera de forma independiente, comunicandose a traves del gateway centralizado.
+                    Un único runtime Spring Boot con módulos de UI, estado e IA coordinados en proceso.
                 </p>
             </div>
 
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- Gateway -->
+                <!-- Runtime -->
                 <div class="reveal">
                     <div class="sh-card sh-gradient-border p-6 h-full">
                         <div class="flex items-center justify-between mb-5">
@@ -552,13 +552,13 @@
                                 <span class="font-mono text-xs text-accent-green">:8080</span>
                             </div>
                         </div>
-                        <h4 class="font-brand text-xl text-[var(--sh-text-1)] mb-2">Gateway</h4>
+                        <h4 class="font-brand text-xl text-[var(--sh-text-1)] mb-2">Runtime</h4>
                         <p class="text-xs text-[var(--sh-text-2)] leading-relaxed mb-4">
-                            Spring Cloud Gateway — enrutamiento, config server, rate limiting, forwarded headers.
+                            Spring Boot unificado con routing MVC, seguridad, rate limiting y observabilidad.
                         </p>
                         <div class="flex gap-1.5 flex-wrap">
                             <span class="sh-badge text-[0.55rem]">WebMVC</span>
-                            <span class="sh-badge text-[0.55rem]">Config</span>
+                            <span class="sh-badge text-[0.55rem]">Security</span>
                             <span class="sh-badge text-[0.55rem]">RateLimit</span>
                         </div>
                     </div>
@@ -574,10 +574,10 @@
                             </div>
                             <div class="sh-status">
                                 <span class="sh-dot"></span>
-                                <span class="font-mono text-xs text-accent-green">:8081</span>
+                                <span class="font-mono text-xs text-accent-green">:8080</span>
                             </div>
                         </div>
-                        <h4 class="font-brand text-xl text-[var(--sh-text-1)] mb-2">State</h4>
+                        <h4 class="font-brand text-xl text-[var(--sh-text-1)] mb-2">State Module</h4>
                         <p class="text-xs text-[var(--sh-text-2)] leading-relaxed mb-4">
                             Redis-backed slide state, demo mode, haptic events con propagacion sub-segundo.
                         </p>
@@ -599,10 +599,10 @@
                             </div>
                             <div class="sh-status">
                                 <span class="sh-dot"></span>
-                                <span class="font-mono text-xs text-accent-green">:8082</span>
+                                <span class="font-mono text-xs text-accent-green">:8080</span>
                             </div>
                         </div>
-                        <h4 class="font-brand text-xl text-[var(--sh-text-1)] mb-2">Interface</h4>
+                        <h4 class="font-brand text-xl text-[var(--sh-text-1)] mb-2">UI Module</h4>
                         <p class="text-xs text-[var(--sh-text-2)] leading-relaxed mb-4">
                             Thymeleaf views, auth local + OAuth2, S3 uploads, email via Resend.
                         </p>
@@ -625,10 +625,10 @@
                             </div>
                             <div class="sh-status">
                                 <span class="sh-dot"></span>
-                                <span class="font-mono text-xs text-accent-green">:8083</span>
+                                <span class="font-mono text-xs text-accent-green">:8080</span>
                             </div>
                         </div>
-                        <h4 class="font-brand text-xl text-[var(--sh-text-1)] mb-2">Intelligence</h4>
+                        <h4 class="font-brand text-xl text-[var(--sh-text-1)] mb-2">AI Module</h4>
                         <p class="text-xs text-[var(--sh-text-2)] leading-relaxed mb-4">
                             Gemini Vision, Groq generation, deploy tutor, almacenamiento MongoDB.
                         </p>
