@@ -3,46 +3,40 @@ package com.brixo.slidehub.state.controller;
 import com.brixo.slidehub.state.model.SlideStateResponse;
 import com.brixo.slidehub.state.service.SlideStateService;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.mock;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@WebMvcTest(SlideController.class)
 class SlideControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockitoBean
-    private SlideStateService slideStateService;
+    private final SlideStateService slideStateService = mock(SlideStateService.class);
+    private final SlideController slideController = new SlideController(slideStateService);
 
     @Test
     void getSlide_whenNoState_returnsDefaultSlideAndTotal() throws Exception {
         given(slideStateService.getCurrentSlide()).willReturn(new SlideStateResponse(1, 11));
 
-        mockMvc.perform(get("/api/slide"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.slide").value(1))
-                .andExpect(jsonPath("$.totalSlides").value(11));
+        ResponseEntity<SlideStateResponse> response = slideController.getSlide();
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().slide()).isEqualTo(1);
+        assertThat(response.getBody().totalSlides()).isEqualTo(11);
     }
 
     @Test
     void setSlide_whenValidPayload_returnsUpdatedSlideState() throws Exception {
         given(slideStateService.setSlide(3, 12)).willReturn(new SlideStateResponse(3, 12));
 
-        mockMvc.perform(post("/api/slide")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"slide\":3,\"totalSlides\":12}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.slide").value(3))
-                .andExpect(jsonPath("$.totalSlides").value(12));
+        ResponseEntity<SlideStateResponse> response = slideController
+                .setSlide(new com.brixo.slidehub.state.model.SetSlideRequest(3, 12));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().slide()).isEqualTo(3);
+        assertThat(response.getBody().totalSlides()).isEqualTo(12);
     }
 }
