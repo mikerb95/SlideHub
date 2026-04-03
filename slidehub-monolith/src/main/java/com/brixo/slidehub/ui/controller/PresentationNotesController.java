@@ -84,7 +84,7 @@ public class PresentationNotesController {
      * Flujo:
      * 1. Obtiene la presentación del usuario (con slides y S3 URLs)
      * 2. Construye la lista de referencias de slides
-    * 3. Ejecuta generate-all del módulo IA
+     * 3. Ejecuta generate-all del módulo IA
      * 4. Devuelve número de notas generadas
      *
      * @param id      ID de la presentación
@@ -141,7 +141,7 @@ public class PresentationNotesController {
     }
 
     /**
-    * Obtiene las notas generadas de una presentación.
+     * Obtiene las notas generadas de una presentación.
      *
      * @param id ID de la presentación
      */

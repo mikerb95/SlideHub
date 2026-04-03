@@ -16,13 +16,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Servicio puente entre ui-service y ai-service para generación de notas
+ * Servicio de orquestación entre presentación e IA para generación de notas
  * (PLAN-EXPANSION.md Fase 3).
  *
- * El ui-service tiene acceso a los datos de la presentación (slides + S3 URLs)
- * en
- * PostgreSQL. Este servicio construye la solicitud completa para ai-service,
- * incluyendo las URLs de las imágenes, y la envía vía WebClient.
+ * Construye la solicitud completa a partir de datos de presentación
+ * (slides + S3 URLs) y ejecuta la lógica de IA en-process.
  */
 @Service
 public class NotesBridgeService {
@@ -47,7 +45,7 @@ public class NotesBridgeService {
     // ── Generación de notas ───────────────────────────────────────────────────
 
     /**
-     * Solicita al ai-service que genere notas para todos los slides de una
+    * Genera notas para todos los slides de una
      * presentación.
      *
      * @param presentationId ID de la presentación
@@ -98,7 +96,7 @@ public class NotesBridgeService {
     }
 
     /**
-     * Solicita al ai-service un análisis técnico del repositorio.
+    * Ejecuta un análisis técnico del repositorio.
      *
      * @param repoUrl URL del repositorio GitHub
      * @return mapa con los campos del análisis (language, framework, technologies,
