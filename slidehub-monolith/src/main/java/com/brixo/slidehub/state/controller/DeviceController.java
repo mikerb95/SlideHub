@@ -48,23 +48,27 @@ public class DeviceController {
     @PostMapping("/register")
     public ResponseEntity<Device> registerDevice(@RequestBody RegisterDeviceRequest request,
             HttpServletRequest httpRequest) {
-        return ResponseEntity.ok(upsert(request, httpRequest));
+        return upsert(request, httpRequest)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.badRequest().build());
     }
 
     /** Heartbeat de presencia: reutiliza el mismo upsert de registro. */
     @PostMapping("/heartbeat")
     public ResponseEntity<Device> heartbeat(@RequestBody RegisterDeviceRequest request,
             HttpServletRequest httpRequest) {
-        return ResponseEntity.ok(upsert(request, httpRequest));
+        return upsert(request, httpRequest)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.badRequest().build());
     }
 
-    private Device upsert(RegisterDeviceRequest request, HttpServletRequest httpRequest) {
+    private java.util.Optional<Device> upsert(RegisterDeviceRequest request, HttpServletRequest httpRequest) {
         String name = normalizeOrDefault(request.name(), "unknown-device");
         String type = normalizeOrDefault(request.type(), "unknown");
         String token = normalizeOrDefault(request.token(), null);
 
         if (token == null) {
-            throw new IllegalArgumentException("token es obligatorio");
+            return java.util.Optional.empty();
         }
 
         Device device = new Device(
@@ -74,7 +78,7 @@ public class DeviceController {
                 resolveClientIp(httpRequest),
                 LocalDateTime.now());
 
-        return deviceRegistryService.register(device);
+        return java.util.Optional.of(deviceRegistryService.register(device));
     }
 
     private String normalizeOrDefault(String value, String fallback) {
