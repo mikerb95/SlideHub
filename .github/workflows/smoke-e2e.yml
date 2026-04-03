@@ -1,6 +1,22 @@
 name: Smoke E2E Monolith
 
 on:
+  push:
+    branches:
+      - development
+    paths:
+      - 'slidehub-monolith/**'
+      - 'scripts/smoke-e2e.sh'
+      - '.github/workflows/smoke-e2e.yml'
+      - 'docs/SMOKE-E2E.md'
+  pull_request:
+    branches:
+      - development
+    paths:
+      - 'slidehub-monolith/**'
+      - 'scripts/smoke-e2e.sh'
+      - '.github/workflows/smoke-e2e.yml'
+      - 'docs/SMOKE-E2E.md'
   workflow_dispatch:
 
 jobs:
