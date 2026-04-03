@@ -4,8 +4,10 @@ import com.brixo.slidehub.ai.model.RepoAnalysis;
 import com.brixo.slidehub.ai.service.RepoAnalysisService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.Map;
 
@@ -49,6 +51,14 @@ public class RepoAnalysisController {
             RepoAnalysis analysis = repoAnalysisService.analyze(repoUrl);
             return ResponseEntity.ok(analysis);
         } catch (Exception e) {
+            if (isGeminiRateLimited(e)) {
+                log.warn("Gemini 429 al analizar repositorio {}", repoUrl);
+                return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                        .body(Map.of(
+                                "error",
+                                "La cuota de Gemini fue excedida (HTTP 429). Espera unos minutos o revisa el plan/facturación de la API.",
+                                "code", "GEMINI_QUOTA_EXCEEDED"));
+            }
             log.error("Error analizando repositorio {}: {}", repoUrl, e.getMessage());
             return ResponseEntity.internalServerError()
                     .body(Map.of("error", "Error al analizar el repositorio: " + e.getMessage()));
@@ -72,9 +82,33 @@ public class RepoAnalysisController {
             RepoAnalysis analysis = repoAnalysisService.reanalyze(repoUrl);
             return ResponseEntity.ok(analysis);
         } catch (Exception e) {
+            if (isGeminiRateLimited(e)) {
+                log.warn("Gemini 429 al re-analizar repositorio {}", repoUrl);
+                return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                        .body(Map.of(
+                                "error",
+                                "La cuota de Gemini fue excedida (HTTP 429). Espera unos minutos o revisa el plan/facturación de la API.",
+                                "code", "GEMINI_QUOTA_EXCEEDED"));
+            }
             log.error("Error re-analizando repositorio {}: {}", repoUrl, e.getMessage());
             return ResponseEntity.internalServerError()
                     .body(Map.of("error", "Error al re-analizar el repositorio: " + e.getMessage()));
         }
+    }
+
+    private boolean isGeminiRateLimited(Throwable throwable) {
+        Throwable current = throwable;
+        while (current != null) {
+            if (current instanceof WebClientResponseException webClientResponseException
+                    && webClientResponseException.getStatusCode().value() == 429) {
+                return true;
+            }
+            String message = current.getMessage();
+            if (message != null && message.contains("HTTP 429")) {
+                return true;
+            }
+            current = current.getCause();
+        }
+        return false;
     }
 }

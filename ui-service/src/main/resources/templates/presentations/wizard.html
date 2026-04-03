@@ -1239,7 +1239,8 @@
                     input.value = '';
                     await refreshParticipants();
                 } else {
-                    showError('participant-error', 'No se pudo agregar el participante.');
+                    const data = await readJsonSafe(res);
+                    showError('participant-error', data.error || 'No se pudo agregar el participante.');
                 }
             } catch (e) {
                 showError('participant-error', 'Error de conexion.');

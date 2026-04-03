@@ -6,6 +6,8 @@ import com.brixo.slidehub.ui.service.MeetingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -202,9 +204,32 @@ public class MeetingController {
         if (authentication == null) {
             throw new IllegalArgumentException("Autenticación requerida.");
         }
+
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof OidcUser oidcUser) {
+            String googleId = oidcUser.getSubject();
+            if (googleId != null && !googleId.isBlank()) {
+                return userRepository.findByGoogleId(googleId)
+                        .orElseThrow(() -> new IllegalArgumentException("Usuario autenticado no encontrado."));
+            }
+        }
+
+        if (principal instanceof OAuth2User oauth2User) {
+            Object githubId = oauth2User.getAttribute("id");
+            if (githubId != null) {
+                return userRepository.findByGithubId(githubId.toString())
+                        .orElseThrow(() -> new IllegalArgumentException("Usuario autenticado no encontrado."));
+            }
+            Object googleId = oauth2User.getAttribute("sub");
+            if (googleId != null) {
+                return userRepository.findByGoogleId(googleId.toString())
+                        .orElseThrow(() -> new IllegalArgumentException("Usuario autenticado no encontrado."));
+            }
+        }
+
         String identifier = authentication.getName();
-        return userRepository.findByEmail(identifier)
-                .or(() -> userRepository.findByUsername(identifier))
+        return userRepository.findByUsername(identifier)
+                .or(() -> userRepository.findByEmail(identifier))
                 .orElseThrow(() -> new IllegalArgumentException("Usuario autenticado no encontrado."));
     }
 }
