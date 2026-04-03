@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlideHub — Presentador</title>
+    <th:block th:replace="~{fragments/head :: assets}"></th:block>
+    <style>
+        .slide-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+
+        .slide-preview img.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body class="sh bg-sh-deep antialiased min-h-screen lg:h-screen flex flex-col overflow-y-auto lg:overflow-hidden">
+
+    <!-- ═══ Topbar ═══ -->
+    <nav class="sh-nav" style="position: sticky;">
+        <div class="sh-nav-inner">
+            <div class="flex items-center gap-3">
+                <span class="font-brand text-base tracking-tight">Presentador</span>
+                <div class="sh-status ml-1 hidden sm:inline-flex">
+                    <span class="sh-dot"></span>
+                    <span class="sh-label">LIVE</span>
+                </div>
+            </div>
+
+            <!-- Nav Controls -->
+            <div class="flex items-center gap-2">
+                <button class="sh-btn text-xs py-1 px-2.5" id="btn-prev" disabled>
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <span id="slide-counter" class="font-mono text-sm text-[var(--sh-text-3)] min-w-[5rem] text-center">
+                    &mdash; / &mdash;
+                </span>
+                <button class="sh-btn text-xs py-1 px-2.5" id="btn-next" disabled>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+
+                <a href="/presentations" class="sh-btn sh-btn-ghost text-xs ml-2">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <span class="hidden sm:inline">Presentaciones</span>
+                </a>
+                <a href="/main-panel" class="sh-btn sh-btn-ghost text-xs">
+                    <i class="fa-solid fa-table-cells-large"></i>
+                    <span class="hidden sm:inline">Panel</span>
+                </a>
+                <a th:href="@{/auth/profile}" class="sh-btn sh-btn-ghost text-xs">
+                    <i class="fa-solid fa-user"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ═══ Content: Slide + Notes ═══ -->
+    <div class="flex flex-1 flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
+
+        <!-- Slide Preview -->
+        <div class="slide-preview flex-1 min-h-[42vh] lg:min-h-0 bg-black flex items-center justify-center relative"
+            id="slide-area">
+            <!-- Slides injected by JS -->
+        </div>
+
+        <!-- Notes Panel -->
+        <div class="w-full lg:w-[380px] lg:min-w-[280px] bg-sh-card border-t lg:border-t-0 lg:border-l border-[var(--sh-border)] overflow-y-auto p-4 sm:p-5"
+            id="notes-panel">
+            <div class="sh-label mb-4">
+                <i class="fa-solid fa-note-sticky mr-1"></i>NOTAS DEL PRESENTADOR
+            </div>
+            <div id="notes-content">
+                <div class="text-center mt-12 text-[var(--sh-text-3)]">
+                    <i class="fa-solid fa-robot text-2xl mb-3 block opacity-40"></i>
+                    <p class="text-xs font-mono leading-relaxed">
+                        Las notas IA aparecerán aquí.<br>
+                        Genéralas desde el panel maestro.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Scripts ═══ -->
+    <script th:inline="javascript">
+        const POLL_INTERVAL_MS = /*[[${pollIntervalMs}]]*/ 1500;
+        const API_SLIDE_URL = '/api/slide';
+        const PRESENTATION_ID = /*[[${presentationId}]]*/ '';
+        const SLIDES_CATALOG_API = PRESENTATION_ID ? `/api/presentations/${PRESENTATION_ID}/slides` : '';
+
+        let currentSlide = 0;
+        let totalSlides = 0;
+        let slideUrls = [];
+        const slideArea = document.getElementById('slide-area');
+        const counter = document.getElementById('slide-counter');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+
+        if (PRESENTATION_ID) {
+            const panelLink = document.querySelector('a[href="/main-panel"]');
+            if (panelLink) {
+                panelLink.href = `/main-panel?presentationId=${encodeURIComponent(PRESENTATION_ID)}`;
+            }
+        }
+
+        function buildSlides(total) {
+            slideArea.innerHTML = '';
+            for (let i = 1; i <= total; i++) {
+                const img = document.createElement('img');
+                const url = slideUrls[i - 1] || `/presentation/Slide${i}.PNG`;
+                img.src = url;
+                img.alt = `Slide ${i}`;
+                img.id = `pres-slide-${i}`;
+                slideArea.appendChild(img);
+            }
+        }
+
+        async function loadSlidesCatalog() {
+            if (!SLIDES_CATALOG_API) {
+                slideUrls = [];
+                return;
+            }
+            try {
+                const res = await fetch(SLIDES_CATALOG_API);
+                if (!res.ok) {
+                    slideUrls = [];
+                    return;
+                }
+                const data = await res.json();
+                slideUrls = (data.slides || [])
+                    .sort((a, b) => a.number - b.number)
+                    .map(slide => PRESENTATION_ID
+                        ? `/api/presentations/${PRESENTATION_ID}/slides/${slide.number}/image`
+                        : (slide.s3Url || `/presentation/Slide${slide.number}.PNG`));
+                if (slideUrls.length > 0) {
+                    totalSlides = slideUrls.length;
+                    buildSlides(totalSlides);
+                }
+            } catch (_) {
+                slideUrls = [];
+            }
+        }
+
+        function showSlide(n) {
+            document.querySelectorAll('#slide-area img.active')
+                .forEach(el => el.classList.remove('active'));
+            const s = document.getElementById(`pres-slide-${n}`);
+            if (s) s.classList.add('active');
+            counter.textContent = `${n} / ${totalSlides}`;
+            btnPrev.disabled = n <= 1;
+            btnNext.disabled = n >= totalSlides;
+        }
+
+        async function fetchState() {
+            try {
+                const res = await fetch(API_SLIDE_URL);
+                if (!res.ok) return;
+                const data = await res.json();
+                const effectiveTotal = slideUrls.length > 0 ? slideUrls.length : data.totalSlides;
+                if (effectiveTotal !== totalSlides) {
+                    totalSlides = effectiveTotal;
+                    buildSlides(totalSlides);
+                }
+                if (data.slide !== currentSlide) {
+                    currentSlide = data.slide;
+                    showSlide(currentSlide);
+                }
+            } catch (_) { }
+        }
+
+        async function navigate(delta) {
+            const target = currentSlide + delta;
+            if (target < 1 || target > totalSlides) return;
+            try {
+                await fetch(API_SLIDE_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ slide: target, totalSlides })
+                });
+                currentSlide = target;
+                showSlide(currentSlide);
+            } catch (_) { }
+        }
+
+        btnPrev.addEventListener('click', () => navigate(-1));
+        btnNext.addEventListener('click', () => navigate(1));
+
+        loadSlidesCatalog().finally(fetchState);
+        setInterval(fetchState, POLL_INTERVAL_MS);
+    </script>
+</body>
+
+</html>

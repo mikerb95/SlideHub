@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Notas IA — ' + ${presentation.name}">Notas IA — SlideHub</title>
+    <th:block th:replace="~{fragments/head :: assets}"></th:block>
+    <style>
+        .slide-thumb {
+            width: 120px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: var(--sh-r-md);
+            border: 2px solid var(--sh-border);
+            cursor: pointer;
+            transition: border-color var(--sh-t-fast);
+        }
+
+        .slide-thumb:hover {
+            border-color: var(--sh-blue);
+        }
+
+        .slide-card {
+            background: var(--sh-deep);
+            border: 1px solid var(--sh-border);
+            border-radius: var(--sh-r-md);
+            padding: 1rem;
+        }
+
+        .note-card {
+            background: rgba(88, 166, 255, 0.06);
+            border: 1px solid rgba(88, 166, 255, 0.15);
+            border-radius: var(--sh-r-md);
+            padding: 1rem;
+        }
+
+        .key-phrase {
+            background: rgba(88, 166, 255, 0.2);
+            border-radius: var(--sh-r-md);
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            font-family: var(--sh-font-mono);
+            color: var(--sh-blue);
+        }
+
+        .demo-tag {
+            background: rgba(63, 185, 80, 0.2);
+            border-radius: var(--sh-r-md);
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            font-family: var(--sh-font-mono);
+            color: var(--sh-green);
+        }
+
+        .progress-track {
+            height: 4px;
+            background: var(--sh-border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--sh-blue);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 640px) {
+            .notes-nav {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                justify-content: flex-start;
+            }
+
+            .notes-nav-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body class="sh bg-sh-deep antialiased min-h-screen">
+
+    <!-- ═══ Topbar ═══ -->
+    <nav class="sh-nav" style="position: sticky;">
+        <div class="sh-nav-inner notes-nav">
+            <div class="flex items-center gap-2 sm:gap-3">
+                <span class="font-brand text-base tracking-tight">Notas IA</span>
+                <span class="font-mono text-xs text-[var(--sh-text-3)]"
+                    th:text="${presentation.name}">Presentación</span>
+            </div>
+            <div class="notes-nav-actions flex items-center gap-2">
+                <a href="/presentations" class="sh-btn sh-btn-ghost text-xs">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span class="hidden sm:inline">Volver</span>
+                </a>
+                <a href="/presenter" class="sh-btn sh-btn-ghost text-xs">
+                    <i class="fa-solid fa-chalkboard"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        <div class="flex flex-col lg:flex-row gap-6">
+
+            <!-- Left column: config + controls -->
+            <div class="lg:w-[340px] flex-shrink-0 space-y-4">
+
+                <!-- Config card -->
+                <div class="sh-card p-4">
+                    <div class="sh-label mb-4">
+                        <i class="fa-solid fa-robot mr-1"></i>GENERAR NOTAS IA
+                    </div>
+
+                    <div class="mb-4">
+                        <span class="sh-badge mb-2"
+                            th:classappend="${presentation.sourceType.name() == 'DRIVE'} ? 'sh-badge-blue' : 'sh-badge-green'"
+                            th:text="${presentation.sourceType.name() == 'DRIVE' ? 'Google Drive' : 'Carga manual'}">
+                        </span>
+                        <div class="text-[var(--sh-text-1)] font-semibold mt-1" th:text="${presentation.name}">Nombre
+                        </div>
+                        <div class="text-[var(--sh-text-3)] text-xs font-mono"
+                            th:text="${totalSlides} + ' diapositivas'">0
+                            diapositivas</div>
+                    </div>
+
+                    <!-- Repo URL -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-mono text-[var(--sh-text-3)] mb-1">
+                            <i class="fa-brands fa-github mr-1"></i>URL DEL REPOSITORIO
+                        </label>
+                        <input type="url" id="repo-url" class="sh-input w-full"
+                            placeholder="https://github.com/user/repo" th:value="${presentation.repoUrl}">
+                        <div class="text-[var(--sh-text-3)] text-xs mt-1">
+                            Gemini analiza el repositorio para notas más precisas.
+                        </div>
+                    </div>
+
+                    <!-- Pipeline description -->
+                    <div class="rounded p-3 mb-4" style="background: var(--sh-deep); font-size: 0.75rem;">
+                        <div class="flex items-center gap-2 mb-1.5 text-[var(--sh-text-3)]">
+                            <i class="fa-solid fa-eye" style="color: var(--sh-blue);"></i>
+                            <span>Gemini Vision — análisis visual de diapositivas</span>
+                        </div>
+                        <div class="flex items-center gap-2 mb-1.5 text-[var(--sh-text-3)]">
+                            <i class="fa-solid fa-code-branch" style="color: var(--sh-amber);"></i>
+                            <span>Gemini — extracción de contexto del repositorio</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-[var(--sh-text-3)]">
+                            <i class="fa-solid fa-bolt" style="color: var(--sh-green);"></i>
+                            <span>Groq — generación de notas estructuradas</span>
+                        </div>
+                    </div>
+
+                    <!-- Generate button -->
+                    <button type="button" class="sh-btn sh-btn-primary w-full" id="btn-generate"
+                        onclick="generateAllNotes()">
+                        <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Generar todas las notas
+                    </button>
+                    <div class="text-[var(--sh-text-3)] text-xs font-mono mt-1.5 text-center">
+                        ~<span th:text="${totalSlides * 5}">30</span>s para
+                        <span th:text="${totalSlides}">N</span> diapositivas
+                    </div>
+                </div>
+
+                <!-- Progress card -->
+                <div id="generation-progress" class="sh-card p-4 hidden">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="fa-solid fa-spinner fa-spin" style="color: var(--sh-blue);"></i>
+                        <span class="font-mono text-sm text-[var(--sh-text-1)]">Generando notas…</span>
+                    </div>
+                    <div class="progress-track mb-2">
+                        <div class="progress-fill" id="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <div id="progress-text" class="text-xs font-mono text-[var(--sh-text-3)]">Iniciando pipeline de IA…
+                    </div>
+                </div>
+
+                <!-- Result card -->
+                <div id="generation-result" class="sh-card p-4 hidden">
+                    <div id="result-success" class="hidden">
+                        <div class="flex items-center gap-2" style="color: var(--sh-green);">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span class="font-mono text-sm font-semibold">Notas generadas</span>
+                        </div>
+                        <div id="result-count" class="text-[var(--sh-text-3)] text-xs font-mono mt-1"></div>
+                    </div>
+                    <div id="result-error" class="hidden">
+                        <div class="flex items-center gap-2" style="color: var(--sh-red);">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <span class="font-mono text-sm font-semibold">Error</span>
+                        </div>
+                        <div id="error-message" class="text-[var(--sh-text-3)] text-xs font-mono mt-1"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right column: slides + notes -->
+            <div class="flex-1 min-w-0">
+                <div id="slides-container" class="space-y-3">
+                    <div th:if="${#lists.isEmpty(presentation.slides)}"
+                        class="text-center py-12 text-[var(--sh-text-3)]">
+                        <i class="fa-solid fa-image text-2xl mb-3 block opacity-40"></i>
+                        <p class="text-xs font-mono">Aún no hay diapositivas en esta presentación.</p>
+                    </div>
+
+                    <div th:each="slide : ${presentation.slides}" th:id="${'slide-' + slide.number}" class="slide-card">
+                        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
+
+                            <!-- Thumbnail -->
+                            <div class="flex-shrink-0">
+                                <img th:src="${slide.s3Url}" th:alt="${'Diapositiva ' + slide.number}"
+                                    class="slide-thumb" loading="lazy" onerror="this.style.display='none'">
+                            </div>
+
+                            <!-- Note content -->
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="sh-badge" th:text="${'Diapositiva ' + slide.number}">Diapositiva
+                                        N</span>
+                                    <span th:each="note : ${existingNotes}"
+                                        th:if="${note.get('slideNumber') == slide.number}"
+                                        class="sh-badge-green text-xs">
+                                        <i class="fa-solid fa-robot mr-1"></i>Nota IA
+                                    </span>
+                                </div>
+
+                                <!-- Existing note -->
+                                <div th:each="note : ${existingNotes}"
+                                    th:if="${note.get('slideNumber') == slide.number}"
+                                    th:id="${'note-content-' + slide.number}" class="note-card">
+                                    <div class="font-semibold text-sm text-[var(--sh-text-1)] mb-2"
+                                        th:text="${note.get('title')}">Título</div>
+                                    <ul class="mb-2 pl-4 space-y-1 text-sm text-[var(--sh-text-2)]">
+                                        <li th:each="point : ${note.get('points')}" th:text="${point}"></li>
+                                    </ul>
+                                    <div class="flex flex-wrap gap-1 mb-1">
+                                        <span th:each="kp : ${note.get('keyPhrases')}" th:text="${kp}"
+                                            class="key-phrase"></span>
+                                    </div>
+                                    <div class="flex flex-wrap gap-1">
+                                        <span th:each="tag : ${note.get('demoTags')}" th:text="${tag}"
+                                            class="demo-tag"></span>
+                                    </div>
+                                    <div class="text-[var(--sh-text-3)] text-xs font-mono mt-2"
+                                        th:if="${note.get('suggestedTime') != null}"
+                                        th:text="'⏱ ' + ${note.get('suggestedTime')}"></div>
+                                </div>
+
+                                <!-- Placeholder -->
+                                <div th:if="${#lists.isEmpty(existingNotes) || !#lists.contains(existingNotes.![get('slideNumber')], slide.number)}"
+                                    th:id="${'note-placeholder-' + slide.number}"
+                                    class="text-[var(--sh-text-3)] text-xs font-mono italic py-2">
+                                    No hay nota para esta diapositiva. Genera una con IA.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        const presentationId = /*[[${presentation.id}]]*/ '';
+        const totalSlides = /*[[${totalSlides}]]*/ 0;
+        const INTER_SLIDE_MS = 1500;
+
+        async function generateAllNotes() {
+            const repoUrl = document.getElementById('repo-url').value.trim();
+            const btn = document.getElementById('btn-generate');
+
+            btn.disabled = true;
+            document.getElementById('generation-progress').classList.remove('hidden');
+            document.getElementById('generation-result').classList.add('hidden');
+            document.getElementById('result-success').classList.add('hidden');
+            document.getElementById('result-error').classList.add('hidden');
+            updateProgress(0, 'Conectando con el pipeline de IA…');
+
+            let fakePct = 5;
+            const fakeTimer = setInterval(() => {
+                if (fakePct < 90) {
+                    fakePct += Math.random() * 3;
+                    const slideEst = Math.floor((fakePct / 100) * totalSlides);
+                    updateProgress(fakePct, `Analizando diapositiva ~${slideEst + 1} de ${totalSlides}…`);
+                }
+            }, INTER_SLIDE_MS);
+
+            const params = new URLSearchParams();
+            if (repoUrl) params.append('repoUrl', repoUrl);
+
+            try {
+                const res = await fetch(
+                    `/api/presentations/${presentationId}/generate-notes?${params}`,
+                    { method: 'POST' }
+                );
+                clearInterval(fakeTimer);
+                const data = await res.json();
+
+                updateProgress(100, '¡Completado!');
+                document.getElementById('generation-result').classList.remove('hidden');
+
+                if (res.ok && data.success !== false) {
+                    document.getElementById('result-success').classList.remove('hidden');
+                    document.getElementById('result-count').textContent =
+                        `${data.notesGenerated} de ${data.totalSlides || totalSlides} notas generadas.`;
+                    setTimeout(() => window.location.reload(), 2000);
+                } else {
+                    document.getElementById('result-error').classList.remove('hidden');
+                    document.getElementById('error-message').textContent =
+                        data.error || data.errorMessage || 'Error desconocido.';
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                clearInterval(fakeTimer);
+                document.getElementById('generation-result').classList.remove('hidden');
+                document.getElementById('result-error').classList.remove('hidden');
+                document.getElementById('error-message').textContent =
+                    'Error de conexión: ' + e.message;
+                btn.disabled = false;
+            }
+        }
+
+        function updateProgress(pct, text) {
+            document.getElementById('progress-bar').style.width = Math.min(100, pct) + '%';
+            document.getElementById('progress-text').textContent = text;
+        }
+    </script>
+</body>
+
+</html>

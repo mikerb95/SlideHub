@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlideHub — Multi-Screen Presentation System</title>
+    <th:block th:replace="~{fragments/head :: assets}"></th:block>
+    <style>
+        /* ── Scroll-triggered reveal ── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-delay-1 {
+            transition-delay: 0.1s;
+        }
+
+        .reveal-delay-2 {
+            transition-delay: 0.2s;
+        }
+
+        .reveal-delay-3 {
+            transition-delay: 0.3s;
+        }
+
+        .reveal-delay-4 {
+            transition-delay: 0.4s;
+        }
+
+        /* ── Hero glow ── */
+        .hero-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.08;
+            pointer-events: none;
+        }
+
+        .hero-glow-green {
+            background: var(--sh-green);
+            top: -200px;
+            left: 50%;
+            transform: translateX(-70%);
+        }
+
+        .hero-glow-blue {
+            background: var(--sh-blue);
+            top: -100px;
+            left: 50%;
+            transform: translateX(20%);
+        }
+
+        /* ── Gradient text ── */
+        .text-gradient {
+            background: linear-gradient(135deg, var(--sh-green), var(--sh-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ── Feature video-like frame ── */
+        .feature-frame {
+            background: var(--sh-void);
+            border: 1px solid var(--sh-border);
+            border-radius: var(--sh-r-lg);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .feature-frame::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 60%, var(--sh-void) 100%);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* ── Floating particles ── */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--sh-green);
+            border-radius: 50%;
+            opacity: 0;
+            animation: float-up 4s ease-in-out infinite;
+        }
+
+        @keyframes float-up {
+            0% {
+                opacity: 0;
+                transform: translateY(0) scale(0);
+            }
+
+            20% {
+                opacity: 0.6;
+                transform: translateY(-20px) scale(1);
+            }
+
+            80% {
+                opacity: 0.3;
+                transform: translateY(-80px) scale(0.6);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(0);
+            }
+        }
+
+        /* ── Step connector ── */
+        .step-connector {
+            width: 2px;
+            height: 48px;
+            background: linear-gradient(180deg, var(--sh-green), transparent);
+            margin: 0 auto;
+        }
+
+        /* ── Smooth scroll ── */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* ── Marquee for tech stack ── */
+        @keyframes marquee {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        .marquee-track {
+            animation: marquee 30s linear infinite;
+            display: flex;
+            gap: 3rem;
+            width: max-content;
+        }
+
+        .marquee-track:hover {
+            animation-play-state: paused;
+        }
+    </style>
+</head>
+
+<body class="sh bg-sh-deep antialiased">
+
+    <!-- ═══════════════════════════════════
+         NAVIGATION
+         ═══════════════════════════════════ -->
+    <nav class="sh-nav" style="background: rgba(13,17,23,0.5);">
+        <div class="sh-nav-inner">
+            <div class="flex items-center gap-3">
+                <span class="font-brand text-lg tracking-tight text-[var(--sh-text-1)]">SlideHub</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="#features"
+                    class="hidden sm:inline text-xs font-mono text-[var(--sh-text-3)] hover:text-[var(--sh-text-1)] transition-colors">Features</a>
+                <a href="#how-it-works"
+                    class="hidden sm:inline text-xs font-mono text-[var(--sh-text-3)] hover:text-[var(--sh-text-1)] transition-colors">How
+                    it works</a>
+                <a href="#architecture"
+                    class="hidden sm:inline text-xs font-mono text-[var(--sh-text-3)] hover:text-[var(--sh-text-1)] transition-colors">Architecture</a>
+                <a th:href="@{/auth/login}" class="sh-btn sh-btn-primary text-xs py-1.5 px-4">
+                    Comenzar
+                </a>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- ═══════════════════════════════════
+         HERO — Apple-style dramatic intro
+         ═══════════════════════════════════ -->
+    <section class="min-h-screen flex items-center justify-center relative overflow-hidden">
+        <div class="hero-glow hero-glow-green"></div>
+        <div class="hero-glow hero-glow-blue"></div>
+
+        <div class="text-center max-w-4xl mx-auto px-6 relative z-10 pt-16">
+            <div class="sh-fade-in">
+                <div
+                    class="inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-full border border-[var(--sh-border)] bg-[var(--sh-surface)]">
+                    <span class="sh-dot" style="width:5px; height:5px;"></span>
+                    <span class="font-mono text-xs text-[var(--sh-text-2)]">Presentation Control System</span>
+                </div>
+            </div>
+
+            <h1 class="sh-fade-in font-brand leading-[0.95] mb-8 text-[var(--sh-text-1)]"
+                style="font-size: clamp(3rem, 8vw, 6.5rem); animation-delay: 0.1s;">
+                Presenta con<br>
+                <span class="text-gradient">inteligencia.</span>
+            </h1>
+
+            <p class="sh-fade-in text-[var(--sh-text-2)] text-lg lg:text-xl max-w-2xl mx-auto mb-12 leading-relaxed"
+                style="animation-delay: 0.2s;">
+                Control multi-pantalla, notas generadas por IA, remote haptico
+                y sesiones colaborativas. Todo sincronizado en tiempo real.
+            </p>
+
+            <div class="sh-fade-in flex gap-4 justify-center flex-wrap mb-16" style="animation-delay: 0.3s;">
+                <a th:href="@{/auth/login}" class="sh-btn sh-btn-primary sh-btn-lg text-sm">
+                    <i class="fa-solid fa-rocket mr-1"></i>
+                    Crear Presentacion
+                </a>
+                <a href="#how-it-works" class="sh-btn sh-btn-lg text-sm">
+                    <i class="fa-solid fa-play mr-1"></i>
+                    Como funciona
+                </a>
+            </div>
+
+            <!-- Hero metrics -->
+            <div class="sh-fade-in grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-xl mx-auto"
+                style="animation-delay: 0.4s;">
+                <div class="text-center">
+                    <div class="font-mono text-2xl font-bold text-accent-green">4</div>
+                    <div class="font-mono text-[0.6rem] text-[var(--sh-text-3)] uppercase tracking-wider">Microservicios
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="font-mono text-2xl font-bold text-accent-blue">2</div>
+                    <div class="font-mono text-[0.6rem] text-[var(--sh-text-3)] uppercase tracking-wider">Motores IA
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="font-mono text-2xl font-bold text-accent-amber">5</div>
+                    <div class="font-mono text-[0.6rem] text-[var(--sh-text-3)] uppercase tracking-wider">Vistas sync
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="font-mono text-2xl font-bold text-[var(--sh-text-1)]">&lt;1s</div>
+                    <div class="font-mono text-[0.6rem] text-[var(--sh-text-3)] uppercase tracking-wider">Latencia</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll indicator -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-40">
+            <span class="font-mono text-[0.6rem] text-[var(--sh-text-3)] uppercase tracking-widest">Scroll</span>
+            <div class="w-[1px] h-8 bg-gradient-to-b from-[var(--sh-text-3)] to-transparent"></div>
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════
+         HOW IT WORKS — Step flow
+         ═══════════════════════════════════ -->
+    <section id="how-it-works" class="py-32 relative">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="text-center mb-20 reveal">
+                <div class="sh-label mb-4">WORKFLOW</div>
+                <h2 class="font-brand text-4xl lg:text-5xl text-[var(--sh-text-1)] mb-4">
+                    De archivo a<br>escenario en minutos.
+                </h2>
+                <p class="text-[var(--sh-text-2)] text-base max-w-lg mx-auto">
+                    Un flujo guiado que prepara todo lo que necesitas para una presentacion profesional.
+                </p>
+            </div>
+
+            <div class="space-y-0">
+                <!-- Step 1 -->
+                <div class="reveal">
+                    <div class="flex gap-6 items-start">
+                        <div class="flex flex-col items-center flex-shrink-0">
+                            <div
+                                class="w-12 h-12 rounded-full border-2 border-accent-green bg-[var(--sh-green-dim)] flex items-center justify-center">
+                                <span class="font-mono text-sm font-bold text-accent-green">01</span>
+                            </div>
+                        </div>
+                        <div class="pb-12">
+                            <h3 class="font-brand text-xl text-[var(--sh-text-1)] mb-2">Sube tu presentacion</h3>
+                            <p class="text-sm text-[var(--sh-text-2)] leading-relaxed">
+                                Importa tus diapositivas desde Google Drive o sube los archivos
+                                directamente desde tu computador. Todo se almacena en Amazon S3.
+                            </p>
+                            <div class="flex gap-2 mt-3">
+                                <span class="sh-badge text-[0.6rem]"><i
+                                        class="fa-brands fa-google-drive mr-1"></i>Drive</span>
+                                <span class="sh-badge text-[0.6rem]"><i
+                                        class="fa-solid fa-upload mr-1"></i>Upload</span>
+                                <span class="sh-badge text-[0.6rem]"><i class="fa-brands fa-aws mr-1"></i>S3</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-connector"></div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="reveal reveal-delay-1">
+                    <div class="flex gap-6 items-start">
+                        <div class="flex flex-col items-center flex-shrink-0">
+                            <div
+                                class="w-12 h-12 rounded-full border-2 border-accent-blue bg-[var(--sh-blue-dim)] flex items-center justify-center">
+                                <span class="font-mono text-sm font-bold text-accent-blue">02</span>
+                            </div>
+                        </div>
+                        <div class="pb-12">
+                            <h3 class="font-brand text-xl text-[var(--sh-text-1)] mb-2">Conecta tu repositorio</h3>
+                            <p class="text-sm text-[var(--sh-text-2)] leading-relaxed">
+                                Proporciona la URL de tu repositorio en GitHub. Gemini analiza
+                                el codigo fuente para comprender el contexto tecnico de tu proyecto.
+                            </p>
+                            <div class="flex gap-2 mt-3">
+                                <span class="sh-badge text-[0.6rem]"><i
+                                        class="fa-brands fa-github mr-1"></i>GitHub</span>
+                                <span class="sh-badge text-[0.6rem]"><i class="fa-solid fa-eye mr-1"></i>Gemini</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-connector"
+                        style="background: linear-gradient(180deg, var(--sh-blue), transparent);"></div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="reveal reveal-delay-2">
+                    <div class="flex gap-6 items-start">
+                        <div class="flex flex-col items-center flex-shrink-0">
+                            <div
+                                class="w-12 h-12 rounded-full border-2 border-accent-amber bg-[var(--sh-amber-dim)] flex items-center justify-center">
+                                <span class="font-mono text-sm font-bold text-accent-amber">03</span>
+                            </div>
+                        </div>
+                        <div class="pb-12">
+                            <h3 class="font-brand text-xl text-[var(--sh-text-1)] mb-2">IA genera tus notas</h3>
+                            <p class="text-sm text-[var(--sh-text-2)] leading-relaxed">
+                                Gemini Vision analiza cada diapositiva visualmente. Groq genera
+                                notas de apoyo estructuradas con puntos clave, frases importantes
+                                y tiempos sugeridos para cada slide.
+                            </p>
+                            <div class="flex gap-2 mt-3">
+                                <span class="sh-badge text-[0.6rem]"><i class="fa-solid fa-eye mr-1"></i>Gemini
+                                    Vision</span>
+                                <span class="sh-badge text-[0.6rem]"><i class="fa-solid fa-bolt mr-1"></i>Groq</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-connector"
+                        style="background: linear-gradient(180deg, var(--sh-amber), transparent);"></div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="reveal reveal-delay-3">
+                    <div class="flex gap-6 items-start">
+                        <div class="flex flex-col items-center flex-shrink-0">
+                            <div
+                                class="w-12 h-12 rounded-full border-2 border-accent-green bg-[var(--sh-green-dim)] flex items-center justify-center">
+                                <span class="font-mono text-sm font-bold text-accent-green">04</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-brand text-xl text-[var(--sh-text-1)] mb-2">Presenta en equipo</h3>
+                            <p class="text-sm text-[var(--sh-text-2)] leading-relaxed">
+                                Agrega co-presentadores, asigna diapositivas a cada uno y genera
+                                un codigo QR para que se unan desde sus dispositivos en tiempo real.
+                            </p>
+                            <div class="flex gap-2 mt-3">
+                                <span class="sh-badge text-[0.6rem]"><i class="fa-solid fa-qrcode mr-1"></i>QR
+                                    Join</span>
+                                <span class="sh-badge text-[0.6rem]"><i class="fa-solid fa-users mr-1"></i>Team</span>
+                                <span class="sh-badge text-[0.6rem]"><i
+                                        class="fa-solid fa-mobile-screen mr-1"></i>Remote</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════
+         FEATURES — Large cards
+         ═══════════════════════════════════ -->
+    <section id="features" class="py-32">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-20 reveal">
+                <div class="sh-label mb-4">CAPABILITIES</div>
+                <h2 class="font-brand text-4xl lg:text-5xl text-[var(--sh-text-1)]">
+                    Todo lo que necesitas.<br>
+                    <span class="text-[var(--sh-text-3)]">Nada que no.</span>
+                </h2>
+            </div>
+
+            <!-- Feature 1: Multi-screen sync — full width -->
+            <div class="reveal mb-6">
+                <div class="sh-card p-8 lg:p-12 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-64 h-64 rounded-full filter blur-[100px] opacity-[0.04]"
+                        style="background: var(--sh-green);"></div>
+                    <div class="relative z-10 max-w-2xl">
+                        <div class="sh-icon sh-icon-lg sh-icon-green mb-5">
+                            <i class="fa-solid fa-arrows-rotate"></i>
+                        </div>
+                        <div class="sh-label mb-2">SYNC PROTOCOL</div>
+                        <h3 class="font-brand text-3xl lg:text-4xl text-[var(--sh-text-1)] mb-4">
+                            Sincronizacion multi-pantalla
+                        </h3>
+                        <p class="text-[var(--sh-text-2)] text-base leading-relaxed mb-6">
+                            Proyector, presentador, remote y demo — todas las vistas sincronizadas
+                            en tiempo real. El estado vive en Redis con propagacion sub-segundo
+                            a traves del gateway centralizado.
+                        </p>
+                        <div class="flex gap-3 flex-wrap">
+                            <div class="flex items-center gap-2 text-xs font-mono text-[var(--sh-text-3)]">
+                                <span class="sh-dot" style="width:5px; height:5px;"></span> 5 vistas activas
+                            </div>
+                            <div class="flex items-center gap-2 text-xs font-mono text-[var(--sh-text-3)]">
+                                <span class="sh-dot sh-dot--blue" style="width:5px; height:5px;"></span> Polling 1000ms
+                            </div>
+                            <div class="flex items-center gap-2 text-xs font-mono text-[var(--sh-text-3)]">
+                                <span class="sh-dot" style="width:5px; height:5px;"></span> Redis store
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature 2 + 3: Two columns -->
+            <div class="grid lg:grid-cols-2 gap-6 mb-6">
+                <div class="reveal reveal-delay-1">
+                    <div class="sh-card p-8 h-full relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-48 h-48 rounded-full filter blur-[80px] opacity-[0.04]"
+                            style="background: var(--sh-amber);"></div>
+                        <div class="relative z-10">
+                            <div class="sh-icon sh-icon-lg sh-icon-amber mb-5">
+                                <i class="fa-solid fa-brain"></i>
+                            </div>
+                            <div class="sh-label mb-2">AI PIPELINE</div>
+                            <h3 class="font-brand text-2xl text-[var(--sh-text-1)] mb-3">Notas con IA</h3>
+                            <p class="text-sm text-[var(--sh-text-2)] leading-relaxed mb-4">
+                                Gemini Vision analiza cada slide visualmente. Groq genera notas
+                                estructuradas con puntos clave, frases importantes y tags de demo.
+                                Pide ampliar cualquier nota al instante.
+                            </p>
+                            <div class="font-mono text-[0.65rem] text-[var(--sh-text-3)]">
+                                Gemini Vision + Groq LLaMA &middot; MongoDB
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reveal reveal-delay-2">
+                    <div class="sh-card p-8 h-full relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-48 h-48 rounded-full filter blur-[80px] opacity-[0.04]"
+                            style="background: var(--sh-blue);"></div>
+                        <div class="relative z-10">
+                            <div class="sh-icon sh-icon-lg sh-icon-blue mb-5">
+                                <i class="fa-solid fa-mobile-screen-button"></i>
+                            </div>
+                            <div class="sh-label mb-2">HAPTIC REMOTE</div>
+                            <h3 class="font-brand text-2xl text-[var(--sh-text-1)] mb-3">Remote haptico</h3>
+                            <p class="text-sm text-[var(--sh-text-2)] leading-relaxed mb-4">
+                                Navegacion por gestos con vibracion tactil. Asistente de voz
+                                push-to-talk con transcripcion Groq Whisper para ayuda
+                                contextual en tiempo real.
+                            </p>
+                            <div class="font-mono text-[0.65rem] text-[var(--sh-text-3)]">
+                                Swipe + Voice &middot; Vibration API &middot; Whisper STT
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature 4 + 5 + 6: Three columns -->
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="reveal reveal-delay-1">
+                    <div class="sh-card p-6 h-full">
+                        <div class="sh-icon sh-icon-lg sh-icon-blue mb-4">
+                            <i class="fa-solid fa-table-cells-large"></i>
+                        </div>
+                        <div class="sh-label mb-2">CONTROL SURFACE</div>
+                        <h4 class="font-brand text-xl text-[var(--sh-text-1)] mb-2">Panel maestro</h4>
+                        <p class="text-sm text-[var(--sh-text-2)] leading-relaxed">
+                            Interfaz de 11" con grid de thumbnails, sesiones de reunion,
+                            asignacion de slides y barra lateral de acciones rapidas.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="reveal reveal-delay-2">
+                    <div class="sh-card p-6 h-full">
+                        <div class="sh-icon sh-icon-lg sh-icon-green mb-4">
+                            <i class="fa-solid fa-qrcode"></i>
+                        </div>
+                        <div class="sh-label mb-2">QR SESSIONS</div>
+                        <h4 class="font-brand text-xl text-[var(--sh-text-1)] mb-2">Sesiones QR</h4>
+                        <p class="text-sm text-[var(--sh-text-2)] leading-relaxed">
+                            Genera un QR para que tu equipo se una desde cualquier dispositivo.
+                            Asigna slides y recibe feedback haptico en tiempo real.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="reveal reveal-delay-3">
+                    <div class="sh-card p-6 h-full">
+                        <div class="sh-icon sh-icon-lg sh-icon-red mb-4">
+                            <i class="fa-solid fa-display"></i>
+                        </div>
+                        <div class="sh-label mb-2">DUAL MODE</div>
+                        <h4 class="font-brand text-xl text-[var(--sh-text-1)] mb-2">Modo demo</h4>
+                        <p class="text-sm text-[var(--sh-text-2)] leading-relaxed">
+                            Alterna entre slides y demos en vivo con iframes. Memoria de
+                            slide de retorno para no perder el hilo.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════
+         ARCHITECTURE
+         ═══════════════════════════════════ -->
+    <section id="architecture" class="py-32">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-20 reveal">
+                <div class="sh-label mb-4">SYSTEM ARCHITECTURE</div>
+                <h2 class="font-brand text-4xl lg:text-5xl text-[var(--sh-text-1)] mb-4">
+                    Cuatro servicios.<br>
+                    <span class="text-[var(--sh-text-3)]">Un sistema.</span>
+                </h2>
+                <p class="text-[var(--sh-text-2)] text-base max-w-lg mx-auto">
+                    Cada nodo opera de forma independiente, comunicandose a traves del gateway centralizado.
+                </p>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Gateway -->
+                <div class="reveal">
+                    <div class="sh-card sh-gradient-border p-6 h-full">
+                        <div class="flex items-center justify-between mb-5">
+                            <div
+                                class="w-10 h-10 rounded-full border border-accent-green flex items-center justify-center">
+                                <i class="fa-solid fa-tower-broadcast text-accent-green text-sm"></i>
+                            </div>
+                            <div class="sh-status">
+                                <span class="sh-dot"></span>
+                                <span class="font-mono text-xs text-accent-green">:8080</span>
+                            </div>
+                        </div>
+                        <h4 class="font-brand text-xl text-[var(--sh-text-1)] mb-2">Gateway</h4>
+                        <p class="text-xs text-[var(--sh-text-2)] leading-relaxed mb-4">
+                            Spring Cloud Gateway — enrutamiento, config server, rate limiting, forwarded headers.
+                        </p>
+                        <div class="flex gap-1.5 flex-wrap">
+                            <span class="sh-badge text-[0.55rem]">WebMVC</span>
+                            <span class="sh-badge text-[0.55rem]">Config</span>
+                            <span class="sh-badge text-[0.55rem]">RateLimit</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- State -->
+                <div class="reveal reveal-delay-1">
+                    <div class="sh-card sh-gradient-border p-6 h-full">
+                        <div class="flex items-center justify-between mb-5">
+                            <div
+                                class="w-10 h-10 rounded-full border border-accent-red flex items-center justify-center">
+                                <i class="fa-solid fa-bolt text-accent-red text-sm"></i>
+                            </div>
+                            <div class="sh-status">
+                                <span class="sh-dot"></span>
+                                <span class="font-mono text-xs text-accent-green">:8081</span>
+                            </div>
+                        </div>
+                        <h4 class="font-brand text-xl text-[var(--sh-text-1)] mb-2">State</h4>
+                        <p class="text-xs text-[var(--sh-text-2)] leading-relaxed mb-4">
+                            Redis-backed slide state, demo mode, haptic events con propagacion sub-segundo.
+                        </p>
+                        <div class="flex gap-1.5 flex-wrap">
+                            <span class="sh-badge text-[0.55rem]">Redis</span>
+                            <span class="sh-badge text-[0.55rem]">REST</span>
+                            <span class="sh-badge text-[0.55rem]">SSE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- UI -->
+                <div class="reveal reveal-delay-2">
+                    <div class="sh-card sh-gradient-border p-6 h-full">
+                        <div class="flex items-center justify-between mb-5">
+                            <div
+                                class="w-10 h-10 rounded-full border border-accent-blue flex items-center justify-center">
+                                <i class="fa-solid fa-layer-group text-accent-blue text-sm"></i>
+                            </div>
+                            <div class="sh-status">
+                                <span class="sh-dot"></span>
+                                <span class="font-mono text-xs text-accent-green">:8082</span>
+                            </div>
+                        </div>
+                        <h4 class="font-brand text-xl text-[var(--sh-text-1)] mb-2">Interface</h4>
+                        <p class="text-xs text-[var(--sh-text-2)] leading-relaxed mb-4">
+                            Thymeleaf views, auth local + OAuth2, S3 uploads, email via Resend.
+                        </p>
+                        <div class="flex gap-1.5 flex-wrap">
+                            <span class="sh-badge text-[0.55rem]">JPA</span>
+                            <span class="sh-badge text-[0.55rem]">OAuth2</span>
+                            <span class="sh-badge text-[0.55rem]">S3</span>
+                            <span class="sh-badge text-[0.55rem]">Resend</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI -->
+                <div class="reveal reveal-delay-3">
+                    <div class="sh-card sh-gradient-border p-6 h-full">
+                        <div class="flex items-center justify-between mb-5">
+                            <div
+                                class="w-10 h-10 rounded-full border border-accent-amber flex items-center justify-center">
+                                <i class="fa-solid fa-brain text-accent-amber text-sm"></i>
+                            </div>
+                            <div class="sh-status">
+                                <span class="sh-dot"></span>
+                                <span class="font-mono text-xs text-accent-green">:8083</span>
+                            </div>
+                        </div>
+                        <h4 class="font-brand text-xl text-[var(--sh-text-1)] mb-2">Intelligence</h4>
+                        <p class="text-xs text-[var(--sh-text-2)] leading-relaxed mb-4">
+                            Gemini Vision, Groq generation, deploy tutor, almacenamiento MongoDB.
+                        </p>
+                        <div class="flex gap-1.5 flex-wrap">
+                            <span class="sh-badge text-[0.55rem]">Gemini</span>
+                            <span class="sh-badge text-[0.55rem]">Groq</span>
+                            <span class="sh-badge text-[0.55rem]">Mongo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════
+         TECH MARQUEE
+         ═══════════════════════════════════ -->
+    <section class="py-16 border-t border-b" style="border-color: var(--sh-border);">
+        <div class="overflow-hidden">
+            <div class="marquee-track">
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-brands fa-java text-accent-blue"></i> Java 21</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-solid fa-leaf text-accent-green"></i> Spring Boot 4</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-solid fa-cloud text-accent-blue"></i> Spring Cloud</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-solid fa-bolt text-accent-red"></i> Redis</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-solid fa-database text-accent-blue"></i> PostgreSQL</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-solid fa-cubes text-accent-green"></i> MongoDB</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-solid fa-eye text-accent-amber"></i> Gemini Vision</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-solid fa-robot text-accent-green"></i> Groq</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-brands fa-aws text-accent-amber"></i> Amazon S3</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-brands fa-google-drive text-accent-blue"></i> Google Drive</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-brands fa-github text-[var(--sh-text-2)]"></i> OAuth2</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-solid fa-rocket text-accent-green"></i> Render</span>
+                <!-- Duplicate for seamless loop -->
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-brands fa-java text-accent-blue"></i> Java 21</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-solid fa-leaf text-accent-green"></i> Spring Boot 4</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-solid fa-cloud text-accent-blue"></i> Spring Cloud</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-solid fa-bolt text-accent-red"></i> Redis</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-solid fa-database text-accent-blue"></i> PostgreSQL</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-solid fa-cubes text-accent-green"></i> MongoDB</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-solid fa-eye text-accent-amber"></i> Gemini Vision</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-solid fa-robot text-accent-green"></i> Groq</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-brands fa-aws text-accent-amber"></i> Amazon S3</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-brands fa-google-drive text-accent-blue"></i> Google Drive</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-brands fa-github text-[var(--sh-text-2)]"></i> OAuth2</span>
+                <span class="font-mono text-sm text-[var(--sh-text-3)] whitespace-nowrap flex items-center gap-2"><i
+                        class="fa-solid fa-rocket text-accent-green"></i> Render</span>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════
+         CTA — Final
+         ═══════════════════════════════════ -->
+    <section class="py-32 relative overflow-hidden">
+        <div class="absolute inset-0"
+            style="background: radial-gradient(ellipse at center, rgba(63,185,80,0.04) 0%, transparent 70%);"></div>
+        <div class="max-w-3xl mx-auto px-6 text-center relative z-10 reveal">
+            <h2 class="font-brand text-4xl lg:text-6xl text-[var(--sh-text-1)] mb-6">
+                Tu proxima presentacion,<br>
+                <span class="text-gradient">potenciada por IA.</span>
+            </h2>
+            <p class="text-[var(--sh-text-2)] text-base mb-10 max-w-md mx-auto">
+                Registrate, sube tus slides y deja que la inteligencia artificial
+                prepare todo para tu exposicion.
+            </p>
+            <div class="flex gap-4 justify-center flex-wrap">
+                <a th:href="@{/auth/register}" class="sh-btn sh-btn-primary sh-btn-lg text-sm">
+                    <i class="fa-solid fa-user-plus mr-1"></i>
+                    Crear cuenta gratis
+                </a>
+                <a th:href="@{/auth/login}" class="sh-btn sh-btn-lg text-sm">
+                    <i class="fa-solid fa-arrow-right-to-bracket mr-1"></i>
+                    Iniciar sesion
+                </a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════
+         FOOTER
+         ═══════════════════════════════════ -->
+    <footer class="py-8 border-t" style="border-color: var(--sh-border);">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <span class="font-brand text-sm text-[var(--sh-text-3)]">SlideHub</span>
+            <div class="flex items-center gap-6">
+                <a th:href="@{/slides}"
+                    class="font-mono text-xs text-[var(--sh-text-3)] hover:text-[var(--sh-text-1)] transition-colors">Projector</a>
+                <a th:href="@{/remote}"
+                    class="font-mono text-xs text-[var(--sh-text-3)] hover:text-[var(--sh-text-1)] transition-colors">Remote</a>
+                <a th:href="@{/demo}"
+                    class="font-mono text-xs text-[var(--sh-text-3)] hover:text-[var(--sh-text-1)] transition-colors">Demo</a>
+            </div>
+            <div class="font-mono text-[0.65rem] text-[var(--sh-text-3)]">
+                Spring Boot 4 &middot; Java 21 &middot; Render
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- ═══ Scroll Reveal Script ═══ -->
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
+</body>
+
+</html>
