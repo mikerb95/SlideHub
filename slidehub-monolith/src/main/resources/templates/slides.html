@@ -6,16 +6,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SlideHub — Proyector</title>
     <style>
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #000; width: 100vw; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        .slide-wrapper { position: relative; width: 100vw; height: 100vh; }
-        .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; display: none; }
-        .slide.active { display: block; }
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-wrapper {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
         #error-msg {
-            display: none; position: fixed; bottom: 1rem; right: 1rem;
-            background: rgba(248, 81, 73, 0.85); backdrop-filter: blur(8px);
-            color: #fff; padding: 0.4rem 0.8rem; border-radius: 4px;
-            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+            display: none;
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: rgba(248, 81, 73, 0.85);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
         }
     </style>
 </head>
