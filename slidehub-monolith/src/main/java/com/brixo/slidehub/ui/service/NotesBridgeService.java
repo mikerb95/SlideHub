@@ -1,11 +1,16 @@
 package com.brixo.slidehub.ui.service;
 
+import com.brixo.slidehub.ai.model.GenerateAllRequest;
+import com.brixo.slidehub.ai.model.PresenterNote;
+import com.brixo.slidehub.ai.model.RepoAnalysis;
+import com.brixo.slidehub.ai.model.SlideReference;
+import com.brixo.slidehub.ai.repository.PresenterNoteRepository;
+import com.brixo.slidehub.ai.service.NotesService;
+import com.brixo.slidehub.ai.service.RepoAnalysisService;
+import tools.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.Map;
@@ -24,12 +29,19 @@ public class NotesBridgeService {
 
     private static final Logger log = LoggerFactory.getLogger(NotesBridgeService.class);
 
-    private final WebClient aiClient;
+    private final NotesService notesService;
+    private final RepoAnalysisService repoAnalysisService;
+    private final PresenterNoteRepository presenterNoteRepository;
+    private final ObjectMapper objectMapper;
 
-    public NotesBridgeService(@Value("${slidehub.ai-service.url}") String aiServiceUrl) {
-        this.aiClient = WebClient.builder()
-                .baseUrl(aiServiceUrl)
-                .build();
+    public NotesBridgeService(NotesService notesService,
+            RepoAnalysisService repoAnalysisService,
+            PresenterNoteRepository presenterNoteRepository,
+            ObjectMapper objectMapper) {
+        this.notesService = notesService;
+        this.repoAnalysisService = repoAnalysisService;
+        this.presenterNoteRepository = presenterNoteRepository;
+        this.objectMapper = objectMapper;
     }
 
     // ── Generación de notas ───────────────────────────────────────────────────
@@ -45,29 +57,21 @@ public class NotesBridgeService {
      */
     public int generateAllNotes(String presentationId, String repoUrl,
             List<Map<String, Object>> slideRefs) {
-        var requestBody = Map.of(
-                "presentationId", presentationId,
-                "repoUrl", repoUrl != null ? repoUrl : "",
-                "slides", slideRefs);
+        List<SlideReference> slides = slideRefs.stream()
+            .map(this::toSlideReference)
+            .toList();
+
+        GenerateAllRequest request = new GenerateAllRequest(
+            presentationId,
+            repoUrl != null ? repoUrl : "",
+            slides);
 
         try {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> response = aiClient.post()
-                    .uri("/api/ai/notes/generate-all")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(requestBody)
-                    .retrieve()
-                    .bodyToMono(Map.class)
-                    .block();
-
-            if (response == null)
-                return 0;
-            Object notesGenerated = response.get("notesGenerated");
-            return notesGenerated instanceof Number n ? n.intValue() : 0;
+            return notesService.generateAll(request);
         } catch (Exception e) {
-            log.error("Error llamando a ai-service generate-all para {}: {}",
+            log.error("Error ejecutando generate-all en monolito para {}: {}",
                     presentationId, e.getMessage());
-            throw new RuntimeException("Error al generar notas en ai-service: " + e.getMessage(), e);
+            throw new RuntimeException("Error al generar notas: " + e.getMessage(), e);
         }
     }
 
@@ -80,17 +84,14 @@ public class NotesBridgeService {
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getNotes(String presentationId) {
         try {
-            List<Map<String, Object>> notes = aiClient.get()
-                    .uri("/api/ai/notes/{id}", presentationId)
-                    .retrieve()
-                    .bodyToFlux(Map.class)
-                    .cast(Map.class)
-                    .map(m -> (Map<String, Object>) m)
-                    .collectList()
-                    .block();
-            return notes != null ? notes : List.of();
+            List<PresenterNote> notes = presenterNoteRepository
+                .findByPresentationIdOrderBySlideNumberAsc(presentationId);
+
+            return notes.stream()
+                .map(note -> objectMapper.convertValue(note, Map.class))
+                .toList();
         } catch (Exception e) {
-            log.error("Error obteniendo notas de ai-service para {}: {}",
+            log.error("Error obteniendo notas para {}: {}",
                     presentationId, e.getMessage());
             return List.of();
         }
@@ -106,17 +107,21 @@ public class NotesBridgeService {
     @SuppressWarnings("unchecked")
     public Map<String, Object> analyzeRepo(String repoUrl) {
         try {
-            Map<String, Object> result = (Map<String, Object>) aiClient.post()
-                    .uri("/api/ai/analyze-repo")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(Map.of("repoUrl", repoUrl))
-                    .retrieve()
-                    .bodyToMono(Map.class)
-                    .block();
-            return result != null ? result : Map.of();
+            RepoAnalysis analysis = repoAnalysisService.analyze(repoUrl);
+            return objectMapper.convertValue(analysis, Map.class);
         } catch (Exception e) {
-            log.error("Error analizando repo {} en ai-service: {}", repoUrl, e.getMessage());
+            log.error("Error analizando repo {}: {}", repoUrl, e.getMessage());
             return Map.of("error", e.getMessage());
         }
+    }
+
+    private SlideReference toSlideReference(Map<String, Object> slideRef) {
+        Object slideNumberRaw = slideRef.get("slideNumber");
+        int slideNumber = slideNumberRaw instanceof Number
+                ? ((Number) slideNumberRaw).intValue()
+                : Integer.parseInt(String.valueOf(slideNumberRaw));
+        Object imageUrlRaw = slideRef.get("imageUrl");
+        String imageUrl = imageUrlRaw != null ? String.valueOf(imageUrlRaw) : null;
+        return new SlideReference(slideNumber, imageUrl);
     }
 }
