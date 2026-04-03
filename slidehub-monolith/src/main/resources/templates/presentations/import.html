@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Importar presentación — SlideHub</title>
+    <th:block th:replace="~{fragments/head :: assets}"></th:block>
+    <style>
+        .folder-item,
+        .image-item {
+            cursor: pointer;
+            padding: 0.4rem 0.7rem;
+            border-radius: var(--sh-r-md);
+            transition: background var(--sh-t-fast), border-color var(--sh-t-fast);
+            background: var(--sh-deep);
+            border: 1px solid var(--sh-border);
+            font-family: var(--sh-font-mono);
+            font-size: 0.8rem;
+            color: var(--sh-text-2);
+        }
+
+        .folder-item:hover,
+        .image-item:hover {
+            border-color: var(--sh-blue);
+            color: var(--sh-text-1);
+        }
+
+        .folder-item.selected {
+            background: var(--sh-blue-dim);
+            border-color: var(--sh-blue);
+            color: var(--sh-blue);
+        }
+
+        #upload-drop-zone {
+            border: 2px dashed var(--sh-border-active);
+            border-radius: var(--sh-r-md);
+            padding: 2.5rem;
+            text-align: center;
+            transition: border-color var(--sh-t-fast), background var(--sh-t-fast);
+            cursor: pointer;
+        }
+
+        #upload-drop-zone.drag-over {
+            border-color: var(--sh-blue);
+            background: var(--sh-blue-dim);
+        }
+
+        @media (max-width: 640px) {
+            .import-nav {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                justify-content: flex-start;
+            }
+
+            .import-nav-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            #upload-drop-zone {
+                padding: 1.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="sh bg-sh-deep antialiased min-h-screen">
+
+    <!-- ═══ Nav ═══ -->
+    <nav class="sh-nav">
+        <div class="sh-nav-inner import-nav">
+            <div class="flex items-center gap-2 sm:gap-3">
+                <a href="/presenter" class="flex items-center gap-3 no-underline text-[var(--sh-text-1)]">
+
+                    <span class="font-brand text-base tracking-tight">SlideHub</span>
+                </a>
+                <span class="sh-badge ml-1">IMPORTAR</span>
+            </div>
+            <div class="import-nav-actions flex items-center gap-2">
+                <a href="/main-panel" class="sh-btn sh-btn-ghost text-xs">
+                    <i class="fa-solid fa-table-cells-large"></i> Panel
+                </a>
+                <a href="/auth/profile" class="sh-btn sh-btn-ghost text-xs">
+                    <i class="fa-solid fa-user"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 pt-16 pb-8">
+        <div th:if="${deleted}" class="sh-alert sh-alert-success mb-4">
+            <i class="fa-solid fa-circle-check mt-0.5"></i>
+            <span>Presentación eliminada correctamente.</span>
+        </div>
+        <div th:if="${notFound}" class="sh-alert sh-alert-warn mb-4">
+            <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+            <span>La presentación ya no existe o no tienes permisos.</span>
+        </div>
+        <div th:if="${deleteError}" class="sh-alert sh-alert-error mb-4">
+            <i class="fa-solid fa-circle-exclamation mt-0.5"></i>
+            <span>No se pudo eliminar la presentación. Inténtalo nuevamente.</span>
+        </div>
+
+        <div class="grid lg:grid-cols-[1fr_2fr] gap-6">
+
+            <!-- ── Left: Existing Presentations ── -->
+            <div>
+                <div class="sh-card p-5">
+                    <div class="sh-label mb-3">
+                        <i class="fa-solid fa-layer-group mr-1"></i>MIS PRESENTACIONES
+                    </div>
+                    <div id="presentations-list" class="flex flex-col gap-2">
+                        <div th:if="${#lists.isEmpty(presentations)}"
+                            class="text-center py-6 font-mono text-xs text-[var(--sh-text-3)]">
+                            Aún no tienes presentaciones.
+                        </div>
+                        <div th:each="p : ${presentations}"
+                            class="bg-[var(--sh-deep)] border border-[var(--sh-border)] rounded-tech p-3">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <div class="text-sm font-medium text-[var(--sh-text-1)]" th:text="${p.name()}">
+                                        Nombre</div>
+                                    <div class="font-mono text-xs text-[var(--sh-text-3)]"
+                                        th:text="${p.totalSlides()} + ' slides'">0 diapositivas</div>
+                                </div>
+                                <span class="sh-badge text-[0.6rem]"
+                                    th:classappend="${p.sourceType() == 'DRIVE'} ? 'sh-badge-blue' : 'sh-badge-green'"
+                                    th:text="${p.sourceType() == 'DRIVE' ? 'Drive' : 'Subida'}">
+                                </span>
+                            </div>
+                            <div class="flex gap-1.5 flex-wrap">
+                                <a th:href="@{/main-panel(presentationId=${p.id()})}"
+                                    class="sh-btn sh-btn-ghost text-[0.7rem] py-1 px-2.5">
+                                    <i class="fa-solid fa-table-cells-large"></i> Panel
+                                </a>
+                                <a th:href="@{/presenter(presentationId=${p.id()})}"
+                                    class="sh-btn sh-btn-ghost text-[0.7rem] py-1 px-2.5">
+                                    <i class="fa-solid fa-chalkboard"></i> Presentar
+                                </a>
+                                <a th:href="@{/presentations/{id}/generate-notes(id=${p.id()})}"
+                                    class="sh-btn sh-btn-ghost text-[0.7rem] py-1 px-2.5">
+                                    <i class="fa-solid fa-robot"></i> Notas IA
+                                </a>
+                                <form th:action="@{/presentations/{id}/delete(id=${p.id()})}" method="post"
+                                    class="inline">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"
+                                        th:if="${_csrf}">
+                                    <button type="button" th:attr="data-presentation-name=${p.name()}"
+                                        onclick="openDeleteModal(this)"
+                                        class="sh-btn sh-btn-ghost text-[0.7rem] py-1 px-2.5 text-[var(--sh-red)]">
+                                        <i class="fa-solid fa-trash"></i> Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Right: Import ── -->
+            <div>
+                <div class="sh-card p-6">
+                    <div class="sh-label mb-1">
+                        <i class="fa-solid fa-download mr-1"></i>IMPORTAR PRESENTACIÓN
+                    </div>
+                    <h2 class="font-brand text-2xl mb-5 text-[var(--sh-text-1)]">Importar</h2>
+
+                    <!-- Tabs -->
+                    <div class="sh-tabs mb-6">
+                        <button class="sh-tab active" id="tab-drive" onclick="showTab('drive')">
+                            <i class="fa-brands fa-google-drive mr-1"></i> Google Drive
+                        </button>
+                        <button class="sh-tab" id="tab-upload" onclick="showTab('upload')">
+                            <i class="fa-solid fa-upload mr-1"></i> Subida manual
+                        </button>
+                    </div>
+
+                    <!-- ── Tab: Google Drive ── -->
+                    <div id="panel-drive">
+                        <div th:if="${!hasGoogleToken}" class="sh-alert sh-alert-warn mb-4">
+                            <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+                            <span>Vincula tu <a href="/oauth2/authorization/google" class="underline">cuenta de
+                                    Google</a> para acceder a Drive.</span>
+                        </div>
+
+                        <div th:if="${hasGoogleToken}">
+                            <div class="grid md:grid-cols-2 gap-3 mb-4">
+                                <div>
+                                    <label class="sh-input-label">Nombre *</label>
+                                    <input type="text" id="drive-name" class="sh-input" placeholder="Mi presentación">
+                                </div>
+                                <div>
+                                    <label class="sh-input-label">Repositorio GitHub (opcional)</label>
+                                    <input type="url" id="drive-repo" class="sh-input"
+                                        placeholder="https://github.com/...">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="sh-input-label">Descripción</label>
+                                    <input type="text" id="drive-desc" class="sh-input"
+                                        placeholder="Descripción opcional">
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2 mb-3">
+                                <label class="sh-input-label mb-0">Carpeta de Drive *</label>
+                                <button type="button" class="sh-btn text-xs py-0.5 px-2" onclick="loadFolders()">
+                                    <i class="fa-solid fa-arrows-rotate"></i> Cargar
+                                </button>
+                            </div>
+                            <div id="folders-loading" class="hidden font-mono text-xs text-[var(--sh-text-3)] mb-2">
+                                <i class="fa-solid fa-spinner fa-spin mr-1"></i>Cargando carpetas...
+                            </div>
+                            <div id="folders-list" class="flex flex-wrap gap-2 mb-4"></div>
+
+                            <div id="images-section" class="hidden mb-4">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="sh-input-label mb-0">Imágenes</span>
+                                    <span id="images-count" class="sh-badge text-[0.6rem]">0</span>
+                                </div>
+                                <div id="images-list" class="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto"></div>
+                            </div>
+
+                            <div id="drive-error" class="sh-alert sh-alert-error hidden mb-3"></div>
+
+                            <button type="button" class="sh-btn sh-btn-primary w-full sm:w-auto justify-center"
+                                id="btn-import-drive" onclick="importFromDrive()" disabled>
+                                <i class="fa-solid fa-download"></i> Importar desde Drive
+                            </button>
+                            <div id="drive-progress" class="hidden mt-2 font-mono text-xs text-[var(--sh-text-3)]">
+                                <i class="fa-solid fa-spinner fa-spin mr-1"></i>Importando...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── Tab: Manual Upload ── -->
+                    <div id="panel-upload" class="hidden">
+                        <div class="grid md:grid-cols-2 gap-3 mb-4">
+                            <div>
+                                <label class="sh-input-label">Nombre *</label>
+                                <input type="text" id="upload-name" class="sh-input" placeholder="Mi presentación">
+                            </div>
+                            <div>
+                                <label class="sh-input-label">Repositorio GitHub (opcional)</label>
+                                <input type="url" id="upload-repo" class="sh-input"
+                                    placeholder="https://github.com/...">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="sh-input-label">Descripción</label>
+                                <input type="text" id="upload-desc" class="sh-input" placeholder="Descripción opcional">
+                            </div>
+                        </div>
+
+                        <div id="upload-drop-zone" onclick="document.getElementById('file-input').click()">
+                            <i class="fa-solid fa-cloud-arrow-up text-2xl mb-2 block text-[var(--sh-text-3)]"></i>
+                            <p class="text-sm text-[var(--sh-text-2)] mb-1">Arrastra imágenes aquí o haz clic para
+                                seleccionar</p>
+                            <p class="font-mono text-xs text-[var(--sh-text-3)]">PNG, JPG, GIF, WEBP — ordenadas por
+                                nombre</p>
+                            <input type="file" id="file-input" accept=".png,.jpg,.jpeg,.gif,.webp" multiple
+                                class="hidden" onchange="onFilesSelected(event)">
+                        </div>
+
+                        <div id="file-preview" class="mt-3 flex flex-wrap gap-2"></div>
+                        <div id="upload-error" class="sh-alert sh-alert-error hidden mt-2"></div>
+
+                        <button type="button" class="sh-btn sh-btn-green mt-4 w-full sm:w-auto justify-center"
+                            id="btn-import-upload" onclick="importFromUpload()" disabled
+                            style="background: var(--sh-green); border-color: var(--sh-green); color: var(--sh-deep);">
+                            <i class="fa-solid fa-upload"></i> Subir presentación
+                        </button>
+                        <div id="upload-progress" class="hidden mt-2 font-mono text-xs text-[var(--sh-text-3)]">
+                            <i class="fa-solid fa-spinner fa-spin mr-1"></i>Subiendo archivos...
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="delete-modal" class="sh-overlay hidden" onclick="if(event.target===this)closeDeleteModal()">
+        <div class="sh-modal max-w-md w-[92%]">
+            <div class="flex items-center justify-between mb-4">
+                <div class="sh-label"><i class="fa-solid fa-triangle-exclamation mr-1"></i>CONFIRMAR ELIMINACIÓN</div>
+                <button type="button" class="sh-btn sh-btn-ghost text-xs" onclick="closeDeleteModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <p class="text-sm text-[var(--sh-text-2)] mb-2">Vas a eliminar:</p>
+            <p id="delete-modal-name" class="font-mono text-xs text-[var(--sh-text-1)] mb-4"></p>
+            <p class="text-xs text-[var(--sh-text-3)] mb-5">Esta acción no se puede deshacer.</p>
+            <div class="flex justify-end gap-2">
+                <button type="button" class="sh-btn text-xs" onclick="closeDeleteModal()">Cancelar</button>
+                <button type="button" class="sh-btn sh-btn-danger text-xs" onclick="confirmDelete()">
+                    <i class="fa-solid fa-trash"></i> Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let deleteFormRef = null;
+
+        function openDeleteModal(button) {
+            deleteFormRef = button.closest('form');
+            const name = button.getAttribute('data-presentation-name') || 'Presentación';
+            document.getElementById('delete-modal-name').textContent = name;
+            document.getElementById('delete-modal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').classList.add('hidden');
+            deleteFormRef = null;
+        }
+
+        function confirmDelete() {
+            if (deleteFormRef) {
+                deleteFormRef.submit();
+            }
+        }
+
+        function showTab(tab) {
+            document.getElementById('panel-drive').classList.toggle('hidden', tab !== 'drive');
+            document.getElementById('panel-upload').classList.toggle('hidden', tab !== 'upload');
+            document.getElementById('tab-drive').classList.toggle('active', tab === 'drive');
+            document.getElementById('tab-upload').classList.toggle('active', tab === 'upload');
+        }
+
+        let selectedFolderId = null, selectedFolderName = '';
+
+        async function loadFolders() {
+            document.getElementById('folders-loading').classList.remove('hidden');
+            document.getElementById('folders-list').innerHTML = '';
+            document.getElementById('images-section').classList.add('hidden');
+            selectedFolderId = null;
+            document.getElementById('btn-import-drive').disabled = true;
+
+            try {
+                const res = await fetch('/api/presentations/drive/folders');
+                const data = await res.json();
+                document.getElementById('folders-loading').classList.add('hidden');
+                if (!res.ok) { showError('drive-error', data.error || 'Error al cargar carpetas.'); return; }
+
+                const list = document.getElementById('folders-list');
+                if (!data.folders || data.folders.length === 0) {
+                    list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)">No se encontraron carpetas.</span>';
+                    return;
+                }
+                data.folders.forEach(f => {
+                    const el = document.createElement('button');
+                    el.className = 'folder-item';
+                    el.innerHTML = `<i class="fa-solid fa-folder mr-1"></i>${escHtml(f.name)}`;
+                    el.onclick = () => selectFolder(f.id, f.name, el);
+                    list.appendChild(el);
+                });
+            } catch (e) {
+                document.getElementById('folders-loading').classList.add('hidden');
+                showError('drive-error', 'Error de red al cargar carpetas.');
+            }
+        }
+
+        async function selectFolder(folderId, folderName, el) {
+            document.querySelectorAll('#folders-list .folder-item').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedFolderId = folderId;
+            selectedFolderName = folderName;
+            document.getElementById('btn-import-drive').disabled = false;
+
+            const section = document.getElementById('images-section');
+            const list = document.getElementById('images-list');
+            section.classList.remove('hidden');
+            list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)"><i class="fa-solid fa-spinner fa-spin mr-1"></i>Cargando...</span>';
+
+            try {
+                const res = await fetch(`/api/presentations/drive/folders/${folderId}/images`);
+                const data = await res.json();
+                list.innerHTML = '';
+                document.getElementById('images-count').textContent = data.images ? data.images.length : 0;
+                if (data.images && data.images.length > 0) {
+                    data.images.forEach(img => {
+                        const span = document.createElement('span');
+                        span.className = 'sh-badge';
+                        span.textContent = img.name;
+                        list.appendChild(span);
+                    });
+                } else {
+                    list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)">No hay imágenes en esta carpeta.</span>';
+                    document.getElementById('btn-import-drive').disabled = true;
+                }
+            } catch (e) {
+                list.innerHTML = '<span class="font-mono text-xs" style="color:var(--sh-text-3)">Error al cargar imágenes.</span>';
+            }
+        }
+
+        async function importFromDrive() {
+            const name = document.getElementById('drive-name').value.trim();
+            if (!name) { showError('drive-error', 'El nombre es obligatorio.'); return; }
+            if (!selectedFolderId) { showError('drive-error', 'Selecciona una carpeta de Drive.'); return; }
+            hideError('drive-error');
+            document.getElementById('btn-import-drive').disabled = true;
+            document.getElementById('drive-progress').classList.remove('hidden');
+
+            const params = new URLSearchParams({
+                name,
+                description: document.getElementById('drive-desc').value.trim(),
+                driveFolderId: selectedFolderId,
+                driveFolderName: selectedFolderName,
+                repoUrl: document.getElementById('drive-repo').value.trim()
+            });
+
+            try {
+                const res = await fetch('/api/presentations/create-from-drive', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params
+                });
+                const data = await res.json();
+                document.getElementById('drive-progress').classList.add('hidden');
+                if (res.ok && data.success) { window.location.reload(); }
+                else { showError('drive-error', data.error || 'Error al importar.'); document.getElementById('btn-import-drive').disabled = false; }
+            } catch (e) {
+                document.getElementById('drive-progress').classList.add('hidden');
+                showError('drive-error', 'Error de red.');
+                document.getElementById('btn-import-drive').disabled = false;
+            }
+        }
+
+        let selectedFiles = [];
+
+        function onFilesSelected(event) {
+            selectedFiles = Array.from(event.target.files);
+            renderFilePreview();
+            document.getElementById('btn-import-upload').disabled = selectedFiles.length === 0;
+        }
+
+        function renderFilePreview() {
+            const preview = document.getElementById('file-preview');
+            preview.innerHTML = '';
+            selectedFiles.sort((a, b) => a.name.localeCompare(b.name));
+            selectedFiles.forEach((f, i) => {
+                const span = document.createElement('span');
+                span.className = 'sh-badge';
+                span.textContent = `${i + 1}. ${f.name}`;
+                preview.appendChild(span);
+            });
+        }
+
+        const dropZone = document.getElementById('upload-drop-zone');
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault(); dropZone.classList.remove('drag-over');
+            selectedFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+            renderFilePreview();
+            document.getElementById('btn-import-upload').disabled = selectedFiles.length === 0;
+        });
+
+        async function importFromUpload() {
+            const name = document.getElementById('upload-name').value.trim();
+            if (!name) { showError('upload-error', 'El nombre es obligatorio.'); return; }
+            if (selectedFiles.length === 0) { showError('upload-error', 'Selecciona al menos un archivo.'); return; }
+            hideError('upload-error');
+            document.getElementById('btn-import-upload').disabled = true;
+            document.getElementById('upload-progress').classList.remove('hidden');
+
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('description', document.getElementById('upload-desc').value.trim());
+            formData.append('repoUrl', document.getElementById('upload-repo').value.trim());
+            selectedFiles.forEach(f => formData.append('files', f));
+
+            try {
+                const res = await fetch('/api/presentations/create-from-upload', { method: 'POST', body: formData });
+                const data = await res.json();
+                document.getElementById('upload-progress').classList.add('hidden');
+                if (res.ok && data.success) { window.location.reload(); }
+                else { showError('upload-error', data.error || 'Error de subida.'); document.getElementById('btn-import-upload').disabled = false; }
+            } catch (e) {
+                document.getElementById('upload-progress').classList.add('hidden');
+                showError('upload-error', 'Error de red.');
+                document.getElementById('btn-import-upload').disabled = false;
+            }
+        }
+
+        function showError(id, msg) {
+            const el = document.getElementById(id);
+            el.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-2"></i>' + msg;
+            el.classList.remove('hidden');
+        }
+        function hideError(id) { document.getElementById(id).classList.add('hidden'); }
+        function escHtml(str) { return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+    </script>
+</body>
+
+</html>

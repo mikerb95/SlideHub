@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Deploy Tutor — SlideHub</title>
+    <th:block th:replace="~{fragments/head :: assets}"></th:block>
+    <style>
+        .step-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            font-family: var(--sh-font-mono);
+            flex-shrink: 0;
+        }
+
+        .step-pending {
+            background: var(--sh-card);
+            color: var(--sh-text-3);
+            border: 1px solid var(--sh-border);
+        }
+
+        .step-active {
+            background: rgba(88, 166, 255, 0.1);
+            border: 2px solid var(--sh-blue);
+            color: var(--sh-blue);
+        }
+
+        .step-done {
+            background: var(--sh-green);
+            color: var(--sh-deep);
+        }
+
+        .step-error {
+            background: var(--sh-red);
+            color: #fff;
+        }
+
+        .step-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 0;
+        }
+
+        .step-row+.step-row {
+            border-top: 1px solid var(--sh-border);
+        }
+
+        .chip {
+            display: inline-block;
+            background: var(--sh-card);
+            border: 1px solid var(--sh-border);
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-size: 0.78rem;
+            font-family: var(--sh-font-mono);
+            color: var(--sh-text-2);
+            margin: 2px;
+        }
+
+        .tip-item {
+            border-left: 3px solid var(--sh-blue);
+            padding-left: 0.75rem;
+        }
+
+        .env-line {
+            color: var(--sh-green);
+        }
+
+        pre.output-block {
+            background: var(--sh-deep);
+            color: var(--sh-text-2);
+            border: 1px solid var(--sh-border);
+            border-radius: var(--sh-r-md);
+            font-size: 0.82rem;
+            max-height: 420px;
+            overflow-y: auto;
+            padding: 1rem;
+            font-family: var(--sh-font-mono);
+            margin: 0;
+        }
+
+        @media (max-width: 640px) {
+            .deploy-nav {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                justify-content: flex-start;
+            }
+
+            .deploy-nav-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .result-head {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .result-head-actions {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body class="sh bg-sh-deep antialiased min-h-screen">
+
+    <!-- ═══ Topbar ═══ -->
+    <nav class="sh-nav" style="position: sticky;">
+        <div class="sh-nav-inner deploy-nav">
+            <div class="flex items-center gap-2 sm:gap-3">
+                <span class="font-brand text-base tracking-tight">Deploy Tutor</span>
+                <div class="sh-status ml-1 hidden sm:inline-flex">
+                    <i class="fa-solid fa-rocket text-xs" style="color: var(--sh-blue);"></i>
+                </div>
+            </div>
+            <div class="deploy-nav-actions flex items-center gap-2">
+                <a href="/presenter" class="sh-btn sh-btn-ghost text-xs">
+                    <i class="fa-solid fa-chalkboard"></i>
+                    <span class="hidden sm:inline">Presentador</span>
+                </a>
+                <a href="/main-panel" class="sh-btn sh-btn-ghost text-xs">
+                    <i class="fa-solid fa-table-cells-large"></i>
+                    <span class="hidden sm:inline">Panel</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-[900px] mx-auto px-4 py-6 space-y-4">
+
+        <!-- ═══ Config Card ═══ -->
+        <div class="sh-card p-5" id="form-card">
+            <div class="sh-label mb-4">
+                <i class="fa-brands fa-github mr-1"></i>CONFIGURACIÓN
+            </div>
+            <div class="flex flex-col md:flex-row gap-3">
+                <div class="flex-1">
+                    <label class="block text-xs font-mono text-[var(--sh-text-3)] mb-1">REPO URL</label>
+                    <input type="url" class="sh-input w-full" id="repoUrl" placeholder="https://github.com/user/repo">
+                </div>
+                <div class="w-full md:w-48">
+                    <label class="block text-xs font-mono text-[var(--sh-text-3)] mb-1">PLATFORM</label>
+                    <select id="platform" class="sh-input w-full" style="cursor:pointer;">
+                        <option value="render" selected>Render</option>
+                        <option value="vercel">Vercel</option>
+                        <option value="netlify">Netlify</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+                <button id="btn-generate" class="sh-btn sh-btn-primary w-full sm:w-auto justify-center"
+                    onclick="runPipeline(false)">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Analizar y generar
+                </button>
+                <button id="btn-refresh" class="sh-btn text-xs hidden w-full sm:w-auto justify-center"
+                    onclick="runPipeline(true)">
+                    <i class="fa-solid fa-rotate-right mr-1"></i>Regenerar
+                </button>
+                <span id="global-error" class="text-xs font-mono hidden" style="color: var(--sh-red);"></span>
+            </div>
+        </div>
+
+        <!-- ═══ Progress Steps ═══ -->
+        <div class="sh-card p-4 hidden" id="progress-card">
+            <div class="sh-label mb-3">
+                <i class="fa-solid fa-list-check mr-1"></i>PROGRESO DEL PIPELINE
+            </div>
+            <div class="step-row">
+                <span class="step-badge step-pending" id="s-analyze-badge">1</span>
+                <div class="flex-1">
+                    <div class="text-sm font-semibold text-[var(--sh-text-1)]">Analizando repositorio</div>
+                    <div class="text-xs text-[var(--sh-text-3)]">Detecta lenguaje, framework, puertos y dependencias
+                    </div>
+                </div>
+                <i class="fa-solid fa-spinner fa-spin hidden" style="color:var(--sh-blue);" id="s-analyze-spin"></i>
+                <i class="fa-solid fa-check hidden" style="color:var(--sh-green);" id="s-analyze-ok"></i>
+                <i class="fa-solid fa-xmark hidden" style="color:var(--sh-red);" id="s-analyze-err"></i>
+            </div>
+            <div class="step-row">
+                <span class="step-badge step-pending" id="s-dockerfile-badge">2</span>
+                <div class="flex-1">
+                    <div class="text-sm font-semibold text-[var(--sh-text-1)]">Generando Dockerfile</div>
+                    <div class="text-xs text-[var(--sh-text-3)]">Multi-stage optimizado con healthcheck</div>
+                </div>
+                <i class="fa-solid fa-spinner fa-spin hidden" style="color:var(--sh-blue);" id="s-dockerfile-spin"></i>
+                <i class="fa-solid fa-check hidden" style="color:var(--sh-green);" id="s-dockerfile-ok"></i>
+                <i class="fa-solid fa-xmark hidden" style="color:var(--sh-red);" id="s-dockerfile-err"></i>
+            </div>
+            <div class="step-row">
+                <span class="step-badge step-pending" id="s-guide-badge">3</span>
+                <div class="flex-1">
+                    <div class="text-sm font-semibold text-[var(--sh-text-1)]">Generando guía de despliegue</div>
+                    <div class="text-xs text-[var(--sh-text-3)]">Pasos, variables de entorno y recomendaciones</div>
+                </div>
+                <i class="fa-solid fa-spinner fa-spin hidden" style="color:var(--sh-blue);" id="s-guide-spin"></i>
+                <i class="fa-solid fa-check hidden" style="color:var(--sh-green);" id="s-guide-ok"></i>
+                <i class="fa-solid fa-xmark hidden" style="color:var(--sh-red);" id="s-guide-err"></i>
+            </div>
+        </div>
+
+        <!-- ═══ Results ═══ -->
+        <div id="results" class="hidden space-y-4">
+
+            <!-- Analysis card -->
+            <div class="sh-card p-5">
+                <div class="sh-label mb-4">
+                    <i class="fa-solid fa-magnifying-glass-chart mr-1"></i>ANÁLISIS DEL REPOSITORIO
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-[var(--sh-text-3)] font-mono text-xs">Lenguaje</span>
+                            <span id="a-language" class="font-semibold" style="color:var(--sh-blue);"></span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-[var(--sh-text-3)] font-mono text-xs">Framework</span>
+                            <span id="a-framework" class="font-semibold" style="color:var(--sh-blue);"></span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-[var(--sh-text-3)] font-mono text-xs">Build</span>
+                            <span id="a-build" style="color:#d2a8ff;"></span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-[var(--sh-text-3)] font-mono text-xs">Puertos</span>
+                            <span id="a-ports" style="color:var(--sh-amber);"></span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-xs font-mono text-[var(--sh-text-3)] mb-1">Tecnologías</div>
+                        <div id="a-technologies" class="mb-2"></div>
+                        <div class="text-xs font-mono text-[var(--sh-text-3)] mb-1">Bases de datos</div>
+                        <div id="a-databases"></div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div class="text-xs font-mono text-[var(--sh-text-3)] mb-1">Resumen</div>
+                    <div id="a-summary" class="text-sm text-[var(--sh-text-2)]"></div>
+                </div>
+                <div id="a-hints-row" class="mt-2 hidden">
+                    <div class="text-xs font-mono text-[var(--sh-text-3)] mb-1">Pistas de despliegue</div>
+                    <div id="a-hints" class="text-sm text-[var(--sh-text-2)]"></div>
+                </div>
+            </div>
+
+            <!-- Dockerfile card -->
+            <div class="sh-card overflow-hidden">
+                <div class="result-head flex items-center justify-between p-4 border-b border-[var(--sh-border)]">
+                    <div class="sh-label">
+                        <i class="fa-brands fa-docker mr-1" style="color:#1d63ed;"></i>DOCKERFILE
+                    </div>
+                    <div class="result-head-actions flex gap-2">
+                        <button class="sh-btn sh-btn-ghost text-xs" onclick="copyEl('dockerfile-output', this)">
+                            <i class="fa-regular fa-copy mr-1"></i>Copiar
+                        </button>
+                        <button class="sh-btn sh-btn-ghost text-xs" onclick="dlText('dockerfile-output','Dockerfile')">
+                            <i class="fa-solid fa-download mr-1"></i>Descargar
+                        </button>
+                    </div>
+                </div>
+                <pre id="dockerfile-output" class="output-block" style="border:none; border-radius:0;"></pre>
+            </div>
+
+            <!-- Deployment guide card -->
+            <div class="sh-card overflow-hidden">
+                <div class="result-head flex items-center justify-between p-4 border-b border-[var(--sh-border)]">
+                    <div class="sh-label">
+                        <i class="fa-solid fa-map mr-1" style="color:#f78166;"></i>GUÍA DE DESPLIEGUE —
+                        <span id="platform-label" class="uppercase"></span>
+                    </div>
+                    <div class="result-head-actions flex gap-2">
+                        <button class="sh-btn sh-btn-ghost text-xs" onclick="copyEl('guide-output', this)">
+                            <i class="fa-regular fa-copy mr-1"></i>Copiar
+                        </button>
+                        <button class="sh-btn sh-btn-ghost text-xs"
+                            onclick="dlText('guide-output','GUIA-DESPLIEGUE.md')">
+                            <i class="fa-solid fa-download mr-1"></i>.md
+                        </button>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <pre id="guide-output" class="output-block"
+                        style="background:transparent;border:none;padding:0;white-space:pre-wrap;max-height:none;"></pre>
+                </div>
+            </div>
+
+            <!-- Tips card -->
+            <div class="sh-card p-5 hidden" id="tips-card">
+                <div class="sh-label mb-3">
+                    <i class="fa-solid fa-lightbulb mr-1" style="color:var(--sh-amber);"></i>CONSEJOS
+                </div>
+                <ul id="tips-list" class="space-y-1"></ul>
+            </div>
+
+            <!-- .env example card -->
+            <div class="sh-card overflow-hidden hidden" id="env-card">
+                <div class="result-head flex items-center justify-between p-4 border-b border-[var(--sh-border)]">
+                    <div class="sh-label">
+                        <i class="fa-solid fa-key mr-1" style="color:var(--sh-green);"></i>VARIABLES DE ENTORNO
+                    </div>
+                    <div class="result-head-actions flex gap-2">
+                        <button class="sh-btn sh-btn-ghost text-xs" onclick="copyEl('env-output', this)">
+                            <i class="fa-regular fa-copy mr-1"></i>Copiar
+                        </button>
+                        <button class="sh-btn sh-btn-ghost text-xs" onclick="dlText('env-output','.env.example')">
+                            <i class="fa-solid fa-download mr-1"></i>.env.example
+                        </button>
+                    </div>
+                </div>
+                <pre id="env-output" class="output-block env-line" style="border:none; border-radius:0;"></pre>
+            </div>
+
+        </div><!-- /results -->
+    </div><!-- /container -->
+
+    <script>
+        function stepCls(name, cls) {
+            document.getElementById('s-' + name + '-badge').className = 'step-badge ' + cls;
+            ['spin', 'ok', 'err'].forEach(s => document.getElementById('s-' + name + '-' + s).classList.add('hidden'));
+        }
+        function stepStart(name) { stepCls(name, 'step-active'); document.getElementById('s-' + name + '-spin').classList.remove('hidden'); }
+        function stepDone(name) { stepCls(name, 'step-done'); document.getElementById('s-' + name + '-ok').classList.remove('hidden'); }
+        function stepFail(name) { stepCls(name, 'step-error'); document.getElementById('s-' + name + '-err').classList.remove('hidden'); }
+
+        function chips(arr) {
+            if (!arr || !arr.length) return '<span class="text-xs font-mono" style="color:var(--sh-text-3);">—</span>';
+            return arr.map(t => `<span class="chip">${t}</span>`).join('');
+        }
+
+        function renderAnalysis(a) {
+            document.getElementById('a-language').textContent = a.language || '—';
+            document.getElementById('a-framework').textContent = a.framework || '—';
+            document.getElementById('a-build').textContent = a.buildSystem || '—';
+            document.getElementById('a-ports').textContent = (a.ports && a.ports.length) ? a.ports.join(', ') : '—';
+            document.getElementById('a-technologies').innerHTML = chips(a.technologies);
+            document.getElementById('a-databases').innerHTML = chips(a.databases);
+            document.getElementById('a-summary').textContent = a.summary || '';
+            const hintsRow = document.getElementById('a-hints-row');
+            if (a.deploymentHints) {
+                document.getElementById('a-hints').textContent = a.deploymentHints;
+                hintsRow.classList.remove('hidden');
+            } else { hintsRow.classList.add('hidden'); }
+        }
+
+        function renderGuide(g, platform) {
+            document.getElementById('guide-output').textContent = g.guide || '';
+            document.getElementById('dockerfile-output').textContent = g.dockerfile || '';
+            document.getElementById('platform-label').textContent = platform;
+
+            const tipsCard = document.getElementById('tips-card');
+            const tipsList = document.getElementById('tips-list');
+            if (g.tips && g.tips.length) {
+                tipsList.innerHTML = g.tips.map(t => `<li class="tip-item py-1 text-sm text-[var(--sh-text-2)]">${t}</li>`).join('');
+                tipsCard.classList.remove('hidden');
+            } else { tipsCard.classList.add('hidden'); }
+
+            const envCard = document.getElementById('env-card');
+            if (g.environmentExample) {
+                document.getElementById('env-output').textContent = g.environmentExample;
+                envCard.classList.remove('hidden');
+            } else { envCard.classList.add('hidden'); }
+        }
+
+        async function runPipeline(refresh) {
+            const repoUrl = document.getElementById('repoUrl').value.trim();
+            const platform = document.getElementById('platform').value;
+            const errEl = document.getElementById('global-error');
+            if (!repoUrl) { errEl.textContent = 'Ingresa la URL del repositorio.'; errEl.classList.remove('hidden'); return; }
+            errEl.classList.add('hidden');
+
+            document.getElementById('progress-card').classList.remove('hidden');
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('btn-generate').disabled = true;
+            document.getElementById('btn-refresh').classList.add('hidden');
+            ['analyze', 'dockerfile', 'guide'].forEach(n => stepCls(n, 'step-pending'));
+
+            // Step 1 — Analyze
+            stepStart('analyze');
+            let analysis;
+            try {
+                const r = await fetch('/api/ai/deploy/analyze', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ repoUrl })
+                });
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                analysis = await r.json();
+                stepDone('analyze');
+                renderAnalysis(analysis);
+            } catch (e) {
+                stepFail('analyze');
+                errEl.textContent = 'Error analizando el repositorio: ' + e.message;
+                errEl.classList.remove('hidden');
+                document.getElementById('btn-generate').disabled = false;
+                return;
+            }
+
+            // Step 2 — Dockerfile
+            stepStart('dockerfile');
+            let dockerResp;
+            try {
+                const r = await fetch('/api/ai/deploy/dockerfile', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        repoUrl, language: analysis.language, framework: analysis.framework,
+                        ports: analysis.ports, environment: analysis.environment
+                    })
+                });
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                dockerResp = await r.json();
+                stepDone('dockerfile');
+            } catch (e) {
+                stepFail('dockerfile');
+                errEl.textContent = 'Error generando el Dockerfile: ' + e.message;
+                errEl.classList.remove('hidden');
+                document.getElementById('btn-generate').disabled = false;
+                return;
+            }
+
+            // Step 3 — Guide
+            stepStart('guide');
+            try {
+                const endpoint = refresh ? '/api/ai/deploy/guide/refresh' : '/api/ai/deploy/guide';
+                const r = await fetch(endpoint, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ repoUrl, platform })
+                });
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                const g = await r.json();
+                if (!g.dockerfile && dockerResp.dockerfile) g.dockerfile = dockerResp.dockerfile;
+                stepDone('guide');
+                renderGuide(g, platform);
+            } catch (e) {
+                stepFail('guide');
+                errEl.textContent = 'Error generando la guía: ' + e.message;
+                errEl.classList.remove('hidden');
+                document.getElementById('btn-generate').disabled = false;
+                return;
+            }
+
+            document.getElementById('results').classList.remove('hidden');
+            document.getElementById('btn-generate').disabled = false;
+            document.getElementById('btn-refresh').classList.remove('hidden');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function copyEl(id, btn) {
+            navigator.clipboard.writeText(document.getElementById(id).textContent).then(() => {
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i>Copiado';
+                setTimeout(() => btn.innerHTML = orig, 1500);
+            });
+        }
+
+        function dlText(id, filename) {
+            const blob = new Blob([document.getElementById(id).textContent], { type: 'text/plain' });
+            const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: filename });
+            a.click(); URL.revokeObjectURL(a.href);
+        }
+    </script>
+
+</body>
+
+</html>
