@@ -55,8 +55,8 @@ public class GatewayRateLimitService {
     }
 
     private GatewayRateLimitDecision evaluateRule(HttpServletRequest request,
-                                                  GatewayRateLimitProperties.Rule rule,
-                                                  String path) {
+            GatewayRateLimitProperties.Rule rule,
+            String path) {
         long now = System.currentTimeMillis();
         String key = buildKey(request, rule, path);
         String bucketKey = rule.getName() + "|" + key;

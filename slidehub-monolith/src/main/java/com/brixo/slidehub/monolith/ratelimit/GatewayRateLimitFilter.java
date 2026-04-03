@@ -29,8 +29,8 @@ public class GatewayRateLimitFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+            HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
         GatewayRateLimitDecision decision = rateLimitService.evaluate(request);
         if (decision.permitted()) {
             filterChain.doFilter(request, response);
