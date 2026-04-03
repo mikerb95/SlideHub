@@ -29,12 +29,42 @@
         const API_SLIDE_URL = '/api/slide';
         const PRESENTATION_ID = /*[[${presentationId}]]*/ '';
         const SLIDES_CATALOG_API = PRESENTATION_ID ? `/api/presentations/${PRESENTATION_ID}/slides` : '';
+        const DEVICE_TYPE = 'slides-screen';
+        const DEVICE_STORAGE_KEY = `device-token:${DEVICE_TYPE}:${PRESENTATION_ID || 'global'}`;
 
         let currentSlide = 0;
         let totalSlides = 0;
         let slideUrls = [];
+        let deviceToken = localStorage.getItem(DEVICE_STORAGE_KEY) || '';
         const wrapper = document.getElementById('slide-wrapper');
         const errorMsg = document.getElementById('error-msg');
+
+        function ensureDeviceToken() {
+            if (deviceToken) {
+                return deviceToken;
+            }
+            const generated = (window.crypto && crypto.randomUUID)
+                ? crypto.randomUUID()
+                : `dev-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+            deviceToken = generated;
+            localStorage.setItem(DEVICE_STORAGE_KEY, generated);
+            return generated;
+        }
+
+        async function sendDeviceHeartbeat(register = false) {
+            const endpoint = register ? '/api/devices/register' : '/api/devices/heartbeat';
+            try {
+                await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: `slides-${PRESENTATION_ID || 'public'}`,
+                        type: DEVICE_TYPE,
+                        token: ensureDeviceToken()
+                    })
+                });
+            } catch (_) { }
+        }
 
         function buildSlides(total) {
             wrapper.innerHTML = '';
@@ -84,6 +114,8 @@
 
         loadSlidesCatalog().finally(poll);
         setInterval(poll, POLL_INTERVAL_MS);
+        sendDeviceHeartbeat(true);
+        setInterval(() => sendDeviceHeartbeat(false), 30000);
     </script>
 </body>
 

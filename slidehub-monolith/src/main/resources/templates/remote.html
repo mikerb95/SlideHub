@@ -437,6 +437,8 @@
         const PRESENTATION_ID = query.get('presentationId') || '';
         const JOIN_TOKEN = query.get('joinToken') || '';
         const STORAGE_KEY = `participant-token:${PRESENTATION_ID}`;
+        const DEVICE_TYPE = 'remote';
+        const DEVICE_STORAGE_KEY = `device-token:${DEVICE_TYPE}:${PRESENTATION_ID || 'global'}`;
 
         let currentSlide = 1;
         let totalSlides = 0;
@@ -449,6 +451,7 @@
         let mediaStream = null;
         let audioChunks = [];
         let recording = false;
+        let deviceToken = localStorage.getItem(DEVICE_STORAGE_KEY) || '';
 
         const indicator = document.getElementById('slide-indicator');
         const btnPrev = document.getElementById('btn-prev');
@@ -463,6 +466,37 @@
         const notice = document.getElementById('notice');
         const assistCard = document.getElementById('assist-card');
         const assistAnswerText = document.getElementById('assist-answer-text');
+
+        function ensureDeviceToken() {
+            if (deviceToken) {
+                return deviceToken;
+            }
+
+            const generated = (window.crypto && crypto.randomUUID)
+                ? crypto.randomUUID()
+                : `dev-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
+            deviceToken = generated;
+            localStorage.setItem(DEVICE_STORAGE_KEY, generated);
+            return generated;
+        }
+
+        async function sendDeviceHeartbeat(register = false) {
+            const token = ensureDeviceToken();
+            const endpoint = register ? '/api/devices/register' : '/api/devices/heartbeat';
+
+            try {
+                await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: `remote-${PRESENTATION_ID || 'public'}`,
+                        type: DEVICE_TYPE,
+                        token
+                    })
+                });
+            } catch (_) { }
+        }
 
         // ── Slide state ───────────────────────────────────────────────────────
 
@@ -802,9 +836,11 @@
             helpBtn.classList.add('visible');
             micBtn.classList.add('visible');
         }
+        sendDeviceHeartbeat(true);
         fetchState();
         loadJoinOptions();
         setInterval(fetchState, POLL_INTERVAL_MS);
+        setInterval(() => sendDeviceHeartbeat(false), 30000);
     </script>
 </body>
 

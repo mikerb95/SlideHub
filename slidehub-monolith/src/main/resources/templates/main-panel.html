@@ -399,6 +399,8 @@
         const LINKS_API = '/api/presentations/' + PRESENTATION_ID + '/links';
         const MEETING_API = '/api/presentations/' + PRESENTATION_ID + '/meeting';
         const SLIDES_CATALOG_API = PRESENTATION_ID ? '/api/presentations/' + PRESENTATION_ID + '/slides' : '';
+        const DEVICE_TYPE = 'main-panel';
+        const DEVICE_STORAGE_KEY = `device-token:${DEVICE_TYPE}:${PRESENTATION_ID || 'global'}`;
 
         let currentSlide = 0;
         let totalSlides = 0;
@@ -407,6 +409,7 @@
         let participants = [];
         let assignments = [];
         let activeSession = null;
+        let deviceToken = localStorage.getItem(DEVICE_STORAGE_KEY) || '';
 
         const grid = document.getElementById('slide-grid');
         const counter = document.getElementById('slide-counter');
@@ -423,6 +426,33 @@
         const assignmentsList = document.getElementById('assignments-list');
         const quickSlideTitleInput = document.getElementById('quick-slide-title');
         const quickSlideBodyInput = document.getElementById('quick-slide-body');
+
+        function ensureDeviceToken() {
+            if (deviceToken) {
+                return deviceToken;
+            }
+            const generated = (window.crypto && crypto.randomUUID)
+                ? crypto.randomUUID()
+                : `dev-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+            deviceToken = generated;
+            localStorage.setItem(DEVICE_STORAGE_KEY, generated);
+            return generated;
+        }
+
+        async function sendDeviceHeartbeat(register = false) {
+            const endpoint = register ? '/api/devices/register' : '/api/devices/heartbeat';
+            try {
+                await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: `main-panel-${PRESENTATION_ID || 'default'}`,
+                        type: DEVICE_TYPE,
+                        token: ensureDeviceToken()
+                    })
+                });
+            } catch (_) { }
+        }
 
         // ── Modal helpers ──────────────────────────────────────────────────────
 
@@ -887,6 +917,8 @@
         }
         loadSlidesCatalog().finally(fetchState);
         setInterval(fetchState, POLL_INTERVAL_MS);
+        sendDeviceHeartbeat(true);
+        setInterval(() => sendDeviceHeartbeat(false), 30000);
     </script>
 </body>
 

@@ -9,6 +9,7 @@ import com.brixo.slidehub.ui.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -74,6 +75,13 @@ public class SecurityConfig {
                                                 .permitAll()
                                                 .requestMatchers("/api/presentations/*/slides").permitAll()
                                                 .requestMatchers("/api/presentations/*/slides/*/image").permitAll()
+                                                // Registro de dispositivos (heartbeat público; lectura ADMIN)
+                                                .requestMatchers(HttpMethod.POST, "/api/devices/register",
+                                                                "/api/devices/heartbeat")
+                                                .permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/devices",
+                                                                "/api/devices/token/*")
+                                                .hasRole("ADMIN")
                                                 // Auth pública — incluye rutas OAuth2 de Spring Security
                                                 .requestMatchers("/auth/**", "/oauth2/**", "/login/oauth2/**")
                                                 .permitAll()
