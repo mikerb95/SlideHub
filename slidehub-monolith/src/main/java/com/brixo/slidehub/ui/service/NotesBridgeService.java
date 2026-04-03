@@ -58,13 +58,13 @@ public class NotesBridgeService {
     public int generateAllNotes(String presentationId, String repoUrl,
             List<Map<String, Object>> slideRefs) {
         List<SlideReference> slides = slideRefs.stream()
-            .map(this::toSlideReference)
-            .toList();
+                .map(this::toSlideReference)
+                .toList();
 
         GenerateAllRequest request = new GenerateAllRequest(
-            presentationId,
-            repoUrl != null ? repoUrl : "",
-            slides);
+                presentationId,
+                repoUrl != null ? repoUrl : "",
+                slides);
 
         try {
             return notesService.generateAll(request);
@@ -85,11 +85,11 @@ public class NotesBridgeService {
     public List<Map<String, Object>> getNotes(String presentationId) {
         try {
             List<PresenterNote> notes = presenterNoteRepository
-                .findByPresentationIdOrderBySlideNumberAsc(presentationId);
+                    .findByPresentationIdOrderBySlideNumberAsc(presentationId);
 
             return notes.stream()
-                .map(note -> objectMapper.convertValue(note, Map.class))
-                .toList();
+                    .map(note -> objectMapper.convertValue(note, Map.class))
+                    .toList();
         } catch (Exception e) {
             log.error("Error obteniendo notas para {}: {}",
                     presentationId, e.getMessage());
