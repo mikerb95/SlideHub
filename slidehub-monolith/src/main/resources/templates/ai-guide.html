@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guía del Microservicio IA — SlideHub</title>
+    <title>Guía del Módulo IA — SlideHub</title>
     <th:block th:replace="~{fragments/head :: assets}"></th:block>
     <style>
         .guide-section {
@@ -266,12 +266,12 @@
                 </a>
                 <span class="font-brand text-sm sm:text-base">SlideHub</span>
                 <span class="text-[var(--sh-text-3)] text-xs hidden sm:inline">/</span>
-                <span class="font-mono text-[0.68rem] sm:text-xs text-[var(--sh-text-2)]">Guía del microservicio
+                <span class="font-mono text-[0.68rem] sm:text-xs text-[var(--sh-text-2)]">Guía del módulo
                     IA</span>
             </div>
             <div class="guide-nav-badges flex items-center gap-2">
-                <span class="sh-badge-blue text-xs">ai-service</span>
-                <span class="sh-badge text-xs">puerto 8083</span>
+                <span class="sh-badge-blue text-xs">módulo IA</span>
+                <span class="sh-badge text-xs">/api/ai/**</span>
             </div>
         </div>
     </nav>
@@ -302,9 +302,9 @@
             <!-- Encabezado -->
             <div>
                 <div class="sh-label mb-2">GUÍA TÉCNICA PARA ESTUDIANTES</div>
-                <h1 class="font-brand text-3xl text-[var(--sh-text-1)] mb-3">ai-service</h1>
+                <h1 class="font-brand text-3xl text-[var(--sh-text-1)] mb-3">Módulo IA</h1>
                 <p class="text-[var(--sh-text-2)] text-sm leading-relaxed max-w-2xl">
-                    Este documento explica cómo funciona el microservicio de inteligencia artificial de SlideHub:
+                    Este documento explica cómo funciona el módulo de inteligencia artificial de SlideHub:
                     qué hace, cómo fluye la información entre los modelos, y cómo se almacena el resultado.
                     Está escrito para alguien que ya sabe programar pero que ve este código por primera vez.
                 </p>
@@ -314,11 +314,11 @@
              1. ¿QUÉ ES?
         ══════════════════════════════════════ -->
             <section id="que-es" class="guide-section sh-card p-6 space-y-4">
-                <div class="sh-label"><i class="fa-solid fa-circle-info mr-1"></i>¿QUÉ ES EL AI-SERVICE?</div>
+                <div class="sh-label"><i class="fa-solid fa-circle-info mr-1"></i>¿QUÉ ES EL MÓDULO IA?</div>
 
                 <p class="text-sm text-[var(--sh-text-2)] leading-relaxed">
-                    <code class="font-mono text-[var(--sh-blue)]">ai-service</code> es uno de los cuatro microservicios
-                    de SlideHub.
+                    El <code class="font-mono text-[var(--sh-blue)]">módulo IA</code> es una parte lógica del
+                    monolito de SlideHub.
                     Su única responsabilidad es <strong class="text-[var(--sh-text-1)]">coordinar llamadas a modelos de
                         IA externos</strong>
                     y persistir los resultados en MongoDB para no tener que regenerarlos cada vez.
@@ -354,10 +354,10 @@
                 </div>
 
                 <div class="note-callout">
-                    <strong>¿Por qué separarlo en su propio servicio?</strong><br>
+                    <strong>¿Por qué separarlo en su propio módulo?</strong><br>
                     Las llamadas a Gemini y Groq tardan entre 2 y 15 segundos y tienen costo por uso.
-                    Al aislarlas en un servicio propio: el resto de la app no se bloquea esperando,
-                    se puede escalar independientemente, y los resultados se cachean en MongoDB
+                    Al aislarlas en un módulo propio: el resto de la app no se bloquea esperando,
+                    la responsabilidad queda encapsulada y los resultados se cachean en MongoDB
                     para evitar pagar dos veces por la misma generación.
                 </div>
             </section>
@@ -369,41 +369,39 @@
                 <div class="sh-label"><i class="fa-solid fa-diagram-project mr-1"></i>ARQUITECTURA DEL SISTEMA</div>
 
                 <p class="text-sm text-[var(--sh-text-2)] leading-relaxed">
-                    SlideHub tiene cuatro microservicios. Todos los pedidos externos llegan primero al
-                    <code class="font-mono text-[var(--sh-amber)]">gateway-service</code>, que decide a qué servicio
-                    enrutar.
-                    El <code class="font-mono text-[var(--sh-blue)]">ai-service</code> nunca recibe tráfico directo del
-                    navegador.
+                    SlideHub corre como <strong class="text-[var(--sh-text-1)]">monolito modular</strong>.
+                    El navegador llama directamente a rutas del backend y el módulo IA atiende
+                    los endpoints bajo <code class="font-mono text-[var(--sh-blue)]">/api/ai/**</code>.
                 </p>
 
                 <div class="code-block">Navegador / Dispositivo
                     │
                     ▼
                     ┌──────────────────────────────────────────────────────────────┐
-                    │ gateway-service (puerto 8080) │
-                    │ · Enruta las solicitudes │
-                    │ · Aplica rate limiting a endpoints sensibles │
-                    └────┬───────────────┬──────────────────┬───────────────────── ┘
-                    │ │ │
-                    ▼ ▼ ▼
-                    ui-service state-service ai-service
-                    :8082 :8081 :8083
-                    · Vistas · Slide actual · Gemini API
-                    · Auth · Estado demo · Groq API
-                    · S3 · Redis · MongoDB</div>
+                    │ slidehub-monolith (puerto 8080) │
+                    │ · Vistas + Auth + API + Rate limiting │
+                    └────┬───────────────────────┬───────────────────────────────┘
+                    │                       │
+                    ▼                       ▼
+                    módulo state            módulo ai
+                    · Slide/demo/haptics    · Notes/deploy/assist
+                    · Redis                 · Gemini/Groq + MongoDB
+
+                    módulo ui
+                    · Thymeleaf + OAuth2 + PostgreSQL + S3</div>
 
                 <div class="tip-callout">
-                    El <code class="font-mono">gateway-service</code> aplica reglas de rate limiting específicas para
-                    los endpoints de IA
+                    El monolito aplica reglas de rate limiting específicas para los endpoints de IA
                     (máximo 5–6 llamadas por minuto por IP) para controlar el costo de las APIs externas.
                 </div>
 
                 <p class="text-sm text-[var(--sh-text-2)] leading-relaxed">
-                    Internamente, el <code class="font-mono text-[var(--sh-blue)]">ai-service</code> tiene esta
+                    Internamente, el <code class="font-mono text-[var(--sh-blue)]">módulo IA</code> tiene esta
                     estructura:
                 </p>
 
-                <div class="code-block">ai-service/
+                <div class="code-block">slidehub-monolith/
+                    src/main/java/com/brixo/slidehub/ai/
                     controller/
                     NotesController.java → /api/ai/notes/**
                     RepoAnalysisController.java → /api/ai/analyze-repo
@@ -573,15 +571,15 @@
                 <div class="code-block">{
                     "presentationId": "abc-123",
                     "slideNumber": 3,
-                    "title": "Arquitectura de microservicios",
+                    "title": "Arquitectura monolítica modular",
                     "points": [
-                    "Cada servicio tiene una responsabilidad única",
-                    "Comunicación via HTTP REST con WebClient",
-                    "El gateway centraliza el enrutamiento"
+                    "Cada módulo tiene una responsabilidad clara",
+                    "La IA se consume vía HTTP hacia proveedores externos",
+                    "El backend centraliza seguridad y rate limiting"
                     ],
                     "suggestedTime": "~3 min",
-                    "keyPhrases": ["principio de responsabilidad única", "gateway pattern"],
-                    "demoTags": ["demo-gateway-routing"]
+                    "keyPhrases": ["modular monolith", "single deployment unit"],
+                    "demoTags": ["demo-ia-modulo"]
                     }</div>
 
                 <div class="note-callout">
@@ -637,11 +635,11 @@
                     "buildSystem": "Maven",
                     "technologies": ["Redis", "PostgreSQL", "Thymeleaf", "Docker"],
                     "databases": ["PostgreSQL", "Redis"],
-                    "ports": [8080, 8081, 8082, 8083],
+                    "ports": [8080],
                     "environment": ["DATABASE_URL", "REDIS_HOST", "GEMINI_API_KEY"],
-                    "summary": "Sistema multi-pantalla de presentaciones con microservicios",
-                    "structure": "4 microservicios: gateway, state, ui, ai",
-                    "deploymentHints": "Usar Render con Web Services separados, Redis addon"
+                    "summary": "Sistema multi-pantalla de presentaciones en monolito modular",
+                    "structure": "Monolito con módulos lógicos: ui, state y ai",
+                    "deploymentHints": "Desplegar un solo servicio con variables de entorno centralizadas"
                     }</div>
 
                 <div class="tip-callout">
@@ -785,7 +783,7 @@
                 <div class="sh-label"><i class="fa-solid fa-database mr-1"></i>BASE DE DATOS — MONGODB</div>
 
                 <p class="text-sm text-[var(--sh-text-2)] leading-relaxed">
-                    El <code class="font-mono text-[var(--sh-blue)]">ai-service</code> usa MongoDB exclusivamente.
+                    El <code class="font-mono text-[var(--sh-blue)]">módulo IA</code> usa MongoDB exclusivamente.
                     Se eligió MongoDB (en lugar de PostgreSQL) porque los datos generados por IA son documentos
                     semi-estructurados: listas de longitud variable, campos opcionales, texto largo.
                     Encajan mejor en un modelo de documentos que en tablas relacionales.
@@ -895,8 +893,8 @@
                 <div class="sh-label"><i class="fa-solid fa-plug mr-1"></i>REFERENCIA DE ENDPOINTS</div>
 
                 <p class="text-sm text-[var(--sh-text-2)] leading-relaxed">
-                    Todos los endpoints son accesibles a través del
-                    <code class="font-mono text-[var(--sh-amber)]">gateway-service</code> en el puerto 8080.
+                    Todos los endpoints son accesibles directamente en el backend monolítico
+                    en el puerto 8080.
                     Los que generan IA tienen rate limiting activo.
                 </p>
 
@@ -993,10 +991,10 @@
                 </div>
 
                 <div class="warn-callout">
-                    <strong>Rate limiting activo en el gateway:</strong>
+                    <strong>Rate limiting activo en el backend:</strong>
                     Los endpoints de IA tienen límites de 5–6 solicitudes por minuto por IP para controlar el costo de
                     las APIs.
-                    Si una solicitud supera el límite, el gateway devuelve <code
+                    Si una solicitud supera el límite, el backend devuelve <code
                         class="font-mono">429 Too Many Requests</code>
                     con el header <code class="font-mono">Retry-After</code> indicando cuántos segundos esperar.
                 </div>
@@ -1004,7 +1002,7 @@
 
             <!-- Footer -->
             <div class="text-center py-4">
-                <span class="font-mono text-xs text-[var(--sh-text-3)]">ai-service — SlideHub v1 · Spring Boot 4 · Java
+                <span class="font-mono text-xs text-[var(--sh-text-3)]">Módulo IA — SlideHub v1 · Spring Boot 4 · Java
                     21</span>
             </div>
 

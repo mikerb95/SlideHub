@@ -198,7 +198,7 @@
                         <span class="sh-badge text-xs">Escala interna M0–M4: M2</span>
                     </div>
                     <p class="text-sm text-[var(--sh-text-2)] leading-relaxed">
-                        El código mantiene una base estable para evolución: arquitectura por microservicios,
+                        El código mantiene una base estable para evolución: arquitectura monolítica modular,
                         convenciones claras y cobertura funcional en pruebas. Aún faltan prácticas de madurez más
                         altas en seguridad de datos sensibles y estandarización formal de calidad por release.
                     </p>
@@ -206,10 +206,10 @@
                         <div class="phase-card">
                             <div class="mini-title">Fortalezas vigentes</div>
                             <ul class="text-xs text-[var(--sh-text-2)] leading-relaxed space-y-1 list-none">
-                                <li><i class="fa-solid fa-check mr-1 text-[var(--sh-blue)]"></i>Separación por servicio
+                                <li><i class="fa-solid fa-check mr-1 text-[var(--sh-blue)]"></i>Separación por módulo
                                     y responsabilidades técnicas definidas.</li>
                                 <li><i class="fa-solid fa-check mr-1 text-[var(--sh-blue)]"></i>Endpoints de health,
-                                    smoke E2E y suites de test por módulo.</li>
+                                    smoke E2E y suites de test por dominio.</li>
                                 <li><i class="fa-solid fa-check mr-1 text-[var(--sh-blue)]"></i>Trazabilidad funcional
                                     mediante historias y documentación activa.</li>
                             </ul>
@@ -292,21 +292,21 @@
                         <div class="phase-card">
                             <div class="mini-title">Seguridad aplicada</div>
                             <div class="phase-text">
-                                `ui-service/.../SecurityConfig.java`,
-                                `gateway-service/.../GatewayRateLimitService.java`
+                                `slidehub-monolith/.../ui/config/SecurityConfig.java`,
+                                `slidehub-monolith/.../monolith/ratelimit/GatewayRateLimitService.java`
                             </div>
                         </div>
                         <div class="phase-card">
                             <div class="mini-title">Pruebas y verificación</div>
                             <div class="phase-text">
                                 `docs/SMOKE-E2E.md`, `.github/workflows/smoke-e2e.yml`,
-                                tests en `ui-service`, `gateway-service`, `ai-service`, `state-service`.
+                                tests en `slidehub-monolith`.
                             </div>
                         </div>
                         <div class="phase-card">
                             <div class="mini-title">Brecha 27001 (P0)</div>
                             <div class="phase-text">
-                                `ui-service/.../V1__create_users.sql` + entidad `User` + servicios OAuth2 con
+                                `slidehub-monolith/.../db/migration/V1__create_users.sql` + entidad `User` + servicios OAuth2 con
                                 persistencia directa de token.
                             </div>
                         </div>
@@ -325,7 +325,7 @@
                         </div>
                         <div class="phase-card">
                             <div class="phase-label">DO</div>
-                            <div class="phase-text">Implementación por microservicio con responsabilidades técnicas
+                            <div class="phase-text">Implementación por módulo con responsabilidades técnicas
                                 separadas.</div>
                         </div>
                         <div class="phase-card">

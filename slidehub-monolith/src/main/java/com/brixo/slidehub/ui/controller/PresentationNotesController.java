@@ -27,8 +27,8 @@ import java.util.Optional;
  * Fase 3,
  * tareas 35).
  *
- * Actúa como puente entre ui-service (datos de presentación en PostgreSQL)
- * y ai-service (generación de notas con Gemini + Groq).
+ * Orquesta la generación de notas entre el módulo de presentaciones
+ * (datos en PostgreSQL) y el módulo de IA (Gemini + Groq).
  */
 @Controller
 public class PresentationNotesController {
@@ -84,7 +84,7 @@ public class PresentationNotesController {
      * Flujo:
      * 1. Obtiene la presentación del usuario (con slides y S3 URLs)
      * 2. Construye la lista de referencias de slides
-     * 3. Llama a ai-service generate-all
+    * 3. Ejecuta generate-all del módulo IA
      * 4. Devuelve número de notas generadas
      *
      * @param id      ID de la presentación
@@ -117,7 +117,7 @@ public class PresentationNotesController {
                     .body(Map.of("error", "La presentación no tiene slides."));
         }
 
-        // Construir lista de referencias de slides para ai-service
+        // Construir lista de referencias de slides para el módulo IA
         List<Map<String, Object>> slideRefs = presentation.getSlides().stream()
                 .map(slide -> {
                     Map<String, Object> ref = new HashMap<>();
@@ -141,7 +141,7 @@ public class PresentationNotesController {
     }
 
     /**
-     * Obtiene las notas generadas de una presentación (proxy a ai-service).
+    * Obtiene las notas generadas de una presentación.
      *
      * @param id ID de la presentación
      */
