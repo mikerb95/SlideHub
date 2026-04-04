@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -69,11 +70,12 @@ public class DatabaseConfig {
      * cuando el DataSource se define manualmente en un @Bean.
      */
     @Bean(initMethod = "migrate")
+    @ConditionalOnProperty(prefix = "spring.flyway", name = "enabled", havingValue = "true", matchIfMissing = true)
     public Flyway flyway(DataSource dataSource,
-                         @Value("${spring.flyway.locations:classpath:db/migration}") String locations,
-                         @Value("${spring.flyway.baseline-on-migrate:false}") boolean baselineOnMigrate,
-                         @Value("${spring.flyway.default-schema:#{null}}") String defaultSchema,
-                         @Value("${spring.flyway.schemas:#{null}}") String schemas) {
+            @Value("${spring.flyway.locations:classpath:db/migration}") String locations,
+            @Value("${spring.flyway.baseline-on-migrate:false}") boolean baselineOnMigrate,
+            @Value("${spring.flyway.default-schema:#{null}}") String defaultSchema,
+            @Value("${spring.flyway.schemas:#{null}}") String schemas) {
         var config = Flyway.configure()
                 .dataSource(dataSource)
                 .locations(locations)
@@ -96,11 +98,12 @@ public class DatabaseConfig {
      * antes de validar el esquema.
      */
     @Bean
+    @ConditionalOnProperty(prefix = "spring.flyway", name = "enabled", havingValue = "true", matchIfMissing = true)
     public static BeanFactoryPostProcessor flywayDependencyPostProcessor() {
         return beanFactory -> {
             if (beanFactory.containsBeanDefinition("entityManagerFactory")) {
                 beanFactory.getBeanDefinition("entityManagerFactory")
-                        .setDependsOn(new String[]{"flyway"});
+                        .setDependsOn(new String[] { "flyway" });
             }
         };
     }
