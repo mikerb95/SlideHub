@@ -1,0 +1,74 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+@page { margin: 1in; }
+body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; line-height: 1.45; color: #111; }
+h1 { font-size: 22pt; margin: 0 0 0.35em 0; }
+h2 { font-size: 15pt; margin: 1.1em 0 0.35em 0; }
+h3 { font-size: 12pt; margin: 0.9em 0 0.25em 0; }
+p { margin: 0.15em 0 0.6em 0; }
+ul, ol { margin: 0.15em 0 0.8em 1.4em; }
+li { margin: 0.12em 0; }
+strong { font-weight: 700; }
+blockquote { margin: 0.6em 0; padding: 0.45em 0.75em; background: #f5f7fa; border-left: 4px solid #99a; }
+hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
+.code { font-family: 'Courier New', monospace; }
+</style></head><body><h1>Migración a Monolito — Fase 1 (Consolidación funcional)</h1>
+<p>Fecha: 2026-04-03</p>
+<p>Rama: <span class="code">development</span></p>
+<h2>Objetivo</h2>
+<p>Consolidar funcionalidad core en <span class="code">slidehub-monolith</span>, incorporando dominios <span class="code">state</span>, <span class="code">ai</span> y <span class="code">ui</span>, y eliminar las primeras fronteras HTTP internas entre módulos.</p>
+<h2>Cambios realizados</h2>
+<h3>1) Migración de dominios Java</h3>
+<p>Se consolidaron paquetes dentro de <span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/</span>:</p>
+<ul>
+<li><span class="code">state/**</span> (controllers, models, services)</li>
+<li><span class="code">ai/**</span> (controllers, models, repositories, services)</li>
+<li><span class="code">ui/**</span> (config, controllers, models, repositories, services, exception)</li>
+</ul>
+<h3>2) Migración de recursos</h3>
+<p>Se incorporaron en <span class="code">slidehub-monolith/src/main/resources/</span>:</p>
+<ul>
+<li><span class="code">templates/**</span></li>
+<li><span class="code">static/**</span></li>
+<li><span class="code">db/migration/**</span></li>
+</ul>
+<p>Esto dejó operativa la capa web y la persistencia del monolito con assets y migraciones disponibles.</p>
+<h3>3) Compatibilidad de rutas</h3>
+<p>Se preservaron rutas funcionales existentes para evitar ruptura del frontend:</p>
+<ul>
+<li>Estado/hápticos: <span class="code">/api/slide</span>, <span class="code">/api/demo</span>, <span class="code">/api/haptics/**</span></li>
+<li>IA: <span class="code">/api/ai/**</span></li>
+<li>Presentaciones/reuniones: <span class="code">/api/presentations/**</span></li>
+<li>Vistas: <span class="code">/slides</span>, <span class="code">/remote</span>, <span class="code">/demo</span>, <span class="code">/presenter</span>, <span class="code">/main-panel</span>, etc.</li>
+</ul>
+<h3>4) Eliminación inicial de HTTP interno (in-process)</h3>
+<p>Se refactorizaron servicios puente para invocación directa en el mismo proceso:</p>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/NotesBridgeService.java</span></li>
+</ul>
+<p>  - de llamadas HTTP a <span class="code">NotesService</span> / <span class="code">RepoAnalysisService</span> / <span class="code">PresenterNoteRepository</span>.</p>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/AssistBridgeService.java</span></li>
+</ul>
+<p>  - de POST multipart interno a llamada directa <span class="code">AssistService</span>.</p>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/HapticBridgeService.java</span></li>
+</ul>
+<p>  - de POST interno a llamada directa <span class="code">HapticEventService</span>.</p>
+<h2>Verificación</h2>
+<p>Compilación del monolito tras consolidación:</p>
+<p>```bash</p>
+<p>./mvnw clean compile -pl slidehub-monolith -am</p>
+<p>```</p>
+<p>Resultado esperado: <span class="code">BUILD SUCCESS</span>.</p>
+<h2>Resultado de fase</h2>
+<ul>
+<li><span class="code">slidehub-monolith</span> ya contiene la funcionalidad principal de UI + State + AI.</li>
+<li>Se removieron fronteras HTTP internas críticas entre módulos.</li>
+<li>Código y recursos base quedaron centralizados en una sola unidad de despliegue.</li>
+</ul>
+<h2>Próximo paso sugerido (Fase 2)</h2>
+<ol>
+<li>1. Limpiar dependencias residuales de URLs internas (<span class="code">state-service</span>/<span class="code">ai-service</span>).</li>
+<li>2. Adaptar <span class="code">KeepAliveService</span> y <span class="code">StatusChecksService</span> a modo monolito.</li>
+<li>3. Alinear textos/documentación técnica de UI al nuevo modelo arquitectónico.</li>
+</ol></body></html>

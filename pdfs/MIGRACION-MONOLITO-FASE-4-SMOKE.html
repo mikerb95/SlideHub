@@ -1,0 +1,80 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+@page { margin: 1in; }
+body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; line-height: 1.45; color: #111; }
+h1 { font-size: 22pt; margin: 0 0 0.35em 0; }
+h2 { font-size: 15pt; margin: 1.1em 0 0.35em 0; }
+h3 { font-size: 12pt; margin: 0.9em 0 0.25em 0; }
+p { margin: 0.15em 0 0.6em 0; }
+ul, ol { margin: 0.15em 0 0.8em 1.4em; }
+li { margin: 0.12em 0; }
+strong { font-weight: 700; }
+blockquote { margin: 0.6em 0; padding: 0.45em 0.75em; background: #f5f7fa; border-left: 4px solid #99a; }
+hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
+.code { font-family: 'Courier New', monospace; }
+</style></head><body><h1>Migración a Monolito — Fase 4 (Smoke E2E)</h1>
+<p>Fecha: 2026-04-03</p>
+<p>Rama: <span class="code">development</span></p>
+<h2>Objetivo</h2>
+<p>Alinear validación rápida (local/CI) al modo monolítico, retirando el smoke basado en 4 servicios y dejando una ruta única de verificación.</p>
+<h2>Cambios realizados</h2>
+<h3>1) Documento de smoke actualizado</h3>
+<p>Se actualizó:</p>
+<ul>
+<li><span class="code">docs/SMOKE-E2E.md</span></li>
+</ul>
+<p>Ahora describe:</p>
+<ul>
+<li>flujo smoke para <span class="code">slidehub-monolith</span></li>
+<li>endpoints validados del backend único</li>
+<li>variables opcionales del script</li>
+<li>nota explícita de deprecación del smoke microservicios</li>
+</ul>
+<h3>2) Script de smoke monolito</h3>
+<p>Se actualizó:</p>
+<ul>
+<li><span class="code">scripts/smoke-e2e.sh</span></li>
+</ul>
+<p>Cambios clave:</p>
+<ul>
+<li>inicia Redis + Mongo temporales</li>
+<li>inicia solo <span class="code">slidehub-monolith</span></li>
+<li>usa <span class="code">PORT</span> configurable (<span class="code">SMOKE_PORT</span>)</li>
+<li>fuerza entorno smoke estable:</li>
+</ul>
+<p>  - <span class="code">SPRING_FLYWAY_ENABLED=false</span></p>
+<p>  - <span class="code">SPRING_JPA_HIBERNATE_DDL_AUTO=update</span></p>
+<p>  - H2 en memoria para smoke</p>
+<ul>
+<li>valida endpoints públicos/API críticos del monolito</li>
+</ul>
+<h3>3) Workflow de GitHub Actions alineado</h3>
+<p>Se actualizó:</p>
+<ul>
+<li><span class="code">.github/workflows/smoke-e2e.yml</span></li>
+</ul>
+<p>Cambios:</p>
+<ul>
+<li>nombre del workflow: <span class="code">Smoke E2E Monolith</span></li>
+<li>job renombrado a <span class="code">smoke-e2e-monolith</span></li>
+<li>ejecución directa de <span class="code">./scripts/smoke-e2e.sh</span></li>
+</ul>
+<h2>Verificación</h2>
+<ul>
+<li>Sintaxis bash del script:</li>
+</ul>
+<p>```bash</p>
+<p>bash -n ./scripts/smoke-e2e.sh</p>
+<p>```</p>
+<ul>
+<li>Compilación del monolito:</li>
+</ul>
+<p>```bash</p>
+<p>./mvnw clean compile -pl slidehub-monolith -am</p>
+<p>```</p>
+<p>Resultado esperado: <span class="code">BUILD SUCCESS</span>.</p>
+<h2>Resultado de fase</h2>
+<ul>
+<li>Smoke E2E principal ya está orientado al monolito.</li>
+<li>CI manual de smoke y documentación quedaron consistentes.</li>
+<li>Flujo legacy de microservicios marcado como deprecado para transición.</li>
+</ul></body></html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+@page { margin: 1in; }
+body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; line-height: 1.45; color: #111; }
+h1 { font-size: 22pt; margin: 0 0 0.35em 0; }
+h2 { font-size: 15pt; margin: 1.1em 0 0.35em 0; }
+h3 { font-size: 12pt; margin: 0.9em 0 0.25em 0; }
+p { margin: 0.15em 0 0.6em 0; }
+ul, ol { margin: 0.15em 0 0.8em 1.4em; }
+li { margin: 0.12em 0; }
+strong { font-weight: 700; }
+blockquote { margin: 0.6em 0; padding: 0.45em 0.75em; background: #f5f7fa; border-left: 4px solid #99a; }
+hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
+.code { font-family: 'Courier New', monospace; }
+</style></head><body><h1>Migración a Monolito — Fase 2</h1>
+<p>Fecha: 2026-04-03</p>
+<p>Rama: <span class="code">development</span></p>
+<h2>Objetivo de esta fase</h2>
+<p>Eliminar dependencias internas de arquitectura de microservicios dentro de <span class="code">slidehub-monolith</span>, alinear narrativa técnica/UI al modelo monolítico modular y dejar evidencia documental de los cambios.</p>
+<h2>Cambios implementados</h2>
+<h3>1) Terminología y narrativa en UI</h3>
+<p>Se actualizaron vistas para reflejar arquitectura monolítica modular:</p>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/resources/templates/showcase.html</span></li>
+</ul>
+<p>  - Métrica principal cambia de <strong>4 Microservicios</strong> a <strong>1 Monolito</strong>.</p>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/resources/templates/ai-guide.html</span></li>
+</ul>
+<p>  - Título y encabezados cambian de “microservicio IA” a “módulo IA”.</p>
+<p>  - Se reemplaza la explicación de gateway + 4 servicios por diagrama de monolito modular.</p>
+<p>  - Se ajustan ejemplos JSON (<span class="code">summary</span>, <span class="code">structure</span>, <span class="code">ports</span>, <span class="code">deploymentHints</span>) al nuevo modelo.</p>
+<p>  - Se actualiza sección de endpoints/rate limit para backend único.</p>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/resources/templates/calidad.html</span></li>
+</ul>
+<p>  - Redacción de madurez y PDCA cambia de microservicios a módulos.</p>
+<p>  - Evidencia técnica apunta a rutas de <span class="code">slidehub-monolith</span>.</p>
+<p>  - Pruebas listadas como centralizadas en <span class="code">slidehub-monolith</span>.</p>
+<h3>2) Limpieza de metadatos técnicos</h3>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ai/controller/NotesController.java</span></li>
+</ul>
+<p>  - Health now returns:</p>
+<p>    - <span class="code">service: slidehub-monolith</span></p>
+<p>    - <span class="code">module: ai</span></p>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/PresentationNotesController.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/NotesBridgeService.java</span></li>
+</ul>
+<p>  - Comentarios y descripciones adaptados de “puente entre servicios” a “orquestación in-process”.</p>
+<h3>3) Ajuste funcional de rutas de slides</h3>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/state/service/SlideStateService.java</span></li>
+</ul>
+<p>  - Se añadieron candidatos de directorio para entorno monolito:</p>
+<p>    - <span class="code">./src/main/resources/static/slides</span></p>
+<p>    - <span class="code">./slidehub-monolith/src/main/resources/static/slides</span></p>
+<p>  - Se mantienen rutas legacy para compatibilidad temporal durante transición.</p>
+<h2>Verificación</h2>
+<p>Compilación del módulo monolito:</p>
+<p>```bash</p>
+<p>./mvnw clean compile -pl slidehub-monolith -am</p>
+<p>```</p>
+<p>Resultado: <strong>BUILD SUCCESS</strong>.</p>
+<h2>Estado al cierre de Fase 2</h2>
+<ul>
+<li>Arquitectura monolítica modular funcional y compilando.</li>
+<li>Terminología principal de vistas técnicas alineada al monolito.</li>
+<li>Dependencias internas de “service URL” ya retiradas en <span class="code">KeepAliveService</span> y <span class="code">StatusChecksService</span> (fase previa) y documentación consistente con ello.</li>
+</ul>
+<h2>Próximos pasos sugeridos (Fase 3)</h2>
+<ol>
+<li>1. Consolidar <span class="code">render.yaml</span> para despliegue de <strong>un solo servicio</strong>.</li>
+<li>2. Añadir perfil de ejecución local exclusivo de monolito (<span class="code">application-dev.properties</span> específico).</li>
+<li>3. Reorganizar documentación raíz (<span class="code">README.md</span>, <span class="code">DEPLOYMENT.md</span>) para retirar instrucciones de 4 servicios como default.</li>
+<li>4. Ejecutar smoke E2E orientado a monolito y actualizar <span class="code">docs/SMOKE-E2E.md</span>.</li>
+</ol></body></html>
