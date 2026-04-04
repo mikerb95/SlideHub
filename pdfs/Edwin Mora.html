@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+@page { margin: 1.2in; }
+body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; line-height: 1.45; color: #111; }
+h1 { font-size: 22pt; margin: 0 0 0.4em 0; }
+h2 { font-size: 15pt; margin-top: 1.2em; margin-bottom: 0.4em; }
+h3 { font-size: 12pt; margin-top: 1em; margin-bottom: 0.3em; }
+p { margin: 0.2em 0 0.6em 0; }
+ul, ol { margin: 0.2em 0 0.8em 1.4em; }
+li { margin: 0.15em 0; }
+strong { font-weight: 700; }
+blockquote { margin: 0.6em 0; padding: 0.5em 0.8em; background: #f5f7fa; border-left: 4px solid #99a; }
+hr { border: none; border-top: 1px solid #999; margin: 1.2em 0; }
+.code { font-family: 'Courier New', monospace; }
+.pagebreak { page-break-before: always; }
+</style></head><body><h1>Edwin Mora</h1>
+<h2>Guía de exposición (2 minutos) — Gateway y control de entrada</h2>
+<h2>1. Rol en el proyecto</h2>
+<p>Responsable histórico de <span class="code">gateway-service</span> y de la lógica de control de entrada/rate limiting durante la migración a monolito.</p>
+<h2>2. Qué cambió en tu parte (de microservicio a monolito)</h2>
+<h3>Antes</h3>
+<ul>
+<li><span class="code">gateway-service</span> era un servicio independiente.</li>
+<li>Su trabajo principal era enrutar peticiones entre servicios internos (<span class="code">ui</span>, <span class="code">state</span>, <span class="code">ai</span>).</li>
+<li>Además aplicaba protección anti-abuso.</li>
+</ul>
+<h3>Ahora</h3>
+<ul>
+<li>El enrutamiento interno entre servicios ya no es necesario, porque todo corre en <span class="code">slidehub-monolith</span>.</li>
+<li>Se mantiene tu aporte clave: <strong>control de entrada y rate limit</strong>, ahora dentro del monolito.</li>
+</ul>
+<h2>3. Archivos que debes dominar para sustentar</h2>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/SlideHubMonolithApplication.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitFilter.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitService.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitProperties.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitDecision.java</span></li>
+<li><span class="code">docs/MIGRACION-MONOLITO-FASE-0.md</span></li>
+<li><span class="code">docs/MIGRACION-MONOLITO-FASE-1.md</span></li>
+</ul>
+<h2>4. Guion exacto para 2 minutos</h2>
+<h3>0:00 – 0:30</h3>
+<p>“Mi responsabilidad era el Gateway. Antes teníamos un servicio dedicado a enrutar tráfico entre cuatro microservicios y a proteger endpoints sensibles.”</p>
+<h3>0:30 – 1:10</h3>
+<p>“Con la migración, ese rol cambió: el ruteo interno dejó de ser necesario porque UI, State y AI ahora viven en el mismo proceso. Lo que sí preservamos fue la capa de protección de entrada con rate limiting.”</p>
+<h3>1:10 – 1:40</h3>
+<p>“Esto se implementó en el monolito con <span class="code">GatewayRateLimitFilter</span>, <span class="code">GatewayRateLimitService</span> y configuración centralizada en <span class="code">GatewayRateLimitProperties</span>.”</p>
+<h3>1:40 – 2:00</h3>
+<p>“En resumen: pasamos de una portería entre edificios a seguridad de acceso en un solo edificio. Menos complejidad operativa, misma protección en entrada.”</p>
+<h2>5. Guía de estudio rápida (20–30 min)</h2>
+<ol>
+<li>1. Lee <span class="code">docs/MIGRACION-MONOLITO-FASE-0.md</span> y anota 3 cambios clave.</li>
+<li>2. Revisa cómo se usa el filtro de rate limit en el monolito.</li>
+<li>3. Ten clara la frase: “eliminamos proxy interno, no eliminamos seguridad de entrada”.</li>
+<li>4. Practica explicar el cambio en una sola oración.</li>
+</ol>
+<h2>6. Preguntas que te pueden hacer</h2>
+<ul>
+<li><strong>¿Se perdió seguridad al quitar gateway separado?</strong></li>
+</ul>
+<p>  No. La protección se movió al monolito y sigue activa con rate limiting.</p>
+<ul>
+<li><strong>¿Qué desapareció realmente?</strong></li>
+</ul>
+<p>  Desapareció la necesidad operativa del proxy interno entre servicios, no el control de entrada.</p>
+<h2>7. Conexión con el siguiente expositor</h2>
+<p>Cierra diciendo: “Yo explico la entrada del sistema; ahora Jerson muestra cómo quedó el manejo del estado de presentación dentro del monolito.”</p></body></html>

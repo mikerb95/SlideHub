@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+@page { margin: 1.2in; }
+body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; line-height: 1.45; color: #111; }
+h1 { font-size: 22pt; margin: 0 0 0.4em 0; }
+h2 { font-size: 15pt; margin-top: 1.2em; margin-bottom: 0.4em; }
+h3 { font-size: 12pt; margin-top: 1em; margin-bottom: 0.3em; }
+p { margin: 0.2em 0 0.6em 0; }
+ul, ol { margin: 0.2em 0 0.8em 1.4em; }
+li { margin: 0.15em 0; }
+strong { font-weight: 700; }
+blockquote { margin: 0.6em 0; padding: 0.5em 0.8em; background: #f5f7fa; border-left: 4px solid #99a; }
+hr { border: none; border-top: 1px solid #999; margin: 1.2em 0; }
+.code { font-family: 'Courier New', monospace; }
+.pagebreak { page-break-before: always; }
+</style></head><body><h1>Daniel Guacheta</h1>
+<h2>Guía de exposición (2 minutos) — Capa UI y experiencia del usuario</h2>
+<h2>1. Rol en el proyecto</h2>
+<p>Responsable de <span class="code">ui-service</span>: vistas, autenticación, flujo de presentaciones, reuniones y orquestación con state/ai.</p>
+<h2>2. Qué cambió en tu parte (de microservicio a monolito)</h2>
+<h3>Antes</h3>
+<ul>
+<li>UI corría en un servicio propio.</li>
+<li>Varios flujos dependían de llamadas HTTP internas a state/ai.</li>
+<li>Mayor complejidad por configuración de URLs internas.</li>
+</ul>
+<h3>Ahora</h3>
+<ul>
+<li>UI se integra en <span class="code">slidehub-monolith</span> como módulo interno (<span class="code">com.brixo.slidehub.ui</span>).</li>
+<li>Se conserva comportamiento funcional.</li>
+<li>Se simplifica la orquestación al reemplazar llamadas internas de red por invocaciones directas.</li>
+</ul>
+<h2>3. Archivos que debes dominar para sustentar</h2>
+<h3>Configuración</h3>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/config/SecurityConfig.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/config/DatabaseConfig.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/config/S3Config.java</span></li>
+</ul>
+<h3>Controladores clave</h3>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/AuthController.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/PresentationViewController.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/PresentationImportController.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/PresentationNotesController.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/MeetingController.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/StatusController.java</span></li>
+</ul>
+<h3>Servicios clave</h3>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/PresentationService.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/MeetingService.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/GoogleDriveService.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/QuickLinkService.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/StatusChecksService.java</span></li>
+</ul>
+<h3>Puentes migrados a in-process</h3>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/NotesBridgeService.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/AssistBridgeService.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/HapticBridgeService.java</span></li>
+</ul>
+<h3>Recursos</h3>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/resources/templates/**</span></li>
+<li><span class="code">slidehub-monolith/src/main/resources/static/**</span></li>
+<li><span class="code">slidehub-monolith/src/main/resources/db/migration/**</span></li>
+</ul>
+<h2>4. Guion exacto para 2 minutos</h2>
+<h3>0:00 – 0:35</h3>
+<p>“Mi responsabilidad era <span class="code">ui-service</span>: interfaz, auth y flujos de presentación. Antes dependíamos de llamadas HTTP internas a otros servicios para varias acciones.”</p>
+<h3>0:35 – 1:15</h3>
+<p>“Después de migrar, UI vive en el monolito y conserva todas sus vistas y rutas. Lo más importante es que simplificamos la orquestación interna.”</p>
+<h3>1:15 – 1:45</h3>
+<p>“Los puentes <span class="code">NotesBridgeService</span>, <span class="code">AssistBridgeService</span> y <span class="code">HapticBridgeService</span> pasaron de red interna a llamadas directas en el mismo proceso.”</p>
+<h3>1:45 – 2:00</h3>
+<p>“Resultado: misma experiencia para el usuario, menos complejidad técnica de operación.”</p>
+<h2>5. Guía de estudio rápida (20–30 min)</h2>
+<ol>
+<li>1. Prepara un mapa de 6 rutas UI críticas y su controlador.</li>
+<li>2. Explica en 1 frase la diferencia entre “mismo comportamiento” y “menor complejidad interna”.</li>
+<li>3. Memoriza 3 ejemplos de puentes que ya no dependen de HTTP interno.</li>
+<li>4. Ten claro cómo se conserva seguridad (auth local + OAuth2).</li>
+</ol>
+<h2>6. Preguntas que te pueden hacer</h2>
+<ul>
+<li><strong>¿El usuario final notó un cambio fuerte?</strong></li>
+</ul>
+<p>  En funcionalidad, no; en operación y estabilidad interna, sí hubo simplificación.</p>
+<ul>
+<li><strong>¿Qué parte fue la más importante en UI?</strong></li>
+</ul>
+<p>  Eliminar dependencia de red interna en flujos críticos sin perder comportamiento.</p>
+<h2>7. Conexión con el siguiente expositor</h2>
+<p> Cierra diciendo: “A continuación, David presenta cómo el módulo de IA mantuvo sus capacidades al integrarse al monolito.”</p></body></html>

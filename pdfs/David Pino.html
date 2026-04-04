@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+@page { margin: 1.2in; }
+body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; line-height: 1.45; color: #111; }
+h1 { font-size: 22pt; margin: 0 0 0.4em 0; }
+h2 { font-size: 15pt; margin-top: 1.2em; margin-bottom: 0.4em; }
+h3 { font-size: 12pt; margin-top: 1em; margin-bottom: 0.3em; }
+p { margin: 0.2em 0 0.6em 0; }
+ul, ol { margin: 0.2em 0 0.8em 1.4em; }
+li { margin: 0.15em 0; }
+strong { font-weight: 700; }
+blockquote { margin: 0.6em 0; padding: 0.5em 0.8em; background: #f5f7fa; border-left: 4px solid #99a; }
+hr { border: none; border-top: 1px solid #999; margin: 1.2em 0; }
+.code { font-family: 'Courier New', monospace; }
+.pagebreak { page-break-before: always; }
+</style></head><body><h1>David Pino</h1>
+<h2>Guía de exposición (2 minutos) — Módulo de IA</h2>
+<h2>1. Rol en el proyecto</h2>
+<p>Responsable de <span class="code">ai-service</span>: notas IA, análisis de repositorio, deploy tutor y asistencia por audio.</p>
+<h2>2. Qué cambió en tu parte (de microservicio a monolito)</h2>
+<h3>Antes</h3>
+<ul>
+<li>IA estaba en un servicio independiente.</li>
+<li>Se comunicaba por HTTP con el resto del sistema.</li>
+<li>Persistía datos en MongoDB.</li>
+</ul>
+<h3>Ahora</h3>
+<ul>
+<li>IA se integra como módulo interno <span class="code">com.brixo.slidehub.ai</span> dentro de <span class="code">slidehub-monolith</span>.</li>
+<li>Se conserva lógica de negocio y contratos funcionales.</li>
+<li>Continúan integraciones externas (Gemini, Groq, MongoDB), pero sin separación de proceso para la capa interna de la plataforma.</li>
+</ul>
+<h2>3. Archivos que debes dominar para sustentar</h2>
+<h3>Controladores</h3>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ai/controller/NotesController.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ai/controller/RepoAnalysisController.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ai/controller/DeployTutorController.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ai/controller/AssistController.java</span></li>
+</ul>
+<h3>Servicios</h3>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/GeminiService.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/GroqService.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/NotesService.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/RepoAnalysisService.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/DeploymentService.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/AssistService.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/GitHubRepoContextService.java</span></li>
+</ul>
+<h3>Repositorios y modelos</h3>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ai/repository/PresenterNoteRepository.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ai/repository/RepoAnalysisRepository.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ai/repository/DeploymentGuideRepository.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ai/model/PresenterNote.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ai/model/RepoAnalysis.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ai/model/DeploymentGuide.java</span></li>
+</ul>
+<h3>Referencias</h3>
+<ul>
+<li><span class="code">docs/MIGRACION-MONOLITO-FASE-1.md</span></li>
+<li><span class="code">docs/MIGRACION-MONOLITO-FASE-2.md</span></li>
+</ul>
+<h2>4. Guion exacto para 2 minutos</h2>
+<h3>0:00 – 0:35</h3>
+<p>“Mi responsabilidad era <span class="code">ai-service</span>. Ahí viven notas IA, análisis de repositorio, deploy tutor y asistencia por audio.”</p>
+<h3>0:35 – 1:15</h3>
+<p>“Con la migración, esta capacidad no se eliminó: se integró en el monolito como módulo <span class="code">ai</span>, manteniendo sus endpoints y comportamiento funcional.”</p>
+<h3>1:15 – 1:45</h3>
+<p>“Servicios como <span class="code">GeminiService</span>, <span class="code">GroqService</span> y <span class="code">NotesService</span> se conservan. También repositorios Mongo como <span class="code">PresenterNoteRepository</span> y <span class="code">RepoAnalysisRepository</span>.”</p>
+<h3>1:45 – 2:00</h3>
+<p>“En resumen: la IA sigue igual de potente, pero ahora está mejor integrada y con menos complejidad operativa interna.”</p>
+<h2>5. Guía de estudio rápida (20–30 min)</h2>
+<ol>
+<li>1. Repasa el flujo completo: entrada → contexto → generación → persistencia.</li>
+<li>2. Ten 3 ejemplos concretos de endpoints IA y su uso.</li>
+<li>3. Practica explicar que “cambió el despliegue, no el valor funcional”.</li>
+<li>4. Relaciona IA con UI para mostrar integración del producto completo.</li>
+</ol>
+<h2>6. Preguntas que te pueden hacer</h2>
+<ul>
+<li><strong>¿Perdieron integración con Gemini/Groq al migrar?</strong></li>
+</ul>
+<p>  No. Esas integraciones externas se mantienen.</p>
+<ul>
+<li><strong>¿Qué sí cambió?</strong></li>
+</ul>
+<p>  La IA ya no corre como proceso independiente dentro de la plataforma; corre como módulo interno del monolito.</p>
+<h2>7. Conexión con el siguiente expositor</h2>
+<p>Cierra diciendo: “Finalmente, Mike explica cómo toda esta integración se tradujo en una operación de infraestructura más simple y económica.”</p></body></html>

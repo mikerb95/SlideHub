@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+@page { margin: 1.2in; }
+body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; line-height: 1.45; color: #111; }
+h1 { font-size: 22pt; margin: 0 0 0.4em 0; }
+h2 { font-size: 15pt; margin-top: 1.2em; margin-bottom: 0.4em; }
+h3 { font-size: 12pt; margin-top: 1em; margin-bottom: 0.3em; }
+p { margin: 0.2em 0 0.6em 0; }
+ul, ol { margin: 0.2em 0 0.8em 1.4em; }
+li { margin: 0.15em 0; }
+strong { font-weight: 700; }
+blockquote { margin: 0.6em 0; padding: 0.5em 0.8em; background: #f5f7fa; border-left: 4px solid #99a; }
+hr { border: none; border-top: 1px solid #999; margin: 1.2em 0; }
+.code { font-family: 'Courier New', monospace; }
+.pagebreak { page-break-before: always; }
+</style></head><body><h1>Mike Rodriguez</h1>
+<h2>Guía de exposición (2 minutos) — Infraestructura y despliegue</h2>
+<h2>1. Rol en el proyecto</h2>
+<p>Responsable de infraestructura y despliegue: Render, blueprint, variables de entorno, salud operativa y documentación de despliegue.</p>
+<h2>2. Qué cambió en tu parte (de operación distribuida a operación unificada)</h2>
+<h3>Antes</h3>
+<ul>
+<li>Se operaban 4 servicios separados en Render.</li>
+<li>Había que coordinar health checks, puertos, variables y despliegues por servicio.</li>
+<li>Mayor complejidad diaria de operación.</li>
+</ul>
+<h3>Ahora</h3>
+<ul>
+<li>Se despliega un solo servicio principal: <span class="code">slidehub-monolith</span>.</li>
+<li>Se unifica el punto de health check.</li>
+<li>Se simplifica la estrategia de build, deploy y troubleshooting.</li>
+</ul>
+<h2>3. Archivos que debes dominar para sustentar</h2>
+<ul>
+<li><span class="code">render.yaml</span></li>
+<li><span class="code">slidehub-monolith/Dockerfile</span></li>
+<li><span class="code">DEPLOYMENT.md</span></li>
+<li><span class="code">README.md</span></li>
+<li><span class="code">docs/MIGRACION-MONOLITO-FASE-3-DEPLOY-DOCS.md</span></li>
+<li><span class="code">docs/MIGRACION-MONOLITO-FASE-4-SMOKE.md</span></li>
+<li><span class="code">scripts/smoke-e2e.sh</span></li>
+<li><span class="code">.github/workflows/smoke-e2e.yml</span></li>
+</ul>
+<h2>4. Guion exacto para 2 minutos</h2>
+<h3>0:00 – 0:35</h3>
+<p>“Mi responsabilidad fue llevar la operación de 4 servicios en Render a un modelo unificado con <span class="code">slidehub-monolith</span>.”</p>
+<h3>0:35 – 1:15</h3>
+<p>“El cambio principal se ve en <span class="code">render.yaml</span>: pasamos de un despliegue distribuido a un servicio único, con health check central y configuración consolidada.”</p>
+<h3>1:15 – 1:45</h3>
+<p>“También se adaptó <span class="code">DEPLOYMENT.md</span> y el <span class="code">Dockerfile</span> del monolito, y se alineó el smoke E2E para validar el nuevo camino operativo.”</p>
+<h3>1:45 – 2:00</h3>
+<p>“Conclusión: menos costo, menos fricción de operación y una ruta más clara para mantener el sistema estable.”</p>
+<h2>5. Guía de estudio rápida (20–30 min)</h2>
+<ol>
+<li>1. Revisa <span class="code">render.yaml</span> y explica la diferencia antes/ahora.</li>
+<li>2. Estudia cómo se valida salud del servicio (<span class="code">/actuator/health</span>).</li>
+<li>3. Memoriza el argumento económico: menos instancias, menos complejidad operativa.</li>
+<li>4. Ten clara la diferencia entre “build loop” y “restart por healthcheck”.</li>
+</ol>
+<h2>6. Preguntas que te pueden hacer</h2>
+<ul>
+<li><strong>¿Por qué este cambio ahorra dinero?</strong></li>
+</ul>
+<p>  Porque se reduce el número de instancias y la operación multi-servicio.</p>
+<ul>
+<li><strong>¿Se perdió escalabilidad por mover a monolito?</strong></li>
+</ul>
+<p>  Para la etapa actual del proyecto, el equilibrio costo-beneficio es mejor con monolito modular; la separación lógica interna se mantiene.</p>
+<h2>7. Cierre de equipo (para sustentar entre los 5)</h2>
+<p>Cierra con esta idea: “Entre los 5 mostramos continuidad completa: entrada segura (Edwin), estado (Jerson), experiencia de usuario (Daniel), IA (David) e infraestructura (Mike), todo integrado en una arquitectura más simple y defendible.”</p></body></html>

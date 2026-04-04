@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+@page { margin: 1.2in; }
+body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; line-height: 1.45; color: #111; }
+h1 { font-size: 22pt; margin: 0 0 0.4em 0; }
+h2 { font-size: 15pt; margin-top: 1.2em; margin-bottom: 0.4em; }
+h3 { font-size: 12pt; margin-top: 1em; margin-bottom: 0.3em; }
+p { margin: 0.2em 0 0.6em 0; }
+ul, ol { margin: 0.2em 0 0.8em 1.4em; }
+li { margin: 0.15em 0; }
+strong { font-weight: 700; }
+blockquote { margin: 0.6em 0; padding: 0.5em 0.8em; background: #f5f7fa; border-left: 4px solid #99a; }
+hr { border: none; border-top: 1px solid #999; margin: 1.2em 0; }
+.code { font-family: 'Courier New', monospace; }
+.pagebreak { page-break-before: always; }
+</style></head><body><h1>Jerson Molina</h1>
+<h2>Guía de exposición (2 minutos) — Estado de presentación (<span class="code">state</span>)</h2>
+<h2>1. Rol en el proyecto</h2>
+<p>Responsable de <span class="code">state-service</span>: estado de slides, demo, dispositivos y eventos hápticos.</p>
+<h2>2. Qué cambió en tu parte (de microservicio a monolito)</h2>
+<h3>Antes</h3>
+<ul>
+<li><span class="code">state-service</span> era un proceso separado.</li>
+<li>Atendía endpoints de estado y sincronización.</li>
+<li>Dependía de despliegue independiente.</li>
+</ul>
+<h3>Ahora</h3>
+<ul>
+<li>Tu dominio sigue existiendo casi igual, pero como módulo interno:</li>
+</ul>
+<p>  - <span class="code">com.brixo.slidehub.state</span></p>
+<ul>
+<li>Se conserva funcionalidad y contratos, cambia solo el contenedor de ejecución.</li>
+</ul>
+<h2>3. Archivos que debes dominar para sustentar</h2>
+<h3>Controladores</h3>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/state/controller/SlideController.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/state/controller/DemoController.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/state/controller/DeviceController.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/state/controller/HapticController.java</span></li>
+</ul>
+<h3>Servicios</h3>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/state/service/SlideStateService.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/state/service/DemoStateService.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/state/service/DeviceRegistryService.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/state/service/HapticEventService.java</span></li>
+</ul>
+<h3>Modelos</h3>
+<ul>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/state/model/SlideStateResponse.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/state/model/DemoState.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/state/model/Device.java</span></li>
+<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/state/model/HapticEvent.java</span></li>
+</ul>
+<h3>Referencias de migración</h3>
+<ul>
+<li><span class="code">docs/MIGRACION-MONOLITO-FASE-1.md</span></li>
+<li><span class="code">docs/MIGRACION-MONOLITO-FASE-2.md</span></li>
+</ul>
+<h2>4. Guion exacto para 2 minutos</h2>
+<h3>0:00 – 0:35</h3>
+<p>“Yo lideraba <span class="code">state-service</span>, que controla slide actual, demo, dispositivos y eventos hápticos. Era un servicio separado dentro de la arquitectura distribuida.”</p>
+<h3>0:35 – 1:15</h3>
+<p>“Con la migración, esa lógica no se elimina: se integra al módulo <span class="code">state</span> dentro de <span class="code">slidehub-monolith</span>. Los endpoints y comportamiento principal se mantienen.”</p>
+<h3>1:15 – 1:45</h3>
+<p>“Los componentes clave en el monolito son <span class="code">SlideController</span>, <span class="code">DemoController</span>, <span class="code">SlideStateService</span> y <span class="code">HapticEventService</span>. Es el mismo dominio, pero sin despliegue aislado.”</p>
+<h3>1:45 – 2:00</h3>
+<p>“Conclusión: no cambiamos el negocio de estado; cambiamos la forma de ejecutarlo para simplificar operación.”</p>
+<h2>5. Guía de estudio rápida (20–30 min)</h2>
+<ol>
+<li>1. Enumera 4 endpoints de estado y su propósito.</li>
+<li>2. Relaciona cada endpoint con su controlador.</li>
+<li>3. Prepara una frase para explicar por qué este cambio fue parcial, no total.</li>
+<li>4. Repasa cómo state se conecta con UI/AI ahora (in-process).</li>
+</ol>
+<h2>6. Preguntas que te pueden hacer</h2>
+<ul>
+<li><strong>¿Perdieron funcionalidades al migrar state?</strong></li>
+</ul>
+<p>  No. Se conserva la funcionalidad; se movió al módulo interno del monolito.</p>
+<ul>
+<li><strong>¿Qué ventaja obtuvieron?</strong></li>
+</ul>
+<p>  Menos dependencia de red interna y menos puntos de falla operativos.</p>
+<h2>7. Conexión con el siguiente expositor</h2>
+<p>Cierra diciendo: “Ahora Daniel explica cómo la capa UI se simplificó al dejar de consumir servicios internos por HTTP.”</p></body></html>
