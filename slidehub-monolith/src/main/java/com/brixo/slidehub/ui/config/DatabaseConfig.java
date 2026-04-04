@@ -72,10 +72,10 @@ public class DatabaseConfig {
     @Bean(initMethod = "migrate")
     @ConditionalOnProperty(prefix = "spring.flyway", name = "enabled", havingValue = "true", matchIfMissing = true)
     public Flyway flyway(DataSource dataSource,
-                         @Value("${spring.flyway.locations:classpath:db/migration}") String locations,
-                         @Value("${spring.flyway.baseline-on-migrate:false}") boolean baselineOnMigrate,
-                         @Value("${spring.flyway.default-schema:#{null}}") String defaultSchema,
-                         @Value("${spring.flyway.schemas:#{null}}") String schemas) {
+            @Value("${spring.flyway.locations:classpath:db/migration}") String locations,
+            @Value("${spring.flyway.baseline-on-migrate:false}") boolean baselineOnMigrate,
+            @Value("${spring.flyway.default-schema:#{null}}") String defaultSchema,
+            @Value("${spring.flyway.schemas:#{null}}") String schemas) {
         var config = Flyway.configure()
                 .dataSource(dataSource)
                 .locations(locations)
@@ -103,7 +103,7 @@ public class DatabaseConfig {
         return beanFactory -> {
             if (beanFactory.containsBeanDefinition("entityManagerFactory")) {
                 beanFactory.getBeanDefinition("entityManagerFactory")
-                        .setDependsOn(new String[]{"flyway"});
+                        .setDependsOn(new String[] { "flyway" });
             }
         };
     }
