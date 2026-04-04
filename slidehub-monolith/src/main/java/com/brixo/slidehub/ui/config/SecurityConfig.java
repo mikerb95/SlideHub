@@ -97,7 +97,8 @@ public class SecurityConfig {
                                                 .requestMatchers("/css/**", "/js/**", "/images/**", "/slides/**")
                                                 .permitAll()
                                                 // Documentación/calidad y checks de prueba públicos
-                                                .requestMatchers("/calidad", "/status", "/status/api/checks")
+                                                .requestMatchers("/calidad", "/status", "/status/api/checks",
+                                                                "/actuator/health", "/actuator/info")
                                                 .permitAll()
                                                 // Panel del presentador, main panel y tutor de deployment — requiere
                                                 // PRESENTER
