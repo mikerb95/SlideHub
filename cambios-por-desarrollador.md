@@ -70,7 +70,7 @@ Adicionalmente, se revisó la estructura real del módulo `slidehub-monolith` pa
 - **gateway-service:** Edwin Mora
 - **state-service:** Jerson Molina
 - **ui-service:** Daniel Guacheta
-- **ai-service:** Davin Pino
+- **ai-service:** David Pino
 - **Infraestructura:** Mike Rodriguez
 
 ---
@@ -249,11 +249,11 @@ La experiencia de usuario se conserva, pero la operación es más simple porque 
 
 ---
 
-## 5.4 Davin Pino — AI Service
+## 5.4 David Pino — AI Service
 
 ### 5.4.1 Situación antes de la migración
 
-Davin lideraba la capa de inteligencia artificial:
+David lideraba la capa de inteligencia artificial:
 - notas para presentador,
 - análisis de repositorio,
 - deploy tutor,
@@ -359,7 +359,7 @@ Antes, Mike coordinaba cuatro sedes conectadas. Ahora administra una sede centra
 | Edwin Mora | gateway-service | Completo | El rol de enrutamiento distribuido se transforma en control de acceso interno |
 | Jerson Molina | state-service | Parcial | Se preserva el dominio state, cambia la forma de despliegue |
 | Daniel Guacheta | ui-service | Parcial | Se mantiene la capa de interfaz, pero se simplifica la integración interna |
-| Davin Pino | ai-service | Parcial | Se conserva el negocio IA y se integra al runtime único |
+| David Pino | ai-service | Parcial | Se conserva el negocio IA y se integra al runtime único |
 | Mike Rodriguez | Infraestructura | Completo | Se sustituye operación distribuida por operación unificada |
 
 ---

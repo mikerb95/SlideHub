@@ -75,4 +75,4 @@ Responsable de `ui-service`: vistas, autenticación, flujo de presentaciones, re
   Eliminar dependencia de red interna en flujos críticos sin perder comportamiento.
 
 ## 7. Conexión con el siguiente expositor
-Cierra diciendo: “A continuación, Davin presenta cómo el módulo de IA mantuvo sus capacidades al integrarse al monolito.”
+ Cierra diciendo: “A continuación, David presenta cómo el módulo de IA mantuvo sus capacidades al integrarse al monolito.”

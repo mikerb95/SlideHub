@@ -1,4 +1,4 @@
-# Davin Pino
+# David Pino
 ## Guía de exposición (2 minutos) — Módulo de IA
 
 ## 1. Rol en el proyecto

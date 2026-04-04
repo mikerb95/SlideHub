@@ -54,4 +54,4 @@ Responsable de infraestructura y despliegue: Render, blueprint, variables de ent
   Para la etapa actual del proyecto, el equilibrio costo-beneficio es mejor con monolito modular; la separación lógica interna se mantiene.
 
 ## 7. Cierre de equipo (para sustentar entre los 5)
-Cierra con esta idea: “Entre los 5 mostramos continuidad completa: entrada segura (Edwin), estado (Jerson), experiencia de usuario (Daniel), IA (Davin) e infraestructura (Mike), todo integrado en una arquitectura más simple y defendible.”
+Cierra con esta idea: “Entre los 5 mostramos continuidad completa: entrada segura (Edwin), estado (Jerson), experiencia de usuario (Daniel), IA (David) e infraestructura (Mike), todo integrado en una arquitectura más simple y defendible.”
