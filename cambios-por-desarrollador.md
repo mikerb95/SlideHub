@@ -1,328 +1,398 @@
-# Cambios por desarrollador — Migración de microservicios a monolito
+# CAMBIOS POR DESARROLLADOR
+## Migración de arquitectura de microservicios a monolito en SlideHub
 
+**Asignatura (formato):** Ingeniería de Software / Arquitectura de Software  
 **Proyecto:** SlideHub  
 **Fecha:** 2026-04-04  
-**Contexto:** consolidación desde arquitectura distribuida (4 microservicios) a arquitectura monolítica modular (`slidehub-monolith`).
+**Elaborado para:** documentación académica y trazabilidad técnica del cambio arquitectónico
 
 ---
 
-## 1. Responsables acordados
+## Resumen
+
+Este documento presenta, de manera ordenada y con enfoque académico, cómo cambió el trabajo de cada responsable durante la migración de SlideHub desde una arquitectura de microservicios (4 servicios) hacia un monolito modular (`slidehub-monolith`).
+
+El informe conserva el detalle completo de archivos, rutas y componentes. Sin embargo, su redacción es menos técnica y más explicativa, con lenguaje apropiado para un trabajo universitario.
+
+Se explica para cada persona:
+- cuál era su servicio antes,
+- qué cambió (total o parcialmente),
+- qué se creó,
+- qué dejó de existir a nivel operativo,
+- de qué ruta de proyecto a qué ruta migró,
+- y cómo funciona ahora su área.
+
+---
+
+## 1. Introducción
+
+SlideHub comenzó con cuatro microservicios independientes:
+- `gateway-service`
+- `state-service`
+- `ui-service`
+- `ai-service`
+
+En ese modelo, cada servicio corría por separado y se comunicaba por HTTP interno. Con el tiempo, se decidió simplificar la operación y unificar el despliegue en un único proceso, manteniendo la separación lógica por módulos internos.
+
+Por ello, el estado actual del proyecto es un monolito modular llamado `slidehub-monolith`, donde existen módulos de negocio diferenciados (`state`, `ui`, `ai`) pero dentro de una sola aplicación.
+
+---
+
+## 2. Objetivos del documento
+
+1. Registrar de forma clara los cambios por responsable.
+2. Explicar el paso “de dónde a dónde” por servicio.
+3. Dejar evidencia de archivos creados o adaptados.
+4. Diferenciar cambios completos frente a cambios parciales.
+5. Facilitar lectura académica y trazabilidad para futuras revisiones.
+
+---
+
+## 3. Metodología utilizada
+
+Para elaborar este informe se tomaron como base los artefactos oficiales de migración y estado del repositorio:
+
+- `docs/MIGRACION-MONOLITO-FASE-0.md`
+- `docs/MIGRACION-MONOLITO-FASE-1.md`
+- `docs/MIGRACION-MONOLITO-FASE-2.md`
+- `docs/MIGRACION-MONOLITO-FASE-3-DEPLOY-DOCS.md`
+- `docs/MIGRACION-MONOLITO-FASE-4-SMOKE.md`
+- `README.md`
+- `DEPLOYMENT.md`
+- `render.yaml`
+
+Adicionalmente, se revisó la estructura real del módulo `slidehub-monolith` para confirmar la presencia efectiva de clases y componentes migrados.
+
+---
+
+## 4. Responsables considerados
 
 - **gateway-service:** Edwin Mora
 - **state-service:** Jerson Molina
 - **ui-service:** Daniel Guacheta
 - **ai-service:** Davin Pino
-- **infraestructura:** Mike Rodriguez
+- **Infraestructura:** Mike Rodriguez
 
 ---
 
-## 2. Vista general del cambio (de dónde → a dónde)
+## 5. Desarrollo por responsable
 
-## 2.1 Nivel arquitectura
+## 5.1 Edwin Mora — Gateway Service
 
-- **Antes (microservicios):**
-  - `gateway-service` (8080)
-  - `state-service` (8081)
-  - `ui-service` (8082)
-  - `ai-service` (8083)
-  - Comunicación interna HTTP entre servicios.
+### 5.1.1 Situación antes de la migración
 
-- **Ahora (monolito modular):**
-  - `slidehub-monolith` (8080)
-  - Módulos internos por paquete:
-    - `com.brixo.slidehub.state`
-    - `com.brixo.slidehub.ui`
-    - `com.brixo.slidehub.ai`
-    - `com.brixo.slidehub.monolith.ratelimit`
+Edwin estaba a cargo del punto de entrada principal del sistema (`gateway-service`). Sus tareas estaban centradas en:
+- enrutar peticiones al servicio correcto,
+- actuar como “puerta” de entrada,
+- aplicar controles de protección (rate limiting) para evitar abuso.
 
-## 2.2 Nivel despliegue
+### 5.1.2 De dónde a dónde migró
 
-- **Antes:** 4 Web Services en Render.
-- **Ahora:** 1 Web Service (`slidehub-monolith`) en Render.
-
----
-
-## 3. Detalle por desarrollador
-
-## 3.1 Edwin Mora — `gateway-service`
-
-## 3.1.1 Estado antes
-
-- Responsable del gateway de entrada:
-  - enrutamiento por path a cada microservicio,
-  - punto central de entrada,
-  - rate limiting para endpoints sensibles.
-- Dependencia operativa de reglas de proxy/rutas y comunicación entre puertos internos.
-
-## 3.1.2 De dónde → a dónde
-
-- **Origen (legacy):** `gateway-service/**`
-- **Destino (monolito):**
+- **Origen:** `gateway-service/**`
+- **Destino funcional en monolito:**
   - `slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/SlideHubMonolithApplication.java`
   - `slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitFilter.java`
   - `slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitService.java`
   - `slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitProperties.java`
   - `slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitDecision.java`
 
-## 3.1.3 Qué cambió exactamente
+### 5.1.3 Qué cambió
 
-- Se elimina la función de **proxy interno** como requisito runtime.
-- Se conserva y porta la lógica de **rate limiting** al monolito.
-- El “enrutamiento entre servicios” deja de ser necesario porque la invocación es in-process.
+El cambio fue **completo** en términos operativos. La parte de “proxy entre servicios” deja de ser necesaria porque los módulos están en el mismo proceso.
 
-## 3.1.4 Qué se creó
+Lo que sí se conserva es la lógica de protección de entrada (rate limiting), ahora embebida en el monolito.
 
-- Capa de rate-limit dentro de `slidehub-monolith` (filtro + servicio + properties + decisión).
+### 5.1.4 Qué se creó y qué dejó de existir
 
-## 3.1.5 Qué dejó de existir (operativamente)
+**Se creó:**
+- una capa de rate limiting interna en el monolito.
 
-- Dependencia del gateway como salto obligatorio para llegar de UI→State/AI.
-- Gestión diaria de reglas de proxy entre servicios para operación core.
+**Dejó de existir (operativamente):**
+- la necesidad de enrutar UI→State→AI como saltos entre servicios independientes.
 
-## 3.1.6 Tipo de cambio
+### 5.1.5 Símil pedagógico
 
-- **Cambio completo del rol técnico operativo.**
-
-## 3.1.7 Símil (cambio completo)
-
-- **Antes:** Edwin administraba una central de tráfico (portería + desvíos entre edificios).  
-- **Ahora:** administra reglas de seguridad de entrada en un único edificio, sin necesidad de redirigir entre edificios.
+Antes, Edwin coordinaba tráfico entre varios edificios conectados. Ahora administra el control de acceso en un solo edificio con áreas internas.
 
 ---
 
-## 3.2 Jerson Molina — `state-service`
+## 5.2 Jerson Molina — State Service
 
-## 3.2.1 Estado antes
+### 5.2.1 Situación antes de la migración
 
-- Responsable del estado de presentación:
-  - slide actual,
-  - modo demo,
-  - registro de dispositivos,
-  - eventos hápticos,
-  - contratos `/api/slide`, `/api/demo`, `/api/haptics/**`.
+Jerson era responsable del estado de la presentación:
+- slide actual,
+- modo demo,
+- registro de dispositivos,
+- eventos hápticos,
+- endpoints de estado (`/api/slide`, `/api/demo`, `/api/haptics/**`).
 
-## 3.2.2 De dónde → a dónde
+### 5.2.2 De dónde a dónde migró
 
-- **Origen (legacy):** `state-service/src/main/java/com/brixo/slidehub/state/**`
-- **Destino (monolito):** `slidehub-monolith/src/main/java/com/brixo/slidehub/state/**`
+- **Origen:** `state-service/src/main/java/com/brixo/slidehub/state/**`
+- **Destino:** `slidehub-monolith/src/main/java/com/brixo/slidehub/state/**`
 
-### Componentes visibles en destino
+### 5.2.3 Archivos principales en destino
 
-- Controllers:
-  - `SlideController.java`
-  - `DemoController.java`
-  - `DeviceController.java`
-  - `HapticController.java`
-- Services:
-  - `SlideStateService.java`
-  - `DemoStateService.java`
-  - `DeviceRegistryService.java`
-  - `HapticEventService.java`
-- Modelos:
-  - `SlideStateResponse.java`, `DemoState.java`, `Device.java`, `HapticEvent.java`, requests asociados.
+**Controladores:**
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/controller/SlideController.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/controller/DemoController.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/controller/DeviceController.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/controller/HapticController.java`
 
-## 3.2.3 Qué cambió exactamente
+**Servicios:**
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/service/SlideStateService.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/service/DemoStateService.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/service/DeviceRegistryService.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/service/HapticEventService.java`
 
-- Se mantiene la lógica de dominio casi intacta.
-- Cambia el contexto de ejecución: de proceso independiente a módulo interno del monolito.
-- Se conserva contrato funcional para clientes.
-- Ajustes de compatibilidad de rutas de slides para contexto monolito (incluyendo paths del módulo monolítico).
+**Modelos:**
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/model/SlideStateResponse.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/model/DemoState.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/model/Device.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/model/HapticEvent.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/model/SetSlideRequest.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/model/SetDemoRequest.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/model/RegisterDeviceRequest.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/model/PublishHapticRequest.java`
 
-## 3.2.4 Qué se creó
+### 5.2.4 Qué cambió
 
-- Réplica funcional del dominio state dentro de `slidehub-monolith`.
+El cambio fue **parcial (estructural)**. El negocio de state se mantiene, pero su ejecución deja de ser un servicio autónomo y pasa a ser un módulo interno.
 
-## 3.2.5 Qué dejó de existir (operativamente)
+### 5.2.5 Qué se creó y qué dejó de existir
 
-- Servicio state desplegado/operado como instancia independiente obligatoria.
-- Dependencia de URL interna state para consumo desde UI.
+**Se creó:**
+- la versión integrada del dominio state dentro del monolito.
 
-## 3.2.6 Tipo de cambio
+**Dejó de existir (operativamente):**
+- state-service como despliegue independiente obligatorio.
 
-- **Cambio parcial/estructural (mismo dominio, nuevo contenedor de ejecución).**
+### 5.2.6 Cómo funciona ahora
 
-## 3.2.7 Cómo funciona ahora
-
-- Funciona como módulo interno `state` dentro del monolito y expone los mismos endpoints core bajo el mismo proceso.
-
----
-
-## 3.3 Daniel Guacheta — `ui-service`
-
-## 3.3.1 Estado antes
-
-- Responsable de:
-  - vistas Thymeleaf,
-  - autenticación local + OAuth2,
-  - controllers de presentación y meeting,
-  - integración con state/ai por HTTP (`WebClient`) en varios puentes.
-
-## 3.3.2 De dónde → a dónde
-
-- **Origen (legacy):** `ui-service/src/main/java/com/brixo/slidehub/ui/**`
-- **Destino (monolito):** `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/**`
-- **Recursos destino:** `slidehub-monolith/src/main/resources/templates/**`, `static/**`, `db/migration/**`
-
-## 3.3.3 Qué cambió exactamente
-
-- Se mantiene el dominio UI funcional.
-- Se retira dependencia de llamadas HTTP internas para funcionalidades in-process.
-- Puentes internos refactorizados para invocación directa:
-  - `NotesBridgeService`
-  - `AssistBridgeService`
-  - `HapticBridgeService`
-- Se alinea documentación/vistas técnicas al modelo monolítico.
-
-## 3.3.4 Qué se creó
-
-- Orquestación interna directa entre módulos en el mismo runtime.
-- Ajustes de configuración base URL para generación consistente de links/callbacks.
-
-## 3.3.5 Qué dejó de existir (operativamente)
-
-- Dependencia obligatoria de `STATE_SERVICE_URL` / `AI_SERVICE_URL` para el flujo interno principal.
-- Fricción por fallas de red internas entre UI y otros servicios del mismo sistema.
-
-## 3.3.6 Tipo de cambio
-
-- **Cambio parcial importante (misma capa funcional, integración interna simplificada).**
-
-## 3.3.7 Cómo funciona ahora
-
-- UI mantiene rutas y comportamiento, pero coordina módulos `state` y `ai` dentro del mismo proceso.
+State conserva sus contratos funcionales, pero trabaja dentro de la misma aplicación que UI y AI.
 
 ---
 
-## 3.4 Davin Pino — `ai-service`
+## 5.3 Daniel Guacheta — UI Service
 
-## 3.4.1 Estado antes
+### 5.3.1 Situación antes de la migración
 
-- Responsable de:
-  - notas IA (Gemini/Groq),
-  - análisis de repos,
-  - deploy tutor,
-  - asistencia por audio,
-  - persistencia MongoDB (`presenter_notes`, `repo_analysis`, `deployment_guides`).
+Daniel lideraba la capa visual y de acceso:
+- vistas Thymeleaf,
+- autenticación local y OAuth2,
+- controllers de presentaciones y reuniones,
+- comunicación con state/ai por HTTP interno en diversos puentes.
 
-## 3.4.2 De dónde → a dónde
+### 5.3.2 De dónde a dónde migró
 
-- **Origen (legacy):** `ai-service/src/main/java/com/brixo/slidehub/ai/**`
-- **Destino (monolito):** `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/**`
+- **Origen:** `ui-service/src/main/java/com/brixo/slidehub/ui/**`
+- **Destino:** `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/**`
+- **Recursos migrados al monolito:**
+  - `slidehub-monolith/src/main/resources/templates/**`
+  - `slidehub-monolith/src/main/resources/static/**`
+  - `slidehub-monolith/src/main/resources/db/migration/**`
 
-### Componentes visibles en destino
+### 5.3.3 Archivos representativos en destino
 
-- Controllers:
-  - `NotesController.java`
-  - `RepoAnalysisController.java`
-  - `DeployTutorController.java`
-  - `AssistController.java`
-- Services:
-  - `GeminiService.java`
-  - `GroqService.java`
-  - `NotesService.java`
-  - `RepoAnalysisService.java`
-  - `DeploymentService.java`
-  - `AssistService.java`
-  - `GitHubRepoContextService.java`
-- Repositorios Mongo:
-  - `PresenterNoteRepository.java`
-  - `RepoAnalysisRepository.java`
-  - `DeploymentGuideRepository.java`
+**Configuración:**
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/config/SecurityConfig.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/config/DatabaseConfig.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/config/S3Config.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/config/ForwardedHostFilter.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/config/UserActivityTrackingFilter.java`
 
-## 3.4.3 Qué cambió exactamente
+**Controladores:**
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/AuthController.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/PresentationViewController.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/PresentationImportController.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/PresentationNotesController.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/PresenterViewController.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/MeetingController.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/StatusController.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/DocsController.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/QuickLinkController.java`
 
-- La lógica de IA y sus contratos se preservan.
-- Se elimina la frontera de red interna con UI para varios flujos.
-- Se mantiene integración externa por HTTP y MongoDB.
+**Servicios (selección):**
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/PresentationService.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/MeetingService.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/GoogleDriveService.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/SlideUploadService.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/QuickLinkService.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/UserService.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/StatusChecksService.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/KeepAliveService.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/EmailService.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/AuthenticatedSessionTracker.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/UserActivityTracker.java`
 
-## 3.4.4 Qué se creó
+**Puentes internos refactorizados a in-process:**
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/NotesBridgeService.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/AssistBridgeService.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/HapticBridgeService.java`
 
-- Port completo del dominio AI al módulo interno del monolito.
+### 5.3.4 Qué cambió
 
-## 3.4.5 Qué dejó de existir (operativamente)
+El cambio fue **parcial importante**. La capa UI se mantiene, pero la comunicación interna deja de depender de red entre servicios y pasa a llamadas directas dentro del mismo proceso.
 
-- Instancia AI independiente como requisito para operar funcionalidades IA dentro de SlideHub.
-- Ruta de dependencia intra-plataforma UI→AI por red interna para operaciones locales del sistema.
+### 5.3.5 Qué se creó y qué dejó de existir
 
-## 3.4.6 Tipo de cambio
+**Se creó:**
+- orquestación interna simplificada UI↔state↔ai.
 
-- **Cambio parcial/estructural (misma lógica de negocio IA, nuevo modo de ejecución).**
+**Dejó de existir (operativamente):**
+- dependencia obligatoria de URLs internas para coordinación entre componentes del propio sistema.
 
-## 3.4.7 Cómo funciona ahora
+### 5.3.6 Cómo funciona ahora
 
-- El módulo AI vive en el mismo proceso que UI/state y conserva su integración externa con proveedores IA y Mongo.
-
----
-
-## 3.5 Mike Rodriguez — Infraestructura
-
-## 3.5.1 Estado antes
-
-- Responsable de infraestructura distribuida:
-  - 4 servicios en Render,
-  - health checks por servicio,
-  - coordinación de variables de entorno cruzadas,
-  - troubleshooting de networking interno y despliegues parciales.
-
-## 3.5.2 De dónde → a dónde
-
-- **Origen (legacy):** blueprint multi-servicio (`render.yaml` antiguo de 4 servicios) + runbooks de microservicios.
-- **Destino (actual):**
-  - `render.yaml` monolítico (1 servicio `slidehub-monolith`)
-  - `DEPLOYMENT.md` monolito-first
-  - `README.md` alineado a monolito modular
-
-## 3.5.3 Qué cambió exactamente
-
-- Se unifica despliegue en una sola unidad.
-- Se simplifica health check a un flujo principal de servicio único.
-- Disminuye acoplamiento de despliegues entre componentes.
-
-## 3.5.4 Qué se creó
-
-- Dockerfile específico del monolito (`slidehub-monolith/Dockerfile`).
-- Blueprint de Render unificado para un solo servicio.
-- Guía de despliegue consolidada con variables centralizadas.
-
-## 3.5.5 Qué dejó de existir (operativamente)
-
-- Operación diaria de 4 pipelines/servicios para correr SlideHub.
-- Problemas recurrentes de proxy interno, puertos y ruteo entre servicios como requisito base.
-
-## 3.5.6 Tipo de cambio
-
-- **Cambio completo del modelo operativo.**
-
-## 3.5.7 Símil (cambio completo)
-
-- **Antes:** Mike operaba un condominio de 4 edificios con portería central y logística entre torres.  
-- **Ahora:** opera un campus de edificio único con áreas internas; menos coordinación externa y menor costo de mantenimiento.
+La experiencia de usuario se conserva, pero la operación es más simple porque todo corre en un único runtime.
 
 ---
 
-## 4. Matriz resumida de “cambio completo” vs “cambio parcial”
+## 5.4 Davin Pino — AI Service
 
-| Responsable | Componente original | Nivel de cambio | Razón |
+### 5.4.1 Situación antes de la migración
+
+Davin lideraba la capa de inteligencia artificial:
+- notas para presentador,
+- análisis de repositorio,
+- deploy tutor,
+- asistencia por audio,
+- persistencia MongoDB para resultados IA.
+
+### 5.4.2 De dónde a dónde migró
+
+- **Origen:** `ai-service/src/main/java/com/brixo/slidehub/ai/**`
+- **Destino:** `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/**`
+
+### 5.4.3 Archivos principales en destino
+
+**Controladores:**
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/controller/NotesController.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/controller/RepoAnalysisController.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/controller/DeployTutorController.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/controller/AssistController.java`
+
+**Servicios:**
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/GeminiService.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/GroqService.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/NotesService.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/RepoAnalysisService.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/DeploymentService.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/AssistService.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/GitHubRepoContextService.java`
+
+**Repositorios y modelos:**
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/repository/PresenterNoteRepository.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/repository/RepoAnalysisRepository.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/repository/DeploymentGuideRepository.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/model/PresenterNote.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/model/RepoAnalysis.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/model/DeploymentGuide.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/model/NoteContent.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/model/GenerateNoteRequest.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/model/GenerateAllRequest.java`
+- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/model/SlideReference.java`
+
+### 5.4.4 Qué cambió
+
+El cambio fue **parcial (estructural)**. La lógica principal de IA y sus contratos se conservan, pero su ejecución queda integrada en el monolito.
+
+### 5.4.5 Qué se creó y qué dejó de existir
+
+**Se creó:**
+- integración de toda la capa AI en el módulo interno del monolito.
+
+**Dejó de existir (operativamente):**
+- necesidad de desplegar `ai-service` como instancia aparte para la operación normal de SlideHub.
+
+### 5.4.6 Cómo funciona ahora
+
+AI sigue consumiendo proveedores externos (Gemini/Groq) y MongoDB, pero ya no vive en un proceso separado del resto del sistema.
+
+---
+
+## 5.5 Mike Rodriguez — Infraestructura
+
+### 5.5.1 Situación antes de la migración
+
+Mike gestionaba una infraestructura distribuida:
+- cuatro servicios independientes,
+- health checks por cada servicio,
+- múltiples configuraciones de entorno,
+- coordinación de despliegues parciales.
+
+### 5.5.2 De dónde a dónde migró
+
+- **Origen:** blueprint de Render para varios servicios.
+- **Destino:** despliegue único monolítico.
+
+### 5.5.3 Archivos clave de infraestructura y despliegue
+
+- `render.yaml` (definición unificada a `slidehub-monolith`)
+- `slidehub-monolith/Dockerfile` (build y runtime del monolito)
+- `DEPLOYMENT.md` (guía operativa monolito-first)
+- `README.md` (arquitectura actual declarada como monolito modular)
+
+### 5.5.4 Qué cambió
+
+El cambio fue **completo** en el modelo operativo: de múltiples despliegues coordinados a un despliegue principal único.
+
+### 5.5.5 Qué se creó y qué dejó de existir
+
+**Se creó:**
+- flujo de despliegue simplificado para un solo servicio.
+
+**Dejó de existir (operativamente):**
+- necesidad de operar de forma diaria cuatro pipelines/servicios como requisito de funcionamiento base.
+
+### 5.5.6 Símil pedagógico
+
+Antes, Mike coordinaba cuatro sedes conectadas. Ahora administra una sede central con áreas internas, con menos sobrecarga de coordinación.
+
+---
+
+## 6. Cuadro comparativo general
+
+| Responsable | Componente previo | Tipo de cambio | Interpretación académica |
 |---|---|---|---|
-| Edwin Mora | gateway-service | Completo | Se elimina función proxy interna y se conserva rate-limit como capacidad interna del monolito |
-| Jerson Molina | state-service | Parcial estructural | Se conserva dominio state, cambia contenedor de ejecución |
-| Daniel Guacheta | ui-service | Parcial importante | UI se conserva y se simplifica integración interna (sin HTTP interno) |
-| Davin Pino | ai-service | Parcial estructural | IA conserva lógica/contratos, cambia modo de despliegue/ejecución |
-| Mike Rodriguez | Infraestructura | Completo | Se pasa de operación distribuida a despliegue único |
+| Edwin Mora | gateway-service | Completo | El rol de enrutamiento distribuido se transforma en control de acceso interno |
+| Jerson Molina | state-service | Parcial | Se preserva el dominio state, cambia la forma de despliegue |
+| Daniel Guacheta | ui-service | Parcial | Se mantiene la capa de interfaz, pero se simplifica la integración interna |
+| Davin Pino | ai-service | Parcial | Se conserva el negocio IA y se integra al runtime único |
+| Mike Rodriguez | Infraestructura | Completo | Se sustituye operación distribuida por operación unificada |
 
 ---
 
-## 5. Qué no desapareció (aclaración importante)
+## 7. Aclaración sobre elementos legacy
 
-- Las carpetas legacy (`gateway-service`, `state-service`, `ui-service`, `ai-service`) **siguen en el repositorio** como referencia histórica.
-- Lo que cambió fue el **camino operativo recomendado y principal**: `slidehub-monolith`.
+Las carpetas de microservicios todavía existen en el repositorio como referencia histórica:
+- `gateway-service/`
+- `state-service/`
+- `ui-service/`
+- `ai-service/`
+
+Esto no contradice la migración. El cambio principal es **operativo y arquitectónico de ejecución**, no necesariamente la eliminación inmediata de todos los artefactos históricos.
 
 ---
 
-## 6. Resultado final por desarrollador (en una línea)
+## 8. Conclusiones
 
-- **Edwin:** de enrutar entre servicios a proteger entrada en monolito con rate-limit.
-- **Jerson:** de servicio state independiente a módulo state interno equivalente.
-- **Daniel:** de UI conectada por red interna a UI orquestando módulos in-process.
-- **Davin:** de AI separada en servicio a AI integrada como módulo del mismo runtime.
-- **Mike:** de gestionar 4 despliegues coordinados a operar un único despliegue consolidado.
+1. La migración no implicó pérdida del núcleo funcional de cada responsable, sino un cambio de entorno de ejecución.
+2. Los cambios completos ocurrieron sobre todo en gateway e infraestructura, porque su razón de ser dependía de la distribución en múltiples servicios.
+3. Los cambios parciales se dieron en state, ui y ai: se conservaron capacidades, pero se simplificó su integración.
+4. La trazabilidad por archivos demuestra que la transición se hizo de manera progresiva y documentada por fases.
+5. El resultado final favorece una operación más sencilla sin romper la división lógica del sistema.
+
+---
+
+## 9. Referencias internas del proyecto
+
+- `docs/MIGRACION-MONOLITO-FASE-0.md`
+- `docs/MIGRACION-MONOLITO-FASE-1.md`
+- `docs/MIGRACION-MONOLITO-FASE-2.md`
+- `docs/MIGRACION-MONOLITO-FASE-3-DEPLOY-DOCS.md`
+- `docs/MIGRACION-MONOLITO-FASE-4-SMOKE.md`
+- `README.md`
+- `DEPLOYMENT.md`
+- `render.yaml`
