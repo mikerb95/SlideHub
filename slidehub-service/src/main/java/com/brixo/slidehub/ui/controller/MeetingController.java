@@ -105,6 +105,18 @@ public class MeetingController {
         }
     }
 
+    @PostMapping("/session/stop")
+    public ResponseEntity<?> stopSession(@PathVariable String presentationId,
+            Authentication authentication) {
+        try {
+            String userId = resolveUser(authentication).getId();
+            meetingService.stopSession(userId, presentationId);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        }
+    }
+
     @PostMapping("/session/heartbeat")
     public ResponseEntity<?> heartbeatSession(@PathVariable String presentationId,
             Authentication authentication) {

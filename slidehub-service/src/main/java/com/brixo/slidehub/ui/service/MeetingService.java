@@ -195,6 +195,17 @@ public class MeetingService {
         return new SessionInfo(saved.getId(), joinToken, buildJoinUrl(presentationId, joinToken), saved.getExpiresAt());
     }
 
+    @Transactional
+    public void stopSession(String userId, String presentationId) {
+        requireOwnedPresentation(userId, presentationId);
+        sessionRepository.findByPresentationIdAndActiveTrue(presentationId).ifPresent(session -> {
+            session.setActive(false);
+            session.setUpdatedAt(LocalDateTime.now());
+            sessionRepository.save(session);
+            viewerService.cleanupSession(session.getId());
+        });
+    }
+
     public Map<String, Object> getJoinOptions(String presentationId, String joinToken) {
         PresentationSession session = requireActiveSession(presentationId, joinToken);
         List<ParticipantItem> participants = listParticipants(presentationId);
