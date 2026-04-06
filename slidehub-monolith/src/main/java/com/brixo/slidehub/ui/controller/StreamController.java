@@ -116,6 +116,6 @@ public class StreamController {
                             "viewerCount", stats.viewerCount(),
                             "handCount", stats.handCount()));
                 })
-                .orElse(ResponseEntity.ok(Map.of("viewerCount", 0, "handCount", 0)));
+                .orElse(ResponseEntity.ok(Map.of("viewerCount", 0L, "handCount", 0L)));
     }
 }
