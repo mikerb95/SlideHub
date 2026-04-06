@@ -190,6 +190,45 @@
     <div class="slide-wrapper" id="slide-wrapper"></div>
     <div id="error-msg">CONNECTION LOST</div>
 
+    <!-- Viewer count badge (top-left, visible solo cuando hay sesión) -->
+    <div id="qa-viewer-count"></div>
+
+    <!-- Q&A FAB button -->
+    <div id="qa-fab">
+        <span>&#10067; Preguntar</span>
+        <span id="qa-hand-badge" class="qa-hand-badge" style="display:none;"></span>
+    </div>
+
+    <!-- Q&A Panel -->
+    <div id="qa-panel">
+        <div class="qa-title">
+            <span>&#128172; PREGUNTAS EN VIVO</span>
+            <button onclick="toggleQaPanel()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:0.9rem;">&#10005;</button>
+        </div>
+
+        <!-- Step 1: setup name (hidden once joined) -->
+        <div id="qa-setup">
+            <input id="qa-name" type="text" maxlength="100" placeholder="Tu nombre (opcional)">
+            <div class="qa-row">
+                <input type="checkbox" id="qa-anon" style="width:auto;margin:0;">
+                <label for="qa-anon" style="font-size:0.72rem;cursor:pointer;">Enviar de forma anónima</label>
+            </div>
+            <button class="qa-btn" id="qa-join-btn" onclick="qaJoin()">Unirse a la sesión</button>
+        </div>
+
+        <!-- Step 2: send question (hidden until joined) -->
+        <div id="qa-form" style="display:none;">
+            <div class="qa-row" style="justify-content:space-between;">
+                <span id="qa-identity" style="font-size:0.68rem;color:#6366f1;"></span>
+                <button class="qa-btn-hand" id="qa-hand-btn" onclick="qaToggleHand()">&#9995; Mano</button>
+            </div>
+            <textarea id="qa-content" rows="3" maxlength="500" placeholder="Escribe tu pregunta..."></textarea>
+            <button class="qa-btn" id="qa-send-btn" onclick="qaSend()">Enviar pregunta</button>
+        </div>
+
+        <div class="qa-msg" id="qa-msg"></div>
+    </div>
+
     <script th:inline="javascript">
         const POLL_INTERVAL_MS = /*[[${pollIntervalMs}]]*/ 1000;
         const API_SLIDE_URL = '/api/slide';
