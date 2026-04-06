@@ -31,6 +31,7 @@ public class MeetingService {
     private final SessionMemberRepository memberRepository;
     private final HapticBridgeService hapticBridgeService;
     private final AssistBridgeService assistBridgeService;
+    private final ViewerService viewerService;
 
     @Value("${slidehub.base-url:http://localhost:8080}")
     private String baseUrl;
@@ -44,7 +45,8 @@ public class MeetingService {
             PresentationSessionRepository sessionRepository,
             SessionMemberRepository memberRepository,
             HapticBridgeService hapticBridgeService,
-            AssistBridgeService assistBridgeService) {
+            AssistBridgeService assistBridgeService,
+            ViewerService viewerService) {
         this.presentationRepository = presentationRepository;
         this.participantRepository = participantRepository;
         this.assignmentRepository = assignmentRepository;
@@ -52,6 +54,7 @@ public class MeetingService {
         this.memberRepository = memberRepository;
         this.hapticBridgeService = hapticBridgeService;
         this.assistBridgeService = assistBridgeService;
+        this.viewerService = viewerService;
     }
 
     public record ParticipantItem(String id, String displayName, boolean presenter) {
