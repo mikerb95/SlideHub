@@ -364,6 +364,43 @@
 
             fab.addEventListener('click', toggleQaPanel);
 
+            async function autoPassiveJoin() {
+                try {
+                    const res = await fetch(`${QA_BASE}/stream/join`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ displayName: '' })
+                    });
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    passiveToken = data.viewerToken;
+                    sessionStorage.setItem(PASSIVE_STORAGE_KEY, passiveToken);
+                    setInterval(() => passiveHeartbeat(), 30000);
+                } catch (_) {}
+            }
+
+            async function passiveHeartbeat() {
+                if (!passiveToken) return;
+                try {
+                    await fetch(`${QA_BASE}/stream/heartbeat`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ viewerToken: passiveToken })
+                    });
+                } catch (_) {}
+            }
+
+            async function leavePassive() {
+                const token = passiveToken || sessionStorage.getItem(PASSIVE_STORAGE_KEY);
+                if (!token) return;
+                passiveToken = null;
+                sessionStorage.removeItem(PASSIVE_STORAGE_KEY);
+                try {
+                    navigator.sendBeacon(`${QA_BASE}/stream/leave`,
+                        new Blob([JSON.stringify({ viewerToken: token })], { type: 'application/json' }));
+                } catch (_) {}
+            }
+
             async function init() {
                 try {
                     const res = await fetch(`${QA_BASE}/questions/settings`);
@@ -382,6 +419,17 @@
                             sessionId = parsed.sessionId;
                             showJoined(parsed.displayName, parsed.anonymous);
                         } catch (_) { sessionStorage.removeItem(STORAGE_KEY); }
+                    }
+
+                    // Auto-register como viewer pasivo para ser contado inmediatamente
+                    if (!viewerToken) {
+                        const storedPassive = sessionStorage.getItem(PASSIVE_STORAGE_KEY);
+                        if (storedPassive) {
+                            passiveToken = storedPassive;
+                            setInterval(() => passiveHeartbeat(), 30000);
+                        } else {
+                            await autoPassiveJoin();
+                        }
                     }
 
                     if (!anonAllowed) {
