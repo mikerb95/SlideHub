@@ -74,6 +74,14 @@ public class Presentation {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    /** Habilita o deshabilita el módulo de Q&A para esta presentación. */
+    @Column(name = "questions_enabled", nullable = false)
+    private boolean questionsEnabled = true;
+
+    /** Permite preguntas anónimas (sin displayName) cuando es true. */
+    @Column(name = "allow_anonymous_questions", nullable = false)
+    private boolean allowAnonymousQuestions = false;
+
     // ── Constructores ─────────────────────────────────────────────────────────
 
     public Presentation() {
