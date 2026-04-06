@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoreo de Disponibilidad — SlideHub</title>
+    <th:block th:replace="~{fragments/head :: assets}"></th:block>
+    <style>
+        .uptime-bar {
+            display: flex;
+            gap: 3px;
+            align-items: flex-end;
+            height: 40px;
+        }
+
+        .uptime-bar-tick {
+            flex: 1;
+            border-radius: 2px;
+            min-height: 8px;
+            transition: opacity 0.2s;
+            cursor: default;
+        }
+
+        .uptime-bar-tick:hover { opacity: 0.75; }
+
+        .stat-card {
+            background: var(--sh-deep);
+            border: 1px solid var(--sh-border);
+            border-radius: var(--sh-r-md);
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .stat-value {
+            font-family: var(--sh-font-mono);
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.78rem;
+            color: var(--sh-text-3);
+        }
+
+        .incident-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid var(--sh-border);
+            font-size: 0.83rem;
+        }
+
+        .incident-row:last-child { border-bottom: none; }
+
+        .pulse-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .pulse-dot.green  { background: var(--sh-green); box-shadow: 0 0 0 3px rgba(74,222,128,0.2); animation: pulse-g 2s infinite; }
+        .pulse-dot.amber  { background: var(--sh-amber); box-shadow: 0 0 0 3px rgba(251,191,36,0.2); }
+        .pulse-dot.red    { background: #f87171;         box-shadow: 0 0 0 3px rgba(248,113,113,0.2); }
+        .pulse-dot.gray   { background: var(--sh-text-3); }
+
+        @keyframes pulse-g {
+            0%, 100% { box-shadow: 0 0 0 3px rgba(74,222,128,0.2); }
+            50%       { box-shadow: 0 0 0 6px rgba(74,222,128,0.05); }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, var(--sh-border) 25%, var(--sh-hover) 50%, var(--sh-border) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-shimmer 1.4s infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes skeleton-shimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+
+<body class="sh antialiased">
+
+    <nav class="sh-nav" style="position:sticky;top:0;z-index:50;">
+        <div class="sh-nav-inner">
+            <div class="flex items-center gap-3">
+                <a href="/sustentacion" class="sh-btn sh-btn-ghost text-xs">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <span class="font-brand text-base">SlideHub</span>
+                <span class="text-[var(--sh-text-3)] text-xs">/</span>
+                <span class="font-mono text-xs text-[var(--sh-text-2)]">Monitoreo</span>
+            </div>
+            <div class="flex items-center gap-2" id="nav-status">
+                <span class="skeleton h-5 w-24 inline-block"></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-3xl mx-auto px-4 py-10 space-y-8">
+
+        <!-- Header -->
+        <header>
+            <div class="flex items-center gap-3 mb-2">
+                <div class="pulse-dot gray" id="header-dot"></div>
+                <h1 class="font-brand text-3xl text-[var(--sh-text-1)]" id="header-name">
+                    <span class="skeleton inline-block h-8 w-48">&nbsp;</span>
+                </h1>
+            </div>
+            <p class="text-sm text-[var(--sh-text-3)] font-mono" id="header-url"></p>
+        </header>
+
+        <!-- Estado actual -->
+        <div class="sh-card p-5">
+            <div class="flex items-center justify-between mb-4">
+                <span class="font-mono text-xs text-[var(--sh-text-3)] uppercase tracking-wider">Estado actual</span>
+                <span class="font-mono text-xs text-[var(--sh-text-3)]" id="checked-at">—</span>
+            </div>
+            <div class="flex items-center gap-4" id="status-block">
+                <span class="skeleton h-10 w-32 inline-block rounded-full"></span>
+            </div>
+        </div>
+
+        <!-- Métricas -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="metrics-grid">
+            <div class="stat-card">
+                <div class="stat-value skeleton h-8 w-16">&nbsp;</div>
+                <div class="stat-label">Uptime 7 días</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value skeleton h-8 w-16">&nbsp;</div>
+                <div class="stat-label">Uptime 30 días</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value skeleton h-8 w-16">&nbsp;</div>
+                <div class="stat-label">Uptime 90 días</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value skeleton h-8 w-16">&nbsp;</div>
+                <div class="stat-label">Respuesta prom.</div>
+            </div>
+        </div>
+
+        <!-- Historial de eventos -->
+        <div class="sh-card p-5">
+            <div class="font-mono text-xs text-[var(--sh-text-3)] uppercase tracking-wider mb-4">
+                Últimos eventos
+            </div>
+            <div id="incidents-list">
+                <div class="skeleton h-5 w-full mb-2 rounded"></div>
+                <div class="skeleton h-5 w-3/4 mb-2 rounded"></div>
+                <div class="skeleton h-5 w-5/6 rounded"></div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center text-xs text-[var(--sh-text-3)] font-mono">
+            Datos proporcionados por
+            <a href="https://uptimerobot.com" target="_blank" rel="noopener"
+               class="text-[var(--sh-blue)] hover:underline">UptimeRobot</a>
+            · Se actualiza cada 60 segundos
+        </footer>
+    </div>
+
+    <script>
+        const COLOR_MAP = {
+            green: 'var(--sh-green)',
+            amber: 'var(--sh-amber)',
+            red:   '#f87171',
+            gray:  'var(--sh-text-3)'
+        };
+
+        async function loadStatus() {
+            try {
+                const res = await fetch('/api/uptime/status');
+                const d = await res.json();
+
+                if (!d.available) {
+                    renderUnavailable(d.reason || 'No disponible');
+                    return;
+                }
+
+                // Nav badge
+                document.getElementById('nav-status').innerHTML =
+                    `<span class="pulse-dot ${d.statusColor}"></span>
+                     <span class="font-mono text-xs" style="color:${COLOR_MAP[d.statusColor]}">${d.statusLabel}</span>`;
+
+                // Header
+                const dot = document.getElementById('header-dot');
+                dot.className = `pulse-dot ${d.statusColor}`;
+                document.getElementById('header-name').textContent = d.monitorName;
+                document.getElementById('header-url').textContent = d.url;
+                document.getElementById('checked-at').textContent = 'Consultado: ' + d.checkedAt;
+
+                // Status badge
+                document.getElementById('status-block').innerHTML =
+                    `<span class="inline-flex items-center gap-2 px-4 py-2 rounded-full font-mono text-sm font-semibold"
+                           style="background:${COLOR_MAP[d.statusColor]}22; color:${COLOR_MAP[d.statusColor]}; border:1px solid ${COLOR_MAP[d.statusColor]}44">
+                        <i class="fa-solid ${d.statusColor === 'green' ? 'fa-circle-check' : d.statusColor === 'red' ? 'fa-circle-xmark' : 'fa-circle-exclamation'}"></i>
+                        ${d.statusLabel}
+                     </span>`;
+
+                // Métricas
+                document.getElementById('metrics-grid').innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-value" style="color:${uptimeColor(d.uptime7d)}">${fmt(d.uptime7d)}%</div>
+                        <div class="stat-label">Uptime 7 días</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" style="color:${uptimeColor(d.uptime30d)}">${fmt(d.uptime30d)}%</div>
+                        <div class="stat-label">Uptime 30 días</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" style="color:${uptimeColor(d.uptime90d)}">${fmt(d.uptime90d)}%</div>
+                        <div class="stat-label">Uptime 90 días</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value text-[var(--sh-text-1)]">${d.avgResponseMs}<span class="text-base font-normal text-[var(--sh-text-3)] ml-1">ms</span></div>
+                        <div class="stat-label">Respuesta prom.</div>
+                    </div>`;
+
+                // Eventos
+                const incidents = d.incidents || [];
+                const list = document.getElementById('incidents-list');
+                if (incidents.length === 0) {
+                    list.innerHTML = '<div class="text-sm text-[var(--sh-text-3)] font-mono py-2">Sin incidentes recientes.</div>';
+                } else {
+                    list.innerHTML = incidents.map(inc => `
+                        <div class="incident-row">
+                            <span class="pulse-dot ${inc.type === 'DOWN' ? 'red' : 'green'}" style="animation:none"></span>
+                            <span class="font-mono text-[var(--sh-text-3)] w-28 shrink-0">${inc.datetime}</span>
+                            <span class="font-semibold" style="color:${inc.type === 'DOWN' ? '#f87171' : 'var(--sh-green)'}">
+                                ${inc.type === 'DOWN' ? 'Caída detectada' : 'Servicio recuperado'}
+                            </span>
+                            <span class="ml-auto font-mono text-xs text-[var(--sh-text-3)]">${inc.duration}</span>
+                        </div>`).join('');
+                }
+
+            } catch (e) {
+                renderUnavailable('Error de red al consultar el estado.');
+            }
+        }
+
+        function renderUnavailable(reason) {
+            document.getElementById('nav-status').innerHTML =
+                `<span class="font-mono text-xs text-[var(--sh-text-3)]">Sin datos</span>`;
+            document.getElementById('header-dot').className = 'pulse-dot gray';
+            document.getElementById('header-name').textContent = 'SlideHub';
+            document.getElementById('status-block').innerHTML =
+                `<span class="text-sm text-[var(--sh-text-3)] font-mono">${esc(reason)}</span>`;
+            document.getElementById('metrics-grid').innerHTML = '';
+            document.getElementById('incidents-list').innerHTML =
+                `<div class="text-sm text-[var(--sh-text-3)] font-mono">${esc(reason)}</div>`;
+        }
+
+        function uptimeColor(val) {
+            const n = parseFloat(val);
+            if (isNaN(n)) return 'var(--sh-text-3)';
+            if (n >= 99) return 'var(--sh-green)';
+            if (n >= 95) return 'var(--sh-amber)';
+            return '#f87171';
+        }
+
+        function fmt(val) {
+            const n = parseFloat(val);
+            return isNaN(n) ? '--' : n.toFixed(2);
+        }
+
+        function esc(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+
+        loadStatus();
+        setInterval(loadStatus, 60_000);
+    </script>
+</body>
+</html>
