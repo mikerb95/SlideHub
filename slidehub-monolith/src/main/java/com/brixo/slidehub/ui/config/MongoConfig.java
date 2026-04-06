@@ -10,16 +10,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
 /**
- * Configura MongoClient explícitamente desde MONGODB_URI.
+ * Configura MongoDB explícitamente desde MONGODB_URI.
  *
- * Problema: spring.data.mongodb.uri=${MONGODB_URI:} resuelve a cadena vacía
- * cuando MONGODB_URI no está en el entorno. Spring Boot 4.x trata la URI vacía
- * como "no configurada" y usa localhost:27017 como fallback.
+ * Problema 1: spring.data.mongodb.uri=${MONGODB_URI:} resuelve a cadena vacía
+ * cuando no está seteada, y Spring Boot 4.x cae a localhost:27017.
  *
- * Esta configuración crea el MongoClient solo cuando MONGODB_URI tiene valor,
- * con logging claro del host al que se conecta.
+ * Problema 2: el MongoHealthIndicator de actuator ejecuta "hello" en la
+ * base de datos "local", que Atlas bloquea. Con MongoDatabaseFactory explícito
+ * que apunta a la base correcta (slidehub), el health check corre ahí.
  */
 @Configuration
 @ConditionalOnExpression("!'${spring.data.mongodb.uri:}'.isBlank()")
@@ -33,12 +35,20 @@ public class MongoConfig {
         String host = connectionString.getHosts() != null && !connectionString.getHosts().isEmpty()
                 ? connectionString.getHosts().get(0)
                 : "unknown";
-        log.info("MongoDB configured explicitly from MONGODB_URI → host: {}", host);
+        log.info("MongoDB configured from MONGODB_URI → cluster: {}", host);
 
         MongoClientSettings settings = MongoClientSettings.builder()
                 .applyConnectionString(connectionString)
                 .build();
 
         return MongoClients.create(settings);
+    }
+
+    @Bean
+    public MongoDatabaseFactory mongoDatabaseFactory(
+            MongoClient mongoClient,
+            @Value("${spring.data.mongodb.database:slidehub}") String database) {
+        log.info("MongoDatabaseFactory using database: {}", database);
+        return new SimpleMongoClientDatabaseFactory(mongoClient, database);
     }
 }
