@@ -92,7 +92,7 @@ public class AuthController {
     @GetMapping("/register")
     public String registerPage(Authentication authentication) {
         if (isAuthenticated(authentication)) {
-            return "redirect:/presenter";
+            return "redirect:/presentations";
         }
         return "auth/register";
     }
