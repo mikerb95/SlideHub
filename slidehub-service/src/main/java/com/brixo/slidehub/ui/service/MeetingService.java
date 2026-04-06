@@ -175,6 +175,7 @@ public class MeetingService {
             existing.setActive(false);
             existing.setUpdatedAt(LocalDateTime.now());
             sessionRepository.save(existing);
+            viewerService.cleanupSession(existing.getId());
         });
 
         String joinToken = UUID.randomUUID().toString().replace("-", "");
