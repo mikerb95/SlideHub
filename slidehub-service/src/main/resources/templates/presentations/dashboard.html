@@ -129,7 +129,8 @@
         <div class="sh-modal max-w-md w-[92%]">
             <div class="flex items-center justify-between mb-4">
                 <div class="sh-label"><i class="fa-solid fa-triangle-exclamation mr-1"></i>CONFIRMAR ELIMINACIÓN</div>
-                <button type="button" class="sh-btn sh-btn-ghost text-xs" onclick="closeDeleteModal()">
+                <button id="delete-close-btn" type="button" class="sh-btn sh-btn-ghost text-xs"
+                    onclick="closeDeleteModal()">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -137,7 +138,7 @@
             <p id="delete-modal-name" class="font-mono text-xs text-[var(--sh-text-1)] mb-4"></p>
             <p class="text-xs text-[var(--sh-text-3)] mb-5">Esta acción no se puede deshacer.</p>
             <div class="flex justify-end gap-2">
-                <button type="button" class="sh-btn text-xs" onclick="closeDeleteModal()">Cancelar</button>
+                <button id="delete-cancel-btn" type="button" class="sh-btn text-xs" onclick="closeDeleteModal()">Cancelar</button>
                 <button id="delete-confirm-btn" type="button" class="sh-btn sh-btn-danger text-xs"
                     onclick="confirmDelete()">
                     <i class="fa-solid fa-trash"></i> Eliminar
@@ -148,21 +149,39 @@
 
     <script>
         let deleteFormRef = null;
+        let deleteInProgress = false;
         const DELETE_CONFIRM_DEFAULT_HTML = '<i class="fa-solid fa-trash"></i> Eliminar';
-        const DELETE_CONFIRM_LOADING_TEXT = 'Eliminando...';
+        const DELETE_CONFIRM_LOADING_HTML = '<i class="fa-solid fa-spinner fa-spin"></i> Eliminando...';
 
         function getDeleteConfirmButton() {
             return document.getElementById('delete-confirm-btn');
         }
 
+        function getDeleteCancelButton() {
+            return document.getElementById('delete-cancel-btn');
+        }
+
+        function getDeleteCloseButton() {
+            return document.getElementById('delete-close-btn');
+        }
+
         function resetDeleteConfirmButton() {
             const confirmBtn = getDeleteConfirmButton();
+            const cancelBtn = getDeleteCancelButton();
+            const closeBtn = getDeleteCloseButton();
             if (!confirmBtn) {
                 return;
             }
+            deleteInProgress = false;
             confirmBtn.disabled = false;
             confirmBtn.removeAttribute('aria-busy');
             confirmBtn.innerHTML = DELETE_CONFIRM_DEFAULT_HTML;
+            if (cancelBtn) {
+                cancelBtn.disabled = false;
+            }
+            if (closeBtn) {
+                closeBtn.disabled = false;
+            }
         }
 
         function openDeleteModal(button) {
@@ -174,6 +193,9 @@
         }
 
         function closeDeleteModal() {
+            if (deleteInProgress) {
+                return;
+            }
             document.getElementById('delete-modal').classList.add('hidden');
             resetDeleteConfirmButton();
             deleteFormRef = null;
@@ -187,9 +209,18 @@
 
             if (deleteFormRef) {
                 if (confirmBtn) {
+                    const cancelBtn = getDeleteCancelButton();
+                    const closeBtn = getDeleteCloseButton();
+                    deleteInProgress = true;
                     confirmBtn.disabled = true;
                     confirmBtn.setAttribute('aria-busy', 'true');
-                    confirmBtn.textContent = DELETE_CONFIRM_LOADING_TEXT;
+                    confirmBtn.innerHTML = DELETE_CONFIRM_LOADING_HTML;
+                    if (cancelBtn) {
+                        cancelBtn.disabled = true;
+                    }
+                    if (closeBtn) {
+                        closeBtn.disabled = true;
+                    }
                 }
                 deleteFormRef.submit();
             }
