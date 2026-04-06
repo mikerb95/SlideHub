@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-
+import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.http.HttpSession;
 import java.util.Optional;
 
@@ -39,15 +39,18 @@ public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AccountDeletionService accountDeletionService;
+    private final com.brixo.slidehub.ui.service.SlideUploadService slideUploadService;
 
     public AuthController(UserService userService,
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            AccountDeletionService accountDeletionService) {
+            AccountDeletionService accountDeletionService,
+            com.brixo.slidehub.ui.service.SlideUploadService slideUploadService) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.accountDeletionService = accountDeletionService;
+        this.slideUploadService = slideUploadService;
     }
 
     // ── Login ─────────────────────────────────────────────────────────────────
@@ -272,6 +275,50 @@ public class AuthController {
         userRepository.findByUsername(username).ifPresent(user -> populateProfileModel(model, user));
 
         return "auth/profile";
+    }
+
+    @PostMapping("/profile/picture")
+    public String uploadProfilePicture(Authentication authentication,
+            @RequestParam("file") MultipartFile file,
+            Model model) {
+        if (!isAuthenticated(authentication)) {
+            return "redirect:/auth/login";
+        }
+        User user = findCurrentUser(authentication);
+        if (user == null) {
+            return "redirect:/auth/login";
+        }
+
+        if (file.isEmpty()) {
+            populateProfileModel(model, user);
+            model.addAttribute("providerErrorMessage", "Debes seleccionar una imagen.");
+            return "auth/profile";
+        }
+
+        try {
+            String key = "profiles/" + user.getId() + "_" + System.currentTimeMillis();
+            String contentType = file.getContentType();
+            String ext = "";
+            if (contentType != null && contentType.contains("jpeg")) {
+                ext = ".jpg";
+            } else if (contentType != null && contentType.contains("png")) {
+                ext = ".png";
+            }
+            key += ext;
+            
+            String url = slideUploadService.upload(key, file.getBytes(), file.getContentType());
+            user.setProfileImageUrl(url);
+            userRepository.save(user);
+
+            populateProfileModel(model, user);
+            model.addAttribute("providerMessage", "Imagen de perfil actualizada correctamente.");
+            return "auth/profile";
+        } catch (Exception ex) {
+            log.error("Error uploading profile picture for user={}", user.getId(), ex);
+            populateProfileModel(model, user);
+            model.addAttribute("providerErrorMessage", "Error al subir la imagen al S3.");
+            return "auth/profile";
+        }
     }
 
     @PostMapping("/unlink/github")

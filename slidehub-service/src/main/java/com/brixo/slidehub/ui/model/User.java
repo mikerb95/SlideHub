@@ -69,6 +69,9 @@ public class User {
 
     // ── Perfil ────────────────────────────────────────────────────────────────
 
+    @Column(name = "profile_image_url", length = 500)
+    private String profileImageUrl;
+
     /**
      * Indica si el usuario completó su perfil tras el primer login OAuth2.
      * Los usuarios locales siempre lo tienen en true (lo completan al registrarse).
@@ -207,6 +210,14 @@ public class User {
 
     public void setProfileCompleted(boolean profileCompleted) {
         this.profileCompleted = profileCompleted;
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 
     public String getDefaultDriveFolderId() {
