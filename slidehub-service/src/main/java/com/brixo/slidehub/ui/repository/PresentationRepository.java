@@ -29,4 +29,8 @@ public interface PresentationRepository extends JpaRepository<Presentation, Stri
     long countBySourceType(SourceType sourceType);
 
     List<Presentation> findAllByOrderByCreatedAtDesc();
+
+    Optional<Presentation> findByJoinCode(String joinCode);
+
+    boolean existsByJoinCode(String joinCode);
 }
