@@ -99,6 +99,80 @@
         });
     }
 
+    function drawSparklines() {
+        document.querySelectorAll('canvas[data-spark]').forEach((canvas) => {
+            const serviceName = canvas.getAttribute('data-spark');
+            const history = latencyHistoryByService.get(serviceName) || [];
+            const points = history.filter((e) => Number.isFinite(e.latencyMs));
+
+            const ratio = window.devicePixelRatio || 1;
+            const w = Math.floor(canvas.clientWidth * ratio);
+            const h = Math.floor(canvas.clientHeight * ratio);
+            if (w < 2 || h < 2) return;
+            if (canvas.width !== w || canvas.height !== h) {
+                canvas.width = w;
+                canvas.height = h;
+            }
+
+            const ctx = canvas.getContext('2d');
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, w, h);
+            ctx.scale(ratio, ratio);
+
+            const dw = w / ratio;
+            const dh = h / ratio;
+
+            if (points.length < 2) {
+                ctx.strokeStyle = 'rgba(110, 118, 129, 0.25)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([3, 3]);
+                ctx.beginPath();
+                ctx.moveTo(0, dh / 2);
+                ctx.lineTo(dw, dh / 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                return;
+            }
+
+            const maxL = Math.max(...points.map((p) => p.latencyMs), 1);
+            const minL = Math.min(...points.map((p) => p.latencyMs), 0);
+            const range = Math.max(1, maxL - minL);
+            const pad = { t: 2, b: 2, l: 1, r: 1 };
+            const cw = dw - pad.l - pad.r;
+            const ch = dh - pad.t - pad.b;
+
+            const xy = points.map((p, i) => ({
+                x: pad.l + (cw * i) / Math.max(1, points.length - 1),
+                y: pad.t + ch - ((p.latencyMs - minL) / range) * ch
+            }));
+
+            const grad = ctx.createLinearGradient(0, pad.t, 0, pad.t + ch);
+            grad.addColorStop(0, 'rgba(88, 166, 255, 0.22)');
+            grad.addColorStop(1, 'rgba(88, 166, 255, 0.01)');
+
+            ctx.beginPath();
+            ctx.moveTo(xy[0].x, pad.t + ch);
+            xy.forEach((p) => ctx.lineTo(p.x, p.y));
+            ctx.lineTo(xy[xy.length - 1].x, pad.t + ch);
+            ctx.closePath();
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(xy[0].x, xy[0].y);
+            for (let i = 1; i < xy.length; i++) ctx.lineTo(xy[i].x, xy[i].y);
+            ctx.strokeStyle = 'rgba(88, 166, 255, 0.9)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            const last = xy[xy.length - 1];
+            ctx.beginPath();
+            ctx.arc(last.x, last.y, 2, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(88, 166, 255, 1)';
+            ctx.fill();
+        });
+    }
+
     function resizeCanvasToDisplaySize(canvas) {
         if (!canvas) return;
         const ratio = window.devicePixelRatio || 1;
