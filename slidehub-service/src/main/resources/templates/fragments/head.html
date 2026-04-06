@@ -13,6 +13,24 @@
         - Tailwind theme config aligned with design tokens
     -->
     <th:block th:fragment="assets">
+        <!-- SEO / Social Preview (WhatsApp, LinkedIn, Facebook, X) -->
+        <meta name="description"
+            th:content="${metaDescription ?: 'SlideHub: plataforma de presentaciones multi-pantalla con sincronización en tiempo real, control remoto y notas asistidas por IA.'}">
+        <meta property="og:type" th:content="${metaType ?: 'website'}">
+        <meta property="og:site_name" content="SlideHub">
+        <meta property="og:title"
+            th:content="${metaTitle ?: 'SlideHub — Presentaciones multi-pantalla en tiempo real'}">
+        <meta property="og:description"
+            th:content="${metaDescription ?: 'SlideHub: plataforma de presentaciones multi-pantalla con sincronización en tiempo real, control remoto y notas asistidas por IA.'}">
+        <meta property="og:url"
+            th:content="${#httpServletRequest != null ? #httpServletRequest.requestURL : 'https://slide.lat'}">
+        <meta property="og:locale" content="es_CO">
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:title"
+            th:content="${metaTitle ?: 'SlideHub — Presentaciones multi-pantalla en tiempo real'}">
+        <meta name="twitter:description"
+            th:content="${metaDescription ?: 'SlideHub: plataforma de presentaciones multi-pantalla con sincronización en tiempo real, control remoto y notas asistidas por IA.'}">
+
         <!-- Tailwind CSS CDN -->
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
