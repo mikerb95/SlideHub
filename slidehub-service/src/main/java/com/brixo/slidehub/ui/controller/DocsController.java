@@ -25,4 +25,9 @@ public class DocsController {
     public String metodologia() {
         return "metodologia";
     }
+
+    @GetMapping("/sustentacion")
+    public String sustentacion() {
+        return "sustentacion";
+    }
 }
