@@ -138,7 +138,7 @@
             <p class="text-xs text-[var(--sh-text-3)] mb-5">Esta acción no se puede deshacer.</p>
             <div class="flex justify-end gap-2">
                 <button type="button" class="sh-btn text-xs" onclick="closeDeleteModal()">Cancelar</button>
-                <button type="button" class="sh-btn sh-btn-danger text-xs" onclick="confirmDelete()">
+                <button id="delete-confirm-btn" type="button" class="sh-btn sh-btn-danger text-xs" onclick="confirmDelete()">
                     <i class="fa-solid fa-trash"></i> Eliminar
                 </button>
             </div>
@@ -147,21 +147,49 @@
 
     <script>
         let deleteFormRef = null;
+        const DELETE_CONFIRM_DEFAULT_HTML = '<i class="fa-solid fa-trash"></i> Eliminar';
+        const DELETE_CONFIRM_LOADING_TEXT = 'Eliminando...';
+
+        function getDeleteConfirmButton() {
+            return document.getElementById('delete-confirm-btn');
+        }
+
+        function resetDeleteConfirmButton() {
+            const confirmBtn = getDeleteConfirmButton();
+            if (!confirmBtn) {
+                return;
+            }
+            confirmBtn.disabled = false;
+            confirmBtn.removeAttribute('aria-busy');
+            confirmBtn.innerHTML = DELETE_CONFIRM_DEFAULT_HTML;
+        }
 
         function openDeleteModal(button) {
             deleteFormRef = button.closest('form');
             const name = button.getAttribute('data-presentation-name') || 'Presentación';
             document.getElementById('delete-modal-name').textContent = name;
+            resetDeleteConfirmButton();
             document.getElementById('delete-modal').classList.remove('hidden');
         }
 
         function closeDeleteModal() {
             document.getElementById('delete-modal').classList.add('hidden');
+            resetDeleteConfirmButton();
             deleteFormRef = null;
         }
 
         function confirmDelete() {
+            const confirmBtn = getDeleteConfirmButton();
+            if (confirmBtn && confirmBtn.disabled) {
+                return;
+            }
+
             if (deleteFormRef) {
+                if (confirmBtn) {
+                    confirmBtn.disabled = true;
+                    confirmBtn.setAttribute('aria-busy', 'true');
+                    confirmBtn.textContent = DELETE_CONFIRM_LOADING_TEXT;
+                }
                 deleteFormRef.submit();
             }
         }
