@@ -287,6 +287,46 @@ public class PresentationImportController {
         }
     }
 
+    /**
+     * Crea una presentación a partir de un archivo .pptx.
+     * Sube el PPTX a S3 (raw-pptx/) y retorna inmediatamente con status PROCESSING.
+     * Lambda convierte el archivo y notifica via webhook cuando termina.
+     */
+    @PostMapping("/api/presentations/create-from-pptx")
+    @ResponseBody
+    public ResponseEntity<?> createFromPptx(
+            @RequestParam String name,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String repoUrl,
+            @RequestParam("file") MultipartFile file,
+            Authentication authentication) {
+        try {
+            User user = resolveUser(authentication);
+            var presentation = presentationService.createFromPptx(user, name, description, repoUrl, file);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "presentationId", presentation.getId(),
+                    "status", "PROCESSING"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            log.error("Error creando presentación desde PPTX: {}", e.getMessage());
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "Error al procesar el archivo: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Polling del wizard: devuelve el estado de conversión PPTX de una presentación.
+     */
+    @GetMapping("/api/presentations/{id}/pptx-status")
+    @ResponseBody
+    public ResponseEntity<?> getPptxStatus(@PathVariable String id) {
+        return presentationService.getPptxStatus(id)
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @PostMapping("/api/presentations/{presentationId}/quick-slide")
     @ResponseBody
     public ResponseEntity<?> createQuickSlide(

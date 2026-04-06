@@ -5,6 +5,7 @@ import com.brixo.slidehub.ui.model.DriveFolder;
 import com.brixo.slidehub.ui.model.Presentation;
 import com.brixo.slidehub.ui.model.Slide;
 import com.brixo.slidehub.ui.model.SlideInfo;
+import com.brixo.slidehub.ui.model.PptxStatus;
 import com.brixo.slidehub.ui.model.SourceType;
 import com.brixo.slidehub.ui.model.User;
 import com.brixo.slidehub.ui.repository.PresentationParticipantRepository;
@@ -27,6 +28,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -292,6 +294,96 @@ public class PresentationService {
         Presentation saved = presentationRepository.save(presentation);
         log.info("Presentación creada desde upload: {} ({} slides)", saved.getId(), saved.getSlides().size());
         return saved;
+    }
+
+    // ── Flujo PPTX via Lambda ─────────────────────────────────────────────────
+
+    /**
+     * Crea una presentación desde un archivo .pptx y lo sube a S3 en el prefijo
+     * {@code raw-pptx/} para activar el trigger de Lambda.
+     *
+     * La presentación queda en estado {@link PptxStatus#PROCESSING} sin slides;
+     * Lambda los registrará vía webhook al terminar.
+     */
+    @Transactional
+    public Presentation createFromPptx(User user,
+            String name,
+            String description,
+            String repoUrl,
+            MultipartFile file) {
+        String filename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "";
+        if (!filename.toLowerCase().endsWith(".pptx")) {
+            throw new IllegalArgumentException("Solo se aceptan archivos .pptx.");
+        }
+
+        Presentation presentation = buildPresentation(user, name, description, repoUrl,
+                SourceType.PPTX, null, null);
+        presentation.setPptxStatus(PptxStatus.PROCESSING);
+        presentationRepository.save(presentation);
+
+        try {
+            byte[] bytes = file.getBytes();
+            String rawKey = "raw-pptx/" + presentation.getId() + ".pptx";
+            slideUploadService.upload(rawKey, bytes,
+                    "application/vnd.openxmlformats-officedocument.presentationml.presentation");
+            log.info("PPTX subido a S3 ({}), esperando Lambda.", rawKey);
+        } catch (java.io.IOException e) {
+            throw new RuntimeException("No se pudo leer el archivo PPTX.", e);
+        }
+
+        return presentation;
+    }
+
+    /**
+     * Registra los slides generados por Lambda y marca la presentación como READY.
+     * Llamado desde el webhook cuando Lambda reporta éxito.
+     */
+    @Transactional
+    public void initializeSlidesAndMarkReady(String presentationId, int slideCount) {
+        Presentation presentation = presentationRepository.findById(presentationId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Presentación no encontrada: " + presentationId));
+
+        presentation.getSlides().clear();
+
+        for (int n = 1; n <= slideCount; n++) {
+            String key = slideUploadService.buildSlideKey(presentationId, n);
+            String s3Url = slideUploadService.buildPublicUrl(key);
+            Slide slide = buildSlide(presentation, n, n + ".png", null, s3Url);
+            presentation.getSlides().add(slide);
+        }
+
+        presentation.setPptxStatus(PptxStatus.READY);
+        presentation.setUpdatedAt(LocalDateTime.now());
+        presentationRepository.save(presentation);
+        log.info("Presentación PPTX {} marcada como READY con {} slides.", presentationId, slideCount);
+    }
+
+    /**
+     * Marca una presentación PPTX como FAILED.
+     * Llamado desde el webhook cuando Lambda reporta error.
+     */
+    @Transactional
+    public void markAsFailed(String presentationId) {
+        presentationRepository.findById(presentationId).ifPresentOrElse(p -> {
+            p.setPptxStatus(PptxStatus.FAILED);
+            p.setUpdatedAt(LocalDateTime.now());
+            presentationRepository.save(p);
+            log.warn("Presentación PPTX {} marcada como FAILED.", presentationId);
+        }, () -> log.warn("markAsFailed: presentación no encontrada: {}", presentationId));
+    }
+
+    /**
+     * Devuelve el estado actual de conversión PPTX para polling del wizard.
+     */
+    @Transactional(readOnly = true)
+    public Optional<Map<String, Object>> getPptxStatus(String presentationId) {
+        return presentationRepository.findById(presentationId).map(p -> {
+            Map<String, Object> result = new HashMap<>();
+            result.put("status", p.getPptxStatus() != null ? p.getPptxStatus().name() : "UNKNOWN");
+            result.put("slideCount", p.getSlides().size());
+            return result;
+        });
     }
 
     @Transactional

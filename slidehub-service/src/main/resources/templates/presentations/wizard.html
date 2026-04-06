@@ -244,6 +244,9 @@
                     <button class="sh-tab" id="tab-drive" onclick="showImportTab('drive')">
                         <i class="fa-brands fa-google-drive mr-1"></i> Google Drive
                     </button>
+                    <button class="sh-tab" id="tab-pptx" onclick="showImportTab('pptx')">
+                        <i class="fa-solid fa-file-powerpoint mr-1"></i> PowerPoint
+                    </button>
                 </div>
 
                 <!-- Upload Panel -->
@@ -263,6 +266,47 @@
                     </button>
                     <div id="upload-progress" class="hidden mt-2 font-mono text-xs text-[var(--sh-text-3)]">
                         <i class="fa-solid fa-spinner fa-spin mr-1"></i>Subiendo archivos...
+                    </div>
+                </div>
+
+                <!-- PPTX Panel -->
+                <div id="panel-pptx" class="hidden">
+                    <div id="pptx-drop-zone"
+                        class="border-2 border-dashed border-[var(--sh-border-active)] rounded-tech p-10 text-center cursor-pointer transition-all"
+                        onclick="document.getElementById('pptx-file-input').click()">
+                        <i class="fa-solid fa-file-powerpoint text-3xl mb-2 block text-[var(--sh-text-3)]"></i>
+                        <p class="text-sm text-[var(--sh-text-2)] mb-1">Arrastra tu archivo .pptx aquí o haz clic</p>
+                        <p class="font-mono text-xs text-[var(--sh-text-3)]">Solo archivos .pptx</p>
+                        <input type="file" id="pptx-file-input" accept=".pptx" class="hidden"
+                            onchange="onPptxSelected(event)">
+                    </div>
+                    <div id="pptx-file-preview" class="mt-2 font-mono text-xs text-[var(--sh-text-2)]"></div>
+                    <div id="pptx-error" class="sh-alert sh-alert-error hidden mt-2"></div>
+                    <button type="button" class="sh-btn sh-btn-primary mt-4" id="btn-pptx" onclick="doPptxUpload()" disabled>
+                        <i class="fa-solid fa-upload mr-1"></i> Subir y convertir
+                    </button>
+
+                    <!-- Estado: subiendo -->
+                    <div id="pptx-uploading" class="hidden mt-3 font-mono text-xs text-[var(--sh-text-3)]">
+                        <i class="fa-solid fa-spinner fa-spin mr-1"></i>Subiendo archivo...
+                    </div>
+
+                    <!-- Estado: Lambda procesando -->
+                    <div id="pptx-processing" class="hidden mt-3 p-3 rounded-tech"
+                        style="background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.2);">
+                        <div class="flex items-center gap-2 mb-1" style="color: var(--sh-blue);">
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+                            <span class="font-mono text-sm font-semibold">Convirtiendo diapositivas...</span>
+                        </div>
+                        <div class="text-xs text-[var(--sh-text-3)]">Lambda está procesando tu PPTX.
+                            Esto puede tomar hasta 1-2 minutos dependiendo del tamaño.</div>
+                        <div class="mt-2">
+                            <div class="h-1 rounded-full overflow-hidden" style="background: var(--sh-border);">
+                                <div id="pptx-progress-bar"
+                                    class="h-full rounded-full animate-pulse"
+                                    style="background: var(--sh-blue); width: 60%;"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -668,8 +712,10 @@
         function showImportTab(tab) {
             document.getElementById('panel-upload').classList.toggle('hidden', tab !== 'upload');
             document.getElementById('panel-drive').classList.toggle('hidden', tab !== 'drive');
+            document.getElementById('panel-pptx').classList.toggle('hidden', tab !== 'pptx');
             document.getElementById('tab-upload').classList.toggle('active', tab === 'upload');
             document.getElementById('tab-drive').classList.toggle('active', tab === 'drive');
+            document.getElementById('tab-pptx').classList.toggle('active', tab === 'pptx');
             // Auto-load Drive root on first tab activation
             if (tab === 'drive' && !driveLoaded) {
                 driveLoaded = true;
@@ -911,6 +957,100 @@
                 showError('drive-error', 'Error de red.');
                 document.getElementById('btn-import-drive').disabled = false;
             }
+        }
+
+        // ── PPTX Upload + Polling ──
+        let selectedPptxFile = null;
+        let pptxPollTimer = null;
+
+        function onPptxSelected(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            selectedPptxFile = file;
+            document.getElementById('pptx-file-preview').textContent = file.name + ' (' + (file.size / 1024 / 1024).toFixed(1) + ' MB)';
+            document.getElementById('btn-pptx').disabled = false;
+            hideError('pptx-error');
+
+            // Drag-drop visual reset
+            const dz = document.getElementById('pptx-drop-zone');
+            dz.style.borderColor = 'var(--sh-green)';
+        }
+
+        const pptxDropZone = document.getElementById('pptx-drop-zone');
+        if (pptxDropZone) {
+            pptxDropZone.addEventListener('dragover', e => { e.preventDefault(); pptxDropZone.classList.add('drag-over'); });
+            pptxDropZone.addEventListener('dragleave', () => pptxDropZone.classList.remove('drag-over'));
+            pptxDropZone.addEventListener('drop', e => {
+                e.preventDefault(); pptxDropZone.classList.remove('drag-over');
+                const file = e.dataTransfer.files[0];
+                if (file && file.name.toLowerCase().endsWith('.pptx')) {
+                    // Simulate the input change
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    document.getElementById('pptx-file-input').files = dt.files;
+                    onPptxSelected({ target: { files: [file] } });
+                } else {
+                    showError('pptx-error', 'Solo se aceptan archivos .pptx.');
+                }
+            });
+        }
+
+        async function doPptxUpload() {
+            const name = document.getElementById('pres-name').value.trim();
+            if (!name) { showError('pptx-error', 'El nombre es requerido.'); return; }
+            if (!selectedPptxFile) { showError('pptx-error', 'Selecciona un archivo .pptx.'); return; }
+            hideError('pptx-error');
+            document.getElementById('btn-pptx').disabled = true;
+            document.getElementById('pptx-uploading').classList.remove('hidden');
+
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('description', document.getElementById('pres-desc').value.trim());
+            formData.append('file', selectedPptxFile);
+
+            try {
+                const res = await fetch('/api/presentations/create-from-pptx', {
+                    method: 'POST', body: formData, headers: csrfHeaders()
+                });
+                const data = await res.json();
+                document.getElementById('pptx-uploading').classList.add('hidden');
+
+                if (res.ok && data.success) {
+                    W.presentationId = data.presentationId;
+                    persistPresentationIdInUrl();
+                    document.getElementById('pptx-processing').classList.remove('hidden');
+                    startPptxPolling(data.presentationId);
+                } else {
+                    showError('pptx-error', data.error || 'Error al subir el archivo.');
+                    document.getElementById('btn-pptx').disabled = false;
+                }
+            } catch (e) {
+                document.getElementById('pptx-uploading').classList.add('hidden');
+                showError('pptx-error', 'Error de conexión.');
+                document.getElementById('btn-pptx').disabled = false;
+            }
+        }
+
+        function startPptxPolling(presentationId) {
+            if (pptxPollTimer) clearInterval(pptxPollTimer);
+            pptxPollTimer = setInterval(async () => {
+                try {
+                    const res = await fetch('/api/presentations/' + presentationId + '/pptx-status');
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    if (data.status === 'READY') {
+                        clearInterval(pptxPollTimer);
+                        W.totalSlides = data.slideCount || 0;
+                        document.getElementById('pptx-processing').classList.add('hidden');
+                        onUploadComplete();
+                    } else if (data.status === 'FAILED') {
+                        clearInterval(pptxPollTimer);
+                        document.getElementById('pptx-processing').classList.add('hidden');
+                        showError('pptx-error', 'Lambda no pudo convertir el archivo. Intenta con otro .pptx.');
+                        document.getElementById('btn-pptx').disabled = false;
+                    }
+                } catch (e) { /* silencioso — reintenta en el próximo tick */ }
+            }, 3000);
         }
 
         function onUploadComplete() {

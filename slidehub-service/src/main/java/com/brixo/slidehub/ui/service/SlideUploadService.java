@@ -92,4 +92,15 @@ public class SlideUploadService {
     public String buildSlideKey(String presentationId, int slideNumber) {
         return "slides/%s/%d.png".formatted(presentationId, slideNumber);
     }
+
+    /**
+     * Construye la URL pública de un objeto S3 sin subir ningún archivo.
+     * Útil para registrar URLs de slides que Lambda ya subió.
+     *
+     * @param key clave S3 del objeto
+     * @return URL pública: "https://{bucket}.s3.{region}.amazonaws.com/{key}"
+     */
+    public String buildPublicUrl(String key) {
+        return "https://%s.s3.%s.amazonaws.com/%s".formatted(bucket, region, key);
+    }
 }
