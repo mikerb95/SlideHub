@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,22 +18,26 @@
             flex-direction: column;
             gap: 0.5rem;
         }
+
         .doc-card:hover {
             border-color: var(--sh-blue);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(88, 166, 255, 0.1);
         }
+
         .doc-icon {
             font-size: 1.5rem;
             color: var(--sh-blue);
             margin-bottom: 0.5rem;
         }
+
         .doc-title {
             font-family: var(--sh-font-brand);
             color: var(--sh-text-1);
             font-size: 1.2rem;
             margin: 0;
         }
+
         .doc-desc {
             font-size: 0.85rem;
             color: var(--sh-text-2);
@@ -40,18 +45,35 @@
             margin: 0;
             flex-grow: 1;
         }
-        .badge-blue { 
-            border: 1px solid rgba(88, 166, 255, 0.45); color: #58a6ff; background: rgba(88, 166, 255, 0.08); 
-            font-family: var(--sh-font-mono); font-size: 0.66rem; border-radius: 4px; padding: 0.08rem 0.42rem; 
-            display: inline-flex; align-items: center; width: max-content;
+
+        .badge-blue {
+            border: 1px solid rgba(88, 166, 255, 0.45);
+            color: #58a6ff;
+            background: rgba(88, 166, 255, 0.08);
+            font-family: var(--sh-font-mono);
+            font-size: 0.66rem;
+            border-radius: 4px;
+            padding: 0.08rem 0.42rem;
+            display: inline-flex;
+            align-items: center;
+            width: max-content;
         }
+
         .badge-gray {
-            border: 1px solid var(--sh-border); color: var(--sh-text-2); background: rgba(255, 255, 255, 0.05); 
-            font-family: var(--sh-font-mono); font-size: 0.66rem; border-radius: 4px; padding: 0.08rem 0.42rem; 
-            display: inline-flex; align-items: center; width: max-content;
+            border: 1px solid var(--sh-border);
+            color: var(--sh-text-2);
+            background: rgba(255, 255, 255, 0.05);
+            font-family: var(--sh-font-mono);
+            font-size: 0.66rem;
+            border-radius: 4px;
+            padding: 0.08rem 0.42rem;
+            display: inline-flex;
+            align-items: center;
+            width: max-content;
         }
     </style>
 </head>
+
 <body class="sh antialiased">
     <nav class="sh-nav" style="position:sticky;top:0;z-index:50;">
         <div class="sh-nav-inner">
@@ -66,23 +88,25 @@
             </div>
         </div>
     </nav>
-    
+
     <div class="max-w-5xl mx-auto px-4 py-8 space-y-8">
         <header class="mb-10 text-center">
             <h1 class="font-brand text-4xl text-[var(--sh-text-1)] mb-3">Portal de Sustentación</h1>
             <p class="text-[var(--sh-text-2)] max-w-2xl mx-auto">
-                Accede rápidamente a toda la documentación de calidad, metodologías, seguimiento organizacional y el estado actual de la plataforma de SlideHub.
+                Accede rápidamente a toda la documentación de calidad, metodologías, seguimiento organizacional y el
+                estado actual de la plataforma de SlideHub.
             </p>
         </header>
 
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            
+
             <a href="/metodologia" class="doc-card">
                 <i class="fa-solid fa-people-group doc-icon"></i>
                 <h2 class="doc-title">Metodología Scrum</h2>
                 <div class="badge-blue mb-1">Agile & Desarrollo</div>
                 <p class="doc-desc">
-                    Justificación de la elección de Scrum frente a alternativas (Cascada, Espiral, Kanban). Mapeo de mitigación de problemas, carga de reuniones y estructuración de sprints.
+                    Justificación de la elección de Scrum frente a alternativas (Cascada, Espiral, Kanban). Mapeo de
+                    mitigación de problemas, carga de reuniones y estructuración de sprints.
                 </p>
             </a>
 
@@ -91,7 +115,8 @@
                 <h2 class="doc-title">Matriz PDCA & Gestión</h2>
                 <div class="badge-blue mb-1">ISO 12207 / 27001</div>
                 <p class="doc-desc">
-                    Plan de gestión iterativo, reporte de verificación (V&V), seguimiento de la certificación de seguridad y cumplimiento normativo (PDCA, PSP).
+                    Plan de gestión iterativo, reporte de verificación (V&V), seguimiento de la certificación de
+                    seguridad y cumplimiento normativo (PDCA, PSP).
                 </p>
             </a>
 
@@ -100,7 +125,8 @@
                 <h2 class="doc-title">Criterios de Calidad</h2>
                 <div class="badge-blue mb-1">ISO 25000 / SQuaRE</div>
                 <p class="doc-desc">
-                    Evaluación y normativas aplicadas al análisis del código, mantenibilidad, rendimiento y usabilidad de la herramienta. 
+                    Evaluación y normativas aplicadas al análisis del código, mantenibilidad, rendimiento y usabilidad
+                    de la herramienta.
                 </p>
             </a>
 
@@ -109,16 +135,18 @@
                 <h2 class="doc-title">Guía de Inteligencia Artificial</h2>
                 <div class="badge-blue mb-1">LLM / Operaciones</div>
                 <p class="doc-desc">
-                    Documentación técnica de integración con Groq, Gemini WebClient, y estrategias de contexto automático para generación de notas y deploys.
+                    Documentación técnica de integración con Groq, Gemini WebClient, y estrategias de contexto
+                    automático para generación de notas y deploys.
                 </p>
             </a>
 
-            <a href="/status" class="doc-card" target="_blank">
+            <a href="/actuator/health" class="doc-card" target="_blank">
                 <i class="fa-solid fa-heart-pulse doc-icon" style="color: #4ade80;"></i>
                 <h2 class="doc-title">Platform Health (Status)</h2>
                 <div class="badge-gray mb-1">Ops & Monitoreo</div>
                 <p class="doc-desc">
-                    Estado en tiempo real de los microservicios acoplados al monolito. Conexiones a PostgreSQL (Aiven), Redis, S3, y servicios API AI. (Actuator)
+                    Estado en tiempo real de los microservicios acoplados al monolito. Conexiones a PostgreSQL (Aiven),
+                    Redis, S3, y servicios API AI. (Actuator)
                 </p>
             </a>
 
@@ -127,11 +155,13 @@
                 <h2 class="doc-title">Deploy Tutor</h2>
                 <div class="badge-gray mb-1">Infraestructura AI</div>
                 <p class="doc-desc">
-                    Módulo generador de guías de despliegue mediante Gemini + Groq. Analiza repositorios y entrega Dockerfiles listos para Render, Netlify o Vercel.
+                    Módulo generador de guías de despliegue mediante Gemini + Groq. Analiza repositorios y entrega
+                    Dockerfiles listos para Render, Netlify o Vercel.
                 </p>
             </a>
 
         </div>
     </div>
 </body>
+
 </html>
