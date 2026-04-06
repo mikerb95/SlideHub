@@ -93,6 +93,19 @@
                 <p th:if="${p.description() != null and !p.description().isBlank()}"
                     class="text-xs text-[var(--sh-text-2)] line-clamp-2" th:text="${p.description()}"></p>
 
+                <!-- Join code -->
+                <div th:if="${p.joinCode() != null}"
+                    class="flex items-center gap-2 bg-[var(--sh-surface-2)] rounded px-2.5 py-1.5">
+                    <i class="fa-solid fa-users text-[var(--sh-text-3)] text-[0.65rem]"></i>
+                    <span class="font-mono text-xs text-[var(--sh-text-3)]">Espectadores:</span>
+                    <span class="font-mono text-sm font-semibold text-[var(--sh-text-1)] tracking-widest"
+                        th:text="${p.joinCode()}">00000</span>
+                    <a th:href="@{/join(code=${p.joinCode()})}" target="_blank"
+                        class="ml-auto font-mono text-[0.6rem] text-[var(--sh-accent)] hover:underline">
+                        /join
+                    </a>
+                </div>
+
                 <!-- Date -->
                 <div class="font-mono text-[0.65rem] text-[var(--sh-text-3)]"
                     th:text="${#temporals.format(p.createdAt(), 'dd MMM yyyy')}">01 Jan 2026</div>

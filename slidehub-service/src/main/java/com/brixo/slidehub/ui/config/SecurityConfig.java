@@ -64,7 +64,7 @@ public class SecurityConfig {
                                 .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
                                 .authorizeHttpRequests(auth -> auth
                                                 // Vistas públicas (HU-005, HU-011, HU-012, HU-013)
-                                                .requestMatchers("/slides", "/remote", "/demo", "/showcase").permitAll()
+                                                .requestMatchers("/slides", "/remote", "/demo", "/showcase", "/join").permitAll()
                                                 // Join de reunión por QR + comandos en remoto (públicos pero
                                                 // tokenizados)
                                                 .requestMatchers(
