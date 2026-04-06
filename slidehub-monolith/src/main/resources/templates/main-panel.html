@@ -938,6 +938,112 @@
         sendDeviceHeartbeat(true);
         setInterval(() => sendDeviceHeartbeat(false), 30000);
     </script>
+
+    <!-- Q&A Panel Script (solo cuando hay presentationId) -->
+    <script th:if="${presentationId != null and presentationId != ''}" th:inline="javascript">
+        (function () {
+            const PRES_ID = /*[[${presentationId}]]*/ '';
+            if (!PRES_ID) return;
+
+            const Q_API = `/api/presentations/${PRES_ID}/questions`;
+            const S_API = `/api/presentations/${PRES_ID}/stream`;
+
+            const qaSection = document.getElementById('qa-section');
+            const mpQList = document.getElementById('mp-q-list');
+            const mpQBadge = document.getElementById('mp-q-badge');
+            const mpViewerStats = document.getElementById('mp-viewer-stats');
+
+            let showAll = false;
+
+            window.mpToggleAllQuestions = function () {
+                showAll = !showAll;
+                document.getElementById('mp-q-show-all-btn').textContent = showAll ? 'Solo pendientes' : 'Ver todas';
+                pollQuestions();
+            };
+
+            async function pollQuestions() {
+                try {
+                    const url = showAll ? Q_API : `${Q_API}?status=PENDING`;
+                    const res = await fetch(url);
+                    if (!res.ok) return;
+                    const questions = await res.json();
+
+                    qaSection.style.display = 'block';
+                    const pending = questions.filter(q => q.status === 'PENDING');
+                    mpQBadge.style.display = pending.length > 0 ? 'inline' : 'none';
+                    mpQBadge.textContent = pending.length;
+
+                    if (questions.length === 0) {
+                        mpQList.innerHTML = '<p class="text-xs font-mono text-[var(--sh-text-3)]">Sin preguntas ' + (showAll ? '.' : 'pendientes.') + '</p>';
+                        return;
+                    }
+
+                    mpQList.innerHTML = questions.map(q => {
+                        const statusColor = q.status === 'ANSWERED' ? 'var(--sh-green)' : q.status === 'DISMISSED' ? 'var(--sh-text-3)' : 'var(--sh-amber)';
+                        return `
+                        <div class="bg-[var(--sh-deep)] border border-[var(--sh-border)] rounded-tech p-2.5 text-xs"
+                             style="${q.status !== 'PENDING' ? 'opacity:0.6' : ''}">
+                            <div class="flex justify-between items-start gap-2 mb-1">
+                                <span class="font-mono text-[0.62rem]" style="color:var(--sh-blue)">
+                                    ${q.anonymous ? '<i class="fa-solid fa-user-secret"></i> Anónimo' : escHtml(q.displayName || 'Sin nombre')}
+                                </span>
+                                <div class="flex items-center gap-1.5 shrink-0">
+                                    ${q.upvotes > 0 ? `<span class="font-mono text-[0.6rem] text-[var(--sh-text-3)]">▲${q.upvotes}</span>` : ''}
+                                    <span class="font-mono text-[0.58rem]" style="color:${statusColor}">${q.status}</span>
+                                </div>
+                            </div>
+                            <p class="text-[var(--sh-text-1)] leading-relaxed mb-2">${escHtml(q.content)}</p>
+                            ${q.status === 'PENDING' ? `
+                            <div class="flex gap-1">
+                                <button onclick="mpMarkQuestion('${q.id}','ANSWERED')"
+                                    class="sh-btn text-[0.62rem] py-0.5 px-2">
+                                    <i class="fa-solid fa-check"></i> Respondida
+                                </button>
+                                <button onclick="mpMarkQuestion('${q.id}','DISMISSED')"
+                                    class="sh-btn sh-btn-ghost text-[0.62rem] py-0.5 px-2">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>` : ''}
+                        </div>`;
+                    }).join('');
+                } catch (_) {}
+            }
+
+            window.mpMarkQuestion = async function (questionId, status) {
+                try {
+                    await fetch(`${Q_API}/${questionId}/status`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status })
+                    });
+                    pollQuestions();
+                } catch (_) {}
+            };
+
+            async function pollStats() {
+                try {
+                    const res = await fetch(`${S_API}/stats`);
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    if (data.viewerCount > 0) {
+                        qaSection.style.display = 'block';
+                        mpViewerStats.textContent = `👁 ${data.viewerCount} espectadores` +
+                            (data.handCount > 0 ? `   ✋ ${data.handCount} manos levantadas` : '');
+                    }
+                } catch (_) {}
+            }
+
+            function escHtml(str) {
+                if (!str) return '';
+                return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+            }
+
+            pollQuestions();
+            pollStats();
+            setInterval(pollQuestions, 5000);
+            setInterval(pollStats, 5000);
+        })();
+    </script>
 </body>
 
 </html>
