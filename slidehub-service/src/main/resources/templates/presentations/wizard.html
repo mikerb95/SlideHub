@@ -294,17 +294,19 @@
                     <!-- Estado: Lambda procesando -->
                     <div id="pptx-processing" class="hidden mt-3 p-3 rounded-tech"
                         style="background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.2);">
-                        <div class="flex items-center gap-2 mb-1" style="color: var(--sh-blue);">
-                            <i class="fa-solid fa-spinner fa-spin"></i>
-                            <span class="font-mono text-sm font-semibold">Convirtiendo diapositivas...</span>
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <div class="flex items-center gap-2" style="color: var(--sh-blue);">
+                                <i class="fa-solid fa-spinner fa-spin"></i>
+                                <span class="font-mono text-sm font-semibold">Convirtiendo diapositivas...</span>
+                            </div>
+                            <span id="pptx-elapsed" class="font-mono text-xs" style="color: var(--sh-text-3);">0s</span>
                         </div>
-                        <div class="text-xs text-[var(--sh-text-3)]">Lambda está procesando tu PPTX.
-                            Esto puede tomar hasta 1-2 minutos dependiendo del tamaño.</div>
+                        <div id="pptx-status-msg" class="text-xs text-[var(--sh-text-3)]">Lambda está procesando tu PPTX. Normalmente tarda 30-60 segundos.</div>
                         <div class="mt-2">
                             <div class="h-1 rounded-full overflow-hidden" style="background: var(--sh-border);">
                                 <div id="pptx-progress-bar"
-                                    class="h-full rounded-full animate-pulse"
-                                    style="background: var(--sh-blue); width: 60%;"></div>
+                                    class="h-full rounded-full transition-all"
+                                    style="background: var(--sh-blue); width: 2%; transition-duration: 3s;"></div>
                             </div>
                         </div>
                     </div>
