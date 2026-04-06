@@ -483,6 +483,13 @@
 
         function buildGrid(total) {
             grid.innerHTML = '';
+            if (total <= 0) {
+                grid.innerHTML = `<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--sh-text-3);">
+                    <i class="fa-solid fa-folder-open" style="font-size:2rem;margin-bottom:.75rem;display:block;"></i>
+                    <p>Abre una presentación desde <a href="/presentations" style="color:var(--sh-accent);">Presentaciones</a> para usar el panel.</p>
+                </div>`;
+                return;
+            }
             for (let i = 1; i <= total; i++) {
                 const div = document.createElement('div');
                 div.className = 'slide-thumb';
@@ -568,7 +575,8 @@
                 const [slideRes, demoRes] = await Promise.all([fetch(API_SLIDE_URL), fetch(API_DEMO_URL)]);
                 if (!slideRes.ok) return;
                 const data = await slideRes.json();
-                const effectiveTotal = slideUrls.length > 0 ? slideUrls.length : data.totalSlides;
+                const effectiveTotal = slideUrls.length > 0 ? slideUrls.length
+                    : (PRESENTATION_ID ? data.totalSlides : 0);
                 if (effectiveTotal !== totalSlides) {
                     totalSlides = effectiveTotal;
                     buildGrid(totalSlides);
