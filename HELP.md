@@ -1,5 +1,13 @@
 # Getting Started
 
+## Propiedad y licencia
+
+Este repositorio es **código cerrado** y se publica en GitHub solo para visibilidad y referencia.
+
+- Licencia: **All Rights Reserved**
+- No se permite usar, copiar, modificar, redistribuir, sublicenciar ni comercializar el código sin autorización escrita previa.
+- La publicación pública del repositorio no concede permisos de uso más allá de los expresamente otorgados por el titular.
+
 ### Reference Documentation
 For further reference, please consider the following sections:
 
