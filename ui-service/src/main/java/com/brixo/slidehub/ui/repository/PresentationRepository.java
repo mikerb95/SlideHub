@@ -24,4 +24,8 @@ public interface PresentationRepository extends JpaRepository<Presentation, Stri
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("delete from Presentation p where p.user.id = :userId")
     int deleteByUserId(@Param("userId") String userId);
+
+    Optional<Presentation> findByJoinCode(String joinCode);
+
+    boolean existsByJoinCode(String joinCode);
 }

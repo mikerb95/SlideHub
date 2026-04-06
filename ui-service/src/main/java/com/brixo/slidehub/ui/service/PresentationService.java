@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Lógica de negocio para importar y listar presentaciones (PLAN-EXPANSION.md
@@ -347,10 +348,22 @@ public class PresentationService {
         p.setSourceType(sourceType);
         p.setDriveFolderId(driveFolderId);
         p.setDriveFolderName(driveFolderName);
+        p.setJoinCode(generateUniqueJoinCode());
         LocalDateTime now = LocalDateTime.now();
         p.setCreatedAt(now);
         p.setUpdatedAt(now);
         return p;
+    }
+
+    private String generateUniqueJoinCode() {
+        ThreadLocalRandom rng = ThreadLocalRandom.current();
+        for (int attempt = 0; attempt < 20; attempt++) {
+            String code = String.format("%05d", rng.nextInt(10000, 100000));
+            if (!presentationRepository.existsByJoinCode(code)) {
+                return code;
+            }
+        }
+        throw new IllegalStateException("No se pudo generar un join code único tras 20 intentos.");
     }
 
     private Slide buildSlide(Presentation presentation,
