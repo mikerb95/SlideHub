@@ -322,6 +322,175 @@
         sendDeviceHeartbeat(true);
         setInterval(() => sendDeviceHeartbeat(false), 30000);
     </script>
+
+    <!-- Q&A Widget Script -->
+    <script th:if="${presentationId != null and presentationId != ''}" th:inline="javascript">
+        (function () {
+            const PRES_ID = /*[[${presentationId}]]*/ '';
+            if (!PRES_ID) return;
+
+            const QA_BASE = `/api/presentations/${PRES_ID}`;
+            const STORAGE_KEY = `qa-viewer:${PRES_ID}`;
+
+            let viewerToken = null;
+            let sessionId = null;
+            let handRaised = false;
+            let qaEnabled = false;
+            let anonAllowed = false;
+
+            const fab = document.getElementById('qa-fab');
+            const panel = document.getElementById('qa-panel');
+            const viewerCountEl = document.getElementById('qa-viewer-count');
+            const handBadge = document.getElementById('qa-hand-badge');
+            const handBtn = document.getElementById('qa-hand-btn');
+            const qaSetup = document.getElementById('qa-setup');
+            const qaForm = document.getElementById('qa-form');
+            const qaIdentity = document.getElementById('qa-identity');
+            const qaMsg = document.getElementById('qa-msg');
+            const qaAnonChk = document.getElementById('qa-anon');
+
+            function showMsg(text, type) {
+                qaMsg.textContent = text;
+                qaMsg.className = 'qa-msg ' + type;
+                if (type === 'ok') setTimeout(() => { qaMsg.textContent = ''; qaMsg.className = 'qa-msg'; }, 3000);
+            }
+
+            window.toggleQaPanel = function () {
+                panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+            };
+
+            fab.addEventListener('click', toggleQaPanel);
+
+            async function init() {
+                try {
+                    const res = await fetch(`${QA_BASE}/questions/settings`);
+                    if (!res.ok) return;
+                    const cfg = await res.json();
+                    qaEnabled = cfg.questionsEnabled;
+                    anonAllowed = cfg.allowAnonymousQuestions;
+                    if (!qaEnabled) return;
+
+                    // Restore session from sessionStorage
+                    const stored = sessionStorage.getItem(STORAGE_KEY);
+                    if (stored) {
+                        try {
+                            const parsed = JSON.parse(stored);
+                            viewerToken = parsed.viewerToken;
+                            sessionId = parsed.sessionId;
+                            showJoined(parsed.displayName, parsed.anonymous);
+                        } catch (_) { sessionStorage.removeItem(STORAGE_KEY); }
+                    }
+
+                    if (!anonAllowed) {
+                        qaAnonChk.parentElement.style.display = 'none';
+                    }
+
+                    fab.style.display = 'flex';
+                    viewerCountEl.style.display = 'block';
+                    pollStats();
+                    setInterval(pollStats, 5000);
+                    if (viewerToken) {
+                        setInterval(heartbeat, 30000);
+                    }
+                } catch (_) {}
+            }
+
+            window.qaJoin = async function () {
+                const nameVal = document.getElementById('qa-name').value.trim();
+                const anon = qaAnonChk.checked;
+                try {
+                    const res = await fetch(`${QA_BASE}/stream/join`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ displayName: anon ? '' : nameVal })
+                    });
+                    if (!res.ok) { showMsg('No hay sesión activa.', 'err'); return; }
+                    const data = await res.json();
+                    viewerToken = data.viewerToken;
+                    sessionId = data.sessionId;
+                    const displayName = anon ? null : (nameVal || null);
+                    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ viewerToken, sessionId, displayName, anonymous: anon }));
+                    showJoined(displayName, anon);
+                    setInterval(heartbeat, 30000);
+                } catch (_) { showMsg('Error al unirse.', 'err'); }
+            };
+
+            function showJoined(displayName, anon) {
+                qaSetup.style.display = 'none';
+                qaForm.style.display = 'block';
+                qaIdentity.textContent = anon ? '(anónimo)' : (displayName ? `Hola, ${displayName}` : '(sin nombre)');
+            }
+
+            window.qaSend = async function () {
+                const content = document.getElementById('qa-content').value.trim();
+                if (!content) { showMsg('Escribe tu pregunta.', 'err'); return; }
+                const stored = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || '{}');
+                const sendBtn = document.getElementById('qa-send-btn');
+                sendBtn.disabled = true;
+                try {
+                    const res = await fetch(`${QA_BASE}/questions/submit`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            viewerToken,
+                            displayName: stored.displayName || null,
+                            anonymous: stored.anonymous || false,
+                            content
+                        })
+                    });
+                    const data = await res.json();
+                    if (!res.ok) { showMsg(data.error || 'Error al enviar.', 'err'); return; }
+                    document.getElementById('qa-content').value = '';
+                    showMsg('¡Pregunta enviada!', 'ok');
+                } catch (_) { showMsg('Error al enviar.', 'err'); }
+                finally { sendBtn.disabled = false; }
+            };
+
+            window.qaToggleHand = async function () {
+                handRaised = !handRaised;
+                handBtn.classList.toggle('active', handRaised);
+                handBadge.style.display = handRaised ? 'inline' : 'none';
+                handBadge.textContent = '✋';
+                try {
+                    await fetch(`${QA_BASE}/stream/hand`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ viewerToken, raised: handRaised })
+                    });
+                } catch (_) {}
+            };
+
+            async function heartbeat() {
+                if (!viewerToken) return;
+                try {
+                    await fetch(`${QA_BASE}/stream/heartbeat`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ viewerToken })
+                    });
+                } catch (_) {}
+            }
+
+            async function pollStats() {
+                try {
+                    const res = await fetch(`${QA_BASE}/stream/stats`);
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    viewerCountEl.textContent = `👁 ${data.viewerCount}` +
+                        (data.handCount > 0 ? `  ✋ ${data.handCount}` : '');
+                } catch (_) {}
+            }
+
+            window.addEventListener('beforeunload', () => {
+                if (viewerToken) {
+                    navigator.sendBeacon(`${QA_BASE}/stream/leave`,
+                        new Blob([JSON.stringify({ viewerToken })], { type: 'application/json' }));
+                }
+            });
+
+            init();
+        })();
+    </script>
 </body>
 
 </html>
