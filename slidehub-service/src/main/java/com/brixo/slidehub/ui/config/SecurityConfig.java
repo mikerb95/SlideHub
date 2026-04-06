@@ -106,10 +106,12 @@ public class SecurityConfig {
                                                 .permitAll()
                                                 // Documentación/calidad y checks de prueba públicos
                                                 .requestMatchers("/calidad", "/status", "/status/api/checks",
-                                                                "/actuator/health", "/actuator/info")
+                                                                "/actuator/health", "/actuator/info",
+                                                                "/sustentacion", "/metodologia", "/matriz-pdca",
+                                                                "/ai-guide", "/deploy-tutor")
                                                 .permitAll()
                                                 // Panel del presentador y main panel — requiere PRESENTER o ADMIN
-                                                .requestMatchers("/presenter", "/main-panel", "/ai-guide")
+                                                .requestMatchers("/presenter", "/main-panel")
                                                 .hasAnyRole("PRESENTER", "ADMIN")
                                                 // Perfil del usuario — requiere estar autenticado
                                                 .requestMatchers("/auth/profile").authenticated()
