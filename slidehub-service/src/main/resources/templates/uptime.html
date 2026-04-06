@@ -212,19 +212,19 @@
                 // Métricas
                 document.getElementById('metrics-grid').innerHTML = `
                     <div class="stat-card">
-                        <div class="stat-value" style="color:${uptimeColor(d.uptime7d)}">${fmt(d.uptime7d)}%</div>
+                        ${uptimeStat(d.uptime7d)}
                         <div class="stat-label">Uptime 7 días</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" style="color:${uptimeColor(d.uptime30d)}">${fmt(d.uptime30d)}%</div>
+                        ${uptimeStat(d.uptime30d)}
                         <div class="stat-label">Uptime 30 días</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" style="color:${uptimeColor(d.uptime90d)}">${fmt(d.uptime90d)}%</div>
+                        ${uptimeStat(d.uptime90d)}
                         <div class="stat-label">Uptime 90 días</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value text-[var(--sh-text-1)]">${d.avgResponseMs}<span class="text-base font-normal text-[var(--sh-text-3)] ml-1">ms</span></div>
+                        <div class="stat-value text-[var(--sh-text-1)]">${d.avgResponseMs > 0 ? d.avgResponseMs + '<span class="text-base font-normal text-[var(--sh-text-3)] ml-1">ms</span>' : '<span class="text-base text-[var(--sh-text-3)]">Sin datos</span>'}</div>
                         <div class="stat-label">Respuesta prom.</div>
                     </div>`;
 
