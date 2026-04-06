@@ -11,9 +11,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.redis.core.RedisTemplate;
 
 /**
  * Lógica de negocio de usuarios: registro, verificación de email (HU-001/002).
@@ -26,16 +28,19 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Value("${slidehub.base-url:http://localhost:8082}")
     private String baseUrl;
 
     public UserService(UserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            EmailService emailService) {
+            EmailService emailService,
+            RedisTemplate<String, String> redisTemplate) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
+        this.redisTemplate = redisTemplate;
     }
 
     /**
@@ -93,7 +98,55 @@ public class UserService {
                 });
     }
 
+    public void requestPasswordReset(String email) {
+        userRepository.findByEmail(email).ifPresent(user -> {
+            String token = UUID.randomUUID().toString();
+            redisTemplate.opsForValue().set("pwreset:" + token, user.getId(), Duration.ofMinutes(15));
+            sendPasswordResetEmail(user.getEmail(), token);
+            log.info("Solicitud de reseteo de contraseña creada para: {}", email);
+        });
+    }
+
+    @Transactional
+    public boolean resetPassword(String token, String newPassword) {
+        String userId = redisTemplate.opsForValue().get("pwreset:" + token);
+        if (userId == null) {
+            return false;
+        }
+        
+        Optional<User> optUser = userRepository.findById(userId);
+        if (optUser.isPresent()) {
+            User user = optUser.get();
+            user.setPasswordHash(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+            redisTemplate.delete("pwreset:" + token);
+            log.info("Contraseña actualizada para usuario: {}", user.getUsername());
+            return true;
+        }
+        return false;
+    }
+
     // ── Privados ──────────────────────────────────────────────────────────────
+
+    private void sendPasswordResetEmail(String email, String token) {
+        String resetUrl = baseUrl + "/auth/reset-password?token=" + token;
+        String html = """
+                <h2 style="font-family:sans-serif">Restablece tu contraseña en SlideHub</h2>
+                <p style="font-family:sans-serif">
+                    Hemos recibido una solicitud para cambiar tu contraseña. Haz clic en el enlace de abajo para establecer una nueva:
+                </p>
+                <a href="%s"
+                   style="background:#1f6feb;color:white;padding:10px 20px;
+                          text-decoration:none;border-radius:6px;font-family:sans-serif;display:inline-block;">
+                    Restablecer contraseña
+                </a>
+                <p style="font-family:sans-serif;color:#8b949e;font-size:0.85rem;margin-top:1rem">
+                    Este enlace expirará en 15 minutos. Si no solicitaste este cambio, puedes ignorar este mensaje.
+                </p>
+                """.formatted(resetUrl);
+
+        emailService.send(email, "Restablece tu contraseña en SlideHub", html);
+    }
 
     private void sendVerificationEmail(String email, String token) {
         String confirmUrl = baseUrl + "/auth/verify?token=" + token;

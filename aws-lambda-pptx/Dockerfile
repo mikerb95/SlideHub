@@ -1,6 +1,6 @@
 FROM public.ecr.aws/lambda/python:3.12 AS builder
 
-RUN yum install -y zip
+RUN dnf install -y zip
 
 WORKDIR /build
 COPY requirements.txt .
