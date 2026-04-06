@@ -108,7 +108,7 @@ public class SecurityConfig {
                                                 .requestMatchers("/calidad", "/status", "/status/api/checks",
                                                                 "/actuator/health", "/actuator/info",
                                                                 "/sustentacion", "/metodologia", "/matriz-pdca",
-                                                                "/ai-guide", "/deploy-tutor",
+                                                                "/ai-guide",
                                                                 "/uptime", "/api/uptime/status")
                                                 .permitAll()
                                                 // Panel del presentador y main panel — requiere PRESENTER o ADMIN
