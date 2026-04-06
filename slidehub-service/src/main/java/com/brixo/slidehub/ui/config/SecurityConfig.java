@@ -111,6 +111,9 @@ public class SecurityConfig {
                                                                 "/ai-guide",
                                                                 "/uptime", "/api/uptime/status")
                                                 .permitAll()
+                                                // Panel de gestión — solo DEVELOPER
+                                                .requestMatchers("/mgr", "/mgr/**")
+                                                .hasRole("DEVELOPER")
                                                 // Panel del presentador y main panel — requiere PRESENTER o ADMIN
                                                 .requestMatchers("/presenter", "/main-panel")
                                                 .hasAnyRole("PRESENTER", "ADMIN")
