@@ -70,18 +70,33 @@
         </div>
 
         <!-- Notes Panel -->
-        <div class="w-full lg:w-[380px] lg:min-w-[280px] bg-sh-card border-t lg:border-t-0 lg:border-l border-[var(--sh-border)] overflow-y-auto p-4 sm:p-5"
+        <div class="w-full lg:w-[380px] lg:min-w-[280px] bg-sh-card border-t lg:border-t-0 lg:border-l border-[var(--sh-border)] overflow-y-auto p-4 sm:p-5 flex flex-col gap-5"
             id="notes-panel">
-            <div class="sh-label mb-4">
-                <i class="fa-solid fa-note-sticky mr-1"></i>NOTAS DEL PRESENTADOR
+
+            <!-- Notas IA -->
+            <div>
+                <div class="sh-label mb-4">
+                    <i class="fa-solid fa-note-sticky mr-1"></i>NOTAS DEL PRESENTADOR
+                </div>
+                <div id="notes-content">
+                    <div class="text-center mt-12 text-[var(--sh-text-3)]">
+                        <i class="fa-solid fa-robot text-2xl mb-3 block opacity-40"></i>
+                        <p class="text-xs font-mono leading-relaxed">
+                            Las notas IA aparecerán aquí.<br>
+                            Genéralas desde el panel maestro.
+                        </p>
+                    </div>
+                </div>
             </div>
-            <div id="notes-content">
-                <div class="text-center mt-12 text-[var(--sh-text-3)]">
-                    <i class="fa-solid fa-robot text-2xl mb-3 block opacity-40"></i>
-                    <p class="text-xs font-mono leading-relaxed">
-                        Las notas IA aparecerán aquí.<br>
-                        Genéralas desde el panel maestro.
-                    </p>
+
+            <!-- Panel de preguntas del stream -->
+            <div id="questions-panel" style="display:none;">
+                <div class="sh-label mb-3 flex items-center justify-between">
+                    <span><i class="fa-solid fa-circle-question mr-1"></i>PREGUNTAS EN VIVO</span>
+                    <span id="q-pending-badge" class="sh-badge" style="display:none;"></span>
+                </div>
+                <div id="q-list" class="flex flex-col gap-2">
+                    <p class="text-xs font-mono text-[var(--sh-text-3)]">Sin preguntas aún.</p>
                 </div>
             </div>
         </div>
