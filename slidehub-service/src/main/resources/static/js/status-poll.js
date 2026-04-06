@@ -32,7 +32,7 @@
 
     function renderRows(checks) {
         if (!checks || checks.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="py-4 text-[var(--sh-text-3)] font-mono text-xs">Sin datos</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="py-4 text-[var(--sh-text-3)] font-mono text-xs">Sin datos</td></tr>';
             return;
         }
 
