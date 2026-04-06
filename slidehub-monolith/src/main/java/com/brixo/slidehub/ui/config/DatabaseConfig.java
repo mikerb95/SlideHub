@@ -69,11 +69,12 @@ public class DatabaseConfig {
      * Sin esto, FlywayAutoConfiguration puede no ejecutar las migraciones
      * cuando el DataSource se define manualmente en un @Bean.
      */
-    @Bean(initMethod = "migrate")
+    @Bean
     @ConditionalOnProperty(prefix = "spring.flyway", name = "enabled", havingValue = "true", matchIfMissing = true)
     public Flyway flyway(DataSource dataSource,
             @Value("${spring.flyway.locations:classpath:db/migration}") String locations,
             @Value("${spring.flyway.baseline-on-migrate:false}") boolean baselineOnMigrate,
+            @Value("${spring.flyway.repair-on-migrate:false}") boolean repairOnMigrate,
             @Value("${spring.flyway.default-schema:#{null}}") String defaultSchema,
             @Value("${spring.flyway.schemas:#{null}}") String schemas) {
         var config = Flyway.configure()
@@ -90,6 +91,11 @@ public class DatabaseConfig {
 
         Flyway flyway = config.load();
         log.info("Flyway configured explicitly with custom DataSource");
+        if (repairOnMigrate) {
+            log.info("Running Flyway repair before migration");
+            flyway.repair();
+        }
+        flyway.migrate();
         return flyway;
     }
 
