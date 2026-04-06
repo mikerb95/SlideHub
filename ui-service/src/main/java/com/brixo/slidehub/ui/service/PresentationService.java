@@ -133,14 +133,21 @@ public class PresentationService {
                 .orElse(List.of());
     }
 
+    @Transactional(readOnly = true)
     public Optional<byte[]> getSlideImage(String presentationId, int slideNumber) {
         return presentationRepository.findById(presentationId)
                 .flatMap(presentation -> presentation.getSlides().stream()
                         .filter(slide -> slide.getNumber() == slideNumber)
                         .findFirst()
-                        .map(slide -> {
+                        .flatMap(slide -> {
                             String key = extractS3Key(slide, presentationId);
-                            return slideUploadService.download(key);
+                            try {
+                                return Optional.of(slideUploadService.download(key));
+                            } catch (Exception ex) {
+                                log.error("Error descargando slide {}/{} de S3 (key={}): {}",
+                                        presentationId, slideNumber, key, ex.getMessage());
+                                return Optional.empty();
+                            }
                         }));
     }
 
