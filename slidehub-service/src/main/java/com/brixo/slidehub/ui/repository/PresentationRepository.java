@@ -1,6 +1,7 @@
 package com.brixo.slidehub.ui.repository;
 
 import com.brixo.slidehub.ui.model.Presentation;
+import com.brixo.slidehub.ui.model.SourceType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
