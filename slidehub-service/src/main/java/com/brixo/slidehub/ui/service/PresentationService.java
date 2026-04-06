@@ -459,6 +459,7 @@ public class PresentationService {
         p.setSourceType(sourceType);
         p.setDriveFolderId(driveFolderId);
         p.setDriveFolderName(driveFolderName);
+        p.setJoinCode(generateUniqueJoinCode());
         LocalDateTime now = LocalDateTime.now();
         p.setCreatedAt(now);
         p.setUpdatedAt(now);
