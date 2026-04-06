@@ -241,6 +241,81 @@
         sendDeviceHeartbeat(true);
         setInterval(() => sendDeviceHeartbeat(false), 30000);
     </script>
+
+    <!-- Q&A Polling Script (only when presentationId is present) -->
+    <script th:if="${presentationId != null and presentationId != ''}" th:inline="javascript">
+        (function () {
+            const PRES_ID = /*[[${presentationId}]]*/ '';
+            if (!PRES_ID) return;
+
+            const Q_API = `/api/presentations/${PRES_ID}/questions`;
+            const qPanel = document.getElementById('questions-panel');
+            const qList = document.getElementById('q-list');
+            const qBadge = document.getElementById('q-pending-badge');
+
+            async function pollQuestions() {
+                try {
+                    const res = await fetch(`${Q_API}?status=PENDING`);
+                    if (!res.ok) return;
+                    const questions = await res.json();
+
+                    qPanel.style.display = 'block';
+
+                    if (questions.length === 0) {
+                        qList.innerHTML = '<p class="text-xs font-mono text-[var(--sh-text-3)]">Sin preguntas pendientes.</p>';
+                        qBadge.style.display = 'none';
+                        return;
+                    }
+
+                    qBadge.style.display = 'inline';
+                    qBadge.textContent = questions.length;
+
+                    qList.innerHTML = questions.map(q => `
+                        <div class="bg-[var(--sh-deep)] border border-[var(--sh-border)] rounded-tech p-3 text-xs">
+                            <div class="flex justify-between items-start gap-2 mb-1">
+                                <span class="font-mono text-[var(--sh-blue)] text-[0.65rem]">
+                                    ${q.anonymous ? '<i class="fa-solid fa-user-secret"></i> Anónimo' : escHtml(q.displayName || 'Sin nombre')}
+                                </span>
+                                <span class="text-[var(--sh-text-3)] text-[0.6rem] shrink-0">
+                                    ${q.upvotes > 0 ? `▲ ${q.upvotes}` : ''}
+                                </span>
+                            </div>
+                            <p class="text-[var(--sh-text-1)] leading-relaxed mb-2">${escHtml(q.content)}</p>
+                            <div class="flex gap-1">
+                                <button onclick="markQuestion('${q.id}', 'ANSWERED')"
+                                    class="sh-btn text-[0.65rem] py-0.5 px-2">
+                                    <i class="fa-solid fa-check"></i> Respondida
+                                </button>
+                                <button onclick="markQuestion('${q.id}', 'DISMISSED')"
+                                    class="sh-btn sh-btn-ghost text-[0.65rem] py-0.5 px-2">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                } catch (_) {}
+            }
+
+            window.markQuestion = async function (questionId, status) {
+                try {
+                    await fetch(`${Q_API}/${questionId}/status`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status })
+                    });
+                    pollQuestions();
+                } catch (_) {}
+            };
+
+            function escHtml(str) {
+                if (!str) return '';
+                return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+            }
+
+            pollQuestions();
+            setInterval(pollQuestions, 5000);
+        })();
+    </script>
 </body>
 
 </html>
