@@ -385,6 +385,7 @@ public class MeetingService {
         session.setActive(false);
         session.setUpdatedAt(LocalDateTime.now());
         sessionRepository.save(session);
+        viewerService.cleanupSession(session.getId());
         return false;
     }
 
