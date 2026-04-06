@@ -87,6 +87,35 @@
         <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
         <!-- Font Awesome Icons -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        <!-- Self-XSS Global Warning -->
+        <script>
+            {
+                const titleStyle = `
+                    color: #ff0000; 
+                    font-size: 50px; 
+                    font-weight: bold; 
+                    text-shadow: 2px 2px 0px #000; 
+                    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                    padding: 10px 0;
+                `;
+                const bodyStyle = `
+                    color: #333333; 
+                    font-size: 18px; 
+                    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+                    line-height: 1.5;
+                    background-color: #f9f9f9;
+                    padding: 15px;
+                    border-radius: 5px;
+                    border-left: 5px solid #ff9900;
+                    display: block;
+                `;
+                console.log(
+                    "%c¡ATENCIÓN!\\n%cDesde el SENA para el mundo...\\n\\nEsta función del navegador está pensada únicamente para desarrolladores. Si alguien te indicó que copiaras y pegaras código aquí para habilitar una función o 'hackear' una cuenta, se trata de una estafa y darás acceso a tu información personal.", 
+                    titleStyle, 
+                    bodyStyle
+                );
+            }
+        </script>
     </th:block>
 </body>
 
