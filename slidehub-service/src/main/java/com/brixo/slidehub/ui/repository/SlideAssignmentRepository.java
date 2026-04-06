@@ -15,6 +15,8 @@ public interface SlideAssignmentRepository extends JpaRepository<SlideAssignment
 
     Optional<SlideAssignment> findByPresentationIdAndSlideNumber(String presentationId, int slideNumber);
 
+    void deleteByParticipantId(String participantId);
+
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("delete from SlideAssignment sa where sa.presentation.id in :presentationIds")
     int deleteByPresentationIdIn(@Param("presentationIds") List<String> presentationIds);
