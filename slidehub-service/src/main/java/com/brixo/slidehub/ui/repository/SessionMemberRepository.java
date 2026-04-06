@@ -17,7 +17,7 @@ public interface SessionMemberRepository extends JpaRepository<SessionMember, St
 
     List<SessionMember> findBySessionIdAndActiveTrue(String sessionId);
 
-    @Modifying
+    void deleteByParticipantId(String participantId);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("delete from SessionMember sm where sm.session.presentation.id in :presentationIds")

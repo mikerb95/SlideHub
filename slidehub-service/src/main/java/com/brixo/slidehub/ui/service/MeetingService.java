@@ -129,6 +129,18 @@ public class MeetingService {
     }
 
     @Transactional
+    public void removeParticipant(String userId, String presentationId, String participantId) {
+        requireOwnedPresentation(userId, presentationId);
+        PresentationParticipant participant = participantRepository
+                .findByIdAndPresentationId(participantId, presentationId)
+                .orElseThrow(() -> new IllegalArgumentException("Participante no encontrado."));
+
+        assignmentRepository.deleteByParticipantId(participantId);
+        memberRepository.deleteByParticipantId(participantId);
+        participantRepository.delete(participant);
+    }
+
+    @Transactional
     public AssignmentItem assignSlide(String userId, String presentationId, int slideNumber, String participantId) {
         requireOwnedPresentation(userId, presentationId);
         if (slideNumber < 1) {
