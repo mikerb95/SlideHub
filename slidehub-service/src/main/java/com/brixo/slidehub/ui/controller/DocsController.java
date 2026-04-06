@@ -20,4 +20,9 @@ public class DocsController {
     public String matrizPdca() {
         return "matriz-pdca";
     }
+
+    @GetMapping("/metodologia")
+    public String metodologia() {
+        return "metodologia";
+    }
 }

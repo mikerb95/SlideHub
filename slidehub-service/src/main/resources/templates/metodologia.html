@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metodología Scrum — SlideHub</title>
+    <th:block th:replace="~{fragments/head :: assets}"></th:block>
+    <style>
+        .guide-section { scroll-margin-top: 72px; }
+        .toc-link {
+            display: block; padding: 0.24rem 0.5rem; border-radius: 4px;
+            font-size: 0.7rem; font-family: var(--sh-font-mono);
+            color: var(--sh-text-3); text-decoration: none;
+            transition: color 0.15s, background 0.15s;
+        }
+        .toc-link:hover { color: var(--sh-blue); background: rgba(88, 166, 255, 0.07); }
+        .phase-card {
+            border: 1px solid var(--sh-border); border-radius: 6px;
+            background: var(--sh-deep); padding: 0.78rem 0.86rem;
+        }
+        .phase-label {
+            font-family: var(--sh-font-mono); color: var(--sh-text-1);
+            font-size: 0.69rem; margin-bottom: 0.35rem; font-weight: bold;
+        }
+        .phase-text { font-size: 0.74rem; color: var(--sh-text-2); line-height: 1.55; }
+        .mini-title {
+            font-size: 0.67rem; font-family: var(--sh-font-mono);
+            color: var(--sh-text-3); text-transform: uppercase;
+            letter-spacing: 0.06em; margin-bottom: 0.35rem;
+        }
+        .tip-callout {
+            background: rgba(88, 166, 255, 0.08); border-left: 3px solid var(--sh-blue);
+            border-radius: 0 6px 6px 0; padding: 0.65rem 0.9rem;
+            font-size: 0.79rem; color: var(--sh-text-2); line-height: 1.58;
+        }
+        .risk-callout {
+            background: rgba(248, 81, 73, 0.08); border-left: 3px solid #f85149;
+            border-radius: 0 6px 6px 0; padding: 0.65rem 0.9rem; font-size: 0.79rem;
+            color: var(--sh-text-2); line-height: 1.58;
+        }
+        .badge-red { border: 1px solid rgba(248, 81, 73, 0.45); color: #f85149; background: rgba(248, 81, 73, 0.08); font-family: var(--sh-font-mono); font-size: 0.66rem; border-radius: 4px; padding: 0.08rem 0.42rem; display: inline-flex; align-items: center; gap: 0.2rem; }
+        .badge-yellow { border: 1px solid rgba(210, 153, 34, 0.45); color: #d29922; background: rgba(210, 153, 34, 0.08); font-family: var(--sh-font-mono); font-size: 0.66rem; border-radius: 4px; padding: 0.08rem 0.42rem; display: inline-flex; align-items: center; gap: 0.2rem; }
+    </style>
+</head>
+<body class="sh antialiased">
+    <nav class="sh-nav" style="position:sticky;top:0;z-index:50;">
+        <div class="sh-nav-inner">
+            <div class="flex items-center gap-3">
+                <a href="/presentations" class="sh-btn sh-btn-ghost text-xs"><i class="fa-solid fa-arrow-left"></i></a>
+                <span class="font-brand text-base">SlideHub</span>
+                <span class="text-[var(--sh-text-3)] text-xs">/</span>
+                <span class="font-mono text-xs text-[var(--sh-text-2)]">Gestión de Proyectos: Metodología</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="sh-badge-blue text-xs">Scrum</span>
+                <span class="sh-badge text-xs">Desarrollo Ágil</span>
+            </div>
+        </div>
+    </nav>
+    <div class="max-w-6xl mx-auto px-4 py-8 flex gap-8">
+        <aside class="hidden lg:block w-48 flex-shrink-0">
+            <div class="sticky top-20">
+                <div class="sh-label mb-3 text-xs">ÍNDICE</div>
+                <nav class="space-y-0.5">
+                    <a href="#por-que-scrum" class="toc-link">1. Por qué Scrum</a>
+                    <a href="#mitigacion" class="toc-link">2. Mitigación de Desventajas</a>
+                    <a href="#otros-modelos" class="toc-link">3. Otros Modelos (Descartados)</a>
+                </nav>
+            </div>
+        </aside>
+        <main class="flex-1 min-w-0 space-y-8">
+
+            <section id="por-que-scrum" class="guide-section">
+                <div class="sh-card p-6 space-y-4">
+                    <div class="sh-label">METODOLOGÍAS ÁGILES</div>
+                    <h1 class="font-brand text-3xl text-[var(--sh-text-1)]">Por qué elegimos Scrum</h1>
+                    <p class="text-sm text-[var(--sh-text-2)] leading-relaxed max-w-3xl">
+                        De acuerdo a las metodologías ágiles de desarrollo, hemos seleccionado <strong class="text-[var(--sh-text-1)]">Scrum</strong> como nuestro marco de trabajo principal debido a los siguientes beneficios clave para la estructura y dimensión de nuestro equipo.
+                    </p>
+                    <div class="grid lg:grid-cols-2 gap-4 mt-4">
+                        <div class="phase-card">
+                            <div class="mini-title">Alineación con Microservicios</div>
+                            <div class="phase-text">
+                                Nuestro proyecto está dividido en servicios pequeños e independientes (state-service, ui-service, ai-service, etc.). Scrum nos permite iterar un servicio por cada sprint para lograr incrementos funcionales más rápido.
+                            </div>
+                        </div>
+                        <div class="phase-card">
+                            <div class="mini-title">Flexibilidad ante APIs de terceros</div>
+                            <div class="phase-text">
+                                Las integraciones con APIs externas como Gemini o Groq requieren experimentación. Scrum nos permite adaptar el rumbo al final de cada Sprint si descubrimos que una API no responde como esperábamos, evitando romper el trabajo de varios días.
+                            </div>
+                        </div>
+                        <div class="phase-card">
+                            <div class="mini-title">Gestión por Historias de Usuario</div>
+                            <div class="phase-text">
+                                Contamos con un Product Backlog estructurado en Historias de Usuario (actualmente hasta la HU-30). Scrum está diseñado exactamente para priorizar y estimar este tipo de requerimientos funcionales y técnicos.
+                            </div>
+                        </div>
+                        <div class="phase-card">
+                            <div class="mini-title">Optimizado para el Tamaño del Equipo</div>
+                            <div class="phase-text">
+                                Somos 5 personas en el equipo de desarrollo. Para Scrum se recomiendan equipos de 3 a 9 desarrolladores, lo que nos ubica en el punto medio, permitiéndonos hacer las "Daily stand-ups" de forma rápida, eficiente y sin cuellos de botella organizacionales.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="mitigacion" class="guide-section">
+                <div class="sh-card p-6 space-y-4">
+                    <div class="sh-label"><i class="fa-solid fa-shield-halved mr-1"></i>RIESGOS ESCENARIO SCRUM</div>
+                    <h2 class="font-brand text-2xl text-[var(--sh-text-1)]">Cómo mitigaremos sus posibles desventajas</h2>
+                    
+                    <div class="space-y-3 pt-2">
+                        <div class="phase-card">
+                            <div class="phase-label">1. Sobrecarga de reuniones</div>
+                            <div class="phase-text text-[var(--sh-text-2)]">
+                                <strong>Problema:</strong> Planning, Daily, Review y Retrospective pueden consumir mucho tiempo de desarrollo efectivo. <br>
+                                <strong>Mitigación:</strong> Reuniones cortas con agenda fija. Dailys de máximo 10–15 minutos, Sprint Planning enfocado en un backlog previamente priorizado, y evitar repetir temas fuera de la sesión.
+                            </div>
+                        </div>
+                        
+                        <div class="phase-card">
+                            <div class="phase-label">2. Riesgo de deuda técnica</div>
+                            <div class="phase-text text-[var(--sh-text-2)]">
+                                <strong>Problema:</strong> Por querer entregar rápido un incremento, se puede improvisar código. <br>
+                                <strong>Mitigación:</strong> Definir criterios de calidad (Definition of Done) en cada historia, requerir Code Reviews, reservar tiempo del sprint para refactorización, y escribir pruebas mínimas antes de cerrar una tarea crítica.
+                            </div>
+                        </div>
+
+                        <div class="phase-card">
+                            <div class="phase-label">3. Dependencias entre tareas</div>
+                            <div class="phase-text text-[var(--sh-text-2)]">
+                                <strong>Problema:</strong> Un bloqueo en la capa Backend frena la integración del Frontend o IA. <br>
+                                <strong>Mitigación:</strong> Dividir historias en piezas pequeñas, definir los contratos de APIs de forma temprana, y planear tareas que permitan el trabajo verdaderamente paralelo.
+                            </div>
+                        </div>
+
+                        <div class="phase-card">
+                            <div class="phase-label">4. Cambios constantes de alcance (Scope Creep)</div>
+                            <div class="phase-text text-[var(--sh-text-2)]">
+                                <strong>Problema:</strong> El Backlog puede crecer descontroladamente interrumpiendo el flujo. <br>
+                                <strong>Mitigación:</strong> Priorización estricta gestionada por el Product Owner, congelar el alcance del sprint una vez iniciado y separar claramente lo "Necesario para MVP" de "Mejoras futuras".
+                            </div>
+                        </div>
+
+                        <div class="phase-card">
+                            <div class="phase-label">5. Falta de claridad por inexperiencia</div>
+                            <div class="phase-text text-[var(--sh-text-2)]">
+                                <strong>Problema:</strong> Scrum puede volverse caótico si el equipo no sigue el marco correctamente. <br>
+                                <strong>Mitigación:</strong> Definir los roles (Scrum Master, PO, Dev Team) desde el inicio, documentar el "Definition of Done", hacer uso de tableros Kanban visibles y mantener seguimiento analítico semanal del tablero real.
+                            </div>
+                        </div>
+
+                        <div class="phase-card">
+                            <div class="phase-label">6. Entregas parciales poco útiles</div>
+                            <div class="phase-text text-[var(--sh-text-2)]">
+                                <strong>Problema:</strong> Se puede terminar un sprint de desarrollo entero sin algo demostrable para el usuario. <br>
+                                <strong>Mitigación:</strong> Cada sprint debe obligatoriamente cerrar con un incremento funcional demostrable; dividir verticalmente las historias para que generen un flujo de valor de punta a punta, y priorizar la integración continua al concluir cada iteración.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="otros-modelos" class="guide-section">
+                <div class="sh-card p-6 space-y-4">
+                    <div class="sh-label"><i class="fa-solid fa-ban mr-1"></i>DESCARTADOS</div>
+                    <h2 class="font-brand text-2xl text-[var(--sh-text-1)]">Por qué no elegimos otro modelo</h2>
+                    
+                    <div class="grid gap-3 pt-2">
+                        <div class="tip-callout">
+                            <strong>¿Por qué no usamos Cascada (Waterfall)?</strong><br>
+                            En Cascada, el proyecto se desarrolla de forma lineal (requisitos → diseño → implementación → pruebas). Este enfoque asume que el problema y la solución no cambiarán. Sin embargo, en SlideHub la dependencia con servicios de IA de terceros y prototipos de pantallas interactivas requerían adaptación continua y la evolución de ideas durante el desarrollo.
+                        </div>
+
+                        <div class="tip-callout" style="border-left-color: var(--sh-amber); background: rgba(210, 153, 34, 0.08);">
+                            <strong>¿Por qué no usamos el Modelo en Espiral?</strong><br>
+                            Aunque permite iteración, exige un gran enfoque burocrático en validación formal y análisis de riesgos en cada vuelta, propio de software militar o médico. En el marco de un proyecto estudiantil, esto generaría fricciones y documentación irreal restando tiempo valioso a la construcción del producto final.
+                        </div>
+
+                        <div class="tip-callout" style="border-left-color: #f85149; background: rgba(248, 81, 73, 0.08);">
+                            <strong>¿Por qué no usamos el Modelo en V?</strong><br>
+                            Es ventajoso si se requiere correspondencia estricta entre fases de desarrollo y fases de ciclo de testing. En nuestro caso, al probar dinámicamente APIs externas y estado en tiempo real (milisegundos) para la sincronización, diversas lógicas técnicas requerían rediseños estructurales profundos, dificultando seguir el rigor plano de un plan de pruebas en forma de 'V'.
+                        </div>
+
+                        <div class="tip-callout">
+                            <strong>¿Por qué no empleamos un Modelo Iterativo Libre?</strong><br>
+                            Aunque es muy cercano a nuestras necesidades, carece del marco, la disciplina y las ceremonias ágiles. Permite iterar de forma caótica, entregando partes aisladas sin obligar a la revisión general de progreso mediante Backlogs priorizados o ciclos bien definidos. Scrum provee esa estructura obligatoria dentro del caos.
+                        </div>
+
+                        <div class="tip-callout" style="border-left-color: var(--sh-blue);">
+                            <strong>¿Por qué no usamos Kanban aisladamente?</strong><br>
+                            <strong>Ventaja (Investigación):</strong> Kanban es sobresaliente para reflejar un flujo continuo y en tiempo real del Trabajo En Progreso (WIP), ideal para soporte (helpdesk) o proyectos maduros.<br>
+                            <strong>Desventaja en nuestro caso:</strong> No incorpora inherentemente las construcciones por hitos o bloqueos de tiempo definidos ("Sprints"). Para guiar al equipo y demostrar un proyecto formativo desde cero, necesitábamos asegurar metas con límites de cadencia temporales, garantizando demos tangibles en la entrega programada (ej. Motor sincrónico, luego sistema IA, etc.).
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</body>
+</html>
