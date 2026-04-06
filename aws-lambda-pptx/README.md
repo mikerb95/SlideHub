@@ -33,11 +33,37 @@ La función Lambda nativa de Python no incluye LibreOffice, así que debes monta
 1. **aws-lambda-libreoffice:** (Una capa pública popular para la ejecución precompilada del motor). Por ejemplo la mantenida por `shelfio` (v7.4+).
 2. **PyMuPDF:** (Puedes instalar las librerias empaquetando el directorio local y subiéndolo como `.zip` junto a `lambda_function.py`).
 
-### Estructura de despliegue local:
+### Estructura de despliegue — IMPORTANTE: no usar `pip install` directo
+
+El paquete **debe** compilarse dentro del runtime de Lambda (Amazon Linux 2).
+Hacerlo con `pip install` en Ubuntu/Debian genera ruedas incompatibles que fallan
+con `libcrypt.so.2: cannot open shared object file` al iniciar la función.
+
+#### Opción A — Docker (recomendada, reproducible):
 ```bash
-pip install -r requirements.txt -t package/
+# Construye dentro del runtime exacto de Lambda
+docker build -t slidehub-lambda-builder .
+docker run --rm -v $(pwd):/output slidehub-lambda-builder \
+    cp /build/function.zip /output/function.zip
+```
+Sube `function.zip` al dashboard de AWS Lambda.
+
+#### Opción B — pip con --platform (sin Docker):
+```bash
+pip install \
+  --platform manylinux2014_x86_64 \
+  --target package/ \
+  --implementation cp \
+  --python-version 3.10 \
+  --only-binary=:all: \
+  -r requirements.txt
 cp lambda_function.py package/
 cd package/ && zip -r9 ../function.zip .
 ```
-Sube `<function.zip>` al dashboard de AWS Lambda.
+Sube `function.zip` al dashboard de AWS Lambda.
+
+> **Por qué falla el `pip install` directo:**
+> PyMuPDF descarga una rueda compilada para tu OS (Ubuntu/Debian) que linkea contra
+> `libcrypt.so.2`. Lambda corre en Amazon Linux 2 donde esa librería no está presente.
+> Las opciones A y B garantizan que se usen ruedas `manylinux2014_x86_64` compatibles.
 
