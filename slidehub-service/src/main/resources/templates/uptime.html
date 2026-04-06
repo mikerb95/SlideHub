@@ -262,17 +262,25 @@
                 `<div class="text-sm text-[var(--sh-text-3)] font-mono">${esc(reason)}</div>`;
         }
 
+        // Genera el HTML del valor de uptime; null = proyecto recién creado sin datos
+        function uptimeStat(val) {
+            if (val === null || val === undefined || val === '') {
+                return '<div class="stat-value text-base text-[var(--sh-text-3)]">Sin datos</div>';
+            }
+            const n = parseFloat(val);
+            if (isNaN(n)) {
+                return '<div class="stat-value text-base text-[var(--sh-text-3)]">—</div>';
+            }
+            const color = n >= 99 ? 'var(--sh-green)' : n >= 95 ? 'var(--sh-amber)' : '#f87171';
+            return `<div class="stat-value" style="color:${color}">${n.toFixed(2)}<span class="text-base font-normal text-[var(--sh-text-3)] ml-0.5">%</span></div>`;
+        }
+
         function uptimeColor(val) {
             const n = parseFloat(val);
             if (isNaN(n)) return 'var(--sh-text-3)';
             if (n >= 99) return 'var(--sh-green)';
             if (n >= 95) return 'var(--sh-amber)';
             return '#f87171';
-        }
-
-        function fmt(val) {
-            const n = parseFloat(val);
-            return isNaN(n) ? '--' : n.toFixed(2);
         }
 
         function esc(s) {
