@@ -165,16 +165,21 @@ public class AuthController {
     public String forgotPasswordSubmit(@RequestParam String email, Model model) {
         try {
             userService.requestPasswordReset(email);
-            model.addAttribute("successMessage", "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.");
+            model.addAttribute("successMessage",
+                    "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.");
         } catch (Exception e) {
             log.error("Error solicitando reseteo de contraseña para {}", email, e);
-            model.addAttribute("successMessage", "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña."); // Prevent email enumeration
+            model.addAttribute("successMessage",
+                    "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña."); // Prevent
+                                                                                                          // email
+                                                                                                          // enumeration
         }
         return "auth/forgot-password";
     }
 
     @GetMapping("/reset-password")
-    public String resetPasswordPage(@RequestParam(required = false) String token, Authentication authentication, Model model) {
+    public String resetPasswordPage(@RequestParam(required = false) String token, Authentication authentication,
+            Model model) {
         if (isAuthenticated(authentication)) {
             return "redirect:/presentations";
         }

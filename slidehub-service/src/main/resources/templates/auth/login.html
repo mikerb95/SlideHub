@@ -43,7 +43,12 @@
                 </div>
 
                 <div class="mb-5">
-                    <label for="password" class="sh-input-label">Contraseña</label>
+                    <div class="flex justify-between items-center w-full mb-1">
+                        <label for="password" class="sh-input-label !mb-0">Contraseña</label>
+                        <a th:href="@{/auth/forgot-password}" class="text-[var(--sh-blue)] text-xs hover:underline">
+                            ¿Olvidaste tu contraseña?
+                        </a>
+                    </div>
                     <input type="password" class="sh-input" id="password" name="password"
                         autocomplete="current-password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
                         required>
