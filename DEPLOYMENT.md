@@ -35,7 +35,7 @@ git push origin development
 
 Resultado esperado:
 
-- 1 Web Service: `slidehub-monolith`
+- 1 Web Service: `slidehub-service`
 - Health check: `/actuator/health`
 - Puerto: `8080`
 
@@ -107,7 +107,7 @@ AWS_SECRET_ACCESS_KEY=<secret>
 
 ## Dominio personalizado
 
-En Render (`slidehub-monolith`) → Settings → Custom Domains:
+En Render (`slidehub-service`) → Settings → Custom Domains:
 
 - Agregar dominio `slide.lat`
 
@@ -166,7 +166,7 @@ Buscar `ERROR`, `Exception`, `Flyway`, `Mongo`, `Redis`, `OAuth2`.
 ### Build falla en Render
 
 ```bash
-./mvnw clean compile -pl slidehub-monolith -am
+./mvnw clean compile -pl slidehub-service -am
 ```
 
 Si falla local, fallará en Render.

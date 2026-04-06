@@ -10,7 +10,7 @@
 
 ## Resumen
 
-Este documento presenta, de manera ordenada y con enfoque académico, cómo cambió el trabajo de cada responsable durante la migración de SlideHub desde una arquitectura de microservicios (4 servicios) hacia un monolito modular (`slidehub-monolith`).
+Este documento presenta, de manera ordenada y con enfoque académico, cómo cambió el trabajo de cada responsable durante la migración de SlideHub desde una arquitectura de microservicios (4 servicios) hacia un monolito modular (`slidehub-service`).
 
 El informe conserva el detalle completo de archivos, rutas y componentes. Sin embargo, su redacción es menos técnica y más explicativa, con lenguaje apropiado para un trabajo universitario.
 
@@ -34,7 +34,7 @@ SlideHub comenzó con cuatro microservicios independientes:
 
 En ese modelo, cada servicio corría por separado y se comunicaba por HTTP interno. Con el tiempo, se decidió simplificar la operación y unificar el despliegue en un único proceso, manteniendo la separación lógica por módulos internos.
 
-Por ello, el estado actual del proyecto es un monolito modular llamado `slidehub-monolith`, donde existen módulos de negocio diferenciados (`state`, `ui`, `ai`) pero dentro de una sola aplicación.
+Por ello, el estado actual del proyecto es un monolito modular llamado `slidehub-service`, donde existen módulos de negocio diferenciados (`state`, `ui`, `ai`) pero dentro de una sola aplicación.
 
 ---
 
@@ -61,7 +61,7 @@ Para elaborar este informe se tomaron como base los artefactos oficiales de migr
 - `DEPLOYMENT.md`
 - `render.yaml`
 
-Adicionalmente, se revisó la estructura real del módulo `slidehub-monolith` para confirmar la presencia efectiva de clases y componentes migrados.
+Adicionalmente, se revisó la estructura real del módulo `slidehub-service` para confirmar la presencia efectiva de clases y componentes migrados.
 
 ---
 
@@ -90,11 +90,11 @@ Edwin estaba a cargo del punto de entrada principal del sistema (`gateway-servic
 
 - **Origen:** `gateway-service/**`
 - **Destino funcional en monolito:**
-  - `slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/SlideHubMonolithApplication.java`
-  - `slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitFilter.java`
-  - `slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitService.java`
-  - `slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitProperties.java`
-  - `slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitDecision.java`
+  - `slidehub-service/src/main/java/com/brixo/slidehub/monolith/SlideHubMonolithApplication.java`
+  - `slidehub-service/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitFilter.java`
+  - `slidehub-service/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitService.java`
+  - `slidehub-service/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitProperties.java`
+  - `slidehub-service/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitDecision.java`
 
 ### 5.1.3 Qué cambió
 
@@ -130,31 +130,31 @@ Jerson era responsable del estado de la presentación:
 ### 5.2.2 De dónde a dónde migró
 
 - **Origen:** `state-service/src/main/java/com/brixo/slidehub/state/**`
-- **Destino:** `slidehub-monolith/src/main/java/com/brixo/slidehub/state/**`
+- **Destino:** `slidehub-service/src/main/java/com/brixo/slidehub/state/**`
 
 ### 5.2.3 Archivos principales en destino
 
 **Controladores:**
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/controller/SlideController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/controller/DemoController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/controller/DeviceController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/controller/HapticController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/state/controller/SlideController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/state/controller/DemoController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/state/controller/DeviceController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/state/controller/HapticController.java`
 
 **Servicios:**
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/service/SlideStateService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/service/DemoStateService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/service/DeviceRegistryService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/service/HapticEventService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/state/service/SlideStateService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/state/service/DemoStateService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/state/service/DeviceRegistryService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/state/service/HapticEventService.java`
 
 **Modelos:**
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/model/SlideStateResponse.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/model/DemoState.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/model/Device.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/model/HapticEvent.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/model/SetSlideRequest.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/model/SetDemoRequest.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/model/RegisterDeviceRequest.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/state/model/PublishHapticRequest.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/state/model/SlideStateResponse.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/state/model/DemoState.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/state/model/Device.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/state/model/HapticEvent.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/state/model/SetSlideRequest.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/state/model/SetDemoRequest.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/state/model/RegisterDeviceRequest.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/state/model/PublishHapticRequest.java`
 
 ### 5.2.4 Qué cambió
 
@@ -187,49 +187,49 @@ Daniel lideraba la capa visual y de acceso:
 ### 5.3.2 De dónde a dónde migró
 
 - **Origen:** `ui-service/src/main/java/com/brixo/slidehub/ui/**`
-- **Destino:** `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/**`
+- **Destino:** `slidehub-service/src/main/java/com/brixo/slidehub/ui/**`
 - **Recursos migrados al monolito:**
-  - `slidehub-monolith/src/main/resources/templates/**`
-  - `slidehub-monolith/src/main/resources/static/**`
-  - `slidehub-monolith/src/main/resources/db/migration/**`
+  - `slidehub-service/src/main/resources/templates/**`
+  - `slidehub-service/src/main/resources/static/**`
+  - `slidehub-service/src/main/resources/db/migration/**`
 
 ### 5.3.3 Archivos representativos en destino
 
 **Configuración:**
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/config/SecurityConfig.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/config/DatabaseConfig.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/config/S3Config.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/config/ForwardedHostFilter.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/config/UserActivityTrackingFilter.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/config/SecurityConfig.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/config/DatabaseConfig.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/config/S3Config.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/config/ForwardedHostFilter.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/config/UserActivityTrackingFilter.java`
 
 **Controladores:**
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/AuthController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/PresentationViewController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/PresentationImportController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/PresentationNotesController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/PresenterViewController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/MeetingController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/StatusController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/DocsController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/QuickLinkController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/AuthController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/PresentationViewController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/PresentationImportController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/PresentationNotesController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/PresenterViewController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/MeetingController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/StatusController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/DocsController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/QuickLinkController.java`
 
 **Servicios (selección):**
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/PresentationService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/MeetingService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/GoogleDriveService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/SlideUploadService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/QuickLinkService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/UserService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/StatusChecksService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/KeepAliveService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/EmailService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/AuthenticatedSessionTracker.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/UserActivityTracker.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/PresentationService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/MeetingService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/GoogleDriveService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/SlideUploadService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/QuickLinkService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/UserService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/StatusChecksService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/KeepAliveService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/EmailService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/AuthenticatedSessionTracker.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/UserActivityTracker.java`
 
 **Puentes internos refactorizados a in-process:**
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/NotesBridgeService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/AssistBridgeService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/HapticBridgeService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/NotesBridgeService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/AssistBridgeService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/HapticBridgeService.java`
 
 ### 5.3.4 Qué cambió
 
@@ -263,36 +263,36 @@ David lideraba la capa de inteligencia artificial:
 ### 5.4.2 De dónde a dónde migró
 
 - **Origen:** `ai-service/src/main/java/com/brixo/slidehub/ai/**`
-- **Destino:** `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/**`
+- **Destino:** `slidehub-service/src/main/java/com/brixo/slidehub/ai/**`
 
 ### 5.4.3 Archivos principales en destino
 
 **Controladores:**
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/controller/NotesController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/controller/RepoAnalysisController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/controller/DeployTutorController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/controller/AssistController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/controller/NotesController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/controller/RepoAnalysisController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/controller/DeployTutorController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/controller/AssistController.java`
 
 **Servicios:**
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/GeminiService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/GroqService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/NotesService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/RepoAnalysisService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/DeploymentService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/AssistService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/GitHubRepoContextService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/service/GeminiService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/service/GroqService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/service/NotesService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/service/RepoAnalysisService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/service/DeploymentService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/service/AssistService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/service/GitHubRepoContextService.java`
 
 **Repositorios y modelos:**
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/repository/PresenterNoteRepository.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/repository/RepoAnalysisRepository.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/repository/DeploymentGuideRepository.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/model/PresenterNote.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/model/RepoAnalysis.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/model/DeploymentGuide.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/model/NoteContent.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/model/GenerateNoteRequest.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/model/GenerateAllRequest.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/model/SlideReference.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/repository/PresenterNoteRepository.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/repository/RepoAnalysisRepository.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/repository/DeploymentGuideRepository.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/model/PresenterNote.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/model/RepoAnalysis.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/model/DeploymentGuide.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/model/NoteContent.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/model/GenerateNoteRequest.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/model/GenerateAllRequest.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/model/SlideReference.java`
 
 ### 5.4.4 Qué cambió
 
@@ -329,8 +329,8 @@ Mike gestionaba una infraestructura distribuida:
 
 ### 5.5.3 Archivos clave de infraestructura y despliegue
 
-- `render.yaml` (definición unificada a `slidehub-monolith`)
-- `slidehub-monolith/Dockerfile` (build y runtime del monolito)
+- `render.yaml` (definición unificada a `slidehub-service`)
+- `slidehub-service/Dockerfile` (build y runtime del monolito)
 - `DEPLOYMENT.md` (guía operativa monolito-first)
 - `README.md` (arquitectura actual declarada como monolito modular)
 

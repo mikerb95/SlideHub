@@ -5,7 +5,7 @@ on:
     branches:
       - development
     paths:
-      - 'slidehub-monolith/**'
+      - 'slidehub-service/**'
       - 'scripts/smoke-e2e.sh'
       - '.github/workflows/smoke-e2e.yml'
       - 'docs/SMOKE-E2E.md'
@@ -13,7 +13,7 @@ on:
     branches:
       - development
     paths:
-      - 'slidehub-monolith/**'
+      - 'slidehub-service/**'
       - 'scripts/smoke-e2e.sh'
       - '.github/workflows/smoke-e2e.yml'
       - 'docs/SMOKE-E2E.md'

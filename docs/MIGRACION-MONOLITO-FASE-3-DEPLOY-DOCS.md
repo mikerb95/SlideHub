@@ -12,12 +12,12 @@ Consolidar despliegue y documentación para que el camino principal del proyecto
 
 Se creó:
 
-- `slidehub-monolith/Dockerfile`
+- `slidehub-service/Dockerfile`
 
 Características:
 
 - Multi-stage (`jdk` builder + `jre` runtime)
-- Build del módulo `slidehub-monolith`
+- Build del módulo `slidehub-service`
 - Healthcheck a `/actuator/health`
 - Puerto `8080`
 
@@ -29,7 +29,7 @@ Se actualizó:
 
 Ahora despliega un único servicio:
 
-- `slidehub-monolith`
+- `slidehub-service`
 
 Se eliminaron servicios separados (`gateway`, `state`, `ui`, `ai`) del blueprint principal.
 
@@ -42,7 +42,7 @@ Se reescribió:
 Nuevos ejes:
 
 - Arquitectura actual = monolito modular
-- Instrucciones de ejecución local con `slidehub-monolith`
+- Instrucciones de ejecución local con `slidehub-service`
 - Resumen API y despliegue orientado a una sola app
 - Nota de legado para módulos microservicio históricos
 
@@ -64,7 +64,7 @@ Incluye:
 
 Se añadió propiedad:
 
-- `slidehub-monolith/src/main/resources/application.properties`
+- `slidehub-service/src/main/resources/application.properties`
   - `slidehub.base-url=${BASE_URL:http://localhost:8080}`
 
 Esto normaliza generación de URLs/callbacks en entorno productivo.
@@ -74,7 +74,7 @@ Esto normaliza generación de URLs/callbacks en entorno productivo.
 Compilación ejecutada:
 
 ```bash
-./mvnw clean compile -pl slidehub-monolith -am
+./mvnw clean compile -pl slidehub-service -am
 ```
 
 Resultado esperado: `BUILD SUCCESS`.
@@ -89,6 +89,6 @@ Resultado esperado: `BUILD SUCCESS`.
 
 Fase 4:
 
-1. Ajustar pipelines CI/CD para ejecutar pruebas focalizadas en `slidehub-monolith`.
+1. Ajustar pipelines CI/CD para ejecutar pruebas focalizadas en `slidehub-service`.
 2. Añadir smoke E2E monolito en `docs/SMOKE-E2E.md`.
 3. Definir checklist de corte para retirar oficialmente rutas de trabajo microservicio en documentación secundaria.

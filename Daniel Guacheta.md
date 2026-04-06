@@ -12,40 +12,40 @@ Responsable de `ui-service`: vistas, autenticación, flujo de presentaciones, re
 - Mayor complejidad por configuración de URLs internas.
 
 ### Ahora
-- UI se integra en `slidehub-monolith` como módulo interno (`com.brixo.slidehub.ui`).
+- UI se integra en `slidehub-service` como módulo interno (`com.brixo.slidehub.ui`).
 - Se conserva comportamiento funcional.
 - Se simplifica la orquestación al reemplazar llamadas internas de red por invocaciones directas.
 
 ## 3. Archivos que debes dominar para sustentar
 ### Configuración
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/config/SecurityConfig.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/config/DatabaseConfig.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/config/S3Config.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/config/SecurityConfig.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/config/DatabaseConfig.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/config/S3Config.java`
 
 ### Controladores clave
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/AuthController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/PresentationViewController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/PresentationImportController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/PresentationNotesController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/MeetingController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/controller/StatusController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/AuthController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/PresentationViewController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/PresentationImportController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/PresentationNotesController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/MeetingController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/StatusController.java`
 
 ### Servicios clave
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/PresentationService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/MeetingService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/GoogleDriveService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/QuickLinkService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/StatusChecksService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/PresentationService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/MeetingService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/GoogleDriveService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/QuickLinkService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/StatusChecksService.java`
 
 ### Puentes migrados a in-process
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/NotesBridgeService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/AssistBridgeService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/HapticBridgeService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/NotesBridgeService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/AssistBridgeService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/HapticBridgeService.java`
 
 ### Recursos
-- `slidehub-monolith/src/main/resources/templates/**`
-- `slidehub-monolith/src/main/resources/static/**`
-- `slidehub-monolith/src/main/resources/db/migration/**`
+- `slidehub-service/src/main/resources/templates/**`
+- `slidehub-service/src/main/resources/static/**`
+- `slidehub-service/src/main/resources/db/migration/**`
 
 ## 4. Guion exacto para 2 minutos
 

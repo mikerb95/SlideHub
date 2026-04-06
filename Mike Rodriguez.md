@@ -12,13 +12,13 @@ Responsable de infraestructura y despliegue: Render, blueprint, variables de ent
 - Mayor complejidad diaria de operación.
 
 ### Ahora
-- Se despliega un solo servicio principal: `slidehub-monolith`.
+- Se despliega un solo servicio principal: `slidehub-service`.
 - Se unifica el punto de health check.
 - Se simplifica la estrategia de build, deploy y troubleshooting.
 
 ## 3. Archivos que debes dominar para sustentar
 - `render.yaml`
-- `slidehub-monolith/Dockerfile`
+- `slidehub-service/Dockerfile`
 - `DEPLOYMENT.md`
 - `README.md`
 - `docs/MIGRACION-MONOLITO-FASE-3-DEPLOY-DOCS.md`
@@ -29,7 +29,7 @@ Responsable de infraestructura y despliegue: Render, blueprint, variables de ent
 ## 4. Guion exacto para 2 minutos
 
 ### 0:00 – 0:35
-“Mi responsabilidad fue llevar la operación de 4 servicios en Render a un modelo unificado con `slidehub-monolith`.”
+“Mi responsabilidad fue llevar la operación de 4 servicios en Render a un modelo unificado con `slidehub-service`.”
 
 ### 0:35 – 1:15
 “El cambio principal se ve en `render.yaml`: pasamos de un despliegue distribuido a un servicio único, con health check central y configuración consolidada.”

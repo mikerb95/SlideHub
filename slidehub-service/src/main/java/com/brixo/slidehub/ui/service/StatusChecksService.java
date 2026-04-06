@@ -34,7 +34,7 @@ public class StatusChecksService {
     private volatile CachedResponse cachedResponse;
 
     public StatusChecksService(
-            @Value("${spring.application.name:slidehub-monolith}") String applicationName,
+            @Value("${spring.application.name:slidehub-service}") String applicationName,
             @Value("${slidehub.render.url:}") String renderUrl,
             @Value("${slidehub.redis.host:${REDIS_HOST:}}") String redisHost,
             @Value("${slidehub.redis.port:${REDIS_PORT:6379}}") int redisPort,

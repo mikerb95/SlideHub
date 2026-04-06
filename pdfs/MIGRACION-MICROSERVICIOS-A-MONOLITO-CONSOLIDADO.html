@@ -14,10 +14,10 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 </style></head><body><h1>Migración de Microservicios a Monolito — Documento Consolidado</h1>
 <p><strong>Proyecto:</strong> SlideHub</p>
 <p><strong>Fecha de consolidación:</strong> 2026-04-04</p>
-<p><strong>Estado actual:</strong> Monolito modular en producción (<span class="code">slidehub-monolith</span>)</p>
+<p><strong>Estado actual:</strong> Monolito modular en producción (<span class="code">slidehub-service</span>)</p>
 <hr/>
 <h2>1) Resumen ejecutivo</h2>
-<p>SlideHub migró de una arquitectura de <strong>4 microservicios</strong> (<span class="code">gateway-service</span>, <span class="code">state-service</span>, <span class="code">ui-service</span>, <span class="code">ai-service</span>) a un <strong>monolito modular</strong> (<span class="code">slidehub-monolith</span>) para simplificar operación, reducir costos de infraestructura y eliminar complejidad innecesaria de red interna (proxy/ruteo/puertos entre servicios).</p>
+<p>SlideHub migró de una arquitectura de <strong>4 microservicios</strong> (<span class="code">gateway-service</span>, <span class="code">state-service</span>, <span class="code">ui-service</span>, <span class="code">ai-service</span>) a un <strong>monolito modular</strong> (<span class="code">slidehub-service</span>) para simplificar operación, reducir costos de infraestructura y eliminar complejidad innecesaria de red interna (proxy/ruteo/puertos entre servicios).</p>
 <p>La migración mantuvo la separación lógica por módulos (<span class="code">ui</span>, <span class="code">state</span>, <span class="code">ai</span>) dentro de un único proceso Spring Boot, conservando el comportamiento funcional de negocio.</p>
 <hr/>
 <h2>2) Alcance de la migración</h2>
@@ -31,14 +31,14 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 </ul>
 <h3>Arquitectura destino (monolito modular)</h3>
 <ul>
-<li><span class="code">slidehub-monolith</span> (único servicio, puerto único)</li>
+<li><span class="code">slidehub-service</span> (único servicio, puerto único)</li>
 <li>Módulos internos:</li>
 </ul>
 <p>  - <span class="code">ui</span></p>
 <p>  - <span class="code">state</span></p>
 <p>  - <span class="code">ai</span></p>
 <ul>
-<li>Despliegue recomendado: 1 solo Web Service en Render (<span class="code">slidehub-monolith</span>)</li>
+<li>Despliegue recomendado: 1 solo Web Service en Render (<span class="code">slidehub-service</span>)</li>
 </ul>
 <hr/>
 <h2>3) Qué se tuvo en cuenta durante la migración</h2>
@@ -78,7 +78,7 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 <h2>4) Qué se creó</h2>
 <h2>4.1 Módulo de ejecución principal</h2>
 <ul>
-<li><strong><span class="code">slidehub-monolith/</span></strong> como servicio principal de ejecución y despliegue.</li>
+<li><strong><span class="code">slidehub-service/</span></strong> como servicio principal de ejecución y despliegue.</li>
 </ul>
 <h2>4.2 Artefactos y documentación de migración</h2>
 <ul>
@@ -96,12 +96,12 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 <ul>
 <li>Blueprint monolítico de Render:</li>
 </ul>
-<p>  - <span class="code">render.yaml</span> (servicio único <span class="code">slidehub-monolith</span>)</p>
+<p>  - <span class="code">render.yaml</span> (servicio único <span class="code">slidehub-service</span>)</p>
 <h2>4.3 Ajustes funcionales/técnicos relevantes</h2>
 <ul>
 <li>Actualización de narrativa UI y técnica a monolito modular en vistas/documentación.</li>
 <li>Ajustes de detección de rutas de slides para contexto monolito (compatibilidad de path).</li>
-<li>Consolidación de la ejecución local/build en torno a <span class="code">slidehub-monolith</span>.</li>
+<li>Consolidación de la ejecución local/build en torno a <span class="code">slidehub-service</span>.</li>
 </ul>
 <hr/>
 <h2>5) Qué dejó de existir (o dejó de ser obligatorio)</h2>
@@ -135,11 +135,11 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 <ul>
 <li>Se mantiene monorepo Maven, pero la ruta principal de compilación/ejecución se centra en:</li>
 </ul>
-<p>  - <span class="code">./mvnw clean compile -pl slidehub-monolith -am</span></p>
-<p>  - <span class="code">./mvnw spring-boot:run -pl slidehub-monolith</span></p>
+<p>  - <span class="code">./mvnw clean compile -pl slidehub-service -am</span></p>
+<p>  - <span class="code">./mvnw spring-boot:run -pl slidehub-service</span></p>
 <h2>6.2 Despliegue</h2>
 <ul>
-<li><span class="code">render.yaml</span> consolidado a un solo servicio (<span class="code">slidehub-monolith</span>) con health check único:</li>
+<li><span class="code">render.yaml</span> consolidado a un solo servicio (<span class="code">slidehub-service</span>) con health check único:</li>
 </ul>
 <p>  - <span class="code">/actuator/health</span></p>
 <h2>6.3 Frontend/UX técnico</h2>

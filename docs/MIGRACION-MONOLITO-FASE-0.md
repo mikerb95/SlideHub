@@ -4,7 +4,7 @@ Fecha: 2026-04-03
 Rama: `development`
 
 ## Objetivo
-Crear la base técnica del monolito sin romper el repo existente, habilitando compilación independiente y arranque inicial sobre `slidehub-monolith`.
+Crear la base técnica del monolito sin romper el repo existente, habilitando compilación independiente y arranque inicial sobre `slidehub-service`.
 
 ## Cambios realizados
 
@@ -12,7 +12,7 @@ Crear la base técnica del monolito sin romper el repo existente, habilitando co
 
 Se creó:
 
-- `slidehub-monolith/pom.xml`
+- `slidehub-service/pom.xml`
 
 Incluye dependencias consolidadas para:
 
@@ -32,13 +32,13 @@ Se actualizó:
 
 Cambio:
 
-- se añadió el módulo `slidehub-monolith` al `<modules>` del agregador.
+- se añadió el módulo `slidehub-service` al `<modules>` del agregador.
 
 ### 3) Bootstrap de aplicación monolítica
 
 Se creó:
 
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/SlideHubMonolithApplication.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/monolith/SlideHubMonolithApplication.java`
 
 Características:
 
@@ -50,10 +50,10 @@ Características:
 
 Se crearon:
 
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitDecision.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitProperties.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitFilter.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitDecision.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitProperties.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitFilter.java`
 
 Objetivo:
 
@@ -63,7 +63,7 @@ Objetivo:
 
 Se creó:
 
-- `slidehub-monolith/src/main/resources/application.properties`
+- `slidehub-service/src/main/resources/application.properties`
 
 Incluye:
 
@@ -81,7 +81,7 @@ Incluye:
 Compilación del nuevo módulo:
 
 ```bash
-./mvnw clean compile -pl slidehub-monolith -am
+./mvnw clean compile -pl slidehub-service -am
 ```
 
 Resultado esperado: `BUILD SUCCESS`.
@@ -94,6 +94,6 @@ Resultado esperado: `BUILD SUCCESS`.
 
 ## Próximo paso sugerido (Fase 1)
 
-1. Migrar código de `state-service`, `ai-service` y `ui-service` dentro de `slidehub-monolith`.
+1. Migrar código de `state-service`, `ai-service` y `ui-service` dentro de `slidehub-service`.
 2. Copiar recursos `templates`, `static`, `db/migration`.
 3. Mantener rutas públicas existentes para compatibilidad frontend.

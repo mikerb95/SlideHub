@@ -8,11 +8,11 @@
 
 services:
   - type: web
-    name: slidehub-monolith
+    name: slidehub-service
     plan: free
     runtime: docker
     region: oregon
-    dockerfilePath: slidehub-monolith/Dockerfile
+    dockerfilePath: slidehub-service/Dockerfile
     autoDeploy: true
     healthCheckPath: /actuator/health
     envVars:

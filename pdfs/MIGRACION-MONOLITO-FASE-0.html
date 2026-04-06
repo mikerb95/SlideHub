@@ -15,12 +15,12 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 <p>Fecha: 2026-04-03</p>
 <p>Rama: <span class="code">development</span></p>
 <h2>Objetivo</h2>
-<p>Crear la base técnica del monolito sin romper el repo existente, habilitando compilación independiente y arranque inicial sobre <span class="code">slidehub-monolith</span>.</p>
+<p>Crear la base técnica del monolito sin romper el repo existente, habilitando compilación independiente y arranque inicial sobre <span class="code">slidehub-service</span>.</p>
 <h2>Cambios realizados</h2>
 <h3>1) Nuevo módulo monolito</h3>
 <p>Se creó:</p>
 <ul>
-<li><span class="code">slidehub-monolith/pom.xml</span></li>
+<li><span class="code">slidehub-service/pom.xml</span></li>
 </ul>
 <p>Incluye dependencias consolidadas para:</p>
 <ul>
@@ -39,12 +39,12 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 </ul>
 <p>Cambio:</p>
 <ul>
-<li>se añadió el módulo <span class="code">slidehub-monolith</span> al <span class="code">&lt;modules&gt;</span> del agregador.</li>
+<li>se añadió el módulo <span class="code">slidehub-service</span> al <span class="code">&lt;modules&gt;</span> del agregador.</li>
 </ul>
 <h3>3) Bootstrap de aplicación monolítica</h3>
 <p>Se creó:</p>
 <ul>
-<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/SlideHubMonolithApplication.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/monolith/SlideHubMonolithApplication.java</span></li>
 </ul>
 <p>Características:</p>
 <ul>
@@ -55,10 +55,10 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 <h3>4) Port inicial de rate limiting (desde gateway)</h3>
 <p>Se crearon:</p>
 <ul>
-<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitDecision.java</span></li>
-<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitProperties.java</span></li>
-<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitService.java</span></li>
-<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitFilter.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitDecision.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitProperties.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitFilter.java</span></li>
 </ul>
 <p>Objetivo:</p>
 <ul>
@@ -67,7 +67,7 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 <h3>5) Configuración unificada base</h3>
 <p>Se creó:</p>
 <ul>
-<li><span class="code">slidehub-monolith/src/main/resources/application.properties</span></li>
+<li><span class="code">slidehub-service/src/main/resources/application.properties</span></li>
 </ul>
 <p>Incluye:</p>
 <ul>
@@ -83,7 +83,7 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 <h2>Verificación</h2>
 <p>Compilación del nuevo módulo:</p>
 <p>```bash</p>
-<p>./mvnw clean compile -pl slidehub-monolith -am</p>
+<p>./mvnw clean compile -pl slidehub-service -am</p>
 <p>```</p>
 <p>Resultado esperado: <span class="code">BUILD SUCCESS</span>.</p>
 <h2>Resultado de fase</h2>
@@ -94,7 +94,7 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 </ul>
 <h2>Próximo paso sugerido (Fase 1)</h2>
 <ol>
-<li>1. Migrar código de <span class="code">state-service</span>, <span class="code">ai-service</span> y <span class="code">ui-service</span> dentro de <span class="code">slidehub-monolith</span>.</li>
+<li>1. Migrar código de <span class="code">state-service</span>, <span class="code">ai-service</span> y <span class="code">ui-service</span> dentro de <span class="code">slidehub-service</span>.</li>
 <li>2. Copiar recursos <span class="code">templates</span>, <span class="code">static</span>, <span class="code">db/migration</span>.</li>
 <li>3. Mantener rutas públicas existentes para compatibilidad frontend.</li>
 </ol></body></html>

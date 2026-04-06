@@ -12,33 +12,33 @@ Responsable de `ai-service`: notas IA, análisis de repositorio, deploy tutor y 
 - Persistía datos en MongoDB.
 
 ### Ahora
-- IA se integra como módulo interno `com.brixo.slidehub.ai` dentro de `slidehub-monolith`.
+- IA se integra como módulo interno `com.brixo.slidehub.ai` dentro de `slidehub-service`.
 - Se conserva lógica de negocio y contratos funcionales.
 - Continúan integraciones externas (Gemini, Groq, MongoDB), pero sin separación de proceso para la capa interna de la plataforma.
 
 ## 3. Archivos que debes dominar para sustentar
 ### Controladores
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/controller/NotesController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/controller/RepoAnalysisController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/controller/DeployTutorController.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/controller/AssistController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/controller/NotesController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/controller/RepoAnalysisController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/controller/DeployTutorController.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/controller/AssistController.java`
 
 ### Servicios
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/GeminiService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/GroqService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/NotesService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/RepoAnalysisService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/DeploymentService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/AssistService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/service/GitHubRepoContextService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/service/GeminiService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/service/GroqService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/service/NotesService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/service/RepoAnalysisService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/service/DeploymentService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/service/AssistService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/service/GitHubRepoContextService.java`
 
 ### Repositorios y modelos
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/repository/PresenterNoteRepository.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/repository/RepoAnalysisRepository.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/repository/DeploymentGuideRepository.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/model/PresenterNote.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/model/RepoAnalysis.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/model/DeploymentGuide.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/repository/PresenterNoteRepository.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/repository/RepoAnalysisRepository.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/repository/DeploymentGuideRepository.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/model/PresenterNote.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/model/RepoAnalysis.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ai/model/DeploymentGuide.java`
 
 ### Referencias
 - `docs/MIGRACION-MONOLITO-FASE-1.md`

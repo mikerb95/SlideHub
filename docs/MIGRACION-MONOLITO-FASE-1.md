@@ -4,13 +4,13 @@ Fecha: 2026-04-03
 Rama: `development`
 
 ## Objetivo
-Consolidar funcionalidad core en `slidehub-monolith`, incorporando dominios `state`, `ai` y `ui`, y eliminar las primeras fronteras HTTP internas entre módulos.
+Consolidar funcionalidad core en `slidehub-service`, incorporando dominios `state`, `ai` y `ui`, y eliminar las primeras fronteras HTTP internas entre módulos.
 
 ## Cambios realizados
 
 ### 1) Migración de dominios Java
 
-Se consolidaron paquetes dentro de `slidehub-monolith/src/main/java/com/brixo/slidehub/`:
+Se consolidaron paquetes dentro de `slidehub-service/src/main/java/com/brixo/slidehub/`:
 
 - `state/**` (controllers, models, services)
 - `ai/**` (controllers, models, repositories, services)
@@ -18,7 +18,7 @@ Se consolidaron paquetes dentro de `slidehub-monolith/src/main/java/com/brixo/sl
 
 ### 2) Migración de recursos
 
-Se incorporaron en `slidehub-monolith/src/main/resources/`:
+Se incorporaron en `slidehub-service/src/main/resources/`:
 
 - `templates/**`
 - `static/**`
@@ -39,13 +39,13 @@ Se preservaron rutas funcionales existentes para evitar ruptura del frontend:
 
 Se refactorizaron servicios puente para invocación directa en el mismo proceso:
 
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/NotesBridgeService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/NotesBridgeService.java`
   - de llamadas HTTP a `NotesService` / `RepoAnalysisService` / `PresenterNoteRepository`.
 
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/AssistBridgeService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/AssistBridgeService.java`
   - de POST multipart interno a llamada directa `AssistService`.
 
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/HapticBridgeService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/ui/service/HapticBridgeService.java`
   - de POST interno a llamada directa `HapticEventService`.
 
 ## Verificación
@@ -53,14 +53,14 @@ Se refactorizaron servicios puente para invocación directa en el mismo proceso:
 Compilación del monolito tras consolidación:
 
 ```bash
-./mvnw clean compile -pl slidehub-monolith -am
+./mvnw clean compile -pl slidehub-service -am
 ```
 
 Resultado esperado: `BUILD SUCCESS`.
 
 ## Resultado de fase
 
-- `slidehub-monolith` ya contiene la funcionalidad principal de UI + State + AI.
+- `slidehub-service` ya contiene la funcionalidad principal de UI + State + AI.
 - Se removieron fronteras HTTP internas críticas entre módulos.
 - Código y recursos base quedaron centralizados en una sola unidad de despliegue.
 

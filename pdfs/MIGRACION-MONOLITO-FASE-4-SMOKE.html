@@ -24,7 +24,7 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 </ul>
 <p>Ahora describe:</p>
 <ul>
-<li>flujo smoke para <span class="code">slidehub-monolith</span></li>
+<li>flujo smoke para <span class="code">slidehub-service</span></li>
 <li>endpoints validados del backend único</li>
 <li>variables opcionales del script</li>
 <li>nota explícita de deprecación del smoke microservicios</li>
@@ -37,7 +37,7 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 <p>Cambios clave:</p>
 <ul>
 <li>inicia Redis + Mongo temporales</li>
-<li>inicia solo <span class="code">slidehub-monolith</span></li>
+<li>inicia solo <span class="code">slidehub-service</span></li>
 <li>usa <span class="code">PORT</span> configurable (<span class="code">SMOKE_PORT</span>)</li>
 <li>fuerza entorno smoke estable:</li>
 </ul>
@@ -69,7 +69,7 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 <li>Compilación del monolito:</li>
 </ul>
 <p>```bash</p>
-<p>./mvnw clean compile -pl slidehub-monolith -am</p>
+<p>./mvnw clean compile -pl slidehub-service -am</p>
 <p>```</p>
 <p>Resultado esperado: <span class="code">BUILD SUCCESS</span>.</p>
 <h2>Resultado de fase</h2>

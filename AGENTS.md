@@ -41,11 +41,11 @@ si hay diferencias de comportamiento.
 
 ## 2. Arquitectura (Monolito Modular)
 
-Este proyecto evolucionó a un **monolito modular** en el módulo `slidehub-monolith`. Los servicios antiguos se conservan como legacy.
+Este proyecto evolucionó a un **monolito modular** en el módulo `slidehub-service`. Los servicios antiguos se conservan como legacy.
 
 ```
 SlideHub/                          ← Parent POM
-├── slidehub-monolith/             ← Aplicación principal (puerto 8080)
+├── slidehub-service/             ← Aplicación principal (puerto 8080)
 │   └── src/main/java/com/brixo/slidehub
 │       ├── state/
 │       ├── ui/
@@ -404,7 +404,7 @@ Secciones clave del doc de análisis por tarea:
    communication va por HTTP (`WebClient`).
 5. **Correr el check de compilación** antes de reportar la tarea como completada:
    ```bash
-   ./mvnw clean compile -pl slidehub-monolith -am
+   ./mvnw clean compile -pl slidehub-service -am
    ```
 6. **Reportar qué archivos se crearon/modificados** al finalizar cada tarea.
 
@@ -497,7 +497,7 @@ Cada microservicio es un **Web Service** independiente en Render:
 
 | Servicio | Nombre en Render | Build Command | Start Command |
 |---|---|---|---|
-| `slidehub-monolith` | `slidehub-monolith` | `./mvnw -pl slidehub-monolith package -am` | `java -jar slidehub-monolith/target/*.jar` |
+| `slidehub-service` | `slidehub-service` | `./mvnw -pl slidehub-service package -am` | `java -jar slidehub-service/target/*.jar` |
 
 **Variables de entorno en Render (por servicio):**
 ```

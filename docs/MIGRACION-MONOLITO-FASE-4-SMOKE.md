@@ -16,7 +16,7 @@ Se actualizó:
 
 Ahora describe:
 
-- flujo smoke para `slidehub-monolith`
+- flujo smoke para `slidehub-service`
 - endpoints validados del backend único
 - variables opcionales del script
 - nota explícita de deprecación del smoke microservicios
@@ -30,7 +30,7 @@ Se actualizó:
 Cambios clave:
 
 - inicia Redis + Mongo temporales
-- inicia solo `slidehub-monolith`
+- inicia solo `slidehub-service`
 - usa `PORT` configurable (`SMOKE_PORT`)
 - fuerza entorno smoke estable:
   - `SPRING_FLYWAY_ENABLED=false`
@@ -61,7 +61,7 @@ bash -n ./scripts/smoke-e2e.sh
 - Compilación del monolito:
 
 ```bash
-./mvnw clean compile -pl slidehub-monolith -am
+./mvnw clean compile -pl slidehub-service -am
 ```
 
 Resultado esperado: `BUILD SUCCESS`.

@@ -4,7 +4,7 @@ Sistema de control de diapositivas en tiempo real con múltiples pantallas sincr
 
 ## Estado actual de arquitectura
 
-SlideHub se ejecuta actualmente como **monolito modular** en el módulo `slidehub-monolith`.
+SlideHub se ejecuta actualmente como **monolito modular** en el módulo `slidehub-service`.
 
 - Un solo proceso Spring Boot (puerto `8080`)
 - Módulos lógicos internos: `ui`, `state`, `ai`
@@ -100,8 +100,8 @@ docker run -d -p 5432:5432 -e POSTGRES_DB=slidehub -e POSTGRES_USER=slidehub -e 
 ### Build + run monolito
 
 ```bash
-./mvnw clean compile -pl slidehub-monolith -am
-./mvnw spring-boot:run -pl slidehub-monolith
+./mvnw clean compile -pl slidehub-service -am
+./mvnw spring-boot:run -pl slidehub-service
 ```
 
 Abrir:
@@ -113,7 +113,7 @@ Abrir:
 ### Tests monolito
 
 ```bash
-./mvnw test -pl slidehub-monolith
+./mvnw test -pl slidehub-service
 ```
 
 ---
@@ -145,7 +145,7 @@ POST        /api/ai/assist/audio
 
 ## Despliegue
 
-El blueprint de Render está en `render.yaml` y despliega **un solo servicio** (`slidehub-monolith`).
+El blueprint de Render está en `render.yaml` y despliega **un solo servicio** (`slidehub-service`).
 
 Más detalle: [DEPLOYMENT.md](DEPLOYMENT.md)
 

@@ -15,17 +15,17 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 <p>Fecha: 2026-04-03</p>
 <p>Rama: <span class="code">development</span></p>
 <h2>Objetivo</h2>
-<p>Consolidar funcionalidad core en <span class="code">slidehub-monolith</span>, incorporando dominios <span class="code">state</span>, <span class="code">ai</span> y <span class="code">ui</span>, y eliminar las primeras fronteras HTTP internas entre módulos.</p>
+<p>Consolidar funcionalidad core en <span class="code">slidehub-service</span>, incorporando dominios <span class="code">state</span>, <span class="code">ai</span> y <span class="code">ui</span>, y eliminar las primeras fronteras HTTP internas entre módulos.</p>
 <h2>Cambios realizados</h2>
 <h3>1) Migración de dominios Java</h3>
-<p>Se consolidaron paquetes dentro de <span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/</span>:</p>
+<p>Se consolidaron paquetes dentro de <span class="code">slidehub-service/src/main/java/com/brixo/slidehub/</span>:</p>
 <ul>
 <li><span class="code">state/**</span> (controllers, models, services)</li>
 <li><span class="code">ai/**</span> (controllers, models, repositories, services)</li>
 <li><span class="code">ui/**</span> (config, controllers, models, repositories, services, exception)</li>
 </ul>
 <h3>2) Migración de recursos</h3>
-<p>Se incorporaron en <span class="code">slidehub-monolith/src/main/resources/</span>:</p>
+<p>Se incorporaron en <span class="code">slidehub-service/src/main/resources/</span>:</p>
 <ul>
 <li><span class="code">templates/**</span></li>
 <li><span class="code">static/**</span></li>
@@ -43,26 +43,26 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 <h3>4) Eliminación inicial de HTTP interno (in-process)</h3>
 <p>Se refactorizaron servicios puente para invocación directa en el mismo proceso:</p>
 <ul>
-<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/NotesBridgeService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/service/NotesBridgeService.java</span></li>
 </ul>
 <p>  - de llamadas HTTP a <span class="code">NotesService</span> / <span class="code">RepoAnalysisService</span> / <span class="code">PresenterNoteRepository</span>.</p>
 <ul>
-<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/AssistBridgeService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/service/AssistBridgeService.java</span></li>
 </ul>
 <p>  - de POST multipart interno a llamada directa <span class="code">AssistService</span>.</p>
 <ul>
-<li><span class="code">slidehub-monolith/src/main/java/com/brixo/slidehub/ui/service/HapticBridgeService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/service/HapticBridgeService.java</span></li>
 </ul>
 <p>  - de POST interno a llamada directa <span class="code">HapticEventService</span>.</p>
 <h2>Verificación</h2>
 <p>Compilación del monolito tras consolidación:</p>
 <p>```bash</p>
-<p>./mvnw clean compile -pl slidehub-monolith -am</p>
+<p>./mvnw clean compile -pl slidehub-service -am</p>
 <p>```</p>
 <p>Resultado esperado: <span class="code">BUILD SUCCESS</span>.</p>
 <h2>Resultado de fase</h2>
 <ul>
-<li><span class="code">slidehub-monolith</span> ya contiene la funcionalidad principal de UI + State + AI.</li>
+<li><span class="code">slidehub-service</span> ya contiene la funcionalidad principal de UI + State + AI.</li>
 <li>Se removieron fronteras HTTP internas críticas entre módulos.</li>
 <li>Código y recursos base quedaron centralizados en una sola unidad de despliegue.</li>
 </ul>

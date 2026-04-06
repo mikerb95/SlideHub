@@ -37,7 +37,7 @@ public class NotesController {
      */
     @GetMapping("/health")
     public ResponseEntity<Map<String, String>> health() {
-        return ResponseEntity.ok(Map.of("status", "ok", "service", "slidehub-monolith", "module", "ai"));
+        return ResponseEntity.ok(Map.of("status", "ok", "service", "slidehub-service", "module", "ai"));
     }
 
     /**

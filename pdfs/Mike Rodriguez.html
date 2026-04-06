@@ -26,14 +26,14 @@ hr { border: none; border-top: 1px solid #999; margin: 1.2em 0; }
 </ul>
 <h3>Ahora</h3>
 <ul>
-<li>Se despliega un solo servicio principal: <span class="code">slidehub-monolith</span>.</li>
+<li>Se despliega un solo servicio principal: <span class="code">slidehub-service</span>.</li>
 <li>Se unifica el punto de health check.</li>
 <li>Se simplifica la estrategia de build, deploy y troubleshooting.</li>
 </ul>
 <h2>3. Archivos que debes dominar para sustentar</h2>
 <ul>
 <li><span class="code">render.yaml</span></li>
-<li><span class="code">slidehub-monolith/Dockerfile</span></li>
+<li><span class="code">slidehub-service/Dockerfile</span></li>
 <li><span class="code">DEPLOYMENT.md</span></li>
 <li><span class="code">README.md</span></li>
 <li><span class="code">docs/MIGRACION-MONOLITO-FASE-3-DEPLOY-DOCS.md</span></li>
@@ -43,7 +43,7 @@ hr { border: none; border-top: 1px solid #999; margin: 1.2em 0; }
 </ul>
 <h2>4. Guion exacto para 2 minutos</h2>
 <h3>0:00 – 0:35</h3>
-<p>“Mi responsabilidad fue llevar la operación de 4 servicios en Render a un modelo unificado con <span class="code">slidehub-monolith</span>.”</p>
+<p>“Mi responsabilidad fue llevar la operación de 4 servicios en Render a un modelo unificado con <span class="code">slidehub-service</span>.”</p>
 <h3>0:35 – 1:15</h3>
 <p>“El cambio principal se ve en <span class="code">render.yaml</span>: pasamos de un despliegue distribuido a un servicio único, con health check central y configuración consolidada.”</p>
 <h3>1:15 – 1:45</h3>

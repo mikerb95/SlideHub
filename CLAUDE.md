@@ -15,7 +15,7 @@ Es la reescritura de un módulo PHP/CodeIgniter 4 documentado en
 - Spring Boot 4.0.3 / Spring Cloud 2025.1.0 / Java 21
 - Maven multi-módulo (4 servicios creados en Fase 0)
 - Redis (estado en memoria y eventos hápticos), MongoDB (notas IA + deploy guides), PostgreSQL/JPA (usuarios, presentaciones, sesiones de reunión y asignaciones), Thymeleaf (UI), Spring Security (auth local + OAuth2), Spring Cloud Gateway (enrutamiento)
-- Monolito modular: `slidehub-monolith` (Puerto 8080)
+- Monolito modular: `slidehub-service` (Puerto 8080)
 - **OAuth2:** GitHub + Google coexisten con login local; tokens en PostgreSQL
 - **Google Drive:** Google Drive REST API v3 vía `WebClient` (sin SDK)
 - **Gemini Vision:** analiza visualmente slides PNG para notas del presentador
@@ -36,7 +36,7 @@ Es la reescritura de un módulo PHP/CodeIgniter 4 documentado en
 
 Antes de producir cualquier código, recorre este checklist internamente:
 
-1. ¿Esta tarea pertenece al módulo `state`, `ui` o `ai` dentro de `slidehub-monolith`?
+1. ¿Esta tarea pertenece al módulo `state`, `ui` o `ai` dentro de `slidehub-service`?
 2. ¿Qué historia de usuario cubre esto? Verificar `AGENTS.md §6` y los criterios de aceptación en el CSV.
 3. ¿El comportamiento detallado está en `docs/Presentation-Module-Analysis.md`? Si sí, cítalo; si no existe, usar el CSV y la implementación actual como base.
 4. ¿Qué paquete Java corresponde según la convención de `AGENTS.md §4`?
@@ -297,7 +297,7 @@ spring.cloud.config.server.native.search-locations=classpath:/config-repo
 
 ### "Implementa el endpoint `GET /api/slide`"
 
-1. Ubicar en `slidehub-monolith/src/main/java/com/brixo/slidehub/state/`
+1. Ubicar en `slidehub-service/src/main/java/com/brixo/slidehub/state/`
 2. Crear: `model/SlideStateResponse.java` (record con `slide` y `totalSlides`), `service/SlideStateService.java`, `controller/SlideController.java`
 3. `SlideStateService` lee `current_slide` de Redis; cuenta archivos del directorio slides para `totalSlides`.
 4. Comportamiento por defecto: si la clave no existe → `{ "slide": 1, "totalSlides": N }` (HU-008 §2)
@@ -321,7 +321,7 @@ spring.cloud.config.server.native.search-locations=classpath:/config-repo
 
 ### "Implementa generación de notas IA (`POST /api/ai/notes/generate`)"
 
-1. Ubicar en `slidehub-monolith/src/main/java/com/brixo/slidehub/ai/`
+1. Ubicar en `slidehub-service/src/main/java/com/brixo/slidehub/ai/`
 2. `NotesController` recibe `GenerateNoteRequest(presentationId, slideNumber, repoUrl, slideContext)`
 3. `GeminiService.extractRepoContext(repoUrl, slideContext)` → llama a Gemini API vía `WebClient`
 4. `GroqService.generateNote(geminiContext)` → llama a Groq API vía `WebClient`

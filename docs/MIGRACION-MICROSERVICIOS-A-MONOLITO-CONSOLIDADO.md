@@ -2,13 +2,13 @@
 
 **Proyecto:** SlideHub  
 **Fecha de consolidación:** 2026-04-04  
-**Estado actual:** Monolito modular en producción (`slidehub-monolith`)
+**Estado actual:** Monolito modular en producción (`slidehub-service`)
 
 ---
 
 ## 1) Resumen ejecutivo
 
-SlideHub migró de una arquitectura de **4 microservicios** (`gateway-service`, `state-service`, `ui-service`, `ai-service`) a un **monolito modular** (`slidehub-monolith`) para simplificar operación, reducir costos de infraestructura y eliminar complejidad innecesaria de red interna (proxy/ruteo/puertos entre servicios).
+SlideHub migró de una arquitectura de **4 microservicios** (`gateway-service`, `state-service`, `ui-service`, `ai-service`) a un **monolito modular** (`slidehub-service`) para simplificar operación, reducir costos de infraestructura y eliminar complejidad innecesaria de red interna (proxy/ruteo/puertos entre servicios).
 
 La migración mantuvo la separación lógica por módulos (`ui`, `state`, `ai`) dentro de un único proceso Spring Boot, conservando el comportamiento funcional de negocio.
 
@@ -24,12 +24,12 @@ La migración mantuvo la separación lógica por módulos (`ui`, `state`, `ai`) 
 - Despliegue multi-servicio en Render
 
 ### Arquitectura destino (monolito modular)
-- `slidehub-monolith` (único servicio, puerto único)
+- `slidehub-service` (único servicio, puerto único)
 - Módulos internos:
   - `ui`
   - `state`
   - `ai`
-- Despliegue recomendado: 1 solo Web Service en Render (`slidehub-monolith`)
+- Despliegue recomendado: 1 solo Web Service en Render (`slidehub-service`)
 
 ---
 
@@ -65,7 +65,7 @@ La migración mantuvo la separación lógica por módulos (`ui`, `state`, `ai`) 
 ## 4) Qué se creó
 
 ## 4.1 Módulo de ejecución principal
-- **`slidehub-monolith/`** como servicio principal de ejecución y despliegue.
+- **`slidehub-service/`** como servicio principal de ejecución y despliegue.
 
 ## 4.2 Artefactos y documentación de migración
 - Fases de migración documentadas:
@@ -77,12 +77,12 @@ La migración mantuvo la separación lógica por módulos (`ui`, `state`, `ai`) 
 - Documentación de despliegue monolítico:
   - `DEPLOYMENT.md`
 - Blueprint monolítico de Render:
-  - `render.yaml` (servicio único `slidehub-monolith`)
+  - `render.yaml` (servicio único `slidehub-service`)
 
 ## 4.3 Ajustes funcionales/técnicos relevantes
 - Actualización de narrativa UI y técnica a monolito modular en vistas/documentación.
 - Ajustes de detección de rutas de slides para contexto monolito (compatibilidad de path).
-- Consolidación de la ejecución local/build en torno a `slidehub-monolith`.
+- Consolidación de la ejecución local/build en torno a `slidehub-service`.
 
 ---
 
@@ -114,11 +114,11 @@ La migración mantuvo la separación lógica por módulos (`ui`, `state`, `ai`) 
 
 ## 6.1 Build y empaquetado
 - Se mantiene monorepo Maven, pero la ruta principal de compilación/ejecución se centra en:
-  - `./mvnw clean compile -pl slidehub-monolith -am`
-  - `./mvnw spring-boot:run -pl slidehub-monolith`
+  - `./mvnw clean compile -pl slidehub-service -am`
+  - `./mvnw spring-boot:run -pl slidehub-service`
 
 ## 6.2 Despliegue
-- `render.yaml` consolidado a un solo servicio (`slidehub-monolith`) con health check único:
+- `render.yaml` consolidado a un solo servicio (`slidehub-service`) con health check único:
   - `/actuator/health`
 
 ## 6.3 Frontend/UX técnico

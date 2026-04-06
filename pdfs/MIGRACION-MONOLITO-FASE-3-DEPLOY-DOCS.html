@@ -20,12 +20,12 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 <h3>1) Dockerfile del monolito</h3>
 <p>Se creó:</p>
 <ul>
-<li><span class="code">slidehub-monolith/Dockerfile</span></li>
+<li><span class="code">slidehub-service/Dockerfile</span></li>
 </ul>
 <p>Características:</p>
 <ul>
 <li>Multi-stage (<span class="code">jdk</span> builder + <span class="code">jre</span> runtime)</li>
-<li>Build del módulo <span class="code">slidehub-monolith</span></li>
+<li>Build del módulo <span class="code">slidehub-service</span></li>
 <li>Healthcheck a <span class="code">/actuator/health</span></li>
 <li>Puerto <span class="code">8080</span></li>
 </ul>
@@ -36,7 +36,7 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 </ul>
 <p>Ahora despliega un único servicio:</p>
 <ul>
-<li><span class="code">slidehub-monolith</span></li>
+<li><span class="code">slidehub-service</span></li>
 </ul>
 <p>Se eliminaron servicios separados (<span class="code">gateway</span>, <span class="code">state</span>, <span class="code">ui</span>, <span class="code">ai</span>) del blueprint principal.</p>
 <h3>3) README monolito-first</h3>
@@ -47,7 +47,7 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 <p>Nuevos ejes:</p>
 <ul>
 <li>Arquitectura actual = monolito modular</li>
-<li>Instrucciones de ejecución local con <span class="code">slidehub-monolith</span></li>
+<li>Instrucciones de ejecución local con <span class="code">slidehub-service</span></li>
 <li>Resumen API y despliegue orientado a una sola app</li>
 <li>Nota de legado para módulos microservicio históricos</li>
 </ul>
@@ -67,14 +67,14 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 <h3>5) Configuración base URL</h3>
 <p>Se añadió propiedad:</p>
 <ul>
-<li><span class="code">slidehub-monolith/src/main/resources/application.properties</span></li>
+<li><span class="code">slidehub-service/src/main/resources/application.properties</span></li>
 </ul>
 <p>  - <span class="code">slidehub.base-url=${BASE_URL:http://localhost:8080}</span></p>
 <p>Esto normaliza generación de URLs/callbacks en entorno productivo.</p>
 <h2>Verificación</h2>
 <p>Compilación ejecutada:</p>
 <p>```bash</p>
-<p>./mvnw clean compile -pl slidehub-monolith -am</p>
+<p>./mvnw clean compile -pl slidehub-service -am</p>
 <p>```</p>
 <p>Resultado esperado: <span class="code">BUILD SUCCESS</span>.</p>
 <h2>Resultado de fase</h2>
@@ -86,7 +86,7 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 <h2>Próximo paso sugerido</h2>
 <p>Fase 4:</p>
 <ol>
-<li>1. Ajustar pipelines CI/CD para ejecutar pruebas focalizadas en <span class="code">slidehub-monolith</span>.</li>
+<li>1. Ajustar pipelines CI/CD para ejecutar pruebas focalizadas en <span class="code">slidehub-service</span>.</li>
 <li>2. Añadir smoke E2E monolito en <span class="code">docs/SMOKE-E2E.md</span>.</li>
 <li>3. Definir checklist de corte para retirar oficialmente rutas de trabajo microservicio en documentación secundaria.</li>
 </ol></body></html>

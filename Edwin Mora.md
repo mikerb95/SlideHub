@@ -12,15 +12,15 @@ Responsable histórico de `gateway-service` y de la lógica de control de entrad
 - Además aplicaba protección anti-abuso.
 
 ### Ahora
-- El enrutamiento interno entre servicios ya no es necesario, porque todo corre en `slidehub-monolith`.
+- El enrutamiento interno entre servicios ya no es necesario, porque todo corre en `slidehub-service`.
 - Se mantiene tu aporte clave: **control de entrada y rate limit**, ahora dentro del monolito.
 
 ## 3. Archivos que debes dominar para sustentar
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/SlideHubMonolithApplication.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitFilter.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitService.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitProperties.java`
-- `slidehub-monolith/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitDecision.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/monolith/SlideHubMonolithApplication.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitFilter.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitService.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitProperties.java`
+- `slidehub-service/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitDecision.java`
 - `docs/MIGRACION-MONOLITO-FASE-0.md`
 - `docs/MIGRACION-MONOLITO-FASE-1.md`
 

@@ -7,8 +7,8 @@
 		<artifactId>slidehub-parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>slidehub-monolith</artifactId>
-	<name>slidehub-monolith</name>
+	<artifactId>slidehub-service</artifactId>
+	<name>slidehub-service</name>
 	<description>SlideHub Monolith — UI + State + AI en una sola aplicación</description>
 
 	<dependencies>

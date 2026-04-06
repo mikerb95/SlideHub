@@ -5,7 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LOG_DIR="${ROOT_DIR}/target/smoke-logs"
 mkdir -p "${LOG_DIR}"
 
-MONOLITH_LOG="${LOG_DIR}/slidehub-monolith.log"
+MONOLITH_LOG="${LOG_DIR}/slidehub-service.log"
 
 MONOLITH_PID=""
 
@@ -88,7 +88,7 @@ docker rm -f "${REDIS_CONTAINER}" "${MONGO_CONTAINER}" >/dev/null 2>&1 || true
 docker run -d --name "${REDIS_CONTAINER}" -p 6379:6379 redis:7-alpine >/dev/null
 docker run -d --name "${MONGO_CONTAINER}" -p 27017:27017 mongo:7 >/dev/null
 
-echo "[INFO] Starting slidehub-monolith on port ${SMOKE_PORT}"
+echo "[INFO] Starting slidehub-service on port ${SMOKE_PORT}"
 PORT="${SMOKE_PORT}" \
 DATABASE_URL='jdbc:h2:mem:slidehub;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE' \
 DB_DRIVER=org.h2.Driver \
@@ -99,7 +99,7 @@ SPRING_DEVTOOLS_RESTART_ENABLED=false \
 MONGODB_URI='mongodb://localhost:27017/slidehub' \
 REDIS_HOST='localhost' \
 REDIS_PORT='6379' \
-./mvnw -q spring-boot:run -pl slidehub-monolith >"${MONOLITH_LOG}" 2>&1 &
+./mvnw -q spring-boot:run -pl slidehub-service >"${MONOLITH_LOG}" 2>&1 &
 MONOLITH_PID="$!"
 
 echo "[INFO] Waiting for services"

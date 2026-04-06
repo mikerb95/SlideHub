@@ -1,6 +1,6 @@
 # Smoke E2E local (Monolito)
 
-Script de verificación rápida para validar que `slidehub-monolith` levanta correctamente y responde en rutas públicas/API críticas sin depender de proveedores externos de IA.
+Script de verificación rápida para validar que `slidehub-service` levanta correctamente y responde en rutas públicas/API críticas sin depender de proveedores externos de IA.
 
 ## Ejecutar
 
