@@ -337,6 +337,9 @@
             let handRaised = false;
             let qaEnabled = false;
             let anonAllowed = false;
+            let passiveToken = null;  // token de registro automático (sin Q&A)
+
+            const PASSIVE_STORAGE_KEY = `qa-passive:${PRES_ID}`;
 
             const fab = document.getElementById('qa-fab');
             const panel = document.getElementById('qa-panel');
