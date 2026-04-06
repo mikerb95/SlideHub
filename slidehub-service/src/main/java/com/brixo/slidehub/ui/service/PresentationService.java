@@ -485,6 +485,17 @@ public class PresentationService {
     /**
      * Determina el content-type para S3 basado en el MIME type reportado por Drive.
      */
+    private String generateUniqueJoinCode() {
+        ThreadLocalRandom rng = ThreadLocalRandom.current();
+        for (int attempt = 0; attempt < 20; attempt++) {
+            String code = String.format("%05d", rng.nextInt(10000, 100000));
+            if (!presentationRepository.existsByJoinCode(code)) {
+                return code;
+            }
+        }
+        throw new IllegalStateException("No se pudo generar un join code único tras 20 intentos.");
+    }
+
     private String resolveContentType(String mimeType) {
         if (mimeType == null)
             return "image/png";
