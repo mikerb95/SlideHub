@@ -646,70 +646,7 @@
             </section>
 
             <!-- ══════════════════════════════════════
-             6. DEPLOY TUTOR
-        ══════════════════════════════════════ -->
-            <section id="deploy" class="guide-section sh-card p-6 space-y-4">
-                <div class="sh-label"><i class="fa-solid fa-rocket mr-1"></i>DEPLOY TUTOR</div>
-
-                <p class="text-sm text-[var(--sh-text-2)] leading-relaxed">
-                    Dado un repositorio y una plataforma (Render, Vercel, Netlify), genera automáticamente
-                    un Dockerfile y una guía paso a paso para desplegarlo. Todo se cachea por
-                    <code class="font-mono">repoUrl + platform</code>.
-                </p>
-
-                <!-- Pipeline deploy -->
-                <div class="pipeline-wrap">
-                    <div class="pipeline-step">
-                        <div class="pipeline-box">repoUrl<br>+ platform</div>
-                        <div class="pipeline-label">Ej: render</div>
-                    </div>
-                    <div class="pipeline-arrow">→</div>
-                    <div class="pipeline-step">
-                        <div class="pipeline-box green">Análisis<br>del repo</div>
-                        <div class="pipeline-label">Lee o genera<br>RepoAnalysis</div>
-                    </div>
-                    <div class="pipeline-arrow">→</div>
-                    <div class="pipeline-step">
-                        <div class="pipeline-box amber">Groq<br>Dockerfile</div>
-                        <div class="pipeline-label">Multi-stage,<br>non-root, HEALTHCHECK</div>
-                    </div>
-                    <div class="pipeline-arrow">→</div>
-                    <div class="pipeline-step">
-                        <div class="pipeline-box amber">Groq<br>Guía</div>
-                        <div class="pipeline-label">Pasos, tips,<br>ejemplo .env</div>
-                    </div>
-                    <div class="pipeline-arrow">→</div>
-                    <div class="pipeline-step">
-                        <div class="pipeline-box green">MongoDB</div>
-                        <div class="pipeline-label">Caché por<br>repo+platform</div>
-                    </div>
-                </div>
-
-                <p class="text-sm text-[var(--sh-text-2)] leading-relaxed">
-                    El resultado final es un <code class="font-mono">DeploymentGuide</code> que incluye:
-                </p>
-
-                <div class="grid sm:grid-cols-2 gap-3">
-                    <div class="p-3 rounded-tech bg-[var(--sh-deep)] border border-[var(--sh-border)]">
-                        <div class="text-xs font-mono text-[var(--sh-amber)] mb-2">dockerfile</div>
-                        <p class="text-xs text-[var(--sh-text-2)] leading-relaxed">
-                            Generado con buenas prácticas: multi-stage build para reducir tamaño,
-                            usuario no-root por seguridad, HEALTHCHECK, variables de entorno como ARG/ENV.
-                        </p>
-                    </div>
-                    <div class="p-3 rounded-tech bg-[var(--sh-deep)] border border-[var(--sh-border)]">
-                        <div class="text-xs font-mono text-[var(--sh-amber)] mb-2">guide + tips</div>
-                        <p class="text-xs text-[var(--sh-text-2)] leading-relaxed">
-                            Guía numerada para la plataforma elegida (Render, Vercel, Netlify)
-                            + lista de tips específicos + ejemplo de archivo <code class="font-mono">.env</code>
-                            con las variables detectadas.
-                        </p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ══════════════════════════════════════
-             7. ASISTENTE DE AUDIO
+             6. ASISTENTE DE AUDIO
         ══════════════════════════════════════ -->
             <section id="audio" class="guide-section sh-card p-6 space-y-4">
                 <div class="sh-label"><i class="fa-solid fa-microphone mr-1"></i>ASISTENTE DE AUDIO</div>
@@ -940,34 +877,6 @@
                             <span class="method-post">POST</span>
                             <span class="ep-path">/api/ai/analyze-repo/refresh</span>
                             <span class="ep-desc">Fuerza nuevo análisis ignorando el caché</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Deploy tutor -->
-                <div>
-                    <div class="text-xs font-mono text-[var(--sh-text-3)] mb-2 uppercase tracking-wider">Deploy Tutor
-                    </div>
-                    <div class="border border-[var(--sh-border)] rounded-tech overflow-hidden">
-                        <div class="ep-row px-3 bg-[var(--sh-deep)]">
-                            <span class="method-post">POST</span>
-                            <span class="ep-path">/api/ai/deploy/analyze</span>
-                            <span class="ep-desc">Analiza repo para despliegue (misma lógica que analyze-repo)</span>
-                        </div>
-                        <div class="ep-row px-3">
-                            <span class="method-post">POST</span>
-                            <span class="ep-path">/api/ai/deploy/dockerfile</span>
-                            <span class="ep-desc">Genera Dockerfile optimizado con Groq</span>
-                        </div>
-                        <div class="ep-row px-3 bg-[var(--sh-deep)]">
-                            <span class="method-post">POST</span>
-                            <span class="ep-path">/api/ai/deploy/guide</span>
-                            <span class="ep-desc">Genera guía de despliegue para Render/Vercel/Netlify</span>
-                        </div>
-                        <div class="ep-row px-3">
-                            <span class="method-post">POST</span>
-                            <span class="ep-path">/api/ai/deploy/guide/refresh</span>
-                            <span class="ep-desc">Regenera la guía borrando el caché</span>
                         </div>
                     </div>
                 </div>
