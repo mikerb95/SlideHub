@@ -1033,22 +1033,56 @@
             }
         }
 
+        let pptxElapsedTimer = null;
+
         function startPptxPolling(presentationId) {
             if (pptxPollTimer) clearInterval(pptxPollTimer);
+            if (pptxElapsedTimer) clearInterval(pptxElapsedTimer);
+
+            const startTime = Date.now();
+            const elapsedEl = document.getElementById('pptx-elapsed');
+            const progressBar = document.getElementById('pptx-progress-bar');
+            const statusMsg = document.getElementById('pptx-status-msg');
+
+            // Actualiza el contador de tiempo y la barra cada segundo en el cliente
+            pptxElapsedTimer = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                if (elapsedEl) elapsedEl.textContent = elapsed < 60 ? elapsed + 's' : Math.floor(elapsed / 60) + 'm ' + (elapsed % 60) + 's';
+                // Barra: llega al 90% en ~90s, luego se detiene ahí
+                const pct = Math.min(90, Math.round((elapsed / 90) * 90));
+                if (progressBar) progressBar.style.width = Math.max(2, pct) + '%';
+                if (statusMsg && elapsed > 60) statusMsg.textContent = 'Tomando más tiempo de lo normal. Lambda puede tardar hasta 3 minutos con archivos grandes.';
+                if (statusMsg && elapsed > 150) statusMsg.textContent = 'Aún procesando... Si falla, el error aparecerá aquí automáticamente.';
+            }, 1000);
+
             pptxPollTimer = setInterval(async () => {
                 try {
                     const res = await fetch('/api/presentations/' + presentationId + '/pptx-status');
                     if (!res.ok) return;
                     const data = await res.json();
+
+                    // Sincronizar el elapsed con el servidor si está disponible
+                    if (data.elapsedSeconds != null && elapsedEl) {
+                        const s = data.elapsedSeconds;
+                        elapsedEl.textContent = s < 60 ? s + 's' : Math.floor(s / 60) + 'm ' + (s % 60) + 's';
+                    }
+
                     if (data.status === 'READY') {
                         clearInterval(pptxPollTimer);
+                        clearInterval(pptxElapsedTimer);
                         W.totalSlides = data.slideCount || 0;
+                        if (progressBar) progressBar.style.width = '100%';
                         document.getElementById('pptx-processing').classList.add('hidden');
                         onUploadComplete();
                     } else if (data.status === 'FAILED') {
                         clearInterval(pptxPollTimer);
+                        clearInterval(pptxElapsedTimer);
                         document.getElementById('pptx-processing').classList.add('hidden');
-                        showError('pptx-error', 'Lambda no pudo convertir el archivo. Intenta con otro .pptx.');
+                        const elapsed = data.elapsedSeconds || 0;
+                        const msg = elapsed > 290
+                            ? 'La conversión superó el tiempo límite (5 min). Lambda no respondió — revisa los logs de AWS o intenta con un .pptx más pequeño.'
+                            : 'Lambda no pudo convertir el archivo. Intenta con otro .pptx.';
+                        showError('pptx-error', msg);
                         document.getElementById('btn-pptx').disabled = false;
                     }
                 } catch (e) { /* silencioso — reintenta en el próximo tick */ }
