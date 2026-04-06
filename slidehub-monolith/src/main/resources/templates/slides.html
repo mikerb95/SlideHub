@@ -57,6 +57,132 @@
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.75rem;
         }
+
+        /* ── Q&A Widget ── */
+        #qa-fab {
+            display: none;
+            position: fixed;
+            bottom: 1.25rem;
+            left: 1.25rem;
+            background: rgba(30, 41, 59, 0.92);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(99, 130, 255, 0.35);
+            border-radius: 999px;
+            padding: 0.45rem 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            color: #94a3b8;
+            cursor: pointer;
+            gap: 0.4rem;
+            align-items: center;
+            z-index: 100;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        #qa-fab:hover { background: rgba(40, 55, 80, 0.95); border-color: rgba(99, 130, 255, 0.6); }
+        #qa-fab .qa-hand-badge {
+            background: rgba(245, 158, 11, 0.25);
+            color: #f59e0b;
+            border-radius: 999px;
+            padding: 0 0.35rem;
+            font-size: 0.65rem;
+        }
+        #qa-panel {
+            display: none;
+            position: fixed;
+            bottom: 4rem;
+            left: 1.25rem;
+            width: min(340px, calc(100vw - 2.5rem));
+            background: rgba(15, 23, 42, 0.97);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(99, 130, 255, 0.25);
+            border-radius: 12px;
+            padding: 1rem;
+            z-index: 101;
+            font-family: 'JetBrains Mono', monospace;
+            color: #94a3b8;
+        }
+        #qa-panel .qa-title {
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            color: #6366f1;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #qa-panel input, #qa-panel textarea {
+            width: 100%;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(99, 130, 255, 0.2);
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 0.75rem;
+            padding: 0.4rem 0.6rem;
+            margin-bottom: 0.5rem;
+            outline: none;
+            resize: none;
+        }
+        #qa-panel input:focus, #qa-panel textarea:focus {
+            border-color: rgba(99, 130, 255, 0.5);
+        }
+        #qa-panel .qa-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.72rem;
+        }
+        #qa-panel .qa-btn {
+            background: #4f46e5;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 0.4rem 0.75rem;
+            font-family: inherit;
+            font-size: 0.72rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 0.25rem;
+        }
+        #qa-panel .qa-btn:disabled { opacity: 0.5; cursor: default; }
+        #qa-panel .qa-btn-hand {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            color: #f59e0b;
+            border-radius: 6px;
+            padding: 0.35rem 0.6rem;
+            font-family: inherit;
+            font-size: 0.7rem;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        #qa-panel .qa-btn-hand.active {
+            background: rgba(245, 158, 11, 0.3);
+        }
+        #qa-panel .qa-msg {
+            font-size: 0.68rem;
+            text-align: center;
+            margin-top: 0.4rem;
+            min-height: 1em;
+        }
+        #qa-panel .qa-msg.ok { color: #34d399; }
+        #qa-panel .qa-msg.err { color: #f87171; }
+        #qa-viewer-count {
+            display: none;
+            position: fixed;
+            top: 0.75rem;
+            left: 0.75rem;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(99, 130, 255, 0.2);
+            border-radius: 999px;
+            padding: 0.2rem 0.65rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: #64748b;
+            z-index: 50;
+        }
     </style>
 </head>
 
