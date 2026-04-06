@@ -74,6 +74,13 @@ public class SecurityConfig {
                                                                 "/api/presentations/*/meeting/help",
                                                                 "/api/presentations/*/meeting/assist/audio")
                                                 .permitAll()
+                                                // Stream viewers: join/heartbeat/leave/hand/stats + Q&A público
+                                                .requestMatchers(
+                                                                "/api/presentations/*/stream/**",
+                                                                "/api/presentations/*/questions/submit",
+                                                                "/api/presentations/*/questions/settings",
+                                                                "/api/presentations/*/questions/*/upvote")
+                                                .permitAll()
                                                 .requestMatchers("/api/presentations/*/slides").permitAll()
                                                 .requestMatchers("/api/presentations/*/slides/*/image").permitAll()
                                                 // Registro de dispositivos (heartbeat público; lectura ADMIN)
