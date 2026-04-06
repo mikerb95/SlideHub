@@ -114,11 +114,20 @@
                     <p th:if="${p.description() != null and !p.description().isBlank()}"
                         class="text-xs text-[var(--sh-text-2)] line-clamp-2" th:text="${p.description()}"></p>
 
-                    <!-- Join code -->
+                    <!-- Espectadores conectados -->
                     <div th:if="${p.joinCode() != null}"
                         class="flex items-center gap-2 bg-[var(--sh-surface)] rounded px-2.5 py-1.5">
                         <i class="fa-solid fa-users text-[var(--sh-text-3)] text-[0.65rem]"></i>
                         <span class="font-mono text-xs text-[var(--sh-text-3)]">Espectadores:</span>
+                        <span class="font-mono text-sm font-semibold text-[var(--sh-text-1)]"
+                            th:attr="data-viewer-target=${p.id()}">—</span>
+                    </div>
+
+                    <!-- Join code -->
+                    <div th:if="${p.joinCode() != null}"
+                        class="flex items-center gap-2 bg-[var(--sh-surface)] rounded px-2.5 py-1.5">
+                        <i class="fa-solid fa-key text-[var(--sh-text-3)] text-[0.65rem]"></i>
+                        <span class="font-mono text-xs text-[var(--sh-text-3)]">Join code:</span>
                         <span class="font-mono text-sm font-semibold text-[var(--sh-text-1)] tracking-widest"
                             th:text="${p.joinCode()}">00000</span>
                         <a th:href="@{/join(code=${p.joinCode()})}" target="_blank"
