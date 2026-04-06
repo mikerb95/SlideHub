@@ -288,9 +288,8 @@
                     <a href="#modelos" class="toc-link">3. Los modelos de IA</a>
                     <a href="#notas" class="toc-link">4. Notas del presentador</a>
                     <a href="#repo" class="toc-link">5. Análisis de repositorio</a>
-                    <a href="#deploy" class="toc-link">6. Deploy Tutor</a>
-                    <a href="#audio" class="toc-link">7. Asistente de audio</a>
-                    <a href="#mongodb" class="toc-link">8. Base de datos</a>
+                    <a href="#audio" class="toc-link">6. Asistente de audio</a>
+                    <a href="#mongodb" class="toc-link">7. Base de datos</a>
                     <a href="#endpoints" class="toc-link">9. Endpoints</a>
                 </nav>
             </div>
@@ -384,7 +383,7 @@
                     │ │
                     ▼ ▼
                     módulo state módulo ai
-                    · Slide/demo/haptics · Notes/deploy/assist
+                    · Slide/demo/haptics · Notes/assist
                     · Redis · Gemini/Groq + MongoDB
 
                     módulo ui
@@ -405,14 +404,12 @@
                     controller/
                     NotesController.java → /api/ai/notes/**
                     RepoAnalysisController.java → /api/ai/analyze-repo
-                    DeployTutorController.java → /api/ai/deploy/**
                     AssistController.java → /api/ai/assist/audio
                     service/
                     GeminiService.java → llamadas HTTP a Google Gemini
                     GroqService.java → llamadas HTTP a Groq (LLM + Whisper)
                     NotesService.java → lógica del pipeline de notas
                     RepoAnalysisService.java → lógica del análisis de repos
-                    DeploymentService.java → lógica de generación de guías
                     AssistService.java → lógica del asistente de audio
                     model/
                     PresenterNote.java → documento MongoDB (notas)
@@ -470,8 +467,6 @@
                                 presentador (JSON)</li>
                             <li><i class="fa-solid fa-microphone mr-1 text-[var(--sh-amber)]"></i>Transcribir audio
                                 (Whisper large-v3)</li>
-                            <li><i class="fa-solid fa-docker mr-1 text-[var(--sh-amber)]"></i>Generar Dockerfiles y
-                                guías de deploy</li>
                             <li><i class="fa-solid fa-comment mr-1 text-[var(--sh-amber)]"></i>Responder preguntas del
                                 público</li>
                         </ul>

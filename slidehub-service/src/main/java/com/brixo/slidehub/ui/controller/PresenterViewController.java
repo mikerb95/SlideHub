@@ -66,13 +66,4 @@ public class PresenterViewController {
         return "main-panel";
     }
 
-    /**
-     * Tutor de deployment — genera Dockerfiles y guías de despliegue con IA
-     * (PLAN-EXPANSION.md Fase 5, tarea 45).
-     * Requiere rol PRESENTER o ADMIN (configurado en SecurityConfig).
-     */
-    @GetMapping("/deploy-tutor")
-    public String deployTutorView() {
-        return "deploy-tutor";
-    }
 }
