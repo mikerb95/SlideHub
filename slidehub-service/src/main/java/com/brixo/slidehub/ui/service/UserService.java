@@ -113,7 +113,7 @@ public class UserService {
         if (userId == null) {
             return false;
         }
-        
+
         Optional<User> optUser = userRepository.findById(userId);
         if (optUser.isPresent()) {
             User user = optUser.get();
@@ -143,7 +143,8 @@ public class UserService {
                 <p style="font-family:sans-serif;color:#8b949e;font-size:0.85rem;margin-top:1rem">
                     Este enlace expirará en 15 minutos. Si no solicitaste este cambio, puedes ignorar este mensaje.
                 </p>
-                """.formatted(resetUrl);
+                """
+                .formatted(resetUrl);
 
         emailService.send(email, "Restablece tu contraseña en SlideHub", html);
     }
