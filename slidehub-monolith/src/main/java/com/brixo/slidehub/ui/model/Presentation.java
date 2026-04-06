@@ -184,4 +184,20 @@ public class Presentation {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public boolean isQuestionsEnabled() {
+        return questionsEnabled;
+    }
+
+    public void setQuestionsEnabled(boolean questionsEnabled) {
+        this.questionsEnabled = questionsEnabled;
+    }
+
+    public boolean isAllowAnonymousQuestions() {
+        return allowAnonymousQuestions;
+    }
+
+    public void setAllowAnonymousQuestions(boolean allowAnonymousQuestions) {
+        this.allowAnonymousQuestions = allowAnonymousQuestions;
+    }
 }

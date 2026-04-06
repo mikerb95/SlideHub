@@ -39,19 +39,24 @@ si hay diferencias de comportamiento.
 
 ---
 
-## 2. Arquitectura de Microservicios
+## 2. Arquitectura (Monolito Modular)
 
-Este proyecto es un **monorepo multi-módulo Maven** con 4 microservicios independientes.
+Este proyecto evolucionó a un **monolito modular** en el módulo `slidehub-monolith`. Los servicios antiguos se conservan como legacy.
 
 ```
-SlideHub/                          ← Parent POM (aggregator, sin código)
-├── state-service/                 ← Servicio de estado (puerto 8081)
-├── ui-service/                    ← Servicio de UI Thymeleaf (puerto 8082)
-├── ai-service/                    ← Servicio de IA: Gemini + Groq + MongoDB (puerto 8083)
-└── gateway-service/               ← API Gateway + Config Server (puerto 8080)
+SlideHub/                          ← Parent POM
+├── slidehub-monolith/             ← Aplicación principal (puerto 8080)
+│   └── src/main/java/com/brixo/slidehub
+│       ├── state/
+│       ├── ui/
+│       └── ai/
+├── state-service/                 ← (Deprecated / Legacy)
+├── ui-service/                    ← (Deprecated / Legacy)
+├── ai-service/                    ← (Deprecated / Legacy)
+└── gateway-service/               ← (Deprecated / Legacy)
 ```
 
-### 2.1 `state-service` (Puerto 8081)
+### 2.1 Módulo `state`
 
 **Responsabilidad única:** gestionar y persistir el estado de presentación activo
 y el registro de dispositivos.
@@ -93,7 +98,7 @@ y el registro de dispositivos.
 
 Cada dispositivo tiene: `name`, `type`, `token`, `lastIp`, `lastConnection`.
 
-### 2.2 `ui-service` (Puerto 8082)
+### 2.2 Módulo `ui`
 
 **Responsabilidad única:** servir las vistas HTML y gestionar autenticación de sesión.
 
@@ -101,7 +106,7 @@ Cada dispositivo tiene: `name`, `type`, `token`, `lastIp`, `lastConnection`.
 |---------------|------------------------------------------------------------------------------|
 | UI            | Thymeleaf 3 + Spring WebMVC                                                  |
 | Seguridad     | Spring Security — sesiones HTTP, BCrypt para passwords                       |
-| HTTP client   | `WebClient` (WebFlux) para llamar a `state-service` y `ai-service`          |
+| HTTP client   | Llamadas a nivel de métodos (inyección de dependencias directas) hacia módulos `state` y `ai`          |
 | Estáticos     | Archivos de slides en `src/main/resources/static/slides/`                   |
 | Sin estado    | No mantiene estado de presentación propio; delega todo a `state-service`    |
 
@@ -129,7 +134,7 @@ Cada dispositivo tiene: `name`, `type`, `token`, `lastIp`, `lastConnection`.
 - Logout → invalida sesión → redirige a `/auth/login`
 - Roles: `PRESENTER` (acceso a control), `ADMIN` (además del panel de devices)
 
-### 2.3 `ai-service` (Puerto 8083)
+### 2.3 Módulo `ai`
 
 **Responsabilidad única:** integración con IA externa (Gemini + Groq) y persistencia de
 notas del presentador y guías de deploy en MongoDB.
@@ -178,7 +183,7 @@ notas del presentador y guías de deploy en MongoDB.
 > Los resultados de análisis (`repo_analysis`) y guías (`deployment_guides`) se cachean en MongoDB.
 > `/guide/refresh` fuerza regeneración descartando el documento cacheado.
 
-### 2.4 `gateway-service` (Puerto 8080)
+### 2.4 Gateway (Ref. Legacy)
 
 **Responsabilidad única:** punto de entrada único + Spring Cloud Config Server.
 
@@ -399,7 +404,7 @@ Secciones clave del doc de análisis por tarea:
    communication va por HTTP (`WebClient`).
 5. **Correr el check de compilación** antes de reportar la tarea como completada:
    ```bash
-   ./mvnw clean compile -pl <module> -am
+   ./mvnw clean compile -pl slidehub-monolith -am
    ```
 6. **Reportar qué archivos se crearon/modificados** al finalizar cada tarea.
 
@@ -490,12 +495,9 @@ Secciones clave del doc de análisis por tarea:
 
 Cada microservicio es un **Web Service** independiente en Render:
 
-| Servicio         | Nombre en Render          | Build Command                              | Start Command                            |
-|------------------|---------------------------|--------------------------------------------|------------------------------------------|
-| `gateway-service`| `slidehub-gateway`        | `./mvnw -pl gateway-service package -am`  | `java -jar gateway-service/target/*.jar` |
-| `state-service`  | `slidehub-state`          | `./mvnw -pl state-service package -am`    | `java -jar state-service/target/*.jar`   |
-| `ui-service`     | `slidehub-ui`             | `./mvnw -pl ui-service package -am`       | `java -jar ui-service/target/*.jar`      |
-| `ai-service`     | `slidehub-ai`             | `./mvnw -pl ai-service package -am`       | `java -jar ai-service/target/*.jar`      |
+| Servicio | Nombre en Render | Build Command | Start Command |
+|---|---|---|---|
+| `slidehub-monolith` | `slidehub-monolith` | `./mvnw -pl slidehub-monolith package -am` | `java -jar slidehub-monolith/target/*.jar` |
 
 **Variables de entorno en Render (por servicio):**
 ```
