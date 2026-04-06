@@ -449,6 +449,8 @@
             window.qaJoin = async function () {
                 const nameVal = document.getElementById('qa-name').value.trim();
                 const anon = qaAnonChk.checked;
+                // Liberar el token pasivo antes de unirse con nombre/anónimo
+                await leavePassive();
                 try {
                     const res = await fetch(`${QA_BASE}/stream/join`, {
                         method: 'POST',
