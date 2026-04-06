@@ -476,7 +476,11 @@
                 const url = slideUrls[i - 1] || (PRESENTATION_ID
                     ? `/api/presentations/${PRESENTATION_ID}/slides/${i}/image`
                     : `/presentation/Slide${i}.PNG`);
-                div.innerHTML = `<img src="${url}" alt="Diapositiva ${i}" loading="lazy">
+                div.innerHTML = `<img src="${url}" alt="Diapositiva ${i}" loading="lazy"
+                                      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                 <div class="slide-thumb-placeholder" style="display:none;width:100%;aspect-ratio:16/9;align-items:center;justify-content:center;color:var(--sh-text-3);font-size:1.5rem;">
+                                     <i class="fa-solid fa-image"></i>
+                                 </div>
                                  <div class="slide-num">${i}</div>`;
                 div.addEventListener('click', () => goToSlide(i));
                 grid.appendChild(div);
