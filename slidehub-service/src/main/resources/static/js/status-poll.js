@@ -58,9 +58,16 @@
                             <i class="fa-solid fa-circle-info"></i> Diagnóstico
                         </button>
                     </td>
+                    <td class="py-2 pr-1 align-middle" style="width:96px;">
+                        <div class="mini-spark-wrap">
+                            <canvas data-spark="${escapeHtmlAttr(check.name)}" aria-hidden="true"></canvas>
+                        </div>
+                    </td>
                 </tr>
             `;
         }).join('');
+
+        requestAnimationFrame(drawSparklines);
 
         if (activeDiagnosticService && diagnosticModal && !diagnosticModal.classList.contains('hidden')) {
             const current = checksCache.find((item) => item.name === activeDiagnosticService);
