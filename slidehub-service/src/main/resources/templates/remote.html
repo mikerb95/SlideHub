@@ -291,6 +291,56 @@
             }
         }
 
+        /* ── Slide previews (mobile only) ── */
+        #slide-preview-section {
+            display: none;
+            width: 100%;
+            max-width: 400px;
+            padding: 0 1rem;
+            margin-bottom: 1.25rem;
+            gap: 0.75rem;
+            align-items: flex-end;
+        }
+
+        #slide-preview-section .preview-col-current {
+            flex: 1;
+        }
+
+        #slide-preview-section .preview-col-next {
+            width: 31%;
+            flex-shrink: 0;
+        }
+
+        .preview-label {
+            font-family: var(--sh-font-mono);
+            font-size: 0.6rem;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: var(--sh-text-3);
+            margin-bottom: 0.3rem;
+        }
+
+        #preview-current {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: contain;
+            border-radius: var(--sh-r-lg);
+            border: 1px solid var(--sh-border-active);
+            background: #000;
+            display: block;
+        }
+
+        #preview-next {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: contain;
+            border-radius: var(--sh-r-md);
+            border: 1px solid var(--sh-border);
+            background: #000;
+            opacity: 0.55;
+            display: block;
+        }
+
         @media (max-width: 640px) {
             .remote-btn {
                 width: 68px;
@@ -298,17 +348,35 @@
                 font-size: 1.55rem;
             }
 
+            /* Previews visibles en mobile */
+            #slide-preview-section {
+                display: flex;
+            }
+
+            /* FABs al doble de tamaño en mobile */
+            .fab {
+                width: 76px;
+                height: 76px;
+                flex-direction: column;
+                padding: 0;
+                gap: 0.2rem;
+                font-size: 0.7rem;
+                border-radius: var(--sh-r-lg);
+            }
+
+            .fab i {
+                font-size: 1.75rem;
+            }
+
             #help-btn {
                 left: 1rem;
                 bottom: 1rem;
-                padding: 0.62rem 0.85rem;
             }
 
             #mic-btn {
                 left: auto;
-                right: 4.8rem;
+                right: 5.2rem;
                 bottom: 1rem;
-                padding: 0.62rem 0.85rem;
             }
 
             #btn-demo-fab {
@@ -319,7 +387,7 @@
             #assist-card {
                 left: 0.6rem;
                 right: 0.6rem;
-                bottom: 4.9rem;
+                bottom: 6rem;
             }
 
             #notice {
