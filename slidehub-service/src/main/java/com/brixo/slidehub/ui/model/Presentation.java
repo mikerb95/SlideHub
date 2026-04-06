@@ -74,6 +74,14 @@ public class Presentation {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    /**
+     * Estado de la conversión PPTX vía Lambda.
+     * Solo aplica cuando {@code sourceType == PPTX}; null en todos los demás casos.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "pptx_status", length = 20)
+    private PptxStatus pptxStatus;
+
     /** Habilita o deshabilita el módulo de Q&A para esta presentación. */
     @Column(name = "questions_enabled", nullable = false)
     private boolean questionsEnabled = true;
@@ -183,6 +191,14 @@ public class Presentation {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public PptxStatus getPptxStatus() {
+        return pptxStatus;
+    }
+
+    public void setPptxStatus(PptxStatus pptxStatus) {
+        this.pptxStatus = pptxStatus;
     }
 
     public boolean isQuestionsEnabled() {

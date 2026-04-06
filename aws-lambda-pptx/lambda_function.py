@@ -2,6 +2,7 @@ import json
 import os
 import boto3
 import urllib.request
+import urllib.parse
 import tempfile
 import subprocess
 import fitz  # PyMuPDF
@@ -69,8 +70,8 @@ def lambda_handler(event, context):
                 png_path = os.path.join(temp_dir, f"Slide_{i+1}.PNG")
                 pix.save(png_path)
                 
-                # Subir PNG al S3 en la carpeta final
-                target_key = f"presentations/{presentation_id}/Slide_{i+1}.PNG"
+                # Subir PNG al S3 en la carpeta final (alineado con buildSlideKey de Java)
+                target_key = f"slides/{presentation_id}/{i+1}.png"
                 s3_client.upload_file(
                     png_path, bucket, target_key,
                     ExtraArgs={'ContentType': 'image/png'}
@@ -78,7 +79,11 @@ def lambda_handler(event, context):
                 uploaded_keys.append(target_key)
                 
             print(f"Éxito: {total_slides} diapositivas extraídas y subidas S3.")
-            
+
+            # Limpiar el PPTX original para no acumular almacenamiento
+            s3_client.delete_object(Bucket=bucket, Key=raw_key)
+            print(f"raw-pptx eliminado: {raw_key}")
+
             # Notificar al Backend de SlideHub
             send_webhook(presentation_id, total_slides, "READY")
             

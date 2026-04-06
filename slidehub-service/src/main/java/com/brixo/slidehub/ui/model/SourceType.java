@@ -7,5 +7,7 @@ public enum SourceType {
     /** Importado desde una carpeta de Google Drive. */
     DRIVE,
     /** Subido manualmente como archivos PNG/JPG. */
-    UPLOAD
+    UPLOAD,
+    /** Subido como archivo .pptx; convertido a PNG via AWS Lambda. */
+    PPTX
 }
