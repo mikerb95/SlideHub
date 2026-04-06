@@ -74,6 +74,9 @@ public class Presentation {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "join_code", length = 5, unique = true)
+    private String joinCode;
+
     // ── Constructores ─────────────────────────────────────────────────────────
 
     public Presentation() {
