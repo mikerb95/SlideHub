@@ -151,6 +151,71 @@ public class AuthController {
         return "auth/login";
     }
 
+    // ── Reseteo de contraseña ────────────────────────────────────────────────
+
+    @GetMapping("/forgot-password")
+    public String forgotPasswordPage(Authentication authentication) {
+        if (isAuthenticated(authentication)) {
+            return "redirect:/presentations";
+        }
+        return "auth/forgot-password";
+    }
+
+    @PostMapping("/forgot-password")
+    public String forgotPasswordSubmit(@RequestParam String email, Model model) {
+        try {
+            userService.requestPasswordReset(email);
+            model.addAttribute("successMessage", "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.");
+        } catch (Exception e) {
+            log.error("Error solicitando reseteo de contraseña para {}", email, e);
+            model.addAttribute("successMessage", "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña."); // Prevent email enumeration
+        }
+        return "auth/forgot-password";
+    }
+
+    @GetMapping("/reset-password")
+    public String resetPasswordPage(@RequestParam(required = false) String token, Authentication authentication, Model model) {
+        if (isAuthenticated(authentication)) {
+            return "redirect:/presentations";
+        }
+        if (token == null || token.isBlank()) {
+            model.addAttribute("errorMessage", "Enlace inválido o expirado.");
+            return "auth/login";
+        }
+        model.addAttribute("token", token);
+        return "auth/reset-password";
+    }
+
+    @PostMapping("/reset-password")
+    public String resetPasswordSubmit(@RequestParam String token,
+            @RequestParam String password,
+            @RequestParam("confirmPassword") String confirmPassword,
+            Model model) {
+        if (password == null || password.length() < 8) {
+            model.addAttribute("errorMessage", "La contraseña debe tener al menos 8 caracteres.");
+            model.addAttribute("token", token);
+            return "auth/reset-password";
+        }
+        if (!password.equals(confirmPassword)) {
+            model.addAttribute("errorMessage", "Las contraseñas no coinciden.");
+            model.addAttribute("token", token);
+            return "auth/reset-password";
+        }
+        try {
+            userService.resetPassword(token, password);
+            model.addAttribute("successMessage", "Tu contraseña ha sido actualizada. Ya puedes iniciar sesión.");
+            return "auth/login";
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("errorMessage", "Enlace inválido o expirado. Solicita uno nuevo.");
+            return "auth/forgot-password";
+        } catch (Exception ex) {
+            log.error("Error reseteando contraseña", ex);
+            model.addAttribute("errorMessage", "Ocurrió un error inesperado al restablecer tu contraseña.");
+            model.addAttribute("token", token);
+            return "auth/reset-password";
+        }
+    }
+
     // ── Completar perfil (usuarios OAuth2 nuevos) ─────────────────────────────
 
     /**
