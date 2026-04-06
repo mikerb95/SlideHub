@@ -68,7 +68,6 @@ public class UptimeService {
 
             JsonNode root = client.post()
                     .uri("/v2/getMonitors")
-                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(BodyInserters.fromFormData(form))
                     .retrieve()
                     .bodyToMono(JsonNode.class)
