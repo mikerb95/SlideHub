@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matriz PDCA — SlideHub</title>
+    <th:block th:replace="~{fragments/head :: assets}"></th:block>
+    <style>
+        .guide-section { scroll-margin-top: 72px; }
+        .toc-link {
+            display: block; padding: 0.24rem 0.5rem; border-radius: 4px;
+            font-size: 0.7rem; font-family: var(--sh-font-mono);
+            color: var(--sh-text-3); text-decoration: none;
+            transition: color 0.15s, background 0.15s;
+        }
+        .toc-link:hover { color: var(--sh-blue); background: rgba(88, 166, 255, 0.07); }
+        .phase-card {
+            border: 1px solid var(--sh-border); border-radius: 6px;
+            background: var(--sh-deep); padding: 0.78rem 0.86rem;
+        }
+        .phase-label {
+            font-family: var(--sh-font-mono); color: var(--sh-text-1);
+            font-size: 0.69rem; margin-bottom: 0.35rem; font-weight: bold;
+        }
+        .phase-text { font-size: 0.74rem; color: var(--sh-text-2); line-height: 1.55; }
+        .mini-title {
+            font-size: 0.67rem; font-family: var(--sh-font-mono);
+            color: var(--sh-text-3); text-transform: uppercase;
+            letter-spacing: 0.06em; margin-bottom: 0.35rem;
+        }
+        .tip-callout {
+            background: rgba(88, 166, 255, 0.08); border-left: 3px solid var(--sh-blue);
+            border-radius: 0 6px 6px 0; padding: 0.65rem 0.9rem;
+            font-size: 0.79rem; color: var(--sh-text-2); line-height: 1.58;
+        }
+        .risk-callout {
+            background: rgba(248, 81, 73, 0.08); border-left: 3px solid #f85149;
+            border-radius: 0 6px 6px 0; padding: 0.65rem 0.9rem; font-size: 0.79rem;
+            color: var(--sh-text-2); line-height: 1.58;
+        }
+        .badge-red { border: 1px solid rgba(248, 81, 73, 0.45); color: #f85149; background: rgba(248, 81, 73, 0.08); font-family: var(--sh-font-mono); font-size: 0.66rem; border-radius: 4px; padding: 0.08rem 0.42rem; display: inline-flex; align-items: center; gap: 0.2rem; }
+        .badge-yellow { border: 1px solid rgba(210, 153, 34, 0.45); color: #d29922; background: rgba(210, 153, 34, 0.08); font-family: var(--sh-font-mono); font-size: 0.66rem; border-radius: 4px; padding: 0.08rem 0.42rem; display: inline-flex; align-items: center; gap: 0.2rem; }
+    </style>
+</head>
+<body class="sh antialiased">
+    <nav class="sh-nav" style="position:sticky;top:0;z-index:50;">
+        <div class="sh-nav-inner">
+            <div class="flex items-center gap-3">
+                <a href="/presentations" class="sh-btn sh-btn-ghost text-xs"><i class="fa-solid fa-arrow-left"></i></a>
+                <span class="font-brand text-base">SlideHub</span>
+                <span class="text-[var(--sh-text-3)] text-xs">/</span>
+                <span class="font-mono text-xs text-[var(--sh-text-2)]">Matriz PDCA & Gestión</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="sh-badge-blue text-xs">PDCA · Plan de Gestión · V&V</span>
+                <span class="sh-badge text-xs">Iteración 2</span>
+            </div>
+        </div>
+    </nav>
+    <div class="max-w-6xl mx-auto px-4 py-8 flex gap-8">
+        <aside class="hidden lg:block w-48 flex-shrink-0">
+            <div class="sticky top-20">
+                <div class="sh-label mb-3 text-xs">ÍNDICE</div>
+                <nav class="space-y-0.5">
+                    <a href="#gestion" class="toc-link">1. Plan de Gestión</a>
+                    <a href="#vv" class="toc-link">2. Informe de Verificación y Validación</a>
+                    <a href="#pdca" class="toc-link">3. Ciclo y Propuestas PDCA</a>
+                    <a href="#psp" class="toc-link">4. Iniciativas PSP</a>
+                </nav>
+            </div>
+        </aside>
+        <main class="flex-1 min-w-0 space-y-8">
+
+            <section id="gestion" class="guide-section">
+                <div class="sh-card p-6 space-y-4">
+                    <div class="sh-label">FASE PLAN</div>
+                    <h1 class="font-brand text-3xl text-[var(--sh-text-1)]">Plan de Gestión</h1>
+                    <p class="text-sm text-[var(--sh-text-2)] leading-relaxed max-w-3xl">
+                        Basado en <strong>ISO/IEC 12207</strong>, SlideHub es operado mediante un ciclo iterativo y de entregas (Sprints) en el que se consolidan distintas <strong>Fases</strong> de diseño y desarrollo, abarcando desde una arquitectura de microservicios distribuida hasta el actual Monolito Modular.
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="phase-card">
+                            <div class="mini-title">Organización y Roles</div>
+                            <div class="phase-text">
+                                <ul class="list-disc pl-4 space-y-1 mb-2">
+                                    <li>Requerimientos trazados contra el documento <b>Requerimientos Funcionales y No Funcionales</b> y el CSV maestro de Historias de Usuario.</li>
+                                    <li>Roles claramente acotados en el sistema: <span class="sh-badge text-xs">PRESENTER</span> y <span class="sh-badge text-xs">ADMIN</span> más accesos públicos para dispositivos pasivos (pantallas).</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="phase-card">
+                            <div class="mini-title">Infraestructura y Base Base de Conocimiento</div>
+                            <div class="phase-text">
+                                <ul class="list-disc pl-4 space-y-1">
+                                    <li>Repositorio controlado con pautas firmes documentadas en <code>AGENTS.md</code> y <code>CLAUDE.md</code>.</li>
+                                    <li>Pipeline DevOps en <b>Render</b> para control de despliegue unificado (Web Service único: `slidehub-service`).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="vv" class="guide-section">
+                <div class="sh-card p-6 space-y-4">
+                    <div class="sh-label"><i class="fa-solid fa-list-check mr-1"></i>FASE CHECK</div>
+                    <h2 class="font-brand text-2xl text-[var(--sh-text-1)]">Informe de Verificación y Validación</h2>
+                    <p class="text-sm text-[var(--sh-text-2)] leading-relaxed">
+                        Evaluamos la calidad operativa y el soporte técnico mediante la evaluación Smoke E2E, los tests automatizados y la revisión sistemática de arquitectura frente a normas internacionales como <strong>ISO/IEC 25000 y 27001</strong>.
+                    </p>
+                    
+                    <div class="space-y-3">
+                        <div class="phase-card">
+                            <div class="phase-label">Análisis E2E y Pruebas Unitarias</div>
+                            <div class="phase-text">
+                                El proyecto está respaldado por <code>smoke-e2e.sh</code> automatizado en GitHub Actions y el servicio <code>StatusChecksService</code> que expone el estado de salud interno de:
+                                <ul class="list-disc pl-5 mt-2 space-y-1">
+                                    <li>DB (PostgreSQL en Aiven), Redis y MongoDB (AI-notes).</li>
+                                    <li>Servicios externos (Gemini WebClient).</li>
+                                    <li>S3 Cloud Storage (AWS SDK v2).</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="phase-card">
+                            <div class="phase-label">Vulnerabilidades Detectadas (Verificación de Seguridad)</div>
+                            <div class="phase-text text-[var(--sh-text-2)] flex flex-col gap-2">
+                                <span class="badge-red w-max">ISO/IEC 27001 - Brecha Crítica</span>
+                                El persistir <b>Tokens OAuth2 (GitHub/Google) en texto plano</b> (entidad <code>User</code> en BD) ha sido verificado como negativo para el estándar de seguridad. Solución asignada: Cifrado en reposo obligatorio.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="pdca" class="guide-section">
+                <div class="sh-card p-6 space-y-4">
+                    <div class="sh-label"><i class="fa-solid fa-rotate mr-1"></i>FASE ACT & GENERAL</div>
+                    <h2 class="font-brand text-2xl text-[var(--sh-text-1)]">Propuestas del Ciclo PDCA</h2>
+                    <p class="text-sm text-[var(--sh-text-2)] leading-relaxed">
+                        El Backlog priorizado define cómo la fase *Act* del ciclo PDCA corregirá las brechas encontradas y propondrá mejoras continuas.
+                    </p>
+
+                    <div class="grid gap-3">
+                        <div class="phase-card border-l-4" style="border-left-color: #f85149;">
+                            <div class="phase-label text-red-400">PRIORIDAD 0 (Urgente - Remediación Inmediata)</div>
+                            <ul class="text-xs text-[var(--sh-text-2)] leading-relaxed space-y-1 list-none mt-2">
+                                <li><i class="fa-solid fa-triangle-exclamation mr-1 text-[var(--sh-red)]"></i> <b>Cifrado en reposo</b> de <code>github_access_token</code> y <code>google_refresh_token</code> mediante JPA <code>AttributeConverter</code>. Rotar credenciales actuales.</li>
+                                <li><i class="fa-solid fa-file-pen mr-1 text-[var(--sh-red)]"></i> Alinear la documentación técnica real con esta actualización de seguridad.</li>
+                            </ul>
+                        </div>
+                        <div class="phase-card border-l-4" style="border-left-color: #58a6ff;">
+                            <div class="phase-label text-blue-400">PRIORIDAD 1 (Corto Plazo - Formalización)</div>
+                            <ul class="text-xs text-[var(--sh-text-2)] leading-relaxed space-y-1 list-none mt-2">
+                                <li><i class="fa-solid fa-angle-right mr-1 text-[var(--sh-blue)]"></i> Crear plan formal de evaluación de calidad (<b>ISO/IEC 25001</b>) documentando características, métricas y umbrales operables.</li>
+                                <li><i class="fa-solid fa-angle-right mr-1 text-[var(--sh-blue)]"></i> Validar una plantilla PDCA estándar para los Incidentes de Desarrollo antes de incluirlos en Hotfixes.</li>
+                                <li><i class="fa-solid fa-angle-right mr-1 text-[var(--sh-blue)]"></i> Establecer KPIs objetivos como *% de éxito Smoke E2E >= 95%*.</li>
+                            </ul>
+                        </div>
+                        <div class="phase-card border-l-4" style="border-left-color: #d29922;">
+                            <div class="phase-label text-yellow-400">PRIORIDAD 2 (Mejora Continua)</div>
+                            <ul class="text-xs text-[var(--sh-text-2)] leading-relaxed space-y-1 list-none mt-2">
+                                <li><i class="fa-solid fa-angle-right mr-1 text-[var(--sh-amber)]"></i> Autoevaluación de madurez de todos los procesos base alineados a <b>ISO/IEC 15504 (SPICE)</b>.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="psp" class="guide-section">
+                <div class="sh-card p-6 space-y-4">
+                    <div class="sh-label"><i class="fa-solid fa-user-check mr-1"></i>PERSONAL SOFTWARE PROCESS</div>
+                    <h2 class="font-brand text-2xl text-[var(--sh-text-1)]">Iniciativas PSP</h2>
+                    <div class="tip-callout">
+                        Para fortalecer la gestión individual del equipo y la estimación de plazos a lo largo del PDCA, SlideHub incorporará prácticas **PSP (Personal Software Process)** de manera gradual.
+                    </div>
+                    <div class="phase-text">
+                        <ul class="list-disc pl-5 space-y-2 mt-2">
+                            <li>Introducir una bitácora o log individual de tiempo por historia de usuario para medir <b>desviación de estimación vs tiempo real.</b></li>
+                            <li>Trazar los <b>defectos detectados por fase</b> (codificación, QA/smoke, producción) a la causa raíz particular del desarrollador para generar retrospectivas más asertivas.</li>
+                            <li><b>Objetivo inmediato:</b> Reducir la desviación de esfuerzo al ±25% y garantizar el 100% de cobertura en *Acceptance Criteria* documentados.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</body>
+</html>

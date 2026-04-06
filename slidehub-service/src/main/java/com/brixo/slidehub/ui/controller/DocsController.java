@@ -15,4 +15,9 @@ public class DocsController {
     public String qualityGuide() {
         return "calidad";
     }
+
+    @GetMapping("/matriz-pdca")
+    public String matrizPdca() {
+        return "matriz-pdca";
+    }
 }
