@@ -2,6 +2,15 @@
 
 Sistema de control de diapositivas en tiempo real con múltiples pantallas sincronizadas, control remoto desde el teléfono y notas del presentador generadas automáticamente con IA.
 
+## Licencia y uso
+
+Este repositorio es de **código cerrado** y está publicado de forma pública solo para visualización/referencia.
+
+- Licencia: **All Rights Reserved**
+- No se permite usar, copiar, modificar, redistribuir, sublicenciar ni comercializar este software sin autorización escrita previa.
+
+Consulta el archivo [LICENSE](LICENSE) para los términos completos.
+
 ## Estado actual de arquitectura
 
 SlideHub se ejecuta actualmente como **monolito modular** en el módulo `slidehub-service`.
