@@ -61,7 +61,7 @@ public class SecurityConfig {
 
                 http
                                 .authenticationProvider(authenticationProvider())
-                                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
+                                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**", "/mgr/bootstrap"))
                                 .authorizeHttpRequests(auth -> auth
                                                 // Vistas públicas (HU-005, HU-011, HU-012, HU-013)
                                                 .requestMatchers("/slides", "/remote", "/demo", "/showcase", "/join").permitAll()
