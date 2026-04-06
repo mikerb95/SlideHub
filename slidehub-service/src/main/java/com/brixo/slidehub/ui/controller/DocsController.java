@@ -1,10 +1,21 @@
 package com.brixo.slidehub.ui.controller;
 
+import com.brixo.slidehub.ui.service.UptimeService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.Map;
 
 @Controller
 public class DocsController {
+
+    private final UptimeService uptimeService;
+
+    public DocsController(UptimeService uptimeService) {
+        this.uptimeService = uptimeService;
+    }
 
     @GetMapping("/ai-guide")
     public String aiGuide() {
@@ -29,5 +40,16 @@ public class DocsController {
     @GetMapping("/sustentacion")
     public String sustentacion() {
         return "sustentacion";
+    }
+
+    @GetMapping("/uptime")
+    public String uptime() {
+        return "uptime";
+    }
+
+    @GetMapping("/api/uptime/status")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> uptimeStatus() {
+        return ResponseEntity.ok(uptimeService.getStatus());
     }
 }
