@@ -582,10 +582,28 @@
 
         // ── Slide state ───────────────────────────────────────────────────────
 
+        function getSlideUrl(n) {
+            if (!PRESENTATION_ID || n < 1 || n > totalSlides) return '';
+            return `/api/presentations/${PRESENTATION_ID}/slides/${n}/image`;
+        }
+
         function updateUI() {
             indicator.textContent = `Diapositiva ${currentSlide} / ${totalSlides}`;
             btnPrev.disabled = currentSlide <= 1;
             btnNext.disabled = currentSlide >= totalSlides;
+            if (PRESENTATION_ID) {
+                const curUrl = getSlideUrl(currentSlide);
+                if (previewCurrent.src !== curUrl) previewCurrent.src = curUrl;
+                const nextUrl = getSlideUrl(currentSlide + 1);
+                if (nextUrl) {
+                    previewNext.src = nextUrl;
+                    previewNext.style.display = '';
+                    previewNext.previousElementSibling.style.display = '';
+                } else {
+                    previewNext.style.display = 'none';
+                    previewNext.previousElementSibling.style.display = 'none';
+                }
+            }
         }
 
         async function fetchState() {

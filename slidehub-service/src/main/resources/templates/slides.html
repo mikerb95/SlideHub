@@ -548,6 +548,12 @@
                     navigator.sendBeacon(`${QA_BASE}/stream/leave`,
                         new Blob([JSON.stringify({ viewerToken })], { type: 'application/json' }));
                 }
+                // Limpiar también el token pasivo si no se unió por Q&A
+                const passive = passiveToken || sessionStorage.getItem(PASSIVE_STORAGE_KEY);
+                if (passive) {
+                    navigator.sendBeacon(`${QA_BASE}/stream/leave`,
+                        new Blob([JSON.stringify({ viewerToken: passive })], { type: 'application/json' }));
+                }
             });
 
             init();
