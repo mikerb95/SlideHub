@@ -111,6 +111,8 @@ public class SecurityConfig {
                                                                 "/ai-guide",
                                                                 "/uptime", "/api/uptime/status")
                                                 .permitAll()
+                                                // Bootstrap del primer DEVELOPER — público pero protegido por secret
+                                                .requestMatchers("/mgr/bootstrap").permitAll()
                                                 // Panel de gestión — solo DEVELOPER
                                                 .requestMatchers("/mgr", "/mgr/**")
                                                 .hasRole("DEVELOPER")
