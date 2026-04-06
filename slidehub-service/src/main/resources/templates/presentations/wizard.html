@@ -1438,9 +1438,31 @@
             list.innerHTML = W.participants.map(p =>
                 '<div class="participant-item">' +
                 '<span class="text-sm text-[var(--sh-text-1)]">' + escHtml(p.displayName) + '</span>' +
+                '<div class="flex items-center gap-3">' +
                 '<span class="sh-badge text-[0.6rem]">' + (p.presenter ? 'Expositor' : 'Invitado') + '</span>' +
+                '<button type="button" class="text-[var(--sh-text-3)] hover:text-accent-red transition-colors" onclick="removeParticipant(\'' + p.id + '\')" title="Eliminar participante">' +
+                '<i class="fa-solid fa-trash text-xs"></i></button>' +
+                '</div>' +
                 '</div>'
             ).join('');
+        }
+
+        async function removeParticipant(participantId) {
+            hideError('participant-error');
+            try {
+                const res = await fetch('/api/presentations/' + W.presentationId + '/meeting/participants/' + participantId, {
+                    method: 'DELETE',
+                    headers: { ...csrfHeaders() }
+                });
+                if (res.ok) {
+                    await refreshParticipants();
+                } else {
+                    const data = await readJsonSafe(res);
+                    showError('participant-error', data.error || 'No se pudo eliminar el participante.');
+                }
+            } catch (e) {
+                showError('participant-error', 'Error de conexión.');
+            }
         }
 
         // ── STEP 6: Start Session ──
