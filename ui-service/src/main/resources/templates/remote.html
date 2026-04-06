@@ -291,6 +291,56 @@
             }
         }
 
+        /* ── Slide previews (mobile only) ── */
+        #slide-preview-section {
+            display: none;
+            width: 100%;
+            max-width: 400px;
+            padding: 0 1rem;
+            margin-bottom: 1.25rem;
+            gap: 0.75rem;
+            align-items: flex-end;
+        }
+
+        #slide-preview-section .preview-col-current {
+            flex: 1;
+        }
+
+        #slide-preview-section .preview-col-next {
+            width: 31%;
+            flex-shrink: 0;
+        }
+
+        .preview-label {
+            font-family: var(--sh-font-mono);
+            font-size: 0.6rem;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: var(--sh-text-3);
+            margin-bottom: 0.3rem;
+        }
+
+        #preview-current {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: contain;
+            border-radius: var(--sh-r-lg);
+            border: 1px solid var(--sh-border-active);
+            background: #000;
+            display: block;
+        }
+
+        #preview-next {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: contain;
+            border-radius: var(--sh-r-md);
+            border: 1px solid var(--sh-border);
+            background: #000;
+            opacity: 0.55;
+            display: block;
+        }
+
         @media (max-width: 640px) {
             .remote-btn {
                 width: 68px;
@@ -298,17 +348,35 @@
                 font-size: 1.55rem;
             }
 
+            /* Previews visibles en mobile */
+            #slide-preview-section {
+                display: flex;
+            }
+
+            /* FABs al doble de tamaño en mobile */
+            .fab {
+                width: 76px;
+                height: 76px;
+                flex-direction: column;
+                padding: 0;
+                gap: 0.2rem;
+                font-size: 0.7rem;
+                border-radius: var(--sh-r-lg);
+            }
+
+            .fab i {
+                font-size: 1.75rem;
+            }
+
             #help-btn {
                 left: 1rem;
                 bottom: 1rem;
-                padding: 0.62rem 0.85rem;
             }
 
             #mic-btn {
                 left: auto;
-                right: 4.8rem;
+                right: 5.2rem;
                 bottom: 1rem;
-                padding: 0.62rem 0.85rem;
             }
 
             #btn-demo-fab {
@@ -319,7 +387,7 @@
             #assist-card {
                 left: 0.6rem;
                 right: 0.6rem;
-                bottom: 4.9rem;
+                bottom: 6rem;
             }
 
             #notice {
@@ -338,6 +406,18 @@
         <i class="fa-solid fa-arrow-left"></i>
         <span id="return-label">Volver diapositiva</span>
     </button>
+
+    <!-- Previews de diapositiva (solo mobile) -->
+    <div id="slide-preview-section">
+        <div class="preview-col-current">
+            <div class="preview-label">Actual</div>
+            <img id="preview-current" alt="Slide actual">
+        </div>
+        <div class="preview-col-next">
+            <div class="preview-label">Siguiente</div>
+            <img id="preview-next" alt="Siguiente slide">
+        </div>
+    </div>
 
     <!-- Indicador de diapositiva -->
     <div id="slide-indicator" class="font-mono text-lg text-[var(--sh-text-3)] mb-8">
@@ -437,6 +517,8 @@
         const PRESENTATION_ID = query.get('presentationId') || '';
         const JOIN_TOKEN = query.get('joinToken') || '';
         const STORAGE_KEY = `participant-token:${PRESENTATION_ID}`;
+        const DEVICE_TYPE = 'remote';
+        const DEVICE_STORAGE_KEY = `device-token:${DEVICE_TYPE}:${PRESENTATION_ID || 'global'}`;
 
         let currentSlide = 1;
         let totalSlides = 0;
@@ -449,6 +531,7 @@
         let mediaStream = null;
         let audioChunks = [];
         let recording = false;
+        let deviceToken = localStorage.getItem(DEVICE_STORAGE_KEY) || '';
 
         const indicator = document.getElementById('slide-indicator');
         const btnPrev = document.getElementById('btn-prev');
@@ -463,13 +546,64 @@
         const notice = document.getElementById('notice');
         const assistCard = document.getElementById('assist-card');
         const assistAnswerText = document.getElementById('assist-answer-text');
+        const previewCurrent = document.getElementById('preview-current');
+        const previewNext = document.getElementById('preview-next');
+
+        function ensureDeviceToken() {
+            if (deviceToken) {
+                return deviceToken;
+            }
+
+            const generated = (window.crypto && crypto.randomUUID)
+                ? crypto.randomUUID()
+                : `dev-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
+            deviceToken = generated;
+            localStorage.setItem(DEVICE_STORAGE_KEY, generated);
+            return generated;
+        }
+
+        async function sendDeviceHeartbeat(register = false) {
+            const token = ensureDeviceToken();
+            const endpoint = register ? '/api/devices/register' : '/api/devices/heartbeat';
+
+            try {
+                await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: `remote-${PRESENTATION_ID || 'public'}`,
+                        type: DEVICE_TYPE,
+                        token
+                    })
+                });
+            } catch (_) { }
+        }
 
         // ── Slide state ───────────────────────────────────────────────────────
+
+        function getSlideUrl(n) {
+            if (!PRESENTATION_ID || n < 1 || n > totalSlides) return '';
+            return `/api/presentations/${PRESENTATION_ID}/slides/${n}/image`;
+        }
 
         function updateUI() {
             indicator.textContent = `Diapositiva ${currentSlide} / ${totalSlides}`;
             btnPrev.disabled = currentSlide <= 1;
             btnNext.disabled = currentSlide >= totalSlides;
+            if (PRESENTATION_ID) {
+                const curUrl = getSlideUrl(currentSlide);
+                if (previewCurrent.src !== curUrl) previewCurrent.src = curUrl;
+                const nextUrl = getSlideUrl(currentSlide + 1);
+                if (nextUrl) {
+                    previewNext.src = nextUrl;
+                    previewNext.style.display = '';
+                    previewNext.previousElementSibling.style.display = '';
+                } else {
+                    previewNext.style.display = 'none';
+                    previewNext.previousElementSibling.style.display = 'none';
+                }
+            }
         }
 
         async function fetchState() {
@@ -802,9 +936,11 @@
             helpBtn.classList.add('visible');
             micBtn.classList.add('visible');
         }
+        sendDeviceHeartbeat(true);
         fetchState();
         loadJoinOptions();
         setInterval(fetchState, POLL_INTERVAL_MS);
+        setInterval(() => sendDeviceHeartbeat(false), 30000);
     </script>
 </body>
 
