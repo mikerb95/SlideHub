@@ -79,6 +79,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String githubId = oauth2User.getAttribute("id").toString();
         String githubUsername = oauth2User.getAttribute("login");
         String email = oauth2User.getAttribute("email"); // puede ser null (email privado)
+        String avatarUrl = oauth2User.getAttribute("avatar_url"); // foto de perfil
         String accessToken = request.getAccessToken().getTokenValue();
 
         // 1. ¿Existe usuario con este githubId?
@@ -87,6 +88,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             User existing = byGithubId.get();
             existing.setGithubUsername(githubUsername);
             existing.setGithubAccessToken(accessToken);
+            if (existing.getProfileImageUrl() == null && avatarUrl != null) {
+                existing.setProfileImageUrl(avatarUrl);
+            }
             log.debug("GitHub login: usuario existente vinculado ({})", existing.getUsername());
             return userRepository.save(existing);
         }
@@ -98,6 +102,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             existing.setGithubId(githubId);
             existing.setGithubUsername(githubUsername);
             existing.setGithubAccessToken(accessToken);
+            if (existing.getProfileImageUrl() == null && avatarUrl != null) {
+                existing.setProfileImageUrl(avatarUrl);
+            }
             log.info("GitHub: vinculado a usuario autenticado ({})", existing.getUsername());
             return userRepository.save(existing);
         }
@@ -110,6 +117,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 existing.setGithubId(githubId);
                 existing.setGithubUsername(githubUsername);
                 existing.setGithubAccessToken(accessToken);
+                if (existing.getProfileImageUrl() == null && avatarUrl != null) {
+                    existing.setProfileImageUrl(avatarUrl);
+                }
                 log.info("GitHub login: vinculado a cuenta existente por email ({})", email);
                 return userRepository.save(existing);
             }
@@ -128,6 +138,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         newUser.setGithubId(githubId);
         newUser.setGithubUsername(githubUsername);
         newUser.setGithubAccessToken(accessToken);
+        newUser.setProfileImageUrl(avatarUrl);
         newUser.setProfileCompleted(false);
         newUser.setCreatedAt(LocalDateTime.now());
         log.info("GitHub login: nueva cuenta creada para {} ({})", resolvedUsername, resolvedEmail);

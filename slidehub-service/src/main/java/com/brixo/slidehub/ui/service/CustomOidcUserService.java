@@ -67,12 +67,16 @@ public class CustomOidcUserService extends OidcUserService {
     private User processGoogleUser(OidcUser oidcUser) {
         String googleId = oidcUser.getSubject();
         String googleEmail = oidcUser.getEmail();
+        String pictureUrl = oidcUser.getPicture();
 
         // 1. Existe usuario con este googleId?
         Optional<User> byGoogleId = userRepository.findByGoogleId(googleId);
         if (byGoogleId.isPresent()) {
             User existing = byGoogleId.get();
             existing.setGoogleEmail(googleEmail);
+            if (existing.getProfileImageUrl() == null && pictureUrl != null) {
+                existing.setProfileImageUrl(pictureUrl);
+            }
             log.debug("Google OIDC login: usuario existente vinculado ({})", existing.getUsername());
             return userRepository.save(existing);
         }
@@ -83,6 +87,9 @@ public class CustomOidcUserService extends OidcUserService {
             User existing = authenticated.get();
             existing.setGoogleId(googleId);
             existing.setGoogleEmail(googleEmail);
+            if (existing.getProfileImageUrl() == null && pictureUrl != null) {
+                existing.setProfileImageUrl(pictureUrl);
+            }
             log.info("Google OIDC: vinculado a usuario autenticado ({})", existing.getUsername());
             return userRepository.save(existing);
         }
@@ -94,6 +101,9 @@ public class CustomOidcUserService extends OidcUserService {
                 User existing = byEmail.get();
                 existing.setGoogleId(googleId);
                 existing.setGoogleEmail(googleEmail);
+                if (existing.getProfileImageUrl() == null && pictureUrl != null) {
+                    existing.setProfileImageUrl(pictureUrl);
+                }
                 log.info("Google OIDC login: vinculado a cuenta existente por email ({})", googleEmail);
                 return userRepository.save(existing);
             }
@@ -116,6 +126,7 @@ public class CustomOidcUserService extends OidcUserService {
         newUser.setEmailVerified(true);
         newUser.setGoogleId(googleId);
         newUser.setGoogleEmail(googleEmail);
+        newUser.setProfileImageUrl(pictureUrl);
         newUser.setProfileCompleted(false);
         newUser.setCreatedAt(LocalDateTime.now());
         log.info("Google OIDC login: nueva cuenta creada para {} ({})", resolvedUsername, resolvedEmail);
