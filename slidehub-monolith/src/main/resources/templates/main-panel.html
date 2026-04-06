@@ -280,6 +280,20 @@
                 </div>
             </div>
 
+            <!-- PREGUNTAS EN VIVO -->
+            <div class="p-4 border-b border-[var(--sh-border-subtle)]" id="qa-section" style="display:none;">
+                <div class="sh-label mb-3 flex items-center justify-between">
+                    <span><i class="fa-solid fa-circle-question mr-1"></i>PREGUNTAS EN VIVO</span>
+                    <span id="mp-q-badge" class="sh-badge" style="display:none;"></span>
+                </div>
+                <div id="mp-viewer-stats" class="font-mono text-[0.65rem] text-[var(--sh-text-3)] mb-3"></div>
+                <div id="mp-q-list" class="flex flex-col gap-2 max-h-[320px] overflow-y-auto">
+                    <p class="text-xs font-mono text-[var(--sh-text-3)]">Sin preguntas pendientes.</p>
+                </div>
+                <button class="sh-btn sh-btn-ghost text-[0.65rem] w-full justify-center mt-2"
+                    id="mp-q-show-all-btn" onclick="mpToggleAllQuestions()">Ver todas</button>
+            </div>
+
             <!-- QUICK SLIDE -->
             <div class="p-4 border-b border-[var(--sh-border-subtle)]">
                 <div class="sh-label mb-3">
