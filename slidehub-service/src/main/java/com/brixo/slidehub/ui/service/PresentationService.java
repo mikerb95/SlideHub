@@ -375,13 +375,32 @@ public class PresentationService {
 
     /**
      * Devuelve el estado actual de conversión PPTX para polling del wizard.
+     * Si la conversión lleva más de 5 minutos en PROCESSING, se marca automáticamente
+     * como FAILED (Lambda falló sin llamar al webhook).
      */
-    @Transactional(readOnly = true)
+    @Transactional
     public Optional<Map<String, Object>> getPptxStatus(String presentationId) {
         return presentationRepository.findById(presentationId).map(p -> {
+            PptxStatus status = p.getPptxStatus() != null ? p.getPptxStatus() : PptxStatus.PROCESSING;
+
+            long elapsedSeconds = 0;
+            if (p.getUpdatedAt() != null) {
+                elapsedSeconds = java.time.Duration.between(p.getUpdatedAt(), LocalDateTime.now()).getSeconds();
+            }
+
+            if (status == PptxStatus.PROCESSING && elapsedSeconds > 300) {
+                log.warn("Presentación {} lleva {}s en PROCESSING sin respuesta de Lambda — marcando FAILED.",
+                        presentationId, elapsedSeconds);
+                p.setPptxStatus(PptxStatus.FAILED);
+                p.setUpdatedAt(LocalDateTime.now());
+                presentationRepository.save(p);
+                status = PptxStatus.FAILED;
+            }
+
             Map<String, Object> result = new HashMap<>();
-            result.put("status", p.getPptxStatus() != null ? p.getPptxStatus().name() : "UNKNOWN");
+            result.put("status", status.name());
             result.put("slideCount", p.getSlides().size());
+            result.put("elapsedSeconds", elapsedSeconds);
             return result;
         });
     }
