@@ -90,6 +90,10 @@ public class Presentation {
     @Column(name = "allow_anonymous_questions", nullable = false)
     private boolean allowAnonymousQuestions = false;
 
+    /** Código de 5 dígitos para que el público acceda en modo espectador. */
+    @Column(name = "join_code", length = 5, unique = true)
+    private String joinCode;
+
     // ── Constructores ─────────────────────────────────────────────────────────
 
     public Presentation() {
