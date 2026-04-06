@@ -12,6 +12,7 @@ services:
     plan: free
     runtime: docker
     region: oregon
+    dockerContext: .
     dockerfilePath: slidehub-service/Dockerfile
     autoDeploy: true
     healthCheckPath: /actuator/health
