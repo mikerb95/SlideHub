@@ -447,17 +447,26 @@
             };
 
             window.qaToggleHand = async function () {
-                handRaised = !handRaised;
-                handBtn.classList.toggle('active', handRaised);
-                handBadge.style.display = handRaised ? 'inline' : 'none';
-                handBadge.textContent = '✋';
+                if (!viewerToken || handBtn.disabled) return;
+                const next = !handRaised;
+                handBtn.disabled = true;
                 try {
-                    await fetch(`${QA_BASE}/stream/hand`, {
+                    const res = await fetch(`${QA_BASE}/stream/hand`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ viewerToken, raised: handRaised })
+                        body: JSON.stringify({ viewerToken, raised: next })
                     });
-                } catch (_) {}
+                    if (res.ok || res.status === 204) {
+                        handRaised = next;
+                        handBtn.classList.toggle('active', handRaised);
+                        handBadge.style.display = handRaised ? 'inline' : 'none';
+                        handBadge.textContent = '✋';
+                    }
+                } catch (_) {
+                    // fallo de red — estado no cambia
+                } finally {
+                    handBtn.disabled = false;
+                }
             };
 
             async function heartbeat() {
