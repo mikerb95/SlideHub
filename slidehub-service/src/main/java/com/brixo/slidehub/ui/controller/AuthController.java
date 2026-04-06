@@ -305,7 +305,7 @@ public class AuthController {
                 ext = ".png";
             }
             key += ext;
-            
+
             String url = slideUploadService.upload(key, file.getBytes(), file.getContentType());
             user.setProfileImageUrl(url);
             userRepository.save(user);

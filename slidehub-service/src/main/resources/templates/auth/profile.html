@@ -69,11 +69,16 @@
             <div class="flex items-start justify-between mb-1 gap-4">
                 <div class="flex items-center gap-4">
                     <div class="relative shrink-0">
-                        <div class="w-16 h-16 rounded-full bg-[var(--sh-deep)] border-2 border-[var(--sh-border)] overflow-hidden flex items-center justify-center">
-                            <img th:if="${user?.profileImageUrl}" th:src="${user.profileImageUrl}" alt="Perfil" class="w-full h-full object-cover">
-                            <i th:unless="${user?.profileImageUrl}" class="fa-solid fa-user text-2xl text-[var(--sh-text-3)]"></i>
+                        <div
+                            class="w-16 h-16 rounded-full bg-[var(--sh-deep)] border-2 border-[var(--sh-border)] overflow-hidden flex items-center justify-center">
+                            <img th:if="${user?.profileImageUrl}" th:src="${user.profileImageUrl}" alt="Perfil"
+                                class="w-full h-full object-cover">
+                            <i th:unless="${user?.profileImageUrl}"
+                                class="fa-solid fa-user text-2xl text-[var(--sh-text-3)]"></i>
                         </div>
-                        <button type="button" class="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-[var(--sh-blue)] text-white flex items-center justify-center shadow hover:bg-[var(--sh-blue-hover)] transition-colors" onclick="document.getElementById('profilePictureInput').click()">
+                        <button type="button"
+                            class="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-[var(--sh-blue)] text-white flex items-center justify-center shadow hover:bg-[var(--sh-blue-hover)] transition-colors"
+                            onclick="document.getElementById('profilePictureInput').click()">
                             <i class="fa-solid fa-camera text-[0.6rem]"></i>
                         </button>
                     </div>
@@ -81,15 +86,18 @@
                         <div class="sh-label mb-2">IDENTIDAD</div>
                         <h1 class="font-brand text-2xl text-[var(--sh-text-1)]"
                             th:text="${user?.username} ?: ${#authentication.name}">usuario</h1>
-                        <div class="font-mono text-sm text-[var(--sh-text-2)] mt-1" th:text="${profileIdentitySubtitle}">
+                        <div class="font-mono text-sm text-[var(--sh-text-2)] mt-1"
+                            th:text="${profileIdentitySubtitle}">
                             email@ejemplo.com</div>
                     </div>
                 </div>
                 <span class="sh-badge-blue" th:text="${user?.role} ?: 'PRESENTER'">PRESENTER</span>
             </div>
-            <form id="profilePictureForm" th:action="@{/auth/profile/picture}" method="post" enctype="multipart/form-data" class="hidden">
+            <form id="profilePictureForm" th:action="@{/auth/profile/picture}" method="post"
+                enctype="multipart/form-data" class="hidden">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf}">
-                <input type="file" id="profilePictureInput" name="file" accept="image/png, image/jpeg" onchange="document.getElementById('profilePictureForm').submit()">
+                <input type="file" id="profilePictureInput" name="file" accept="image/png, image/jpeg"
+                    onchange="document.getElementById('profilePictureForm').submit()">
             </form>
         </div>
 
