@@ -63,6 +63,19 @@ public class MeetingController {
         }
     }
 
+    @org.springframework.web.bind.annotation.DeleteMapping("/participants/{participantId}")
+    public ResponseEntity<?> removeParticipant(@PathVariable String presentationId,
+            @PathVariable String participantId,
+            Authentication authentication) {
+        try {
+            String userId = resolveUser(authentication).getId();
+            meetingService.removeParticipant(userId, presentationId, participantId);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        }
+    }
+
     @GetMapping("/assignments")
     public ResponseEntity<?> listAssignments(@PathVariable String presentationId) {
         return ResponseEntity.ok(meetingService.listAssignments(presentationId));

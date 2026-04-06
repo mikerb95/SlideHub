@@ -75,29 +75,29 @@ public class MeetingService {
     public Optional<SessionInfo> getActiveSession(String userId, String presentationId) {
         requireOwnedPresentation(userId, presentationId);
         return sessionRepository.findByPresentationIdAndActiveTrue(presentationId)
-            .filter(this::ensureNotExpired)
+                .filter(this::ensureNotExpired)
                 .map(session -> new SessionInfo(
                         session.getId(),
                         session.getJoinToken(),
-                buildJoinUrl(presentationId, session.getJoinToken()),
-                session.getExpiresAt()));
-        }
+                        buildJoinUrl(presentationId, session.getJoinToken()),
+                        session.getExpiresAt()));
+    }
 
-        @Transactional
-        public Optional<SessionInfo> heartbeatSession(String userId, String presentationId) {
+    @Transactional
+    public Optional<SessionInfo> heartbeatSession(String userId, String presentationId) {
         requireOwnedPresentation(userId, presentationId);
         return sessionRepository.findByPresentationIdAndActiveTrue(presentationId)
-            .filter(this::ensureNotExpired)
-            .map(session -> {
-                session.setUpdatedAt(LocalDateTime.now());
-                session.setExpiresAt(nextExpiration());
-                PresentationSession renewed = sessionRepository.save(session);
-                return new SessionInfo(
-                    renewed.getId(),
-                    renewed.getJoinToken(),
-                    buildJoinUrl(presentationId, renewed.getJoinToken()),
-                    renewed.getExpiresAt());
-            });
+                .filter(this::ensureNotExpired)
+                .map(session -> {
+                    session.setUpdatedAt(LocalDateTime.now());
+                    session.setExpiresAt(nextExpiration());
+                    PresentationSession renewed = sessionRepository.save(session);
+                    return new SessionInfo(
+                            renewed.getId(),
+                            renewed.getJoinToken(),
+                            buildJoinUrl(presentationId, renewed.getJoinToken()),
+                            renewed.getExpiresAt());
+                });
     }
 
     @Transactional
