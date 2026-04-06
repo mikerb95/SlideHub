@@ -193,6 +193,15 @@
     </div>
 
     <script>
+        // Viewer count por presentación
+        document.querySelectorAll('[data-viewer-target]').forEach(el => {
+            const id = el.dataset.viewerTarget;
+            fetch(`/api/presentations/${id}/stream/stats`)
+                .then(r => r.ok ? r.json() : null)
+                .then(data => { if (data !== null) el.textContent = data.viewerCount ?? '—'; })
+                .catch(() => {});
+        });
+
         let deleteFormRef = null;
         let deleteInProgress = false;
         const DELETE_CONFIRM_DEFAULT_HTML = '<i class="fa-solid fa-trash"></i> Eliminar';
