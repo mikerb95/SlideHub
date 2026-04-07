@@ -16,8 +16,10 @@ WEBHOOK_URL    = os.environ.get('SLIDEHUB_WEBHOOK_URL')
 WEBHOOK_SECRET = os.environ.get('SLIDEHUB_WEBHOOK_SECRET')
 
 # Paths del layer shelfio-brotli
-_BROTLI_ARCHIVE   = '/opt/lo.tar.br'
-_SOFFICE_EXTRACTED = '/tmp/instdir/program/soffice.bin'
+_BROTLI_ARCHIVE    = '/opt/lo.tar.br'
+_LO_PROGRAM_DIR    = '/tmp/instdir/program'
+_SOFFICE_WRAPPER   = '/tmp/instdir/program/soffice'
+_SOFFICE_BIN       = '/tmp/instdir/program/soffice.bin'
 
 
 def _ensure_libreoffice():
@@ -25,9 +27,13 @@ def _ensure_libreoffice():
     El layer shelfio almacena LibreOffice como lo.tar.br.
     Lo extraemos a /tmp/ en el primer cold start; las invocaciones
     siguientes reutilizan el contenido ya extraído.
+    Preferimos el wrapper `soffice` (configura LD_LIBRARY_PATH solo)
+    sobre `soffice.bin` directo.
     """
-    if os.path.exists(_SOFFICE_EXTRACTED):
-        return _SOFFICE_EXTRACTED
+    if os.path.exists(_SOFFICE_BIN):
+        lo_path = _SOFFICE_WRAPPER if os.path.exists(_SOFFICE_WRAPPER) else _SOFFICE_BIN
+        print(f"LibreOffice ya extraído, usando: {lo_path}")
+        return lo_path
 
     if not os.path.exists(_BROTLI_ARCHIVE):
         raise FileNotFoundError(
@@ -36,33 +42,45 @@ def _ensure_libreoffice():
         )
 
     print(f"Cold start: extrayendo LibreOffice desde {_BROTLI_ARCHIVE}...")
+    statvfs = os.statvfs('/tmp')
+    free_mb = statvfs.f_bavail * statvfs.f_frsize // (1024 * 1024)
+    print(f"Espacio libre en /tmp antes de extracción: {free_mb} MB")
 
-    # 1. Descomprimir brotli → tar (escribir a disco para no saturar RAM)
+    # 1. Descomprimir brotli → tar
     tar_path = '/tmp/lo.tar'
     with open(_BROTLI_ARCHIVE, 'rb') as f:
         compressed = f.read()
     with open(tar_path, 'wb') as f:
         f.write(brotli_lib.decompress(compressed))
-    del compressed  # liberar RAM
+    del compressed
 
     # 2. Extraer tar a /tmp/
     with tarfile.open(tar_path) as tar:
         tar.extractall('/tmp/')
     os.remove(tar_path)
 
-    if not os.path.exists(_SOFFICE_EXTRACTED):
-        # Buscar dónde quedó realmente
-        for root, dirs, files in os.walk('/tmp'):
-            if 'soffice.bin' in files:
+    # Diagnóstico: listar lo que quedó en /tmp/instdir/program/
+    if os.path.exists(_LO_PROGRAM_DIR):
+        files = os.listdir(_LO_PROGRAM_DIR)
+        print(f"Contenido de {_LO_PROGRAM_DIR} ({len(files)} entradas): {files[:30]}")
+    else:
+        # Buscar soffice.bin en cualquier parte
+        for root, dirs, files_list in os.walk('/tmp'):
+            if 'soffice.bin' in files_list:
                 found = os.path.join(root, 'soffice.bin')
-                print(f"soffice.bin encontrado en: {found}")
+                print(f"WARN: soffice.bin en ruta inesperada: {found}")
                 os.chmod(found, 0o755)
-                return found
-        raise FileNotFoundError("soffice.bin no encontrado tras la extracción del layer.")
+                wrapper = os.path.join(os.path.dirname(found), 'soffice')
+                return wrapper if os.path.exists(wrapper) else found
+        raise FileNotFoundError("soffice.bin no encontrado tras extracción.")
 
-    os.chmod(_SOFFICE_EXTRACTED, 0o755)
-    print(f"LibreOffice listo en: {_SOFFICE_EXTRACTED}")
-    return _SOFFICE_EXTRACTED
+    for f in [_SOFFICE_WRAPPER, _SOFFICE_BIN]:
+        if os.path.exists(f):
+            os.chmod(f, 0o755)
+
+    lo_path = _SOFFICE_WRAPPER if os.path.exists(_SOFFICE_WRAPPER) else _SOFFICE_BIN
+    print(f"LibreOffice listo en: {lo_path}")
+    return lo_path
 
 
 def lambda_handler(event, context):
