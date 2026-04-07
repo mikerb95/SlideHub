@@ -1,4 +1,4 @@
-package com.brixo.slidehub.ai.model;
+package com.codebymike.slidehub.ai.model;
 
 import java.util.List;
 

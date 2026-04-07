@@ -1,4 +1,4 @@
-package com.brixo.slidehub.ui.model;
+package com.codebymike.slidehub.ui.model;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

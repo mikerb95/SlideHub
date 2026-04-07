@@ -1,4 +1,4 @@
-package com.brixo.slidehub.gateway;
+package com.codebymike.slidehub.gateway;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

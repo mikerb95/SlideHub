@@ -1,8 +1,8 @@
-package com.brixo.slidehub.ai.service;
+package com.codebymike.slidehub.ai.service;
 
-import com.brixo.slidehub.ai.model.DeploymentGuide;
-import com.brixo.slidehub.ai.model.RepoAnalysis;
-import com.brixo.slidehub.ai.repository.DeploymentGuideRepository;
+import com.codebymike.slidehub.ai.model.DeploymentGuide;
+import com.codebymike.slidehub.ai.model.RepoAnalysis;
+import com.codebymike.slidehub.ai.repository.DeploymentGuideRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

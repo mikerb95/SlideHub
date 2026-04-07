@@ -1,7 +1,7 @@
-package com.brixo.slidehub.state.controller;
+package com.codebymike.slidehub.state.controller;
 
-import com.brixo.slidehub.state.model.SlideStateResponse;
-import com.brixo.slidehub.state.service.SlideStateService;
+import com.codebymike.slidehub.state.model.SlideStateResponse;
+import com.codebymike.slidehub.state.service.SlideStateService;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +32,7 @@ class SlideControllerTest {
         given(slideStateService.setSlide(3, 12)).willReturn(new SlideStateResponse(3, 12));
 
         ResponseEntity<SlideStateResponse> response = slideController
-                .setSlide(new com.brixo.slidehub.state.model.SetSlideRequest(3, 12));
+                .setSlide(new com.codebymike.slidehub.state.model.SetSlideRequest(3, 12));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();

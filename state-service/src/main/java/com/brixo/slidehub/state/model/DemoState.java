@@ -1,4 +1,4 @@
-package com.brixo.slidehub.state.model;
+package com.codebymike.slidehub.state.model;
 
 /**
  * Estado del modo demo — puede ser "slides" (con slide activo) o "url" (con

@@ -1,7 +1,7 @@
-package com.brixo.slidehub.ai.service;
+package com.codebymike.slidehub.ai.service;
 
-import com.brixo.slidehub.ai.model.RepoAnalysis;
-import com.brixo.slidehub.ai.repository.RepoAnalysisRepository;
+import com.codebymike.slidehub.ai.model.RepoAnalysis;
+import com.codebymike.slidehub.ai.repository.RepoAnalysisRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

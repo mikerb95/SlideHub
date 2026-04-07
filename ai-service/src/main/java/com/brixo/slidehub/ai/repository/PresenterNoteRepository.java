@@ -1,6 +1,6 @@
-package com.brixo.slidehub.ai.repository;
+package com.codebymike.slidehub.ai.repository;
 
-import com.brixo.slidehub.ai.model.PresenterNote;
+import com.codebymike.slidehub.ai.model.PresenterNote;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;

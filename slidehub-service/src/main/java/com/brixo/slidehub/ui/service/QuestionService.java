@@ -1,12 +1,12 @@
-package com.brixo.slidehub.ui.service;
+package com.codebymike.slidehub.ui.service;
 
-import com.brixo.slidehub.ui.model.Presentation;
-import com.brixo.slidehub.ui.model.PresentationSession;
-import com.brixo.slidehub.ui.model.Question;
-import com.brixo.slidehub.ui.model.QuestionStatus;
-import com.brixo.slidehub.ui.repository.PresentationRepository;
-import com.brixo.slidehub.ui.repository.PresentationSessionRepository;
-import com.brixo.slidehub.ui.repository.QuestionRepository;
+import com.codebymike.slidehub.ui.model.Presentation;
+import com.codebymike.slidehub.ui.model.PresentationSession;
+import com.codebymike.slidehub.ui.model.Question;
+import com.codebymike.slidehub.ui.model.QuestionStatus;
+import com.codebymike.slidehub.ui.repository.PresentationRepository;
+import com.codebymike.slidehub.ui.repository.PresentationSessionRepository;
+import com.codebymike.slidehub.ui.repository.QuestionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

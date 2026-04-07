@@ -1,6 +1,6 @@
-package com.brixo.slidehub.ui.config;
+package com.codebymike.slidehub.ui.config;
 
-import com.brixo.slidehub.ui.service.UserActivityTracker;
+import com.codebymike.slidehub.ui.service.UserActivityTracker;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

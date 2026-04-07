@@ -1,8 +1,8 @@
-package com.brixo.slidehub.state.controller;
+package com.codebymike.slidehub.state.controller;
 
-import com.brixo.slidehub.state.model.SetSlideRequest;
-import com.brixo.slidehub.state.model.SlideStateResponse;
-import com.brixo.slidehub.state.service.SlideStateService;
+import com.codebymike.slidehub.state.model.SetSlideRequest;
+import com.codebymike.slidehub.state.model.SlideStateResponse;
+import com.codebymike.slidehub.state.service.SlideStateService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,12 +1,12 @@
-package com.brixo.slidehub.ui.service;
+package com.codebymike.slidehub.ui.service;
 
-import com.brixo.slidehub.ui.model.Presentation;
-import com.brixo.slidehub.ui.model.Role;
-import com.brixo.slidehub.ui.model.SourceType;
-import com.brixo.slidehub.ui.model.User;
-import com.brixo.slidehub.ui.repository.PresentationRepository;
-import com.brixo.slidehub.ui.repository.PresentationSessionRepository;
-import com.brixo.slidehub.ui.repository.UserRepository;
+import com.codebymike.slidehub.ui.model.Presentation;
+import com.codebymike.slidehub.ui.model.Role;
+import com.codebymike.slidehub.ui.model.SourceType;
+import com.codebymike.slidehub.ui.model.User;
+import com.codebymike.slidehub.ui.repository.PresentationRepository;
+import com.codebymike.slidehub.ui.repository.PresentationSessionRepository;
+import com.codebymike.slidehub.ui.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,8 +1,8 @@
-package com.brixo.slidehub.ai;
+package com.codebymike.slidehub.ai;
 
-import com.brixo.slidehub.ai.repository.DeploymentGuideRepository;
-import com.brixo.slidehub.ai.repository.PresenterNoteRepository;
-import com.brixo.slidehub.ai.repository.RepoAnalysisRepository;
+import com.codebymike.slidehub.ai.repository.DeploymentGuideRepository;
+import com.codebymike.slidehub.ai.repository.PresenterNoteRepository;
+import com.codebymike.slidehub.ai.repository.RepoAnalysisRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;

@@ -1,4 +1,4 @@
-package com.brixo.slidehub.ui.config;
+package com.codebymike.slidehub.ui.config;
 
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.protocol.ProtocolVersion;

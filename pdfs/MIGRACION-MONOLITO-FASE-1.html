@@ -18,7 +18,7 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 <p>Consolidar funcionalidad core en <span class="code">slidehub-service</span>, incorporando dominios <span class="code">state</span>, <span class="code">ai</span> y <span class="code">ui</span>, y eliminar las primeras fronteras HTTP internas entre módulos.</p>
 <h2>Cambios realizados</h2>
 <h3>1) Migración de dominios Java</h3>
-<p>Se consolidaron paquetes dentro de <span class="code">slidehub-service/src/main/java/com/brixo/slidehub/</span>:</p>
+<p>Se consolidaron paquetes dentro de <span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/</span>:</p>
 <ul>
 <li><span class="code">state/**</span> (controllers, models, services)</li>
 <li><span class="code">ai/**</span> (controllers, models, repositories, services)</li>
@@ -43,15 +43,15 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 <h3>4) Eliminación inicial de HTTP interno (in-process)</h3>
 <p>Se refactorizaron servicios puente para invocación directa en el mismo proceso:</p>
 <ul>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/service/NotesBridgeService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ui/service/NotesBridgeService.java</span></li>
 </ul>
 <p>  - de llamadas HTTP a <span class="code">NotesService</span> / <span class="code">RepoAnalysisService</span> / <span class="code">PresenterNoteRepository</span>.</p>
 <ul>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/service/AssistBridgeService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ui/service/AssistBridgeService.java</span></li>
 </ul>
 <p>  - de POST multipart interno a llamada directa <span class="code">AssistService</span>.</p>
 <ul>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/service/HapticBridgeService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ui/service/HapticBridgeService.java</span></li>
 </ul>
 <p>  - de POST interno a llamada directa <span class="code">HapticEventService</span>.</p>
 <h2>Verificación</h2>

@@ -1,4 +1,4 @@
-package com.brixo.slidehub.state.model;
+package com.codebymike.slidehub.state.model;
 
 import java.time.LocalDateTime;
 

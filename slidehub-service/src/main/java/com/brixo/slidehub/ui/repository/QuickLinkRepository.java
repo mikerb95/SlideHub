@@ -1,6 +1,6 @@
-package com.brixo.slidehub.ui.repository;
+package com.codebymike.slidehub.ui.repository;
 
-import com.brixo.slidehub.ui.model.QuickLink;
+import com.codebymike.slidehub.ui.model.QuickLink;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

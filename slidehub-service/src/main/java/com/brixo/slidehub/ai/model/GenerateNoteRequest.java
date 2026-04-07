@@ -1,4 +1,4 @@
-package com.brixo.slidehub.ai.model;
+package com.codebymike.slidehub.ai.model;
 
 /**
  * Request body para {@code POST /api/ai/notes/generate} (HU-016).

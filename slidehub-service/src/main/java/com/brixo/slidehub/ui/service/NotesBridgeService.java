@@ -1,12 +1,12 @@
-package com.brixo.slidehub.ui.service;
+package com.codebymike.slidehub.ui.service;
 
-import com.brixo.slidehub.ai.model.GenerateAllRequest;
-import com.brixo.slidehub.ai.model.PresenterNote;
-import com.brixo.slidehub.ai.model.RepoAnalysis;
-import com.brixo.slidehub.ai.model.SlideReference;
-import com.brixo.slidehub.ai.repository.PresenterNoteRepository;
-import com.brixo.slidehub.ai.service.NotesService;
-import com.brixo.slidehub.ai.service.RepoAnalysisService;
+import com.codebymike.slidehub.ai.model.GenerateAllRequest;
+import com.codebymike.slidehub.ai.model.PresenterNote;
+import com.codebymike.slidehub.ai.model.RepoAnalysis;
+import com.codebymike.slidehub.ai.model.SlideReference;
+import com.codebymike.slidehub.ai.repository.PresenterNoteRepository;
+import com.codebymike.slidehub.ai.service.NotesService;
+import com.codebymike.slidehub.ai.service.RepoAnalysisService;
 import tools.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

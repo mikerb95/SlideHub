@@ -1,4 +1,4 @@
-package com.brixo.slidehub.ai.model;
+package com.codebymike.slidehub.ai.model;
 
 /**
  * Referencia a un slide individual dentro de una solicitud generate-all.

@@ -1,7 +1,7 @@
-package com.brixo.slidehub.ui.controller;
+package com.codebymike.slidehub.ui.controller;
 
-import com.brixo.slidehub.ui.model.QuickLink;
-import com.brixo.slidehub.ui.service.QuickLinkService;
+import com.codebymike.slidehub.ui.model.QuickLink;
+import com.codebymike.slidehub.ui.service.QuickLinkService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

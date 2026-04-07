@@ -1,6 +1,6 @@
-package com.brixo.slidehub.state.service;
+package com.codebymike.slidehub.state.service;
 
-import com.brixo.slidehub.state.model.HapticEvent;
+import com.codebymike.slidehub.state.model.HapticEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;

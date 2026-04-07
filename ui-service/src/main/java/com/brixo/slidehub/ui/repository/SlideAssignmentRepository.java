@@ -1,6 +1,6 @@
-package com.brixo.slidehub.ui.repository;
+package com.codebymike.slidehub.ui.repository;
 
-import com.brixo.slidehub.ui.model.SlideAssignment;
+import com.codebymike.slidehub.ui.model.SlideAssignment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

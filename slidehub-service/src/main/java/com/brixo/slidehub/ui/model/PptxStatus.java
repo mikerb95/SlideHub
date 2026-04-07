@@ -1,4 +1,4 @@
-package com.brixo.slidehub.ui.model;
+package com.codebymike.slidehub.ui.model;
 
 /**
  * Estado del proceso de conversión PPTX → PNG via AWS Lambda.

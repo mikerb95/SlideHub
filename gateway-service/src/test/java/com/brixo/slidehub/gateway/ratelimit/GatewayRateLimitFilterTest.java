@@ -1,4 +1,4 @@
-package com.brixo.slidehub.gateway.ratelimit;
+package com.codebymike.slidehub.gateway.ratelimit;
 
 import jakarta.servlet.FilterChain;
 import org.junit.jupiter.api.BeforeEach;

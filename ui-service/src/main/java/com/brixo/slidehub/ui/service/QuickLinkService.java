@@ -1,9 +1,9 @@
-package com.brixo.slidehub.ui.service;
+package com.codebymike.slidehub.ui.service;
 
-import com.brixo.slidehub.ui.model.Presentation;
-import com.brixo.slidehub.ui.model.QuickLink;
-import com.brixo.slidehub.ui.repository.PresentationRepository;
-import com.brixo.slidehub.ui.repository.QuickLinkRepository;
+import com.codebymike.slidehub.ui.model.Presentation;
+import com.codebymike.slidehub.ui.model.QuickLink;
+import com.codebymike.slidehub.ui.repository.PresentationRepository;
+import com.codebymike.slidehub.ui.repository.QuickLinkRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

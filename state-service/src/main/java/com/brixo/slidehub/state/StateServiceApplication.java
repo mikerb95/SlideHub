@@ -1,4 +1,4 @@
-package com.brixo.slidehub.state;
+package com.codebymike.slidehub.state;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

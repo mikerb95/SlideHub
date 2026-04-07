@@ -1,6 +1,6 @@
-package com.brixo.slidehub.state.service;
+package com.codebymike.slidehub.state.service;
 
-import com.brixo.slidehub.state.model.Device;
+import com.codebymike.slidehub.state.model.Device;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

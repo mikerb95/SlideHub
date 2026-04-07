@@ -1,7 +1,7 @@
-package com.brixo.slidehub.ui.service;
+package com.codebymike.slidehub.ui.service;
 
-import com.brixo.slidehub.ui.model.StatusCheckItem;
-import com.brixo.slidehub.ui.model.StatusChecksResponse;
+import com.codebymike.slidehub.ui.model.StatusCheckItem;
+import com.codebymike.slidehub.ui.model.StatusChecksResponse;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;

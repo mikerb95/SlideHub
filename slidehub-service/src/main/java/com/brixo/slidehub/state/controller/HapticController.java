@@ -1,7 +1,7 @@
-package com.brixo.slidehub.state.controller;
+package com.codebymike.slidehub.state.controller;
 
-import com.brixo.slidehub.state.model.PublishHapticRequest;
-import com.brixo.slidehub.state.service.HapticEventService;
+import com.codebymike.slidehub.state.model.PublishHapticRequest;
+import com.codebymike.slidehub.state.service.HapticEventService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

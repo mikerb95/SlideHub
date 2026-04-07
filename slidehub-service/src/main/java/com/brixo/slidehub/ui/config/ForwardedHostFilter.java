@@ -1,4 +1,4 @@
-package com.brixo.slidehub.ui.config;
+package com.codebymike.slidehub.ui.config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

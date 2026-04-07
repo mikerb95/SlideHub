@@ -1,8 +1,8 @@
-package com.brixo.slidehub.ui.controller;
+package com.codebymike.slidehub.ui.controller;
 
-import com.brixo.slidehub.ui.model.User;
-import com.brixo.slidehub.ui.repository.UserRepository;
-import com.brixo.slidehub.ui.service.MeetingService;
+import com.codebymike.slidehub.ui.model.User;
+import com.codebymike.slidehub.ui.repository.UserRepository;
+import com.codebymike.slidehub.ui.service.MeetingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;

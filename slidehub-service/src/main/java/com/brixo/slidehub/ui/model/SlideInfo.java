@@ -1,4 +1,4 @@
-package com.brixo.slidehub.ui.model;
+package com.codebymike.slidehub.ui.model;
 
 /**
  * DTO de respuesta que representa un slide importado.

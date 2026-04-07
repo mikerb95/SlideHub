@@ -1,4 +1,4 @@
-package com.brixo.slidehub.monolith.ratelimit;
+package com.codebymike.slidehub.monolith.ratelimit;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;

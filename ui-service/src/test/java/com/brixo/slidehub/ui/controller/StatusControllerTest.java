@@ -1,8 +1,8 @@
-package com.brixo.slidehub.ui.controller;
+package com.codebymike.slidehub.ui.controller;
 
-import com.brixo.slidehub.ui.model.StatusCheckItem;
-import com.brixo.slidehub.ui.model.StatusChecksResponse;
-import com.brixo.slidehub.ui.service.StatusChecksService;
+import com.codebymike.slidehub.ui.model.StatusCheckItem;
+import com.codebymike.slidehub.ui.model.StatusChecksResponse;
+import com.codebymike.slidehub.ui.service.StatusChecksService;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

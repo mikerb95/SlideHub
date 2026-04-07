@@ -1,15 +1,15 @@
-package com.brixo.slidehub.ui.service;
+package com.codebymike.slidehub.ui.service;
 
-import com.brixo.slidehub.ui.model.Presentation;
-import com.brixo.slidehub.ui.model.PresentationParticipant;
-import com.brixo.slidehub.ui.model.PresentationSession;
-import com.brixo.slidehub.ui.model.SessionMember;
-import com.brixo.slidehub.ui.model.SlideAssignment;
-import com.brixo.slidehub.ui.repository.PresentationParticipantRepository;
-import com.brixo.slidehub.ui.repository.PresentationRepository;
-import com.brixo.slidehub.ui.repository.PresentationSessionRepository;
-import com.brixo.slidehub.ui.repository.SessionMemberRepository;
-import com.brixo.slidehub.ui.repository.SlideAssignmentRepository;
+import com.codebymike.slidehub.ui.model.Presentation;
+import com.codebymike.slidehub.ui.model.PresentationParticipant;
+import com.codebymike.slidehub.ui.model.PresentationSession;
+import com.codebymike.slidehub.ui.model.SessionMember;
+import com.codebymike.slidehub.ui.model.SlideAssignment;
+import com.codebymike.slidehub.ui.repository.PresentationParticipantRepository;
+import com.codebymike.slidehub.ui.repository.PresentationRepository;
+import com.codebymike.slidehub.ui.repository.PresentationSessionRepository;
+import com.codebymike.slidehub.ui.repository.SessionMemberRepository;
+import com.codebymike.slidehub.ui.repository.SlideAssignmentRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

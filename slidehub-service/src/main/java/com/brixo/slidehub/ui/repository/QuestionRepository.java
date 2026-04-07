@@ -1,7 +1,7 @@
-package com.brixo.slidehub.ui.repository;
+package com.codebymike.slidehub.ui.repository;
 
-import com.brixo.slidehub.ui.model.Question;
-import com.brixo.slidehub.ui.model.QuestionStatus;
+import com.codebymike.slidehub.ui.model.Question;
+import com.codebymike.slidehub.ui.model.QuestionStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

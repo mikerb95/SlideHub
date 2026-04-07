@@ -44,21 +44,21 @@ hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 <h3>3) Bootstrap de aplicación monolítica</h3>
 <p>Se creó:</p>
 <ul>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/monolith/SlideHubMonolithApplication.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/monolith/SlideHubMonolithApplication.java</span></li>
 </ul>
 <p>Características:</p>
 <ul>
-<li><span class="code">@SpringBootApplication(scanBasePackages = &quot;com.brixo.slidehub&quot;)</span></li>
+<li><span class="code">@SpringBootApplication(scanBasePackages = &quot;com.codebymike.slidehub&quot;)</span></li>
 <li><span class="code">@EnableScheduling</span></li>
 <li><span class="code">@EnableConfigurationProperties</span> para rate limit</li>
 </ul>
 <h3>4) Port inicial de rate limiting (desde gateway)</h3>
 <p>Se crearon:</p>
 <ul>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitDecision.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitProperties.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitService.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/monolith/ratelimit/GatewayRateLimitFilter.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/monolith/ratelimit/GatewayRateLimitDecision.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/monolith/ratelimit/GatewayRateLimitProperties.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/monolith/ratelimit/GatewayRateLimitService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/monolith/ratelimit/GatewayRateLimitFilter.java</span></li>
 </ul>
 <p>Objetivo:</p>
 <ul>

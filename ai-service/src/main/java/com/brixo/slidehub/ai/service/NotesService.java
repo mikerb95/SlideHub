@@ -1,11 +1,11 @@
-package com.brixo.slidehub.ai.service;
+package com.codebymike.slidehub.ai.service;
 
-import com.brixo.slidehub.ai.model.GenerateAllRequest;
-import com.brixo.slidehub.ai.model.GenerateNoteRequest;
-import com.brixo.slidehub.ai.model.NoteContent;
-import com.brixo.slidehub.ai.model.PresenterNote;
-import com.brixo.slidehub.ai.model.SlideReference;
-import com.brixo.slidehub.ai.repository.PresenterNoteRepository;
+import com.codebymike.slidehub.ai.model.GenerateAllRequest;
+import com.codebymike.slidehub.ai.model.GenerateNoteRequest;
+import com.codebymike.slidehub.ai.model.NoteContent;
+import com.codebymike.slidehub.ai.model.PresenterNote;
+import com.codebymike.slidehub.ai.model.SlideReference;
+import com.codebymike.slidehub.ai.repository.PresenterNoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

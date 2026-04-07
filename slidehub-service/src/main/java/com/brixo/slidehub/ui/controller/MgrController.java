@@ -1,6 +1,6 @@
-package com.brixo.slidehub.ui.controller;
+package com.codebymike.slidehub.ui.controller;
 
-import com.brixo.slidehub.ui.service.MgrService;
+import com.codebymike.slidehub.ui.service.MgrService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

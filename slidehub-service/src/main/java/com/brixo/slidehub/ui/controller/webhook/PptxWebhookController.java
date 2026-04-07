@@ -1,6 +1,6 @@
-package com.brixo.slidehub.ui.controller.webhook;
+package com.codebymike.slidehub.ui.controller.webhook;
 
-import com.brixo.slidehub.ui.service.PresentationService;
+import com.codebymike.slidehub.ui.service.PresentationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

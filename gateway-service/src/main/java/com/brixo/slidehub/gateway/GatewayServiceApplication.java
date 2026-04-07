@@ -1,6 +1,6 @@
-package com.brixo.slidehub.gateway;
+package com.codebymike.slidehub.gateway;
 
-import com.brixo.slidehub.gateway.ratelimit.GatewayRateLimitProperties;
+import com.codebymike.slidehub.gateway.ratelimit.GatewayRateLimitProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.config.server.EnableConfigServer;

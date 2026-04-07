@@ -1,7 +1,7 @@
-package com.brixo.slidehub.state.service;
+package com.codebymike.slidehub.state.service;
 
-import com.brixo.slidehub.state.model.DemoState;
-import com.brixo.slidehub.state.model.SetDemoRequest;
+import com.codebymike.slidehub.state.model.DemoState;
+import com.codebymike.slidehub.state.model.SetDemoRequest;
 import tools.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

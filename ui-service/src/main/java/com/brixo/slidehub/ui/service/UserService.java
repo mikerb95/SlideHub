@@ -1,9 +1,9 @@
-package com.brixo.slidehub.ui.service;
+package com.codebymike.slidehub.ui.service;
 
-import com.brixo.slidehub.ui.exception.UserAlreadyExistsException;
-import com.brixo.slidehub.ui.model.Role;
-import com.brixo.slidehub.ui.model.User;
-import com.brixo.slidehub.ui.repository.UserRepository;
+import com.codebymike.slidehub.ui.exception.UserAlreadyExistsException;
+import com.codebymike.slidehub.ui.model.Role;
+import com.codebymike.slidehub.ui.model.User;
+import com.codebymike.slidehub.ui.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,9 +1,9 @@
-package com.brixo.slidehub.ui.controller;
+package com.codebymike.slidehub.ui.controller;
 
-import com.brixo.slidehub.ui.model.QuestionStatus;
-import com.brixo.slidehub.ui.model.User;
-import com.brixo.slidehub.ui.repository.UserRepository;
-import com.brixo.slidehub.ui.service.QuestionService;
+import com.codebymike.slidehub.ui.model.QuestionStatus;
+import com.codebymike.slidehub.ui.model.User;
+import com.codebymike.slidehub.ui.repository.UserRepository;
+import com.codebymike.slidehub.ui.service.QuestionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;

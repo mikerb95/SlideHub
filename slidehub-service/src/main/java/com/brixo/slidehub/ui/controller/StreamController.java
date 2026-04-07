@@ -1,7 +1,7 @@
-package com.brixo.slidehub.ui.controller;
+package com.codebymike.slidehub.ui.controller;
 
-import com.brixo.slidehub.ui.repository.PresentationSessionRepository;
-import com.brixo.slidehub.ui.service.ViewerService;
+import com.codebymike.slidehub.ui.repository.PresentationSessionRepository;
+import com.codebymike.slidehub.ui.service.ViewerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;

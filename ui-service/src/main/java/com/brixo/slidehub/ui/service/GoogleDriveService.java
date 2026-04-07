@@ -1,8 +1,8 @@
-package com.brixo.slidehub.ui.service;
+package com.codebymike.slidehub.ui.service;
 
-import com.brixo.slidehub.ui.model.DriveContents;
-import com.brixo.slidehub.ui.model.DriveFile;
-import com.brixo.slidehub.ui.model.DriveFolder;
+import com.codebymike.slidehub.ui.model.DriveContents;
+import com.codebymike.slidehub.ui.model.DriveFile;
+import com.codebymike.slidehub.ui.model.DriveFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

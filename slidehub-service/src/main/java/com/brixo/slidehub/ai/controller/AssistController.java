@@ -1,6 +1,6 @@
-package com.brixo.slidehub.ai.controller;
+package com.codebymike.slidehub.ai.controller;
 
-import com.brixo.slidehub.ai.service.AssistService;
+import com.codebymike.slidehub.ai.service.AssistService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;

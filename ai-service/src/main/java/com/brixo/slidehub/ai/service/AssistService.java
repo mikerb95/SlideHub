@@ -1,4 +1,4 @@
-package com.brixo.slidehub.ai.service;
+package com.codebymike.slidehub.ai.service;
 
 import org.springframework.stereotype.Service;
 

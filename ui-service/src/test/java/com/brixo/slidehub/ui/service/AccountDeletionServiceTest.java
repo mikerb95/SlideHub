@@ -1,11 +1,11 @@
-package com.brixo.slidehub.ui.service;
+package com.codebymike.slidehub.ui.service;
 
-import com.brixo.slidehub.ui.repository.PresentationParticipantRepository;
-import com.brixo.slidehub.ui.repository.PresentationRepository;
-import com.brixo.slidehub.ui.repository.PresentationSessionRepository;
-import com.brixo.slidehub.ui.repository.SessionMemberRepository;
-import com.brixo.slidehub.ui.repository.SlideAssignmentRepository;
-import com.brixo.slidehub.ui.repository.UserRepository;
+import com.codebymike.slidehub.ui.repository.PresentationParticipantRepository;
+import com.codebymike.slidehub.ui.repository.PresentationRepository;
+import com.codebymike.slidehub.ui.repository.PresentationSessionRepository;
+import com.codebymike.slidehub.ui.repository.SessionMemberRepository;
+import com.codebymike.slidehub.ui.repository.SlideAssignmentRepository;
+import com.codebymike.slidehub.ui.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;

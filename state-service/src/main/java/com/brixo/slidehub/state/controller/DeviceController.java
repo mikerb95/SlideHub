@@ -1,7 +1,7 @@
-package com.brixo.slidehub.state.controller;
+package com.codebymike.slidehub.state.controller;
 
-import com.brixo.slidehub.state.model.Device;
-import com.brixo.slidehub.state.service.DeviceRegistryService;
+import com.codebymike.slidehub.state.model.Device;
+import com.codebymike.slidehub.state.service.DeviceRegistryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,6 +1,6 @@
-package com.brixo.slidehub.ui.service;
+package com.codebymike.slidehub.ui.service;
 
-import com.brixo.slidehub.ai.service.AssistService;
+import com.codebymike.slidehub.ai.service.AssistService;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;

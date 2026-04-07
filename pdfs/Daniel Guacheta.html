@@ -26,39 +26,39 @@ hr { border: none; border-top: 1px solid #999; margin: 1.2em 0; }
 </ul>
 <h3>Ahora</h3>
 <ul>
-<li>UI se integra en <span class="code">slidehub-service</span> como módulo interno (<span class="code">com.brixo.slidehub.ui</span>).</li>
+<li>UI se integra en <span class="code">slidehub-service</span> como módulo interno (<span class="code">com.codebymike.slidehub.ui</span>).</li>
 <li>Se conserva comportamiento funcional.</li>
 <li>Se simplifica la orquestación al reemplazar llamadas internas de red por invocaciones directas.</li>
 </ul>
 <h2>3. Archivos que debes dominar para sustentar</h2>
 <h3>Configuración</h3>
 <ul>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/config/SecurityConfig.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/config/DatabaseConfig.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/config/S3Config.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ui/config/SecurityConfig.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ui/config/DatabaseConfig.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ui/config/S3Config.java</span></li>
 </ul>
 <h3>Controladores clave</h3>
 <ul>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/AuthController.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/PresentationViewController.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/PresentationImportController.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/PresentationNotesController.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/MeetingController.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/controller/StatusController.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ui/controller/AuthController.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ui/controller/PresentationViewController.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ui/controller/PresentationImportController.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ui/controller/PresentationNotesController.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ui/controller/MeetingController.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ui/controller/StatusController.java</span></li>
 </ul>
 <h3>Servicios clave</h3>
 <ul>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/service/PresentationService.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/service/MeetingService.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/service/GoogleDriveService.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/service/QuickLinkService.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/service/StatusChecksService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ui/service/PresentationService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ui/service/MeetingService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ui/service/GoogleDriveService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ui/service/QuickLinkService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ui/service/StatusChecksService.java</span></li>
 </ul>
 <h3>Puentes migrados a in-process</h3>
 <ul>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/service/NotesBridgeService.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/service/AssistBridgeService.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ui/service/HapticBridgeService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ui/service/NotesBridgeService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ui/service/AssistBridgeService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ui/service/HapticBridgeService.java</span></li>
 </ul>
 <h3>Recursos</h3>
 <ul>

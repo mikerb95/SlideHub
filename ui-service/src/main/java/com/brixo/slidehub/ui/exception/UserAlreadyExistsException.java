@@ -1,4 +1,4 @@
-package com.brixo.slidehub.ui.exception;
+package com.codebymike.slidehub.ui.exception;
 
 /**
  * Se lanza cuando se intenta registrar un usuario con username o email ya

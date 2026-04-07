@@ -1,10 +1,10 @@
-package com.brixo.slidehub.ui.controller;
+package com.codebymike.slidehub.ui.controller;
 
-import com.brixo.slidehub.ui.exception.UserAlreadyExistsException;
-import com.brixo.slidehub.ui.model.User;
-import com.brixo.slidehub.ui.repository.UserRepository;
-import com.brixo.slidehub.ui.service.AccountDeletionService;
-import com.brixo.slidehub.ui.service.UserService;
+import com.codebymike.slidehub.ui.exception.UserAlreadyExistsException;
+import com.codebymike.slidehub.ui.model.User;
+import com.codebymike.slidehub.ui.repository.UserRepository;
+import com.codebymike.slidehub.ui.service.AccountDeletionService;
+import com.codebymike.slidehub.ui.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,13 +39,13 @@ public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AccountDeletionService accountDeletionService;
-    private final com.brixo.slidehub.ui.service.SlideUploadService slideUploadService;
+    private final com.codebymike.slidehub.ui.service.SlideUploadService slideUploadService;
 
     public AuthController(UserService userService,
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             AccountDeletionService accountDeletionService,
-            com.brixo.slidehub.ui.service.SlideUploadService slideUploadService) {
+            com.codebymike.slidehub.ui.service.SlideUploadService slideUploadService) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;

@@ -1,4 +1,4 @@
-package com.brixo.slidehub.ui;
+package com.codebymike.slidehub.ui;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,4 +1,4 @@
-package com.brixo.slidehub.ui.model;
+package com.codebymike.slidehub.ui.model;
 
 /**
  * DTO inmutable que representa una carpeta de Google Drive.

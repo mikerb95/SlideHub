@@ -1,11 +1,11 @@
-package com.brixo.slidehub.ui.controller;
+package com.codebymike.slidehub.ui.controller;
 
-import com.brixo.slidehub.ui.model.Presentation;
-import com.brixo.slidehub.ui.model.Role;
-import com.brixo.slidehub.ui.model.User;
-import com.brixo.slidehub.ui.repository.PresentationRepository;
-import com.brixo.slidehub.ui.repository.UserRepository;
-import com.brixo.slidehub.ui.service.PresentationService;
+import com.codebymike.slidehub.ui.model.Presentation;
+import com.codebymike.slidehub.ui.model.Role;
+import com.codebymike.slidehub.ui.model.User;
+import com.codebymike.slidehub.ui.repository.PresentationRepository;
+import com.codebymike.slidehub.ui.repository.UserRepository;
+import com.codebymike.slidehub.ui.service.PresentationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

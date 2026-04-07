@@ -1,4 +1,4 @@
-package com.brixo.slidehub.ui.service;
+package com.codebymike.slidehub.ui.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

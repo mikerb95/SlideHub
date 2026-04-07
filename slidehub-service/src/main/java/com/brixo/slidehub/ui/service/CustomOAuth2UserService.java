@@ -1,8 +1,8 @@
-package com.brixo.slidehub.ui.service;
+package com.codebymike.slidehub.ui.service;
 
-import com.brixo.slidehub.ui.model.Role;
-import com.brixo.slidehub.ui.model.User;
-import com.brixo.slidehub.ui.repository.UserRepository;
+import com.codebymike.slidehub.ui.model.Role;
+import com.codebymike.slidehub.ui.model.User;
+import com.codebymike.slidehub.ui.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;

@@ -26,36 +26,36 @@ hr { border: none; border-top: 1px solid #999; margin: 1.2em 0; }
 </ul>
 <h3>Ahora</h3>
 <ul>
-<li>IA se integra como módulo interno <span class="code">com.brixo.slidehub.ai</span> dentro de <span class="code">slidehub-service</span>.</li>
+<li>IA se integra como módulo interno <span class="code">com.codebymike.slidehub.ai</span> dentro de <span class="code">slidehub-service</span>.</li>
 <li>Se conserva lógica de negocio y contratos funcionales.</li>
 <li>Continúan integraciones externas (Gemini, Groq, MongoDB), pero sin separación de proceso para la capa interna de la plataforma.</li>
 </ul>
 <h2>3. Archivos que debes dominar para sustentar</h2>
 <h3>Controladores</h3>
 <ul>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ai/controller/NotesController.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ai/controller/RepoAnalysisController.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ai/controller/DeployTutorController.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ai/controller/AssistController.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ai/controller/NotesController.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ai/controller/RepoAnalysisController.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ai/controller/DeployTutorController.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ai/controller/AssistController.java</span></li>
 </ul>
 <h3>Servicios</h3>
 <ul>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ai/service/GeminiService.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ai/service/GroqService.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ai/service/NotesService.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ai/service/RepoAnalysisService.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ai/service/DeploymentService.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ai/service/AssistService.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ai/service/GitHubRepoContextService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ai/service/GeminiService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ai/service/GroqService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ai/service/NotesService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ai/service/RepoAnalysisService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ai/service/DeploymentService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ai/service/AssistService.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ai/service/GitHubRepoContextService.java</span></li>
 </ul>
 <h3>Repositorios y modelos</h3>
 <ul>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ai/repository/PresenterNoteRepository.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ai/repository/RepoAnalysisRepository.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ai/repository/DeploymentGuideRepository.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ai/model/PresenterNote.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ai/model/RepoAnalysis.java</span></li>
-<li><span class="code">slidehub-service/src/main/java/com/brixo/slidehub/ai/model/DeploymentGuide.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ai/repository/PresenterNoteRepository.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ai/repository/RepoAnalysisRepository.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ai/repository/DeploymentGuideRepository.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ai/model/PresenterNote.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ai/model/RepoAnalysis.java</span></li>
+<li><span class="code">slidehub-service/src/main/java/com/codebymike/slidehub/ai/model/DeploymentGuide.java</span></li>
 </ul>
 <h3>Referencias</h3>
 <ul>

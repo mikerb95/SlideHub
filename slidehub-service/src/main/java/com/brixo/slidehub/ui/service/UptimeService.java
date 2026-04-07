@@ -1,4 +1,4 @@
-package com.brixo.slidehub.ui.service;
+package com.codebymike.slidehub.ui.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;

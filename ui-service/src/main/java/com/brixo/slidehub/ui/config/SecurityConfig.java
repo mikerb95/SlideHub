@@ -1,11 +1,11 @@
-package com.brixo.slidehub.ui.config;
+package com.codebymike.slidehub.ui.config;
 
-import com.brixo.slidehub.ui.model.User;
-import com.brixo.slidehub.ui.repository.UserRepository;
-import com.brixo.slidehub.ui.service.AuthenticatedSessionTracker;
-import com.brixo.slidehub.ui.service.CustomOAuth2UserService;
-import com.brixo.slidehub.ui.service.CustomOidcUserService;
-import com.brixo.slidehub.ui.service.CustomUserDetailsService;
+import com.codebymike.slidehub.ui.model.User;
+import com.codebymike.slidehub.ui.repository.UserRepository;
+import com.codebymike.slidehub.ui.service.AuthenticatedSessionTracker;
+import com.codebymike.slidehub.ui.service.CustomOAuth2UserService;
+import com.codebymike.slidehub.ui.service.CustomOidcUserService;
+import com.codebymike.slidehub.ui.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;

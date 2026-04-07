@@ -1,4 +1,4 @@
-package com.brixo.slidehub.ui.model;
+package com.codebymike.slidehub.ui.model;
 
 /**
  * Roles de usuario en SlideHub (AGENTS.md §2.2).

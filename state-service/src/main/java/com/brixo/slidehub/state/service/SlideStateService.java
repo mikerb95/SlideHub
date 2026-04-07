@@ -1,6 +1,6 @@
-package com.brixo.slidehub.state.service;
+package com.codebymike.slidehub.state.service;
 
-import com.brixo.slidehub.state.model.SlideStateResponse;
+import com.codebymike.slidehub.state.model.SlideStateResponse;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;

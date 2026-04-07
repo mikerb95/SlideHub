@@ -1,4 +1,4 @@
-package com.brixo.slidehub.monolith.ratelimit;
+package com.codebymike.slidehub.monolith.ratelimit;
 
 public record GatewayRateLimitDecision(boolean permitted, String ruleName, long retryAfterSeconds) {
 
