@@ -66,7 +66,9 @@ public class AuthController {
             @RequestParam(required = false) String accountDeleted,
             Model model) {
         if (isAuthenticated(authentication)) {
-            return "redirect:/presentations";
+            boolean isDeveloper = authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_DEVELOPER"));
+            return isDeveloper ? "redirect:/mgr" : "redirect:/presentations";
         }
         if (error != null) {
             // Mensaje genérico — sin indicar qué campo falló (HU-001 §2)
