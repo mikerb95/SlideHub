@@ -754,7 +754,14 @@
             dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
             dropZone.addEventListener('drop', e => {
                 e.preventDefault(); dropZone.classList.remove('drag-over');
-                selectedFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+                const files = Array.from(e.dataTransfer.files);
+                const pptxFile = files.find(f => f.name.toLowerCase().endsWith('.pptx'));
+                if (pptxFile) {
+                    showImportTab('pptx');
+                    onPptxSelected({ target: { files: [pptxFile] } });
+                    return;
+                }
+                selectedFiles = files.filter(f => f.type.startsWith('image/'));
                 renderFilePreview();
                 document.getElementById('btn-upload').disabled = selectedFiles.length === 0;
             });
