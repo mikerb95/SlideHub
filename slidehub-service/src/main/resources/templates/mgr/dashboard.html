@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="es">
+
 <head>
     <!--
      ======================================================================
@@ -22,637 +23,725 @@
             --red: #ff5252;
             --amber: #ffd740;
         }
-        body { background: var(--bg); color: var(--text-1); font-family: 'SF Mono', 'Fira Code', monospace; }
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
-        .badge-ok   { background: #00e67620; color: #00e676; border: 1px solid #00e67640; }
-        .badge-err  { background: #ff525220; color: #ff5252; border: 1px solid #ff525240; }
-        .badge-role-DEVELOPER { background: #7c3aed20; color: #a78bfa; border: 1px solid #7c3aed40; }
-        .badge-role-ADMIN     { background: #0ea5e920; color: #38bdf8; border: 1px solid #0ea5e940; }
-        .badge-role-PRESENTER { background: #00e67610; color: #00e676; border: 1px solid #00e67630; }
-        .stat-value { font-size: 2rem; font-weight: 700; color: var(--accent); }
-        .stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--text-2); }
-        .tbl th { color: var(--text-2); font-size: 0.7rem; text-transform: uppercase; letter-spacing: .08em; padding: 8px 12px; border-bottom: 1px solid var(--border); }
-        .tbl td { padding: 10px 12px; border-bottom: 1px solid #1e1e1e; font-size: 0.82rem; }
-        .tbl tr:hover td { background: #1c1c1c; }
-        .btn-del { color: var(--red); cursor: pointer; font-size: 0.75rem; padding: 3px 8px; border: 1px solid #ff525240; border-radius: 4px; background: transparent; }
-        .btn-del:hover { background: #ff525215; }
-        .section-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: .12em; color: var(--text-2); margin-bottom: 12px; }
+
+        body {
+            background: var(--bg);
+            color: var(--text-1);
+            font-family: 'SF Mono', 'Fira Code', monospace;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .badge-ok {
+            background: #00e67620;
+            color: #00e676;
+            border: 1px solid #00e67640;
+        }
+
+        .badge-err {
+            background: #ff525220;
+            color: #ff5252;
+            border: 1px solid #ff525240;
+        }
+
+        .badge-role-DEVELOPER {
+            background: #7c3aed20;
+            color: #a78bfa;
+            border: 1px solid #7c3aed40;
+        }
+
+        .badge-role-ADMIN {
+            background: #0ea5e920;
+            color: #38bdf8;
+            border: 1px solid #0ea5e940;
+        }
+
+        .badge-role-PRESENTER {
+            background: #00e67610;
+            color: #00e676;
+            border: 1px solid #00e67630;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: var(--text-2);
+        }
+
+        .tbl th {
+            color: var(--text-2);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tbl td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #1e1e1e;
+            font-size: 0.82rem;
+        }
+
+        .tbl tr:hover td {
+            background: #1c1c1c;
+        }
+
+        .btn-del {
+            color: var(--red);
+            cursor: pointer;
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border: 1px solid #ff525240;
+            border-radius: 4px;
+            background: transparent;
+        }
+
+        .btn-del:hover {
+            background: #ff525215;
+        }
+
+        .section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            color: var(--text-2);
+            margin-bottom: 12px;
+        }
     </style>
 </head>
+
 <body class="min-h-screen">
 
-<!-- Nav -->
-<nav style="border-bottom:1px solid var(--border); background:var(--surface);" class="px-6 py-3 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-        <span style="color:var(--accent); font-size:.8rem; font-weight:700; letter-spacing:.15em;">SLIDEHUB</span>
-        <span style="color:var(--border);">/</span>
-        <span style="color:var(--text-2); font-size:.75rem;">MGR PANEL</span>
-    </div>
-    <div class="flex items-center gap-4">
-        <span style="font-size:.75rem; color:var(--text-2);" th:text="${#authentication.name}"></span>
-        <form method="post" action="/auth/logout" style="display:inline;">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-            <button type="submit" style="background:none;border:none;cursor:pointer;font-size:.75rem;color:var(--text-2);" class="hover:text-white">
-                <i class="fa-solid fa-right-from-bracket"></i>
-            </button>
-        </form>
-    </div>
-</nav>
-
-<div class="p-6 max-w-7xl mx-auto space-y-8">
-
-    <!-- ── Servicios ──────────────────────────────────────────────────── -->
-    <section>
-        <div class="section-title"><i class="fa-solid fa-server mr-1"></i>Estado de servicios</div>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div th:each="entry : ${health}" class="card p-4 flex items-center gap-3">
-                <i th:class="${entry.value} ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-xmark'"
-                   th:style="${entry.value} ? 'color:var(--accent)' : 'color:var(--red)'"></i>
-                <div>
-                    <div style="font-size:.85rem; font-weight:600;" th:text="${entry.key.toUpperCase()}"></div>
-                    <div th:class="${entry.value} ? 'badge-ok' : 'badge-err'"
-                         style="font-size:.65rem; padding:1px 6px; border-radius:4px; display:inline-block; margin-top:2px;"
-                         th:text="${entry.value} ? 'OPERATIVO' : 'ERROR'"></div>
-                </div>
-            </div>
+    <!-- Nav -->
+    <nav style="border-bottom:1px solid var(--border); background:var(--surface);"
+        class="px-6 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <span style="color:var(--accent); font-size:.8rem; font-weight:700; letter-spacing:.15em;">SLIDEHUB</span>
+            <span style="color:var(--border);">/</span>
+            <span style="color:var(--text-2); font-size:.75rem;">MGR PANEL</span>
         </div>
-    </section>
+        <div class="flex items-center gap-4">
+            <span style="font-size:.75rem; color:var(--text-2);" th:text="${#authentication.name}"></span>
+            <form method="post" action="/auth/logout" style="display:inline;">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit"
+                    style="background:none;border:none;cursor:pointer;font-size:.75rem;color:var(--text-2);"
+                    class="hover:text-white">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </form>
+        </div>
+    </nav>
 
-    <!-- ── Stats ─────────────────────────────────────────────────────── -->
-    <div class="grid md:grid-cols-3 gap-6">
+    <div class="p-6 max-w-7xl mx-auto space-y-8">
 
-        <!-- Usuarios -->
-        <section class="card p-5">
-            <div class="section-title"><i class="fa-solid fa-users mr-1"></i>Usuarios</div>
-            <div class="flex items-end gap-2 mb-4">
-                <span class="stat-value" th:text="${userStats.total}">0</span>
-                <span class="stat-label mb-1">registrados</span>
-            </div>
-            <div class="space-y-1.5" style="font-size:.8rem;">
-                <div class="flex justify-between">
-                    <span style="color:var(--text-2);">Presenters</span>
-                    <span th:text="${userStats.presenters}">0</span>
-                </div>
-                <div class="flex justify-between">
-                    <span style="color:var(--text-2);">Admins</span>
-                    <span th:text="${userStats.admins}">0</span>
-                </div>
-                <div class="flex justify-between">
-                    <span style="color:var(--text-2);">Developers</span>
-                    <span th:text="${userStats.developers}">0</span>
-                </div>
-                <div style="border-top:1px solid var(--border); margin:8px 0;"></div>
-                <div class="flex justify-between">
-                    <span style="color:var(--text-2);">Local</span>
-                    <span th:text="${userStats.local}">0</span>
-                </div>
-                <div class="flex justify-between">
-                    <span style="color:var(--text-2);">GitHub</span>
-                    <span th:text="${userStats.github}">0</span>
-                </div>
-                <div class="flex justify-between">
-                    <span style="color:var(--text-2);">Google</span>
-                    <span th:text="${userStats.google}">0</span>
+        <!-- ── Servicios ──────────────────────────────────────────────────── -->
+        <section>
+            <div class="section-title"><i class="fa-solid fa-server mr-1"></i>Estado de servicios</div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div th:each="entry : ${health}" class="card p-4 flex items-center gap-3">
+                    <i th:class="${entry.value} ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-xmark'"
+                        th:style="${entry.value} ? 'color:var(--accent)' : 'color:var(--red)'"></i>
+                    <div>
+                        <div style="font-size:.85rem; font-weight:600;" th:text="${entry.key.toUpperCase()}"></div>
+                        <div th:class="${entry.value} ? 'badge-ok' : 'badge-err'"
+                            style="font-size:.65rem; padding:1px 6px; border-radius:4px; display:inline-block; margin-top:2px;"
+                            th:text="${entry.value} ? 'OPERATIVO' : 'ERROR'"></div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Presentaciones -->
-        <section class="card p-5">
-            <div class="section-title"><i class="fa-solid fa-presentation-screen mr-1"></i>Presentaciones</div>
-            <div class="flex items-end gap-2 mb-4">
-                <span class="stat-value" th:text="${presStats.total}">0</span>
-                <span class="stat-label mb-1">totales</span>
-            </div>
-            <div class="space-y-1.5" style="font-size:.8rem;">
-                <div class="flex justify-between">
-                    <span style="color:var(--text-2);">Drive</span>
-                    <span th:text="${presStats.drive}">0</span>
-                </div>
-                <div class="flex justify-between">
-                    <span style="color:var(--text-2);">Upload</span>
-                    <span th:text="${presStats.upload}">0</span>
-                </div>
-                <div class="flex justify-between">
-                    <span style="color:var(--text-2);">PowerPoint</span>
-                    <span th:text="${presStats.pptx}">0</span>
-                </div>
-            </div>
-        </section>
+        <!-- ── Stats ─────────────────────────────────────────────────────── -->
+        <div class="grid md:grid-cols-3 gap-6">
 
-        <!-- Sesiones -->
-        <section class="card p-5">
-            <div class="section-title"><i class="fa-solid fa-signal mr-1"></i>Sesiones activas</div>
-            <div class="flex items-end gap-2">
-                <span class="stat-value" th:text="${activeSessions}">0</span>
-                <span class="stat-label mb-1">en vivo ahora</span>
-            </div>
-        </section>
-    </div>
+            <!-- Usuarios -->
+            <section class="card p-5">
+                <div class="section-title"><i class="fa-solid fa-users mr-1"></i>Usuarios</div>
+                <div class="flex items-end gap-2 mb-4">
+                    <span class="stat-value" th:text="${userStats.total}">0</span>
+                    <span class="stat-label mb-1">registrados</span>
+                </div>
+                <div class="space-y-1.5" style="font-size:.8rem;">
+                    <div class="flex justify-between">
+                        <span style="color:var(--text-2);">Presenters</span>
+                        <span th:text="${userStats.presenters}">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span style="color:var(--text-2);">Admins</span>
+                        <span th:text="${userStats.admins}">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span style="color:var(--text-2);">Developers</span>
+                        <span th:text="${userStats.developers}">0</span>
+                    </div>
+                    <div style="border-top:1px solid var(--border); margin:8px 0;"></div>
+                    <div class="flex justify-between">
+                        <span style="color:var(--text-2);">Local</span>
+                        <span th:text="${userStats.local}">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span style="color:var(--text-2);">GitHub</span>
+                        <span th:text="${userStats.github}">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span style="color:var(--text-2);">Google</span>
+                        <span th:text="${userStats.google}">0</span>
+                    </div>
+                </div>
+            </section>
 
-    <!-- ── Developers ───────────────────────────────────────────────────── -->
-    <section>
-        <div class="section-title" style="display:flex; align-items:center; justify-content:space-between;">
-            <span><i class="fa-solid fa-code mr-1"></i>Developers</span>
-            <button onclick="openCreateDevModal()"
+            <!-- Presentaciones -->
+            <section class="card p-5">
+                <div class="section-title"><i class="fa-solid fa-presentation-screen mr-1"></i>Presentaciones</div>
+                <div class="flex items-end gap-2 mb-4">
+                    <span class="stat-value" th:text="${presStats.total}">0</span>
+                    <span class="stat-label mb-1">totales</span>
+                </div>
+                <div class="space-y-1.5" style="font-size:.8rem;">
+                    <div class="flex justify-between">
+                        <span style="color:var(--text-2);">Drive</span>
+                        <span th:text="${presStats.drive}">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span style="color:var(--text-2);">Upload</span>
+                        <span th:text="${presStats.upload}">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span style="color:var(--text-2);">PowerPoint</span>
+                        <span th:text="${presStats.pptx}">0</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sesiones -->
+            <section class="card p-5">
+                <div class="section-title"><i class="fa-solid fa-signal mr-1"></i>Sesiones activas</div>
+                <div class="flex items-end gap-2">
+                    <span class="stat-value" th:text="${activeSessions}">0</span>
+                    <span class="stat-label mb-1">en vivo ahora</span>
+                </div>
+            </section>
+        </div>
+
+        <!-- ── Developers ───────────────────────────────────────────────────── -->
+        <section>
+            <div class="section-title" style="display:flex; align-items:center; justify-content:space-between;">
+                <span><i class="fa-solid fa-code mr-1"></i>Developers</span>
+                <button onclick="openCreateDevModal()"
                     style="font-size:.7rem; padding:4px 12px; border-radius:5px; background:var(--accent); color:#000; border:none; cursor:pointer; font-weight:700; letter-spacing:.06em;">
-                + Nuevo Developer
-            </button>
-        </div>
-        <div class="card overflow-x-auto">
-            <table class="tbl w-full">
-                <thead>
-                    <tr>
-                        <th class="text-left">Usuario</th>
-                        <th class="text-left">Email</th>
-                        <th class="text-left">Registrado</th>
-                        <th class="text-right"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="u : ${users}" th:if="${u.role.name() == 'DEVELOPER'}">
-                        <td th:text="${u.username}" style="font-weight:600;"></td>
-                        <td style="color:var(--text-2);" th:text="${u.email}"></td>
-                        <td style="color:var(--text-2); font-size:.78rem;"
-                            th:text="${u.createdAt != null ? #temporals.format(u.createdAt, 'dd MMM yyyy') : '—'}"></td>
-                        <td class="text-right" style="display:flex; gap:6px; justify-content:flex-end;">
-                            <button class="btn-del"
-                                    style="color:var(--accent); border-color:#00e67640;"
-                                    th:data-id="${u.id}"
-                                    th:data-name="${u.username}"
-                                    th:data-email="${u.email}"
+                    + Nuevo Developer
+                </button>
+            </div>
+            <div class="card overflow-x-auto">
+                <table class="tbl w-full">
+                    <thead>
+                        <tr>
+                            <th class="text-left">Usuario</th>
+                            <th class="text-left">Email</th>
+                            <th class="text-left">Registrado</th>
+                            <th class="text-right"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="u : ${users}" th:if="${u.role.name() == 'DEVELOPER'}">
+                            <td th:text="${u.username}" style="font-weight:600;"></td>
+                            <td style="color:var(--text-2);" th:text="${u.email}"></td>
+                            <td style="color:var(--text-2); font-size:.78rem;"
+                                th:text="${u.createdAt != null ? #temporals.format(u.createdAt, 'dd MMM yyyy') : '—'}">
+                            </td>
+                            <td class="text-right" style="display:flex; gap:6px; justify-content:flex-end;">
+                                <button class="btn-del" style="color:var(--accent); border-color:#00e67640;"
+                                    th:data-id="${u.id}" th:data-name="${u.username}" th:data-email="${u.email}"
                                     onclick="openEditDevModal(this)">
-                                <i class="fa-solid fa-pen mr-1"></i>Editar
-                            </button>
-                            <button class="btn-del"
-                                    th:data-id="${u.id}"
-                                    th:data-name="${u.username}"
+                                    <i class="fa-solid fa-pen mr-1"></i>Editar
+                                </button>
+                                <button class="btn-del" th:data-id="${u.id}" th:data-name="${u.username}"
                                     onclick="openDeleteDevModal(this)">
-                                <i class="fa-solid fa-trash-can mr-1"></i>Eliminar
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
+                                    <i class="fa-solid fa-trash-can mr-1"></i>Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
-    <!-- ── Tabla usuarios ─────────────────────────────────────────────── -->
-    <section>
-        <div class="section-title"><i class="fa-solid fa-user-list mr-1"></i>Usuarios registrados
-            <span style="color:var(--accent);" th:text="'(' + ${#lists.size(users)} + ')'"></span>
-        </div>
-        <div class="card overflow-x-auto">
-            <table class="tbl w-full">
-                <thead>
-                    <tr>
-                        <th class="text-left">Usuario</th>
-                        <th class="text-left">Email</th>
-                        <th class="text-left">Rol</th>
-                        <th class="text-left">Auth</th>
-                        <th class="text-left">Verificado</th>
-                        <th class="text-left">Registrado</th>
-                        <th class="text-right"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="u : ${users}">
-                        <td th:text="${u.username}" style="font-weight:600;"></td>
-                        <td style="color:var(--text-2);" th:text="${u.email}"></td>
-                        <td>
-                            <span th:class="'badge-role-' + ${u.role}"
-                                  style="font-size:.65rem; padding:2px 7px; border-radius:4px; display:inline-block;"
-                                  th:text="${u.role}"></span>
-                        </td>
-                        <td style="color:var(--text-2); font-size:.78rem;">
-                            <span th:if="${u.githubId != null}"><i class="fa-brands fa-github mr-1"></i>GitHub</span>
-                            <span th:if="${u.googleId != null}"><i class="fa-brands fa-google mr-1"></i>Google</span>
-                            <span th:if="${u.githubId == null and u.googleId == null}"><i class="fa-solid fa-key mr-1"></i>Local</span>
-                        </td>
-                        <td>
-                            <i th:if="${u.emailVerified}" class="fa-solid fa-check" style="color:var(--accent);"></i>
-                            <i th:unless="${u.emailVerified}" class="fa-solid fa-xmark" style="color:var(--red);"></i>
-                        </td>
-                        <td style="color:var(--text-2); font-size:.78rem;"
-                            th:text="${u.createdAt != null ? #temporals.format(u.createdAt, 'dd MMM yyyy') : '—'}"></td>
-                        <td class="text-right">
-                            <button th:if="${u.role.name() != 'DEVELOPER'}"
-                                    class="btn-del"
-                                    th:data-id="${u.id}"
-                                    th:data-name="${u.username}"
-                                    onclick="confirmDeleteUser(this)">
-                                <i class="fa-solid fa-trash-can mr-1"></i>Eliminar
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
+        <!-- ── Tabla usuarios ─────────────────────────────────────────────── -->
+        <section>
+            <div class="section-title"><i class="fa-solid fa-user-list mr-1"></i>Usuarios registrados
+                <span style="color:var(--accent);" th:text="'(' + ${#lists.size(users)} + ')'"></span>
+            </div>
+            <div class="card overflow-x-auto">
+                <table class="tbl w-full">
+                    <thead>
+                        <tr>
+                            <th class="text-left">Usuario</th>
+                            <th class="text-left">Email</th>
+                            <th class="text-left">Rol</th>
+                            <th class="text-left">Auth</th>
+                            <th class="text-left">Verificado</th>
+                            <th class="text-left">Registrado</th>
+                            <th class="text-right"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="u : ${users}">
+                            <td th:text="${u.username}" style="font-weight:600;"></td>
+                            <td style="color:var(--text-2);" th:text="${u.email}"></td>
+                            <td>
+                                <span th:class="'badge-role-' + ${u.role}"
+                                    style="font-size:.65rem; padding:2px 7px; border-radius:4px; display:inline-block;"
+                                    th:text="${u.role}"></span>
+                            </td>
+                            <td style="color:var(--text-2); font-size:.78rem;">
+                                <span th:if="${u.githubId != null}"><i
+                                        class="fa-brands fa-github mr-1"></i>GitHub</span>
+                                <span th:if="${u.googleId != null}"><i
+                                        class="fa-brands fa-google mr-1"></i>Google</span>
+                                <span th:if="${u.githubId == null and u.googleId == null}"><i
+                                        class="fa-solid fa-key mr-1"></i>Local</span>
+                            </td>
+                            <td>
+                                <i th:if="${u.emailVerified}" class="fa-solid fa-check"
+                                    style="color:var(--accent);"></i>
+                                <i th:unless="${u.emailVerified}" class="fa-solid fa-xmark"
+                                    style="color:var(--red);"></i>
+                            </td>
+                            <td style="color:var(--text-2); font-size:.78rem;"
+                                th:text="${u.createdAt != null ? #temporals.format(u.createdAt, 'dd MMM yyyy') : '—'}">
+                            </td>
+                            <td class="text-right">
+                                <button th:if="${u.role.name() != 'DEVELOPER'}" class="btn-del" th:data-id="${u.id}"
+                                    th:data-name="${u.username}" onclick="confirmDeleteUser(this)">
+                                    <i class="fa-solid fa-trash-can mr-1"></i>Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
-    <!-- ── Tabla presentaciones ───────────────────────────────────────── -->
-    <section>
-        <div class="section-title"><i class="fa-solid fa-film mr-1"></i>Presentaciones
-            <span style="color:var(--accent);" th:text="'(' + ${#lists.size(presentations)} + ')'"></span>
-        </div>
-        <div class="card overflow-x-auto">
-            <table class="tbl w-full">
-                <thead>
-                    <tr>
-                        <th class="text-left">Nombre</th>
-                        <th class="text-left">Propietario</th>
-                        <th class="text-left">Tipo</th>
-                        <th class="text-left">Slides</th>
-                        <th class="text-left">Creada</th>
-                        <th class="text-right"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="p : ${presentations}">
-                        <td style="font-weight:600;" th:text="${p.name}"></td>
-                        <td style="color:var(--text-2);" th:text="${p.user.username}"></td>
-                        <td style="font-size:.75rem; color:var(--text-2);" th:text="${p.sourceType}"></td>
-                        <td th:text="${#lists.size(p.slides)}"></td>
-                        <td style="color:var(--text-2); font-size:.78rem;"
-                            th:text="${#temporals.format(p.createdAt, 'dd MMM yyyy')}"></td>
-                        <td class="text-right">
-                            <button class="btn-del"
-                                    th:data-id="${p.id}"
-                                    th:data-name="${p.name}"
+        <!-- ── Tabla presentaciones ───────────────────────────────────────── -->
+        <section>
+            <div class="section-title"><i class="fa-solid fa-film mr-1"></i>Presentaciones
+                <span style="color:var(--accent);" th:text="'(' + ${#lists.size(presentations)} + ')'"></span>
+            </div>
+            <div class="card overflow-x-auto">
+                <table class="tbl w-full">
+                    <thead>
+                        <tr>
+                            <th class="text-left">Nombre</th>
+                            <th class="text-left">Propietario</th>
+                            <th class="text-left">Tipo</th>
+                            <th class="text-left">Slides</th>
+                            <th class="text-left">Creada</th>
+                            <th class="text-right"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p : ${presentations}">
+                            <td style="font-weight:600;" th:text="${p.name}"></td>
+                            <td style="color:var(--text-2);" th:text="${p.user.username}"></td>
+                            <td style="font-size:.75rem; color:var(--text-2);" th:text="${p.sourceType}"></td>
+                            <td th:text="${#lists.size(p.slides)}"></td>
+                            <td style="color:var(--text-2); font-size:.78rem;"
+                                th:text="${#temporals.format(p.createdAt, 'dd MMM yyyy')}"></td>
+                            <td class="text-right">
+                                <button class="btn-del" th:data-id="${p.id}" th:data-name="${p.name}"
                                     onclick="confirmDeletePresentation(this)">
-                                <i class="fa-solid fa-trash-can mr-1"></i>Eliminar
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
+                                    <i class="fa-solid fa-trash-can mr-1"></i>Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
-</div>
+    </div>
 
-<!-- Toast de confirmación -->
-<div id="delete-toast"
-     class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 hidden"
-     style="background:var(--accent); color:#000; font-size:.8rem; font-weight:600;
+    <!-- Toast de confirmación -->
+    <div id="delete-toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 hidden" style="background:var(--accent); color:#000; font-size:.8rem; font-weight:600;
             padding:10px 20px; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,.5);
             transition:opacity .3s; white-space:nowrap;">
-</div>
-
-<!-- Modal de confirmación -->
-<div id="confirm-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden"
-     style="background:rgba(0,0,0,.75);">
-    <div class="card p-6 w-full max-w-sm space-y-4">
-        <div class="flex items-center justify-between">
-            <h3 style="font-size:.85rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em;">
-                <i class="fa-solid fa-triangle-exclamation mr-1" style="color:var(--red);"></i>Confirmar eliminación
-            </h3>
-            <button id="modal-close-btn" onclick="closeModal()"
-                    style="background:none;border:none;cursor:pointer;color:var(--text-2);font-size:.9rem;">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-        <p id="confirm-msg" style="font-size:.82rem; color:var(--text-2); line-height:1.5;"></p>
-        <p style="font-size:.75rem; color:var(--red);">Esta acción no se puede deshacer.</p>
-        <div class="flex justify-end gap-3">
-            <button id="cancel-btn" onclick="closeModal()"
-                    style="font-size:.8rem; color:var(--text-2); padding:6px 14px; border:1px solid var(--border); border-radius:6px; background:transparent; cursor:pointer;">
-                Cancelar
-            </button>
-            <button id="confirm-btn"
-                    style="font-size:.8rem; color:#fff; padding:6px 14px; border-radius:6px; background:var(--red); border:none; cursor:pointer; display:flex; align-items:center; gap:6px;">
-                <i class="fa-solid fa-trash-can"></i>Eliminar
-            </button>
-        </div>
     </div>
-</div>
 
-<!-- Modal crear / editar Developer -->
-<div id="dev-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden"
-     style="background:rgba(0,0,0,.75);">
-    <div class="card p-6 w-full max-w-sm space-y-4">
-        <div class="flex items-center justify-between">
-            <h3 id="dev-modal-title" style="font-size:.85rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em;"></h3>
-            <button onclick="closeDevModal()"
+    <!-- Modal de confirmación -->
+    <div id="confirm-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden"
+        style="background:rgba(0,0,0,.75);">
+        <div class="card p-6 w-full max-w-sm space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 style="font-size:.85rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em;">
+                    <i class="fa-solid fa-triangle-exclamation mr-1" style="color:var(--red);"></i>Confirmar eliminación
+                </h3>
+                <button id="modal-close-btn" onclick="closeModal()"
                     style="background:none;border:none;cursor:pointer;color:var(--text-2);font-size:.9rem;">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-        <form id="dev-modal-form" class="space-y-3">
-            <input type="hidden" id="dev-form-id">
-            <div>
-                <label style="font-size:.7rem; color:var(--text-2); text-transform:uppercase; letter-spacing:.08em;">Usuario</label>
-                <input id="dev-form-username" type="text" required autocomplete="off"
-                       style="width:100%; background:#1e1e1e; border:1px solid var(--border); border-radius:5px; padding:7px 10px; color:var(--text-1); font-size:.82rem; margin-top:4px; box-sizing:border-box;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
-            <div>
-                <label style="font-size:.7rem; color:var(--text-2); text-transform:uppercase; letter-spacing:.08em;">Email</label>
-                <input id="dev-form-email" type="email" required autocomplete="off"
-                       style="width:100%; background:#1e1e1e; border:1px solid var(--border); border-radius:5px; padding:7px 10px; color:var(--text-1); font-size:.82rem; margin-top:4px; box-sizing:border-box;">
-            </div>
-            <div>
-                <label style="font-size:.7rem; color:var(--text-2); text-transform:uppercase; letter-spacing:.08em;">Contraseña</label>
-                <input id="dev-form-password" type="password" autocomplete="new-password"
-                       style="width:100%; background:#1e1e1e; border:1px solid var(--border); border-radius:5px; padding:7px 10px; color:var(--text-1); font-size:.82rem; margin-top:4px; box-sizing:border-box;">
-            </div>
-            <div>
-                <label style="font-size:.7rem; color:var(--amber); text-transform:uppercase; letter-spacing:.08em;"><i class="fa-solid fa-key mr-1"></i>Clave CREATE_DEV</label>
-                <input id="dev-form-secret" type="password" required autocomplete="off"
-                       style="width:100%; background:#1e1e1e; border:1px solid #ffd74040; border-radius:5px; padding:7px 10px; color:var(--text-1); font-size:.82rem; margin-top:4px; box-sizing:border-box;">
-            </div>
-            <p id="dev-modal-error" style="font-size:.75rem; color:var(--red); min-height:1em;"></p>
+            <p id="confirm-msg" style="font-size:.82rem; color:var(--text-2); line-height:1.5;"></p>
+            <p style="font-size:.75rem; color:var(--red);">Esta acción no se puede deshacer.</p>
             <div class="flex justify-end gap-3">
-                <button type="button" id="dev-cancel-btn" onclick="closeDevModal()"
-                        style="font-size:.8rem; color:var(--text-2); padding:6px 14px; border:1px solid var(--border); border-radius:6px; background:transparent; cursor:pointer;">
+                <button id="cancel-btn" onclick="closeModal()"
+                    style="font-size:.8rem; color:var(--text-2); padding:6px 14px; border:1px solid var(--border); border-radius:6px; background:transparent; cursor:pointer;">
                     Cancelar
                 </button>
-                <button id="dev-submit-btn" type="submit"
-                        style="font-size:.8rem; color:#000; padding:6px 14px; border-radius:6px; background:var(--accent); border:none; cursor:pointer; font-weight:700; display:flex; align-items:center; gap:6px;">
-                    <i class="fa-solid fa-user-plus"></i>Guardar
+                <button id="confirm-btn"
+                    style="font-size:.8rem; color:#fff; padding:6px 14px; border-radius:6px; background:var(--red); border:none; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                    <i class="fa-solid fa-trash-can"></i>Eliminar
                 </button>
             </div>
-        </form>
+        </div>
     </div>
-</div>
 
-<!-- Modal eliminar Developer -->
-<div id="dev-del-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden"
-     style="background:rgba(0,0,0,.75);">
-    <div class="card p-6 w-full max-w-sm space-y-4">
-        <div class="flex items-center justify-between">
-            <h3 style="font-size:.85rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em;">
-                <i class="fa-solid fa-triangle-exclamation mr-1" style="color:var(--red);"></i>Eliminar Developer
-            </h3>
-            <button onclick="closeDeleteDevModal()"
+    <!-- Modal crear / editar Developer -->
+    <div id="dev-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden"
+        style="background:rgba(0,0,0,.75);">
+        <div class="card p-6 w-full max-w-sm space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 id="dev-modal-title"
+                    style="font-size:.85rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em;"></h3>
+                <button onclick="closeDevModal()"
                     style="background:none;border:none;cursor:pointer;color:var(--text-2);font-size:.9rem;">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-        <p id="dev-del-msg" style="font-size:.82rem; color:var(--text-2); line-height:1.5;"></p>
-        <div>
-            <label style="font-size:.7rem; color:var(--amber); text-transform:uppercase; letter-spacing:.08em;"><i class="fa-solid fa-key mr-1"></i>Clave CREATE_DEV para confirmar</label>
-            <input id="dev-del-secret" type="password" autocomplete="off"
-                   style="width:100%; background:#1e1e1e; border:1px solid #ffd74040; border-radius:5px; padding:7px 10px; color:var(--text-1); font-size:.82rem; margin-top:4px; box-sizing:border-box;">
-        </div>
-        <p id="dev-del-error" style="font-size:.75rem; color:var(--red); min-height:1em;"></p>
-        <div class="flex justify-end gap-3">
-            <button onclick="closeDeleteDevModal()"
-                    style="font-size:.8rem; color:var(--text-2); padding:6px 14px; border:1px solid var(--border); border-radius:6px; background:transparent; cursor:pointer;">
-                Cancelar
-            </button>
-            <button id="dev-del-confirm-btn"
-                    style="font-size:.8rem; color:#fff; padding:6px 14px; border-radius:6px; background:var(--red); border:none; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:6px;">
-                <i class="fa-solid fa-trash-can"></i>Eliminar
-            </button>
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="dev-modal-form" class="space-y-3">
+                <input type="hidden" id="dev-form-id">
+                <div>
+                    <label
+                        style="font-size:.7rem; color:var(--text-2); text-transform:uppercase; letter-spacing:.08em;">Usuario</label>
+                    <input id="dev-form-username" type="text" required autocomplete="off"
+                        style="width:100%; background:#1e1e1e; border:1px solid var(--border); border-radius:5px; padding:7px 10px; color:var(--text-1); font-size:.82rem; margin-top:4px; box-sizing:border-box;">
+                </div>
+                <div>
+                    <label
+                        style="font-size:.7rem; color:var(--text-2); text-transform:uppercase; letter-spacing:.08em;">Email</label>
+                    <input id="dev-form-email" type="email" required autocomplete="off"
+                        style="width:100%; background:#1e1e1e; border:1px solid var(--border); border-radius:5px; padding:7px 10px; color:var(--text-1); font-size:.82rem; margin-top:4px; box-sizing:border-box;">
+                </div>
+                <div>
+                    <label
+                        style="font-size:.7rem; color:var(--text-2); text-transform:uppercase; letter-spacing:.08em;">Contraseña</label>
+                    <input id="dev-form-password" type="password" autocomplete="new-password"
+                        style="width:100%; background:#1e1e1e; border:1px solid var(--border); border-radius:5px; padding:7px 10px; color:var(--text-1); font-size:.82rem; margin-top:4px; box-sizing:border-box;">
+                </div>
+                <div>
+                    <label
+                        style="font-size:.7rem; color:var(--amber); text-transform:uppercase; letter-spacing:.08em;"><i
+                            class="fa-solid fa-key mr-1"></i>Clave CREATE_DEV</label>
+                    <input id="dev-form-secret" type="password" required autocomplete="off"
+                        style="width:100%; background:#1e1e1e; border:1px solid #ffd74040; border-radius:5px; padding:7px 10px; color:var(--text-1); font-size:.82rem; margin-top:4px; box-sizing:border-box;">
+                </div>
+                <p id="dev-modal-error" style="font-size:.75rem; color:var(--red); min-height:1em;"></p>
+                <div class="flex justify-end gap-3">
+                    <button type="button" id="dev-cancel-btn" onclick="closeDevModal()"
+                        style="font-size:.8rem; color:var(--text-2); padding:6px 14px; border:1px solid var(--border); border-radius:6px; background:transparent; cursor:pointer;">
+                        Cancelar
+                    </button>
+                    <button id="dev-submit-btn" type="submit"
+                        style="font-size:.8rem; color:#000; padding:6px 14px; border-radius:6px; background:var(--accent); border:none; cursor:pointer; font-weight:700; display:flex; align-items:center; gap:6px;">
+                        <i class="fa-solid fa-user-plus"></i>Guardar
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-</div>
 
-<script>
-    let pendingRow = null;
-    let pendingUrl = null;
-    let pendingSuccessMsg = null;
-    let deleteInProgress = false;
+    <!-- Modal eliminar Developer -->
+    <div id="dev-del-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden"
+        style="background:rgba(0,0,0,.75);">
+        <div class="card p-6 w-full max-w-sm space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 style="font-size:.85rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em;">
+                    <i class="fa-solid fa-triangle-exclamation mr-1" style="color:var(--red);"></i>Eliminar Developer
+                </h3>
+                <button onclick="closeDeleteDevModal()"
+                    style="background:none;border:none;cursor:pointer;color:var(--text-2);font-size:.9rem;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <p id="dev-del-msg" style="font-size:.82rem; color:var(--text-2); line-height:1.5;"></p>
+            <div>
+                <label style="font-size:.7rem; color:var(--amber); text-transform:uppercase; letter-spacing:.08em;"><i
+                        class="fa-solid fa-key mr-1"></i>Clave CREATE_DEV para confirmar</label>
+                <input id="dev-del-secret" type="password" autocomplete="off"
+                    style="width:100%; background:#1e1e1e; border:1px solid #ffd74040; border-radius:5px; padding:7px 10px; color:var(--text-1); font-size:.82rem; margin-top:4px; box-sizing:border-box;">
+            </div>
+            <p id="dev-del-error" style="font-size:.75rem; color:var(--red); min-height:1em;"></p>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeDeleteDevModal()"
+                    style="font-size:.8rem; color:var(--text-2); padding:6px 14px; border:1px solid var(--border); border-radius:6px; background:transparent; cursor:pointer;">
+                    Cancelar
+                </button>
+                <button id="dev-del-confirm-btn"
+                    style="font-size:.8rem; color:#fff; padding:6px 14px; border-radius:6px; background:var(--red); border:none; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:6px;">
+                    <i class="fa-solid fa-trash-can"></i>Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
 
-    const CONFIRM_DEFAULT_HTML = '<i class="fa-solid fa-trash-can"></i>Eliminar';
-    const CONFIRM_LOADING_HTML = '<i class="fa-solid fa-spinner fa-spin"></i>Eliminando...';
+    <script>
+        let pendingRow = null;
+        let pendingUrl = null;
+        let pendingSuccessMsg = null;
+        let deleteInProgress = false;
 
-    function confirmDeleteUser(btn) {
-        if (deleteInProgress) return;
-        const id   = btn.dataset.id;
-        const name = btn.dataset.name;
-        document.getElementById('confirm-msg').innerHTML =
-            `¿Eliminar al usuario <strong style="color:var(--text-1);">${name}</strong> y todas sus presentaciones?`;
-        pendingUrl        = `/mgr/api/users/${id}`;
-        pendingRow        = btn.closest('tr');
-        pendingSuccessMsg = `Usuario "${name}" eliminado correctamente.`;
-        openModal();
-    }
+        const CONFIRM_DEFAULT_HTML = '<i class="fa-solid fa-trash-can"></i>Eliminar';
+        const CONFIRM_LOADING_HTML = '<i class="fa-solid fa-spinner fa-spin"></i>Eliminando...';
 
-    function confirmDeletePresentation(btn) {
-        if (deleteInProgress) return;
-        const id   = btn.dataset.id;
-        const name = btn.dataset.name;
-        document.getElementById('confirm-msg').innerHTML =
-            `¿Eliminar la presentación <strong style="color:var(--text-1);">${name}</strong>?`;
-        pendingUrl        = `/mgr/api/presentations/${id}`;
-        pendingRow        = btn.closest('tr');
-        pendingSuccessMsg = `Presentación "${name}" eliminada correctamente.`;
-        openModal();
-    }
+        function confirmDeleteUser(btn) {
+            if (deleteInProgress) return;
+            const id = btn.dataset.id;
+            const name = btn.dataset.name;
+            document.getElementById('confirm-msg').innerHTML =
+                `¿Eliminar al usuario <strong style="color:var(--text-1);">${name}</strong> y todas sus presentaciones?`;
+            pendingUrl = `/mgr/api/users/${id}`;
+            pendingRow = btn.closest('tr');
+            pendingSuccessMsg = `Usuario "${name}" eliminado correctamente.`;
+            openModal();
+        }
 
-    function openModal() {
-        resetConfirmBtn();
-        document.getElementById('confirm-modal').classList.remove('hidden');
-    }
+        function confirmDeletePresentation(btn) {
+            if (deleteInProgress) return;
+            const id = btn.dataset.id;
+            const name = btn.dataset.name;
+            document.getElementById('confirm-msg').innerHTML =
+                `¿Eliminar la presentación <strong style="color:var(--text-1);">${name}</strong>?`;
+            pendingUrl = `/mgr/api/presentations/${id}`;
+            pendingRow = btn.closest('tr');
+            pendingSuccessMsg = `Presentación "${name}" eliminada correctamente.`;
+            openModal();
+        }
 
-    function closeModal() {
-        if (deleteInProgress) return;
-        document.getElementById('confirm-modal').classList.add('hidden');
-        pendingUrl = null;
-        pendingRow = null;
-        pendingSuccessMsg = null;
-    }
-
-    function resetConfirmBtn() {
-        const btn    = document.getElementById('confirm-btn');
-        const cancel = document.getElementById('cancel-btn');
-        const close  = document.getElementById('modal-close-btn');
-        btn.disabled    = false;
-        btn.innerHTML   = CONFIRM_DEFAULT_HTML;
-        cancel.disabled = false;
-        close.disabled  = false;
-    }
-
-    document.getElementById('confirm-btn').addEventListener('click', async () => {
-        if (deleteInProgress || !pendingUrl) return;
-
-        // ── Estado de carga ──────────────────────────────────────────────
-        deleteInProgress = true;
-        const btn    = document.getElementById('confirm-btn');
-        const cancel = document.getElementById('cancel-btn');
-        const close  = document.getElementById('modal-close-btn');
-        btn.disabled    = true;
-        btn.innerHTML   = CONFIRM_LOADING_HTML;
-        cancel.disabled = true;
-        close.disabled  = true;
-
-        const url        = pendingUrl;
-        const row        = pendingRow;
-        const successMsg = pendingSuccessMsg;
-
-        // ── Petición ─────────────────────────────────────────────────────
-        try {
-            const res = await fetch(url, { method: 'DELETE' });
-
-            // Ocultar modal
-            document.getElementById('confirm-modal').classList.add('hidden');
-            pendingUrl = pendingRow = pendingSuccessMsg = null;
-
-            if (res.ok) {
-                // Animar fila hacia afuera
-                if (row) {
-                    row.style.transition = 'opacity .35s, transform .35s';
-                    row.style.opacity    = '0';
-                    row.style.transform  = 'translateX(12px)';
-                    setTimeout(() => row.remove(), 370);
-                }
-                showToast(successMsg, false);
-            } else {
-                let errorMsg = 'Error al eliminar.';
-                try { errorMsg = (await res.json()).error || errorMsg; } catch (_) {}
-                showToast(errorMsg, true);
-            }
-        } catch (_) {
-            document.getElementById('confirm-modal').classList.add('hidden');
-            showToast('Error de red al eliminar.', true);
-        } finally {
-            deleteInProgress = false;
+        function openModal() {
             resetConfirmBtn();
+            document.getElementById('confirm-modal').classList.remove('hidden');
         }
-    });
 
-    function showToast(message, isError) {
-        const toast = document.getElementById('delete-toast');
-        toast.textContent = (isError ? '✕  ' : '✓  ') + message;
-        toast.style.background = isError ? 'var(--red)' : 'var(--accent)';
-        toast.style.color      = isError ? '#fff'       : '#000';
-        toast.classList.remove('hidden');
-        toast.style.opacity = '1';
-        clearTimeout(toast._timer);
-        toast._timer = setTimeout(() => {
-            toast.style.opacity = '0';
-            setTimeout(() => toast.classList.add('hidden'), 300);
-        }, 3200);
-    }
+        function closeModal() {
+            if (deleteInProgress) return;
+            document.getElementById('confirm-modal').classList.add('hidden');
+            pendingUrl = null;
+            pendingRow = null;
+            pendingSuccessMsg = null;
+        }
 
-    // ── Developer modals ──────────────────────────────────────────────────────
+        function resetConfirmBtn() {
+            const btn = document.getElementById('confirm-btn');
+            const cancel = document.getElementById('cancel-btn');
+            const close = document.getElementById('modal-close-btn');
+            btn.disabled = false;
+            btn.innerHTML = CONFIRM_DEFAULT_HTML;
+            cancel.disabled = false;
+            close.disabled = false;
+        }
 
-    function openCreateDevModal() {
-        document.getElementById('dev-modal-title').textContent = 'Nuevo Developer';
-        document.getElementById('dev-form-id').value = '';
-        document.getElementById('dev-form-username').value = '';
-        document.getElementById('dev-form-email').value = '';
-        document.getElementById('dev-form-password').value = '';
-        document.getElementById('dev-form-password').placeholder = 'Contraseña';
-        document.getElementById('dev-form-secret').value = '';
-        document.getElementById('dev-modal-error').textContent = '';
-        document.getElementById('dev-modal').classList.remove('hidden');
-        document.getElementById('dev-form-username').focus();
-    }
+        document.getElementById('confirm-btn').addEventListener('click', async () => {
+            if (deleteInProgress || !pendingUrl) return;
 
-    function openEditDevModal(btn) {
-        document.getElementById('dev-modal-title').textContent = 'Editar Developer';
-        document.getElementById('dev-form-id').value = btn.dataset.id;
-        document.getElementById('dev-form-username').value = btn.dataset.name;
-        document.getElementById('dev-form-email').value = btn.dataset.email;
-        document.getElementById('dev-form-password').value = '';
-        document.getElementById('dev-form-password').placeholder = 'Nueva contraseña (dejar vacío para no cambiar)';
-        document.getElementById('dev-form-secret').value = '';
-        document.getElementById('dev-modal-error').textContent = '';
-        document.getElementById('dev-modal').classList.remove('hidden');
-        document.getElementById('dev-form-username').focus();
-    }
+            // ── Estado de carga ──────────────────────────────────────────────
+            deleteInProgress = true;
+            const btn = document.getElementById('confirm-btn');
+            const cancel = document.getElementById('cancel-btn');
+            const close = document.getElementById('modal-close-btn');
+            btn.disabled = true;
+            btn.innerHTML = CONFIRM_LOADING_HTML;
+            cancel.disabled = true;
+            close.disabled = true;
 
-    function closeDevModal() {
-        document.getElementById('dev-modal').classList.add('hidden');
-    }
+            const url = pendingUrl;
+            const row = pendingRow;
+            const successMsg = pendingSuccessMsg;
 
-    const DEV_SUBMIT_DEFAULT_HTML  = '<i class="fa-solid fa-user-plus"></i>Guardar';
-    const DEV_SUBMIT_LOADING_HTML  = '<i class="fa-solid fa-spinner fa-spin"></i>Guardando...';
+            // ── Petición ─────────────────────────────────────────────────────
+            try {
+                const res = await fetch(url, { method: 'DELETE' });
 
-    document.getElementById('dev-modal-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const id        = document.getElementById('dev-form-id').value.trim();
-        const username  = document.getElementById('dev-form-username').value.trim();
-        const email     = document.getElementById('dev-form-email').value.trim();
-        const password  = document.getElementById('dev-form-password').value;
-        const secret    = document.getElementById('dev-form-secret').value;
-        const errEl     = document.getElementById('dev-modal-error');
-        const submitBtn = document.getElementById('dev-submit-btn');
-        const cancelBtn = document.getElementById('dev-cancel-btn');
+                // Ocultar modal
+                document.getElementById('confirm-modal').classList.add('hidden');
+                pendingUrl = pendingRow = pendingSuccessMsg = null;
 
-        errEl.textContent    = '';
-        submitBtn.disabled   = true;
-        submitBtn.innerHTML  = DEV_SUBMIT_LOADING_HTML;
-        cancelBtn.disabled   = true;
-
-        const isEdit = id !== '';
-        const url    = isEdit ? `/mgr/api/developers/${id}` : '/mgr/api/developers';
-        const method = isEdit ? 'PUT' : 'POST';
-
-        try {
-            const res  = await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, email, password, secret })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                closeDevModal();
-                showToast(data.message, false);
-                setTimeout(() => location.reload(), 1000);
-            } else {
-                errEl.textContent = data.error || 'Error inesperado.';
+                if (res.ok) {
+                    // Animar fila hacia afuera
+                    if (row) {
+                        row.style.transition = 'opacity .35s, transform .35s';
+                        row.style.opacity = '0';
+                        row.style.transform = 'translateX(12px)';
+                        setTimeout(() => row.remove(), 370);
+                    }
+                    showToast(successMsg, false);
+                } else {
+                    let errorMsg = 'Error al eliminar.';
+                    try { errorMsg = (await res.json()).error || errorMsg; } catch (_) { }
+                    showToast(errorMsg, true);
+                }
+            } catch (_) {
+                document.getElementById('confirm-modal').classList.add('hidden');
+                showToast('Error de red al eliminar.', true);
+            } finally {
+                deleteInProgress = false;
+                resetConfirmBtn();
             }
-        } catch (_) {
-            errEl.textContent = 'Error de red.';
-        } finally {
-            submitBtn.disabled  = false;
-            submitBtn.innerHTML = DEV_SUBMIT_DEFAULT_HTML;
-            cancelBtn.disabled  = false;
+        });
+
+        function showToast(message, isError) {
+            const toast = document.getElementById('delete-toast');
+            toast.textContent = (isError ? '✕  ' : '✓  ') + message;
+            toast.style.background = isError ? 'var(--red)' : 'var(--accent)';
+            toast.style.color = isError ? '#fff' : '#000';
+            toast.classList.remove('hidden');
+            toast.style.opacity = '1';
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 3200);
         }
-    });
 
-    let pendingDeleteDevId   = null;
-    let pendingDeleteDevName = null;
+        // ── Developer modals ──────────────────────────────────────────────────────
 
-    function openDeleteDevModal(btn) {
-        pendingDeleteDevId   = btn.dataset.id;
-        pendingDeleteDevName = btn.dataset.name;
-        document.getElementById('dev-del-msg').innerHTML =
-            `¿Eliminar al developer <strong style="color:var(--text-1);">${pendingDeleteDevName}</strong>?`;
-        document.getElementById('dev-del-secret').value = '';
-        document.getElementById('dev-del-error').textContent = '';
-        document.getElementById('dev-del-modal').classList.remove('hidden');
-        document.getElementById('dev-del-secret').focus();
-    }
+        function openCreateDevModal() {
+            document.getElementById('dev-modal-title').textContent = 'Nuevo Developer';
+            document.getElementById('dev-form-id').value = '';
+            document.getElementById('dev-form-username').value = '';
+            document.getElementById('dev-form-email').value = '';
+            document.getElementById('dev-form-password').value = '';
+            document.getElementById('dev-form-password').placeholder = 'Contraseña';
+            document.getElementById('dev-form-secret').value = '';
+            document.getElementById('dev-modal-error').textContent = '';
+            document.getElementById('dev-modal').classList.remove('hidden');
+            document.getElementById('dev-form-username').focus();
+        }
 
-    function closeDeleteDevModal() {
-        document.getElementById('dev-del-modal').classList.add('hidden');
-        pendingDeleteDevId = pendingDeleteDevName = null;
-    }
+        function openEditDevModal(btn) {
+            document.getElementById('dev-modal-title').textContent = 'Editar Developer';
+            document.getElementById('dev-form-id').value = btn.dataset.id;
+            document.getElementById('dev-form-username').value = btn.dataset.name;
+            document.getElementById('dev-form-email').value = btn.dataset.email;
+            document.getElementById('dev-form-password').value = '';
+            document.getElementById('dev-form-password').placeholder = 'Nueva contraseña (dejar vacío para no cambiar)';
+            document.getElementById('dev-form-secret').value = '';
+            document.getElementById('dev-modal-error').textContent = '';
+            document.getElementById('dev-modal').classList.remove('hidden');
+            document.getElementById('dev-form-username').focus();
+        }
 
-    const DEV_DEL_DEFAULT_HTML  = '<i class="fa-solid fa-trash-can"></i>Eliminar';
-    const DEV_DEL_LOADING_HTML  = '<i class="fa-solid fa-spinner fa-spin"></i>Eliminando...';
+        function closeDevModal() {
+            document.getElementById('dev-modal').classList.add('hidden');
+        }
 
-    document.getElementById('dev-del-confirm-btn').addEventListener('click', async () => {
-        const secret  = document.getElementById('dev-del-secret').value;
-        const errEl   = document.getElementById('dev-del-error');
-        const btn     = document.getElementById('dev-del-confirm-btn');
-        errEl.textContent = '';
-        btn.disabled  = true;
-        btn.innerHTML = DEV_DEL_LOADING_HTML;
+        const DEV_SUBMIT_DEFAULT_HTML = '<i class="fa-solid fa-user-plus"></i>Guardar';
+        const DEV_SUBMIT_LOADING_HTML = '<i class="fa-solid fa-spinner fa-spin"></i>Guardando...';
 
-        try {
-            const res  = await fetch(`/mgr/api/developers/${pendingDeleteDevId}?secret=${encodeURIComponent(secret)}`, {
-                method: 'DELETE'
-            });
-            const data = await res.json();
-            if (res.ok) {
-                closeDeleteDevModal();
-                showToast(data.message, false);
-                setTimeout(() => location.reload(), 1000);
-            } else {
-                errEl.textContent = data.error || 'Error inesperado.';
+        document.getElementById('dev-modal-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('dev-form-id').value.trim();
+            const username = document.getElementById('dev-form-username').value.trim();
+            const email = document.getElementById('dev-form-email').value.trim();
+            const password = document.getElementById('dev-form-password').value;
+            const secret = document.getElementById('dev-form-secret').value;
+            const errEl = document.getElementById('dev-modal-error');
+            const submitBtn = document.getElementById('dev-submit-btn');
+            const cancelBtn = document.getElementById('dev-cancel-btn');
+
+            errEl.textContent = '';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = DEV_SUBMIT_LOADING_HTML;
+            cancelBtn.disabled = true;
+
+            const isEdit = id !== '';
+            const url = isEdit ? `/mgr/api/developers/${id}` : '/mgr/api/developers';
+            const method = isEdit ? 'PUT' : 'POST';
+
+            try {
+                const res = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password, secret })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    closeDevModal();
+                    showToast(data.message, false);
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    errEl.textContent = data.error || 'Error inesperado.';
+                }
+            } catch (_) {
+                errEl.textContent = 'Error de red.';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = DEV_SUBMIT_DEFAULT_HTML;
+                cancelBtn.disabled = false;
             }
-        } catch (_) {
-            errEl.textContent = 'Error de red.';
-        } finally {
-            btn.disabled  = false;
-            btn.innerHTML = DEV_DEL_DEFAULT_HTML;
+        });
+
+        let pendingDeleteDevId = null;
+        let pendingDeleteDevName = null;
+
+        function openDeleteDevModal(btn) {
+            pendingDeleteDevId = btn.dataset.id;
+            pendingDeleteDevName = btn.dataset.name;
+            document.getElementById('dev-del-msg').innerHTML =
+                `¿Eliminar al developer <strong style="color:var(--text-1);">${pendingDeleteDevName}</strong>?`;
+            document.getElementById('dev-del-secret').value = '';
+            document.getElementById('dev-del-error').textContent = '';
+            document.getElementById('dev-del-modal').classList.remove('hidden');
+            document.getElementById('dev-del-secret').focus();
         }
-    });
-</script>
+
+        function closeDeleteDevModal() {
+            document.getElementById('dev-del-modal').classList.add('hidden');
+            pendingDeleteDevId = pendingDeleteDevName = null;
+        }
+
+        const DEV_DEL_DEFAULT_HTML = '<i class="fa-solid fa-trash-can"></i>Eliminar';
+        const DEV_DEL_LOADING_HTML = '<i class="fa-solid fa-spinner fa-spin"></i>Eliminando...';
+
+        document.getElementById('dev-del-confirm-btn').addEventListener('click', async () => {
+            const secret = document.getElementById('dev-del-secret').value;
+            const errEl = document.getElementById('dev-del-error');
+            const btn = document.getElementById('dev-del-confirm-btn');
+            errEl.textContent = '';
+            btn.disabled = true;
+            btn.innerHTML = DEV_DEL_LOADING_HTML;
+
+            try {
+                const res = await fetch(`/mgr/api/developers/${pendingDeleteDevId}?secret=${encodeURIComponent(secret)}`, {
+                    method: 'DELETE'
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    closeDeleteDevModal();
+                    showToast(data.message, false);
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    errEl.textContent = data.error || 'Error inesperado.';
+                }
+            } catch (_) {
+                errEl.textContent = 'Error de red.';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = DEV_DEL_DEFAULT_HTML;
+            }
+        });
+    </script>
 </body>
+
 </html>
