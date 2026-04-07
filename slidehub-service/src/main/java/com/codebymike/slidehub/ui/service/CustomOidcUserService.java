@@ -122,7 +122,7 @@ public class CustomOidcUserService extends OidcUserService {
         newUser.setId(UUID.randomUUID().toString());
         newUser.setUsername(resolvedUsername);
         newUser.setEmail(resolvedEmail);
-        newUser.setRole(Role.PRESENTER);
+        newUser.setRole(Role.HOST);
         newUser.setEmailVerified(true);
         newUser.setGoogleId(googleId);
         newUser.setGoogleEmail(googleEmail);

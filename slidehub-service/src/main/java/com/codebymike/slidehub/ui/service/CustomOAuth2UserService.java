@@ -133,7 +133,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         newUser.setId(UUID.randomUUID().toString());
         newUser.setUsername(resolvedUsername);
         newUser.setEmail(resolvedEmail);
-        newUser.setRole(Role.PRESENTER);
+        newUser.setRole(Role.HOST);
         newUser.setEmailVerified(email != null); // solo verificado si GitHub lo proveyó
         newUser.setGithubId(githubId);
         newUser.setGithubUsername(githubUsername);

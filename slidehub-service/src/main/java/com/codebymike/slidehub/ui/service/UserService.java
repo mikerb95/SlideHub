@@ -69,7 +69,7 @@ public class UserService {
         user.setUsername(username);
         user.setEmail(email);
         user.setPasswordHash(passwordEncoder.encode(rawPassword));
-        user.setRole(Role.PRESENTER);
+        user.setRole(Role.HOST);
         user.setEmailVerified(false);
         user.setEmailVerificationToken(verificationToken);
         user.setCreatedAt(LocalDateTime.now());
