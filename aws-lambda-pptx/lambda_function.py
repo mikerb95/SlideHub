@@ -90,7 +90,12 @@ def lambda_handler(event, context):
             s3_client.download_file(bucket, raw_key, file_path)
 
             print(f"Convirtiendo PPTX → PDF con LibreOffice ({lo_path})...")
-            subprocess.run([
+            lo_env = os.environ.copy()
+            lo_env['HOME'] = '/tmp'
+            lo_env['LD_LIBRARY_PATH'] = '/tmp/instdir/program:' + lo_env.get('LD_LIBRARY_PATH', '')
+            lo_env['UNO_PATH'] = '/tmp/instdir/program'
+            lo_env['PATH'] = '/tmp/instdir/program:' + lo_env.get('PATH', '')
+            result = subprocess.run([
                 lo_path,
                 '--headless', '--invisible', '--nodefault',
                 '--nofirststartwizard',
@@ -98,7 +103,10 @@ def lambda_handler(event, context):
                 '--convert-to', 'pdf',
                 '--outdir', temp_dir,
                 file_path
-            ], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=lo_env)
+            if result.returncode != 0:
+                print(f"soffice stderr: {result.stderr.decode(errors='replace')}")
+                raise subprocess.CalledProcessError(result.returncode, result.args)
 
             if not os.path.exists(pdf_path):
                 raise Exception("La conversión a PDF falló silenciosamente.")
