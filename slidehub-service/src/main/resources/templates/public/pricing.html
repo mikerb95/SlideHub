@@ -7,13 +7,13 @@
     <title>Precios - SlideHub</title>
     <th:block th:replace="~{fragments/head :: assets}"></th:block>
     <style>
-        /* ── Billing Toggle ── */
+        /* Billing Toggle */
         .billing-toggle {
             display: inline-flex;
             gap: 1rem;
-            background: var(--sh-panel);
-            border: 1px solid var(--sh-border);
-            border-radius: var(--sh-r-lg);
+            background: rgba(17, 24, 32, 1);
+            border: 1px solid rgba(48, 54, 61, 1);
+            border-radius: 1rem;
             padding: 0.5rem;
             margin: 2rem auto;
         }
@@ -21,40 +21,41 @@
         .toggle-btn {
             padding: 0.5rem 1.5rem;
             border: none;
-            border-radius: var(--sh-r-md);
+            border-radius: 0.5rem;
             background: transparent;
-            color: var(--sh-text-light);
+            color: rgba(139, 148, 155, 1);
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s;
         }
 
         .toggle-btn.active {
-            background: var(--sh-blue);
+            background: #3b82f6;
             color: white;
         }
 
-        /* ── Pricing Card ── */
+        /* Pricing Card */
         .pricing-card {
-            background: var(--sh-panel);
-            border: 1px solid var(--sh-border);
-            border-radius: var(--sh-r-lg);
+            background: rgba(17, 24, 32, 1);
+            border: 1px solid rgba(48, 54, 61, 1);
+            border-radius: 1rem;
             padding: 2rem;
             display: flex;
             flex-direction: column;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
+            height: 100%;
         }
 
         .pricing-card:hover {
             transform: translateY(-8px);
-            border-color: var(--sh-blue);
+            border-color: #3b82f6;
             box-shadow: 0 20px 40px rgba(59, 130, 246, 0.1);
         }
 
         .pricing-card.pro {
-            border-color: var(--sh-blue);
-            background: linear-gradient(135deg, var(--sh-panel) 0%, rgba(59, 130, 246, 0.05) 100%);
+            border-color: #3b82f6;
+            background: linear-gradient(135deg, rgba(17, 24, 32, 1) 0%, rgba(59, 130, 246, 0.05) 100%);
         }
 
         .pricing-badge {
@@ -62,7 +63,7 @@
             top: -12px;
             left: 50%;
             transform: translateX(-50%);
-            background: linear-gradient(135deg, var(--sh-green), var(--sh-blue));
+            background: linear-gradient(135deg, #3fb950, #3b82f6);
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 20px;
@@ -76,7 +77,7 @@
             font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 1rem;
-            color: var(--sh-text);
+            color: #f8fafc;
         }
 
         .pricing-price {
@@ -87,26 +88,26 @@
         }
 
         .pricing-amount {
-            font-size: 3rem;
+            font-size: 2.5rem;
             font-weight: 800;
-            color: var(--sh-blue);
+            color: #3b82f6;
         }
 
         .pricing-card.pro .pricing-amount {
-            background: linear-gradient(135deg, var(--sh-green), var(--sh-blue));
+            background: linear-gradient(135deg, #3fb950, #3b82f6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
         .pricing-period {
-            color: var(--sh-text-light);
+            color: rgba(139, 148, 155, 1);
             font-size: 0.875rem;
         }
 
         .pricing-saving {
             font-size: 0.875rem;
-            color: var(--sh-green);
+            color: #3fb950;
             margin-top: 0.25rem;
             display: none;
         }
@@ -116,11 +117,11 @@
         }
 
         .pricing-description {
-            color: var(--sh-text-light);
+            color: rgba(139, 148, 155, 1);
             font-size: 0.95rem;
             margin: 1rem 0;
             padding-bottom: 1rem;
-            border-bottom: 1px solid var(--sh-border);
+            border-bottom: 1px solid rgba(48, 54, 61, 1);
         }
 
         .pricing-features {
@@ -135,49 +136,50 @@
             align-items: flex-start;
             gap: 0.75rem;
             margin-bottom: 0.875rem;
-            color: var(--sh-text-light);
+            color: rgba(139, 148, 155, 1);
             font-size: 0.95rem;
         }
 
         .pricing-features i {
-            color: var(--sh-green);
+            color: #3fb950;
             margin-top: 0.125rem;
             flex-shrink: 0;
         }
 
         .pricing-features .highlight {
-            color: var(--sh-text);
+            color: #f8fafc;
             font-weight: 600;
         }
 
         .pricing-cta {
             padding: 0.75rem 1.5rem;
-            border-radius: var(--sh-r-md);
+            border-radius: 0.5rem;
             font-weight: 600;
             border: none;
             cursor: pointer;
             transition: all 0.3s;
             margin-top: 1.5rem;
+            width: 100%;
         }
 
         .pricing-cta.secondary {
             background: transparent;
-            color: var(--sh-text);
-            border: 1px solid var(--sh-border);
+            color: #f8fafc;
+            border: 1px solid rgba(48, 54, 61, 1);
         }
 
         .pricing-cta.secondary:hover {
-            background: var(--sh-border);
-            color: var(--sh-text);
+            background: rgba(48, 54, 61, 1);
+            color: #f8fafc;
         }
 
         .pricing-cta.primary {
-            background: var(--sh-blue);
+            background: #3b82f6;
             color: white;
         }
 
         .pricing-cta.primary:hover {
-            background: var(--sh-blue-dark);
+            background: #2563eb;
         }
 
         .pricing-grid {
@@ -191,59 +193,62 @@
         .reveal {
             opacity: 0;
             transform: translateY(40px);
-            animation: reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        @keyframes reveal {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .reveal.delay-1 {
-            animation-delay: 0.2s;
-        }
-
-        .reveal.delay-2 {
-            animation-delay: 0.4s;
-        }
-
-        .reveal.delay-3 {
-            animation-delay: 0.6s;
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
 
-<body>
-    <th:block th:replace="~{fragments/navbar :: navbar}"></th:block>
+<body class="sh bg-sh-deep antialiased">
 
-    <main class="py-20">
-        <div class="container">
-            <!-- Header -->
+    <!-- NAVIGATION -->
+    <nav class="sh-nav" style="background: rgba(13,17,23,0.5);">
+        <div class="sh-nav-inner">
+            <div class="flex items-center gap-3">
+                <a th:href="@{/showcase}" class="font-brand text-lg tracking-tight text-[var(--sh-text-1)] hover:text-[var(--sh-blue)] transition-colors">SlideHub</a>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="/pricing" class="hidden sm:inline text-xs font-mono text-[var(--sh-text-3)] hover:text-[var(--sh-text-1)] transition-colors font-semibold">Precios</a>
+                <a th:href="@{/auth/login}" class="sh-btn sh-btn-ghost text-xs py-1.5 px-4">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i> Iniciar Sesión
+                </a>
+                <a th:href="@{/auth/register}" class="sh-btn sh-btn-primary text-xs py-1.5 px-4">
+                    Comenzar
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- PRICING HEADER -->
+    <section class="py-20">
+        <div class="max-w-6xl mx-auto px-6">
             <div class="text-center mb-16 reveal">
-                <h1 class="text-5xl font-bold mb-4">Planes para cada necesidad</h1>
-                <p class="text-xl text-sh-text-light max-w-2xl mx-auto">Elige el plan perfecto para tus presentaciones,
-                    desde estudiantes hasta conferencias profesionales.</p>
+                <h1 class="text-5xl md:text-6xl font-bold mb-4 text-[var(--sh-text-1)]">Planes para cada necesidad</h1>
+                <p class="text-xl text-[var(--sh-text-3)] max-w-2xl mx-auto">Elige el plan perfecto para tus presentaciones, desde estudiantes hasta conferencias profesionales.</p>
             </div>
 
             <!-- Billing Toggle -->
-            <div class="text-center reveal delay-1">
+            <div class="text-center mb-12 reveal">
                 <div class="billing-toggle">
                     <button class="toggle-btn active" onclick="setBilling('monthly')">
                         <i class="fa-solid fa-calendar"></i> Mensual
                     </button>
                     <button class="toggle-btn" onclick="setBilling('annual')">
                         <i class="fa-solid fa-calendar-days"></i> Anual
-                        <span style="color: var(--sh-green); margin-left: 0.5rem;">-16%</span>
+                        <span style="color: #3fb950; margin-left: 0.5rem;">-16%</span>
                     </button>
                 </div>
             </div>
 
             <!-- Pricing Cards -->
-            <div class="pricing-grid reveal delay-2">
+            <div class="pricing-grid">
                 <!-- Free -->
-                <div class="pricing-card">
+                <div class="pricing-card reveal">
                     <h3 class="pricing-title">Free</h3>
                     <div class="pricing-price">
                         <span class="pricing-amount">$0</span>
@@ -261,7 +266,7 @@
                 </div>
 
                 <!-- Básico -->
-                <div class="pricing-card">
+                <div class="pricing-card reveal">
                     <h3 class="pricing-title">Básico</h3>
                     <div class="pricing-price">
                         <span class="pricing-amount monthly-price">6.900</span>
@@ -280,14 +285,13 @@
                         <li><i class="fa-solid fa-check"></i> <span class="highlight">Todo lo de Free, más:</span></li>
                         <li><i class="fa-solid fa-check"></i> <span>Presentaciones de hasta 50 diapositivas</span></li>
                         <li><i class="fa-solid fa-check"></i> <span>Generación automática de notas con IA</span></li>
-                        <li><i class="fa-solid fa-check"></i> <span>Generación de contexto de ayuda adicional</span>
-                        </li>
+                        <li><i class="fa-solid fa-check"></i> <span>Generación de contexto de ayuda adicional</span></li>
                     </ul>
                     <a href="/auth/register" class="pricing-cta secondary">Elegir Básico</a>
                 </div>
 
                 <!-- Pro -->
-                <div class="pricing-card pro">
+                <div class="pricing-card pro reveal">
                     <span class="pricing-badge">Más Popular</span>
                     <h3 class="pricing-title">Pro</h3>
                     <div class="pricing-price">
@@ -304,8 +308,7 @@
                     <div class="pricing-saving annual-saving"></div>
                     <p class="pricing-description">La experiencia definitiva para conferencistas.</p>
                     <ul class="pricing-features">
-                        <li><i class="fa-solid fa-check"></i> <span class="highlight">Todo lo de Básico, más:</span>
-                        </li>
+                        <li><i class="fa-solid fa-check"></i> <span class="highlight">Todo lo de Básico, más:</span></li>
                         <li><i class="fa-solid fa-check"></i> <span>Diapositivas ilimitadas</span></li>
                         <li><i class="fa-solid fa-check"></i> <span>Modo Demo avanzado e iFrames</span></li>
                         <li><i class="fa-solid fa-check"></i> <span>Push-to-Talk inteligente</span></li>
@@ -315,9 +318,22 @@
                 </div>
             </div>
         </div>
-    </main>
+    </section>
 
-    <th:block th:replace="~{fragments/footer :: footer}"></th:block>
+    <!-- FOOTER -->
+    <footer class="py-8 border-t" style="border-color: rgba(48, 54, 61, 1);">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <span class="font-brand text-sm text-[var(--sh-text-3)]">SlideHub</span>
+            <div class="flex items-center gap-6">
+                <a th:href="@{/slides}" class="font-mono text-xs text-[var(--sh-text-3)] hover:text-[var(--sh-text-1)] transition-colors">Projector</a>
+                <a th:href="@{/remote}" class="font-mono text-xs text-[var(--sh-text-3)] hover:text-[var(--sh-text-1)] transition-colors">Remote</a>
+                <a th:href="@{/demo}" class="font-mono text-xs text-[var(--sh-text-3)] hover:text-[var(--sh-text-1)] transition-colors">Demo</a>
+            </div>
+            <div class="font-mono text-[0.65rem] text-[var(--sh-text-3)]">
+                Spring Boot 4 &middot; Java 21 &middot; Render
+            </div>
+        </div>
+    </footer>
 
     <script>
         function setBilling(type) {
@@ -337,40 +353,33 @@
                 const annualSaving = card.querySelector('.annual-saving');
 
                 if (isMonthly) {
-                    monthlyPrice.style.display = 'inline';
-                    annualPrice.style.display = 'none';
-                    monthlyPeriod.style.display = 'inline';
-                    annualPeriod.style.display = 'none';
+                    if (monthlyPrice) monthlyPrice.style.display = 'inline';
+                    if (annualPrice) annualPrice.style.display = 'none';
+                    if (monthlyPeriod) monthlyPeriod.style.display = 'inline';
+                    if (annualPeriod) annualPeriod.style.display = 'none';
                     if (monthlySaving) monthlySaving.classList.add('show');
                     if (annualSaving) annualSaving.classList.remove('show');
                 } else {
-                    monthlyPrice.style.display = 'none';
-                    annualPrice.style.display = 'inline';
-                    monthlyPeriod.style.display = 'none';
-                    annualPeriod.style.display = 'inline';
+                    if (monthlyPrice) monthlyPrice.style.display = 'none';
+                    if (annualPrice) annualPrice.style.display = 'inline';
+                    if (monthlyPeriod) monthlyPeriod.style.display = 'none';
+                    if (annualPeriod) annualPeriod.style.display = 'inline';
                     if (monthlySaving) monthlySaving.classList.remove('show');
                     if (annualSaving) annualSaving.classList.add('show');
                 }
             });
         }
 
-        // Trigger reveal animations
-        document.addEventListener('DOMContentLoaded', () => {
-            const reveals = document.querySelectorAll('.reveal');
-            reveals.forEach(el => {
-                setTimeout(() => {
-                    const observer = new IntersectionObserver(entries => {
-                        entries.forEach(entry => {
-                            if (entry.isIntersecting) {
-                                entry.target.style.opacity = '1';
-                                entry.target.style.transform = 'translateY(0)';
-                            }
-                        });
-                    });
-                    observer.observe(el);
-                }, 100);
+        // Scroll reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
             });
-        });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     </script>
 </body>
 
