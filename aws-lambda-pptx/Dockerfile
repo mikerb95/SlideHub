@@ -1,22 +1,14 @@
-FROM public.ecr.aws/lambda/python:3.12
+FROM public.ecr.aws/lambda/python:3.10 AS builder
 
-# LibreOffice + fuentes básicas para rendering correcto de PPTX
-RUN dnf install -y \
-        libreoffice-impress \
-        libreoffice-writer \
-        libreoffice-draw \
-        liberation-fonts \
-        google-noto-fonts-common \
-    && dnf clean all \
-    && rm -rf /var/cache/dnf
+RUN yum install -y zip
 
-# Dependencias Python
+WORKDIR /build
 COPY requirements.txt .
-RUN pip install -r requirements.txt --no-cache-dir
+RUN pip install -r requirements.txt -t ./package/ \
+    --only-binary=:all: \
+    --platform manylinux2014_x86_64
 
-COPY lambda_function.py .
+COPY lambda_function.py ./package/
 
-# soffice estará en /usr/bin/soffice tras dnf install
-ENV LIBREOFFICE_PATH=/usr/bin/soffice
-
-CMD ["lambda_function.lambda_handler"]
+WORKDIR /build/package
+RUN zip -r9 /build/function.zip .
