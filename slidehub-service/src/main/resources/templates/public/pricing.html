@@ -1,198 +1,366 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Precios - SlideHub</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Tailwind via CDN for layout utilities -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <th:block th:replace="~{fragments/head :: assets}"></th:block>
     <style>
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
+        /* ── Billing Toggle ── */
+        .billing-toggle {
+            display: inline-flex;
+            gap: 1rem;
+            background: var(--sh-panel);
+            border: 1px solid var(--sh-border);
+            border-radius: var(--sh-r-lg);
+            padding: 0.5rem;
+            margin: 2rem auto;
         }
 
+        .toggle-btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: var(--sh-r-md);
+            background: transparent;
+            color: var(--sh-text-light);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .toggle-btn.active {
+            background: var(--sh-blue);
+            color: white;
+        }
+
+        /* ── Pricing Card ── */
         .pricing-card {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 1rem;
-            transition: transform 0.2s;
-        }
-
-        .pricing-card:hover {
-            transform: translateY(-5px);
-            border-color: #3b82f6;
-        }
-
-        .pro-card {
-            background: linear-gradient(180deg, #1e293b 0%, #172554 100%);
-            border-color: #3b82f6;
+            background: var(--sh-panel);
+            border: 1px solid var(--sh-border);
+            border-radius: var(--sh-r-lg);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
         }
 
-        .badge-popular {
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--sh-blue);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.1);
+        }
+
+        .pricing-card.pro {
+            border-color: var(--sh-blue);
+            background: linear-gradient(135deg, var(--sh-panel) 0%, rgba(59, 130, 246, 0.05) 100%);
+        }
+
+        .pricing-badge {
             position: absolute;
             top: -12px;
             left: 50%;
             transform: translateX(-50%);
-            background: #3b82f6;
+            background: linear-gradient(135deg, var(--sh-green), var(--sh-blue));
             color: white;
-            padding: 4px 12px;
+            padding: 0.5rem 1rem;
             border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .btn-custom {
-            border-radius: 0.5rem;
+        .pricing-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--sh-text);
+        }
+
+        .pricing-price {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-amount {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--sh-blue);
+        }
+
+        .pricing-card.pro .pricing-amount {
+            background: linear-gradient(135deg, var(--sh-green), var(--sh-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pricing-period {
+            color: var(--sh-text-light);
+            font-size: 0.875rem;
+        }
+
+        .pricing-saving {
+            font-size: 0.875rem;
+            color: var(--sh-green);
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .pricing-saving.show {
+            display: block;
+        }
+
+        .pricing-description {
+            color: var(--sh-text-light);
+            font-size: 0.95rem;
+            margin: 1rem 0;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--sh-border);
+        }
+
+        .pricing-features {
+            list-style: none;
+            padding: 0;
+            margin: 1.5rem 0;
+            flex-grow: 1;
+        }
+
+        .pricing-features li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 0.875rem;
+            color: var(--sh-text-light);
+            font-size: 0.95rem;
+        }
+
+        .pricing-features i {
+            color: var(--sh-green);
+            margin-top: 0.125rem;
+            flex-shrink: 0;
+        }
+
+        .pricing-features .highlight {
+            color: var(--sh-text);
             font-weight: 600;
+        }
+
+        .pricing-cta {
             padding: 0.75rem 1.5rem;
-            transition: all 0.2s;
-            width: 100%;
-        }
-
-        .btn-primary-custom {
-            background: #3b82f6;
-            color: white;
+            border-radius: var(--sh-r-md);
+            font-weight: 600;
             border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1.5rem;
         }
 
-        .btn-primary-custom:hover {
-            background: #2563eb;
-            color: white;
-        }
-
-        .btn-outline-custom {
+        .pricing-cta.secondary {
             background: transparent;
-            color: #f8fafc;
-            border: 1px solid #475569;
+            color: var(--sh-text);
+            border: 1px solid var(--sh-border);
         }
 
-        .btn-outline-custom:hover {
-            background: #334155;
+        .pricing-cta.secondary:hover {
+            background: var(--sh-border);
+            color: var(--sh-text);
+        }
+
+        .pricing-cta.primary {
+            background: var(--sh-blue);
             color: white;
         }
 
-        .feature-icon {
-            color: #10b981;
-            margin-right: 0.5rem;
+        .pricing-cta.primary:hover {
+            background: var(--sh-blue-dark);
         }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            animation: reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes reveal {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .reveal.delay-1 { animation-delay: 0.2s; }
+        .reveal.delay-2 { animation-delay: 0.4s; }
+        .reveal.delay-3 { animation-delay: 0.6s; }
     </style>
 </head>
 
-<body class="min-h-screen flex flex-col">
+<body>
+    <th:block th:replace="~{fragments/navbar :: navbar}"></th:block>
 
-    <nav class="navbar navbar-dark bg-[#0f172a] border-b border-slate-800 py-3">
+    <main class="py-20">
         <div class="container">
-            <a class="navbar-brand font-bold flex items-center gap-2" href="/showcase">
-                <i class="fa-solid fa-layer-group text-blue-500"></i>
-                SlideHub
-            </a>
-            <div class="d-flex gap-2">
-                <a href="/auth/login" class="btn btn-outline-light btn-sm rounded-pill px-4">Iniciar Sesión</a>
+            <!-- Header -->
+            <div class="text-center mb-16 reveal">
+                <h1 class="text-5xl font-bold mb-4">Planes para cada necesidad</h1>
+                <p class="text-xl text-sh-text-light max-w-2xl mx-auto">Elige el plan perfecto para tus presentaciones, desde estudiantes hasta conferencias profesionales.</p>
             </div>
-        </div>
-    </nav>
 
-    <main class="flex-grow container py-16">
-        <div class="text-center mb-16">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">Planes diseñados para ti</h1>
-            <p class="text-slate-400 text-lg max-w-2xl mx-auto">Selecciona el plan de SlideHub que mejor se adapte a tus
-                necesidades de presentación, desde reuniones pequeñas hasta conferencias interactivas profesionales.</p>
-        </div>
-
-        <div class="row g-4 justify-content-center max-w-6xl mx-auto">
-            <!-- Free Tier -->
-            <div class="col-md-4">
-                <div class="pricing-card p-8 h-100 flex flex-col">
-                    <h3 class="text-xl font-bold text-slate-300 mb-2">Free</h3>
-                    <div class="mb-4">
-                        <span class="text-4xl font-bold">$0</span>
-                        <span class="text-slate-400">/mes</span>
-                    </div>
-                    <p class="text-slate-400 text-sm mb-6 pb-6 border-b border-slate-700">Perfecto para estudiantes y
-                        pequeñas reuniones.</p>
-
-                    <ul class="list-unstyled space-y-4 mb-8 flex-grow text-slate-300">
-                        <li><i class="fa-solid fa-check feature-icon"></i> Presentaciones de hasta 20 diapositivas</li>
-                        <li><i class="fa-solid fa-check feature-icon"></i> Preguntas y respuestas en vivo (Q&A)</li>
-                        <li><i class="fa-solid fa-check feature-icon"></i> Participación con levantar la mano</li>
-                        <li><i class="fa-solid fa-check feature-icon"></i> Solicitud de ayuda en grupo (háptica)</li>
-                        <li><i class="fa-solid fa-check feature-icon"></i> Asignación de diapositivas a compañeros</li>
-                    </ul>
-                    <a href="/auth/register" class="btn btn-outline-custom mt-auto">Comienza Gratis</a>
+            <!-- Billing Toggle -->
+            <div class="text-center reveal delay-1">
+                <div class="billing-toggle">
+                    <button class="toggle-btn active" onclick="setBilling('monthly')">
+                        <i class="fa-solid fa-calendar"></i> Mensual
+                    </button>
+                    <button class="toggle-btn" onclick="setBilling('annual')">
+                        <i class="fa-solid fa-calendar-days"></i> Anual
+                        <span style="color: var(--sh-green); margin-left: 0.5rem;">-16%</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- Basic Tier -->
-            <div class="col-md-4">
-                <div class="pricing-card p-8 h-100 flex flex-col relative border-slate-600">
-                    <h3 class="text-xl font-bold text-blue-400 mb-2">Básico</h3>
-                    <div class="mb-4">
-                        <span class="text-4xl font-bold">$9</span>
-                        <span class="text-slate-400">/mes</span>
+            <!-- Pricing Cards -->
+            <div class="pricing-grid reveal delay-2">
+                <!-- Free -->
+                <div class="pricing-card">
+                    <h3 class="pricing-title">Free</h3>
+                    <div class="pricing-price">
+                        <span class="pricing-amount">$0</span>
+                        <span class="pricing-period">siempre</span>
                     </div>
-                    <p class="text-slate-400 text-sm mb-6 pb-6 border-b border-slate-700">Para educadores y
-                        profesionales habituales.</p>
-
-                    <ul class="list-unstyled space-y-4 mb-8 flex-grow text-slate-300">
-                        <li><i class="fa-solid fa-check feature-icon"></i> <span class="font-semibold text-white">Todo
-                                lo de Free, más:</span></li>
-                        <li><i class="fa-solid fa-check feature-icon"></i> Presentaciones de hasta 50 diapositivas</li>
-                        <li><i class="fa-solid fa-check feature-icon text-blue-400"></i> Generación automática de notas
-                            con IA</li>
-                        <li><i class="fa-solid fa-check feature-icon text-blue-400"></i> Generación de contexto de ayuda
-                            adicional</li>
+                    <p class="pricing-description">Perfecto para estudiantes y pequeños proyectos.</p>
+                    <ul class="pricing-features">
+                        <li><i class="fa-solid fa-check"></i> <span>Presentaciones de hasta 20 diapositivas</span></li>
+                        <li><i class="fa-solid fa-check"></i> <span>Preguntas y respuestas en vivo (Q&A)</span></li>
+                        <li><i class="fa-solid fa-check"></i> <span>Participación con levantar la mano</span></li>
+                        <li><i class="fa-solid fa-check"></i> <span>Solicitud de ayuda en grupo</span></li>
+                        <li><i class="fa-solid fa-check"></i> <span>Asignación de diapositivas a compañeros</span></li>
                     </ul>
-                    <a href="/auth/register" class="btn btn-outline-custom mt-auto">Elegir Básico</a>
+                    <a href="/auth/register" class="pricing-cta secondary">Comienza Gratis</a>
                 </div>
-            </div>
 
-            <!-- Pro Tier -->
-            <div class="col-md-4">
-                <div class="pricing-card pro-card p-8 h-100 flex flex-col">
-                    <span class="badge-popular">MÁS POPULAR</span>
-                    <h3 class="text-xl font-bold text-white mb-2">Pro</h3>
-                    <div class="mb-4">
-                        <span class="text-4xl font-bold text-white">$19</span>
-                        <span class="text-blue-200">/mes</span>
+                <!-- Básico -->
+                <div class="pricing-card">
+                    <h3 class="pricing-title">Básico</h3>
+                    <div class="pricing-price">
+                        <span class="pricing-amount monthly-price">6.900</span>
+                        <span class="pricing-amount annual-price" style="display: none;">69.000</span>
+                        <span class="pricing-period">
+                            <span class="monthly-period">COP/mes</span>
+                            <span class="annual-period" style="display: none;">COP/año</span>
+                        </span>
                     </div>
-                    <p class="text-blue-200 text-sm mb-6 pb-6 border-b border-blue-900/50">La experiencia definitiva
-                        para conferencistas.</p>
-
-                    <ul class="list-unstyled space-y-4 mb-8 flex-grow text-slate-200">
-                        <li><i class="fa-solid fa-check feature-icon"></i> <span class="font-semibold text-white">Todo
-                                lo de Básico, más:</span></li>
-                        <li><i class="fa-solid fa-check feature-icon"></i> Diapositivas ilimitadas</li>
-                        <li><i class="fa-solid fa-check feature-icon text-blue-400"></i> Modo Demo avanzado e iFrames
-                        </li>
-                        <li><i class="fa-solid fa-check feature-icon text-blue-400"></i> Push-to-Talk inteligente</li>
-                        <li><i class="fa-solid fa-check feature-icon text-blue-400"></i> Transcripción e IA
-                            Conversacional</li>
+                    <div class="pricing-saving monthly-saving show">
+                        Ahorra $13.800 en facturación anual
+                    </div>
+                    <div class="pricing-saving annual-saving"></div>
+                    <p class="pricing-description">Para educadores y profesionales habituales.</p>
+                    <ul class="pricing-features">
+                        <li><i class="fa-solid fa-check"></i> <span class="highlight">Todo lo de Free, más:</span></li>
+                        <li><i class="fa-solid fa-check"></i> <span>Presentaciones de hasta 50 diapositivas</span></li>
+                        <li><i class="fa-solid fa-check"></i> <span>Generación automática de notas con IA</span></li>
+                        <li><i class="fa-solid fa-check"></i> <span>Generación de contexto de ayuda adicional</span></li>
                     </ul>
-                    <a href="/auth/register" class="btn btn-primary-custom mt-auto">Obtener Pro</a>
+                    <a href="/auth/register" class="pricing-cta secondary">Elegir Básico</a>
+                </div>
+
+                <!-- Pro -->
+                <div class="pricing-card pro">
+                    <span class="pricing-badge">Más Popular</span>
+                    <h3 class="pricing-title">Pro</h3>
+                    <div class="pricing-price">
+                        <span class="pricing-amount monthly-price">15.900</span>
+                        <span class="pricing-amount annual-price" style="display: none;">159.000</span>
+                        <span class="pricing-period">
+                            <span class="monthly-period">COP/mes</span>
+                            <span class="annual-period" style="display: none;">COP/año</span>
+                        </span>
+                    </div>
+                    <div class="pricing-saving monthly-saving show">
+                        Ahorra $31.800 en facturación anual
+                    </div>
+                    <div class="pricing-saving annual-saving"></div>
+                    <p class="pricing-description">La experiencia definitiva para conferencistas.</p>
+                    <ul class="pricing-features">
+                        <li><i class="fa-solid fa-check"></i> <span class="highlight">Todo lo de Básico, más:</span></li>
+                        <li><i class="fa-solid fa-check"></i> <span>Diapositivas ilimitadas</span></li>
+                        <li><i class="fa-solid fa-check"></i> <span>Modo Demo avanzado e iFrames</span></li>
+                        <li><i class="fa-solid fa-check"></i> <span>Push-to-Talk inteligente</span></li>
+                        <li><i class="fa-solid fa-check"></i> <span>Transcripción e IA Conversacional</span></li>
+                    </ul>
+                    <a href="/auth/register" class="pricing-cta primary">Obtener Pro</a>
                 </div>
             </div>
         </div>
     </main>
 
-    <footer class="mt-auto border-t border-slate-800 py-8 bg-[#0f172a]">
-        <div
-            class="container text-center text-slate-500 text-sm flex flex-col md:flex-row justify-between items-center">
-            <p class="mb-2 md:mb-0">© 2026 SlideHub. Todos los derechos reservados.</p>
-            <div class="flex gap-4">
-                <a href="/privacidad" class="text-slate-500 hover:text-white transition">Privacidad</a>
-                <a href="/politicadeuso" class="text-slate-500 hover:text-white transition">Términos</a>
-                <a href="/copyright" class="text-slate-500 hover:text-white transition">Copyright</a>
-            </div>
-        </div>
-    </footer>
+    <th:block th:replace="~{fragments/footer :: footer}"></th:block>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function setBilling(type) {
+            const isMonthly = type === 'monthly';
+
+            // Update toggle buttons
+            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.toggle-btn').classList.add('active');
+
+            // Update all pricing cards
+            document.querySelectorAll('.pricing-card').forEach(card => {
+                const monthlyPrice = card.querySelector('.monthly-price');
+                const annualPrice = card.querySelector('.annual-price');
+                const monthlyPeriod = card.querySelector('.monthly-period');
+                const annualPeriod = card.querySelector('.annual-period');
+                const monthlySaving = card.querySelector('.monthly-saving');
+                const annualSaving = card.querySelector('.annual-saving');
+
+                if (isMonthly) {
+                    monthlyPrice.style.display = 'inline';
+                    annualPrice.style.display = 'none';
+                    monthlyPeriod.style.display = 'inline';
+                    annualPeriod.style.display = 'none';
+                    if (monthlySaving) monthlySaving.classList.add('show');
+                    if (annualSaving) annualSaving.classList.remove('show');
+                } else {
+                    monthlyPrice.style.display = 'none';
+                    annualPrice.style.display = 'inline';
+                    monthlyPeriod.style.display = 'none';
+                    annualPeriod.style.display = 'inline';
+                    if (monthlySaving) monthlySaving.classList.remove('show');
+                    if (annualSaving) annualSaving.classList.add('show');
+                }
+            });
+        }
+
+        // Trigger reveal animations
+        document.addEventListener('DOMContentLoaded', () => {
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach(el => {
+                setTimeout(() => {
+                    const observer = new IntersectionObserver(entries => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                entry.target.style.opacity = '1';
+                                entry.target.style.transform = 'translateY(0)';
+                            }
+                        });
+                    });
+                    observer.observe(el);
+                }, 100);
+            });
+        });
+    </script>
 </body>
 
 </html>
