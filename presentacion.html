@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlideHub — Presentación del Proyecto</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-card: rgba(255,255,255,0.04);
+            --bg-card-hover: rgba(255,255,255,0.07);
+            --text-primary: #f0f0f5;
+            --text-secondary: #8888a0;
+            --text-muted: #55556a;
+            --accent-blue: #4d7cff;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-pink: #ec4899;
+            --gradient-1: linear-gradient(135deg, #4d7cff, #8b5cf6);
+            --gradient-2: linear-gradient(135deg, #06b6d4, #10b981);
+            --gradient-3: linear-gradient(135deg, #f59e0b, #ef4444);
+            --gradient-4: linear-gradient(135deg, #ec4899, #8b5cf6);
+            --border: rgba(255,255,255,0.08);
+            --radius: 16px;
+        }
+
+        html {
+            scroll-behavior: auto;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--gradient-1);
+            z-index: 1000;
+            transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* Slide Counter */
+        .slide-counter {
+            position: fixed;
+            bottom: 30px;
+            right: 40px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            color: var(--text-muted);
+            z-index: 1000;
+            letter-spacing: 1px;
+        }
+        .slide-counter .current {
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        /* Navigation Hint */
+        .nav-hint {
+            position: fixed;
+            bottom: 30px;
+            left: 40px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-size: 13px;
+            z-index: 1000;
+            transition: opacity 0.3s;
+        }
+        .nav-hint .key {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 11px;
+            background: var(--bg-card);
+        }
+
+        /* Slide Container */
+        .slides-wrapper {
+            transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide-content {
+            max-width: 1100px;
+            width: 100%;
+            padding: 40px 60px;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .slide.active .slide-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Background Effects */
+        .slide::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.08;
+            pointer-events: none;
+        }
+
+        .slide:nth-child(odd)::before {
+            background: var(--accent-blue);
+            top: -200px;
+            right: -100px;
+        }
+        .slide:nth-child(even)::before {
+            background: var(--accent-purple);
+            bottom: -200px;
+            left: -100px;
+        }
+
+        /* Typography */
+        .slide-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent-blue);
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .slide-title {
+            font-size: clamp(32px, 4vw, 52px);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -1px;
+        }
+
+        .slide-title .gradient-text {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 700px;
+            font-weight: 300;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(255,255,255,0.12);
+            transform: translateY(-2px);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 14px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .card-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* List Items */
+        .objective-list {
+            list-style: none;
+            margin-top: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .objective-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .objective-list .marker {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            margin-top: 1px;
+        }
+
+        /* User Stories Table */
+        .stories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .story-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .story-item:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .story-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .story-text {
+            color: var(--text-secondary);
+        }
+
+        /* Architecture Diagram */
+        .arch-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 36px;
+            flex-wrap: wrap;
+        }
+
+        .arch-service {
+            text-align: center;
+            padding: 28px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            min-width: 180px;
+            transition: all 0.3s;
+        }
+        .arch-service:hover {
+            transform: scale(1.03);
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        .arch-service .port {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .arch-service .svc-name {
+            font-size: 15px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .arch-service .svc-icon {
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+
+        .arch-arrow {
+            color: var(--text-muted);
+            font-size: 24px;
+        }
+
+        /* PDCA Wheel */
+        .pdca-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 32px;
+        }
+
+        .pdca-card {
+            padding: 28px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            position: relative;
+            overflow: hidden;
+        }
+        .pdca-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+        .pdca-card.plan::before { background: var(--accent-blue); }
+        .pdca-card.do-phase::before { background: var(--accent-green); }
+        .pdca-card.check::before { background: var(--accent-orange); }
+        .pdca-card.act::before { background: var(--accent-purple); }
+
+        .pdca-card .phase-letter {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 36px;
+            font-weight: 800;
+            opacity: 0.12;
+            position: absolute;
+            top: 12px;
+            right: 20px;
+        }
+
+        .pdca-card .phase-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .pdca-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .pdca-card ul li {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            padding-left: 16px;
+            position: relative;
+        }
+        .pdca-card ul li::before {
+            content: '›';
+            position: absolute;
+            left: 0;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* ISO Sections */
+        .iso-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .iso-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .iso-desc {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 24px;
+            max-width: 800px;
+        }
+
+        .iso-items {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .iso-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .iso-item .iso-item-icon {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .iso-item .iso-item-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .iso-item .iso-item-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Pipeline */
+        .pipeline {
+            display: flex;
+            align-items: stretch;
+            gap: 0;
+            margin-top: 36px;
+            position: relative;
+        }
+
+        .pipeline::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 30px;
+            right: 30px;
+            height: 2px;
+            background: var(--border);
+            z-index: 0;
+        }
+
+        .pipeline-stage {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            padding: 0 8px;
+        }
+
+        .pipeline-stage .stage-dot {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+            font-size: 20px;
+            border: 2px solid var(--border);
+            background: var(--bg-primary);
+        }
+
+        .pipeline-stage .stage-name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .pipeline-stage .stage-detail {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Title Slide Specific */
+        .title-slide .slide-content {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .title-logo {
+            font-size: 64px;
+            margin-bottom: 8px;
+        }
+
+        .title-main {
+            font-size: clamp(48px, 6vw, 80px);
+            font-weight: 900;
+            letter-spacing: -3px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+
+        .title-tagline {
+            font-size: 20px;
+            color: var(--text-secondary);
+            font-weight: 300;
+            margin-bottom: 32px;
+        }
+
+        .title-chips {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .chip {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            background: var(--bg-card);
+        }
+
+        /* Animations for staggered children */
+        .slide.active .stagger > * {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+        .slide.active .stagger > *:nth-child(1) { animation-delay: 0.1s; }
+        .slide.active .stagger > *:nth-child(2) { animation-delay: 0.18s; }
+        .slide.active .stagger > *:nth-child(3) { animation-delay: 0.26s; }
+        .slide.active .stagger > *:nth-child(4) { animation-delay: 0.34s; }
+        .slide.active .stagger > *:nth-child(5) { animation-delay: 0.42s; }
+        .slide.active .stagger > *:nth-child(6) { animation-delay: 0.50s; }
+        .slide.active .stagger > *:nth-child(7) { animation-delay: 0.58s; }
+        .slide.active .stagger > *:nth-child(8) { animation-delay: 0.66s; }
+        .slide.active .stagger > *:nth-child(9) { animation-delay: 0.74s; }
+        .slide.active .stagger > *:nth-child(10) { animation-delay: 0.82s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Two-column layout */
+        .two-cols {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-top: 28px;
+        }
+
+        .col-title {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        /* Tech Stack Badges */
+        .tech-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .tech-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .tech-badge .tech-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .slide-content { padding: 30px 24px; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .pdca-grid { grid-template-columns: 1fr; }
+            .two-cols { grid-template-columns: 1fr; }
+            .stories-grid { grid-template-columns: 1fr; }
+            .arch-diagram { flex-direction: column; }
+            .arch-arrow { transform: rotate(90deg); }
+            .pipeline { flex-direction: column; gap: 16px; }
+            .pipeline::before { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="nav-hint">
+    <span class="key">&#9650;</span>
+    <span class="key">&#9660;</span>
+    <span>navegar</span>
+</div>
+
+<div class="slide-counter">
+    <span class="current" id="currentSlide">01</span>
+    <span>/ </span>
+    <span id="totalSlides">12</span>
+</div>
+
+<div class="slides-wrapper" id="slidesWrapper">
+
+    <!-- ========== SLIDE 1: TÍTULO ========== -->
+    <div class="slide title-slide active" data-slide="0">
+        <div class="slide-content">
+            <div class="title-logo">&#9670;</div>
+            <div class="title-main">SlideHub</div>
+            <div class="title-tagline">Sistema de Presentación Multi-Pantalla en Tiempo Real</div>
+            <div class="title-chips">
+                <span class="chip">Java 21</span>
+                <span class="chip">Spring Boot 4</span>
+                <span class="chip">Microservicios</span>
+                <span class="chip">IA Generativa</span>
+                <span class="chip">OAuth2</span>
+                <span class="chip">Redis</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 2: OBJETIVO GENERAL ========== -->
+    <div class="slide" data-slide="1">
+        <div class="slide-content">
+            <div class="slide-label">Objetivo General</div>
+            <div class="slide-title">
+                Reescribir y escalar el módulo de <span class="gradient-text">presentaciones</span>
+            </div>
+            <div class="slide-subtitle" style="margin-bottom: 32px;">
+                Desarrollar una plataforma distribuida de control de presentaciones en tiempo real,
+                migrando el módulo monolítico PHP/CodeIgniter 4 a una arquitectura de microservicios
+                Java con Spring Boot, integrando inteligencia artificial generativa para asistir
+                al presentador y automatizar el despliegue.
+            </div>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-icon" style="background: rgba(77,124,255,0.15); color: var(--accent-blue);">&#9881;</div>
+                    <div class="card-title">De monolito a microservicios</div>
+                    <div class="card-text">4 servicios independientes comunicados por REST API a través de un gateway centralizado.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" style="background: rgba(139,92,246,0.15); color: var(--accent-purple);">&#9733;</div>
+                    <div class="card-title">IA como valor agregado</div>
+                    <div class="card-text">Gemini Vision + Groq generan notas del presentador y guías de despliegue automáticas.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" style="background: rgba(16,185,129,0.15); color: var(--accent-green);">&#9729;</div>
+                    <div class="card-title">Cloud-native</div>
+                    <div class="card-text">Desplegado en Render con Redis, PostgreSQL (Aiven), MongoDB Atlas y S3.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 3: OBJETIVOS ESPECÍFICOS ========== -->
+    <div class="slide" data-slide="2">
+        <div class="slide-content">
+            <div class="slide-label">Objetivos Específicos</div>
+            <div class="slide-title">Metas <span class="gradient-text">concretas</span> del proyecto</div>
+            <ol class="objective-list stagger">
+                <li>
+                    <span class="marker" style="background: rgba(77,124,255,0.15); color: var(--accent-blue);">1</span>
+                    <span>Diseñar e implementar 4 microservicios (Gateway, State, UI, AI) con responsabilidades separadas y comunicación REST.</span>
+                </li>
+                <li>
+                    <span class="marker" style="background: rgba(139,92,246,0.15); color: var(--accent-purple);">2</span>
+                    <span>Implementar sincronización en tiempo real de diapositivas entre N pantallas usando Redis como store de estado.</span>
+                </li>
+                <li>
+                    <span class="marker" style="background: rgba(6,182,212,0.15); color: var(--accent-cyan);">3</span>
+                    <span>Integrar autenticación local (BCrypt) y OAuth2 (GitHub + Google) con Spring Security y persistencia en PostgreSQL.</span>
+                </li>
+                <li>
+                    <span class="marker" style="background: rgba(16,185,129,0.15); color: var(--accent-green);">4</span>
+                    <span>Desarrollar un módulo de IA que genere notas del presentador mediante Gemini Vision y Groq, almacenadas en MongoDB.</span>
+                </li>
+                <li>
+                    <span class="marker" style="background: rgba(245,158,11,0.15); color: var(--accent-orange);">5</span>
+                    <span>Construir un "Deploy Tutor" que analice repositorios y genere Dockerfiles + guías de despliegue automáticas.</span>
+                </li>
+                <li>
+                    <span class="marker" style="background: rgba(236,72,153,0.15); color: var(--accent-pink);">6</span>
+                    <span>Implementar importación de diapositivas desde Google Drive y subida manual a Amazon S3.</span>
+                </li>
+                <li>
+                    <span class="marker" style="background: rgba(239,68,68,0.15); color: var(--accent-red);">7</span>
+                    <span>Desplegar toda la plataforma en Render con integración continua y configuración por perfiles (dev/prod).</span>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 4: HISTORIAS DE USUARIO ========== -->
+    <div class="slide" data-slide="3">
+        <div class="slide-content">
+            <div class="slide-label">Historias de Usuario</div>
+            <div class="slide-title"><span class="gradient-text">30 historias</span> en 7 módulos</div>
+            <div class="stories-grid stagger">
+                <div class="story-item">
+                    <span class="story-id" style="background: rgba(77,124,255,0.15); color: var(--accent-blue);">HU-001 ~ 003</span>
+                    <span class="story-text">Login, registro y logout con sesiones seguras</span>
+                </div>
+                <div class="story-item">
+                    <span class="story-id" style="background: rgba(6,182,212,0.15); color: var(--accent-cyan);">HU-004 ~ 011</span>
+                    <span class="story-text">Control de slides, remote, demo mode, main-panel, polling sync</span>
+                </div>
+                <div class="story-item">
+                    <span class="story-id" style="background: rgba(16,185,129,0.15); color: var(--accent-green);">HU-012 ~ 013</span>
+                    <span class="story-text">Showcase landing page y servicio de imágenes estáticas</span>
+                </div>
+                <div class="story-item">
+                    <span class="story-id" style="background: rgba(245,158,11,0.15); color: var(--accent-orange);">HU-014 ~ 015</span>
+                    <span class="story-text">Registro y consulta de dispositivos conectados (ADMIN)</span>
+                </div>
+                <div class="story-item">
+                    <span class="story-id" style="background: rgba(139,92,246,0.15); color: var(--accent-purple);">HU-016 ~ 020</span>
+                    <span class="story-text">Generación, consulta y borrado de notas IA + health checks</span>
+                </div>
+                <div class="story-item">
+                    <span class="story-id" style="background: rgba(236,72,153,0.15); color: var(--accent-pink);">HU-021 ~ 026</span>
+                    <span class="story-text">OAuth2 GitHub/Google, perfil, importación Drive, upload S3</span>
+                </div>
+                <div class="story-item">
+                    <span class="story-id" style="background: rgba(239,68,68,0.15); color: var(--accent-red);">HU-027 ~ 030</span>
+                    <span class="story-text">Deploy Tutor: análisis de repos, Dockerfile y guías + Gemini Vision</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 5: OVERVIEW ========== -->
+    <div class="slide" data-slide="4">
+        <div class="slide-content">
+            <div class="slide-label">Overview de la Plataforma</div>
+            <div class="slide-title">Arquitectura de <span class="gradient-text">4 microservicios</span></div>
+            <div class="arch-diagram stagger">
+                <div class="arch-service" style="border-top: 3px solid var(--accent-orange);">
+                    <div class="svc-icon">&#9737;</div>
+                    <div class="svc-name">Gateway</div>
+                    <div class="port">:8080</div>
+                    <div class="card-text" style="margin-top:8px;">Enrutamiento + Config Server</div>
+                </div>
+                <div class="arch-arrow">&#10132;</div>
+                <div class="arch-service" style="border-top: 3px solid var(--accent-blue);">
+                    <div class="svc-icon">&#9889;</div>
+                    <div class="svc-name">State Service</div>
+                    <div class="port">:8081 &middot; Redis</div>
+                    <div class="card-text" style="margin-top:8px;">Estado en tiempo real</div>
+                </div>
+                <div class="arch-arrow">&#10132;</div>
+                <div class="arch-service" style="border-top: 3px solid var(--accent-green);">
+                    <div class="svc-icon">&#9783;</div>
+                    <div class="svc-name">UI Service</div>
+                    <div class="port">:8082 &middot; PostgreSQL</div>
+                    <div class="card-text" style="margin-top:8px;">Vistas + Auth + S3</div>
+                </div>
+                <div class="arch-arrow">&#10132;</div>
+                <div class="arch-service" style="border-top: 3px solid var(--accent-purple);">
+                    <div class="svc-icon">&#10024;</div>
+                    <div class="svc-name">AI Service</div>
+                    <div class="port">:8083 &middot; MongoDB</div>
+                    <div class="card-text" style="margin-top:8px;">Gemini + Groq + Notas</div>
+                </div>
+            </div>
+            <div class="tech-grid" style="margin-top: 32px; justify-content: center;">
+                <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-blue);"></span> Spring Boot 4.0.3</div>
+                <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-green);"></span> Java 21</div>
+                <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-purple);"></span> Spring Cloud 2025</div>
+                <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-orange);"></span> Thymeleaf</div>
+                <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-cyan);"></span> WebClient</div>
+                <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-pink);"></span> AWS SDK v2</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 6: CICLO PDCA ========== -->
+    <div class="slide" data-slide="5">
+        <div class="slide-content">
+            <div class="slide-label">Mejora Continua</div>
+            <div class="slide-title">Ciclo <span class="gradient-text">PDCA</span> aplicado a SlideHub</div>
+            <div class="pdca-grid stagger">
+                <div class="pdca-card plan">
+                    <div class="phase-letter">P</div>
+                    <div class="phase-name" style="color: var(--accent-blue);">Plan</div>
+                    <ul>
+                        <li>Análisis del módulo PHP original y extracción de 30 historias de usuario</li>
+                        <li>Diseño de arquitectura de 4 microservicios con responsabilidades claras</li>
+                        <li>Selección de stack: Spring Boot 4 + Redis + PostgreSQL + MongoDB</li>
+                        <li>Planificación en 7 fases (Fase 0 a Fase 6) con entregables definidos</li>
+                    </ul>
+                </div>
+                <div class="pdca-card do-phase">
+                    <div class="phase-letter">D</div>
+                    <div class="phase-name" style="color: var(--accent-green);">Do</div>
+                    <ul>
+                        <li>Implementación incremental: estado &#10132; vistas &#10132; auth &#10132; IA &#10132; deploy</li>
+                        <li>Integración de Gemini Vision, Groq, Google Drive y Resend vía WebClient</li>
+                        <li>Desarrollo de OAuth2 dual (GitHub + Google) con persistencia en JPA</li>
+                        <li>Deploy Tutor: análisis de repos + generación de Dockerfiles automáticos</li>
+                    </ul>
+                </div>
+                <div class="pdca-card check">
+                    <div class="phase-letter">C</div>
+                    <div class="phase-name" style="color: var(--accent-orange);">Check</div>
+                    <ul>
+                        <li>Tests unitarios con JUnit 5 + MockMvc por cada controller y servicio</li>
+                        <li>Validación de contratos REST: status codes, JSON schema, edge cases</li>
+                        <li>Verificación contra criterios de aceptación del CSV de historias de usuario</li>
+                        <li>Health checks en cada servicio: <code>/actuator/health</code></li>
+                    </ul>
+                </div>
+                <div class="pdca-card act">
+                    <div class="phase-letter">A</div>
+                    <div class="phase-name" style="color: var(--accent-purple);">Act</div>
+                    <ul>
+                        <li>Despliegue en Render con perfiles <code>prod</code> y variables de entorno</li>
+                        <li>Migraciones Flyway para evolución segura del esquema PostgreSQL</li>
+                        <li>Documentación de decisiones en AGENTS.md y resúmenes por fase</li>
+                        <li>Iteración sobre feedback: nuevas HU y mejoras de rendimiento</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 7: ISO 15504 ========== -->
+    <div class="slide" data-slide="6">
+        <div class="slide-content">
+            <div class="iso-header">
+                <span class="iso-badge" style="background: rgba(77,124,255,0.15); color: var(--accent-blue);">ISO/IEC 15504</span>
+                <span class="slide-label" style="margin: 0;">SPICE — Evaluación de Madurez del Proceso</span>
+            </div>
+            <div class="slide-title" style="font-size: clamp(28px, 3vw, 40px);">
+                Niveles de <span class="gradient-text">capacidad</span> del proceso
+            </div>
+            <div class="iso-desc">
+                ISO 15504 (SPICE) evalúa la madurez de los procesos de software en 6 niveles (0-5).
+                SlideHub aplica prácticas que posicionan el proyecto en los niveles superiores de capacidad.
+            </div>
+            <div class="iso-items stagger">
+                <div class="iso-item">
+                    <div class="iso-item-icon" style="background: rgba(239,68,68,0.15); color: var(--accent-red);">L1</div>
+                    <div>
+                        <div class="iso-item-title">Nivel 1 — Proceso Ejecutado</div>
+                        <div class="iso-item-desc">El software se construye y cumple su propósito. Los 4 microservicios funcionan, sirven sus endpoints y se comunican entre sí.</div>
+                    </div>
+                </div>
+                <div class="iso-item">
+                    <div class="iso-item-icon" style="background: rgba(245,158,11,0.15); color: var(--accent-orange);">L2</div>
+                    <div>
+                        <div class="iso-item-title">Nivel 2 — Proceso Gestionado</div>
+                        <div class="iso-item-desc">Planificación por fases (0-6) con entregables definidos. Historias de usuario documentadas con criterios de aceptación en CSV. Gestión de configuración con Git.</div>
+                    </div>
+                </div>
+                <div class="iso-item">
+                    <div class="iso-item-icon" style="background: rgba(16,185,129,0.15); color: var(--accent-green);">L3</div>
+                    <div>
+                        <div class="iso-item-title">Nivel 3 — Proceso Establecido</div>
+                        <div class="iso-item-desc">Convenciones estandarizadas en AGENTS.md y CLAUDE.md: estructura de paquetes, patrones de código (records, inyección por constructor, ResponseEntity), y guías de testing.</div>
+                    </div>
+                </div>
+                <div class="iso-item">
+                    <div class="iso-item-icon" style="background: rgba(77,124,255,0.15); color: var(--accent-blue);">L4</div>
+                    <div>
+                        <div class="iso-item-title">Nivel 4 — Proceso Predecible</div>
+                        <div class="iso-item-desc">Health checks (<code>/actuator/health</code>) y tests automatizados por servicio. Monitoreo de estado con endpoints dedicados. Migraciones Flyway para evolución controlada del schema.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 8: ISO 12207 ========== -->
+    <div class="slide" data-slide="7">
+        <div class="slide-content">
+            <div class="iso-header">
+                <span class="iso-badge" style="background: rgba(16,185,129,0.15); color: var(--accent-green);">ISO/IEC 12207</span>
+                <span class="slide-label" style="margin: 0;">Ciclo de Vida del Software</span>
+            </div>
+            <div class="slide-title" style="font-size: clamp(28px, 3vw, 40px);">
+                Procesos del <span class="gradient-text">ciclo de vida</span> aplicados
+            </div>
+            <div class="iso-desc">
+                ISO 12207 define los procesos para adquirir, suministrar, desarrollar, operar y mantener software.
+                SlideHub implementa los siguientes procesos clave:
+            </div>
+            <div class="two-cols">
+                <div>
+                    <div class="col-title">Procesos Principales</div>
+                    <div class="iso-items stagger">
+                        <div class="iso-item">
+                            <div class="iso-item-icon" style="background: rgba(77,124,255,0.15); color: var(--accent-blue);">&#9997;</div>
+                            <div>
+                                <div class="iso-item-title">Desarrollo</div>
+                                <div class="iso-item-desc">Análisis de requisitos (30 HU), diseño arquitectónico (4 microservicios), codificación en Java 21, integración y testing con JUnit 5.</div>
+                            </div>
+                        </div>
+                        <div class="iso-item">
+                            <div class="iso-item-icon" style="background: rgba(16,185,129,0.15); color: var(--accent-green);">&#9654;</div>
+                            <div>
+                                <div class="iso-item-title">Operación</div>
+                                <div class="iso-item-desc">Despliegue en Render con perfiles prod, variables de entorno, y health checks. Operación continua con Redis, PostgreSQL y MongoDB gestionados.</div>
+                            </div>
+                        </div>
+                        <div class="iso-item">
+                            <div class="iso-item-icon" style="background: rgba(139,92,246,0.15); color: var(--accent-purple);">&#8635;</div>
+                            <div>
+                                <div class="iso-item-title">Mantenimiento</div>
+                                <div class="iso-item-desc">Migraciones Flyway, versionado semántico en commits, documentación por fases (FASE-0 a FASE-6 RESUMEN).</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="col-title">Procesos de Soporte</div>
+                    <div class="iso-items stagger">
+                        <div class="iso-item">
+                            <div class="iso-item-icon" style="background: rgba(245,158,11,0.15); color: var(--accent-orange);">&#128203;</div>
+                            <div>
+                                <div class="iso-item-title">Documentación</div>
+                                <div class="iso-item-desc">README, AGENTS.md (spec técnica), CLAUDE.md (guías de código), DEPLOYMENT.md, análisis del módulo original.</div>
+                            </div>
+                        </div>
+                        <div class="iso-item">
+                            <div class="iso-item-icon" style="background: rgba(6,182,212,0.15); color: var(--accent-cyan);">&#128269;</div>
+                            <div>
+                                <div class="iso-item-title">Gestión de Configuración</div>
+                                <div class="iso-item-desc">Git con commits descriptivos. Spring Cloud Config Server centralizado. Profiles dev/prod separados. Variables de entorno para secretos.</div>
+                            </div>
+                        </div>
+                        <div class="iso-item">
+                            <div class="iso-item-icon" style="background: rgba(236,72,153,0.15); color: var(--accent-pink);">&#10004;</div>
+                            <div>
+                                <div class="iso-item-title">Verificación y Validación</div>
+                                <div class="iso-item-desc">Tests con MockMvc, validación contra criterios de aceptación, verificación de contratos REST entre servicios.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 9: ISO 27001 ========== -->
+    <div class="slide" data-slide="8">
+        <div class="slide-content">
+            <div class="iso-header">
+                <span class="iso-badge" style="background: rgba(239,68,68,0.15); color: var(--accent-red);">ISO/IEC 27001</span>
+                <span class="slide-label" style="margin: 0;">Seguridad de la Información</span>
+            </div>
+            <div class="slide-title" style="font-size: clamp(28px, 3vw, 40px);">
+                Controles de <span class="gradient-text">seguridad</span> implementados
+            </div>
+            <div class="iso-desc">
+                ISO 27001 establece un marco para el Sistema de Gestión de Seguridad de la Información (SGSI).
+                SlideHub aplica controles del Anexo A relevantes para una aplicación web distribuida.
+            </div>
+            <div class="cards-grid stagger">
+                <div class="card">
+                    <div class="card-icon" style="background: rgba(77,124,255,0.15); color: var(--accent-blue);">&#128274;</div>
+                    <div class="card-title">A.9 — Control de Acceso</div>
+                    <div class="card-text">Spring Security con roles (PRESENTER, ADMIN). Rutas protegidas por rol. Sesiones invalidadas en logout. OAuth2 como segundo factor de identidad.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" style="background: rgba(16,185,129,0.15); color: var(--accent-green);">&#128272;</div>
+                    <div class="card-title">A.10 — Criptografía</div>
+                    <div class="card-text">Contraseñas hasheadas con BCrypt (factor 10). Tokens OAuth2 encriptados en PostgreSQL. SSL obligatorio en Aiven (PostgreSQL). HTTPS en producción.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" style="background: rgba(245,158,11,0.15); color: var(--accent-orange);">&#128421;</div>
+                    <div class="card-title">A.12 — Seguridad Operacional</div>
+                    <div class="card-text">Variables de entorno para secretos (nunca hardcoded). Perfiles separados dev/prod. Health checks y actuator para monitoreo. Logs con SLF4J estructurado.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" style="background: rgba(139,92,246,0.15); color: var(--accent-purple);">&#127760;</div>
+                    <div class="card-title">A.13 — Seguridad en Comunicaciones</div>
+                    <div class="card-text">Gateway centralizado como único punto de entrada. CORS y headers configurados en gateway-service. Comunicación interna REST entre servicios en red privada.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" style="background: rgba(6,182,212,0.15); color: var(--accent-cyan);">&#128187;</div>
+                    <div class="card-title">A.14 — Desarrollo Seguro</div>
+                    <div class="card-text">Validación de inputs en boundaries. Flyway para migraciones controladas (nunca ddl-auto=create). Inyección por constructor (no reflexión). Sin SDKs innecesarios.</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" style="background: rgba(236,72,153,0.15); color: var(--accent-pink);">&#128230;</div>
+                    <div class="card-title">A.15 — Relaciones con Proveedores</div>
+                    <div class="card-text">APIs externas (Gemini, Groq, Resend) accedidas solo vía WebClient HTTP — sin SDKs que inyecten dependencias opacas. AWS SDK v2 como excepción justificada (SigV4).</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 10: PIPELINE CI/CD ========== -->
+    <div class="slide" data-slide="9">
+        <div class="slide-content">
+            <div class="slide-label">Integración y Despliegue Continuo</div>
+            <div class="slide-title">Pipeline <span class="gradient-text">CI/CD</span></div>
+            <div class="slide-subtitle">Cada push a <code style="background:var(--bg-card); padding:2px 8px; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:14px;">main</code> dispara el pipeline completo en Render para cada microservicio.</div>
+
+            <div class="pipeline stagger">
+                <div class="pipeline-stage">
+                    <div class="stage-dot" style="border-color: var(--accent-blue); color: var(--accent-blue);">&#128196;</div>
+                    <div class="stage-name" style="color: var(--accent-blue);">Source</div>
+                    <div class="stage-detail">Push a main<br>Git webhook<br>Render detecta cambios</div>
+                </div>
+                <div class="pipeline-stage">
+                    <div class="stage-dot" style="border-color: var(--accent-cyan); color: var(--accent-cyan);">&#128295;</div>
+                    <div class="stage-name" style="color: var(--accent-cyan);">Build</div>
+                    <div class="stage-detail">Maven wrapper<br><code style="font-size:10px">./mvnw -pl service package -am</code><br>Compilación Java 21</div>
+                </div>
+                <div class="pipeline-stage">
+                    <div class="stage-dot" style="border-color: var(--accent-green); color: var(--accent-green);">&#9989;</div>
+                    <div class="stage-name" style="color: var(--accent-green);">Test</div>
+                    <div class="stage-detail">JUnit 5 + MockMvc<br>Tests unitarios<br>Validación de contratos</div>
+                </div>
+                <div class="pipeline-stage">
+                    <div class="stage-dot" style="border-color: var(--accent-orange); color: var(--accent-orange);">&#128230;</div>
+                    <div class="stage-name" style="color: var(--accent-orange);">Package</div>
+                    <div class="stage-detail">JAR ejecutable<br>spring-boot-maven-plugin<br>Perfil prod activado</div>
+                </div>
+                <div class="pipeline-stage">
+                    <div class="stage-dot" style="border-color: var(--accent-purple); color: var(--accent-purple);">&#9729;</div>
+                    <div class="stage-name" style="color: var(--accent-purple);">Deploy</div>
+                    <div class="stage-detail">Render Web Service<br><code style="font-size:10px">java -jar target/*.jar</code><br>Zero-downtime</div>
+                </div>
+                <div class="pipeline-stage">
+                    <div class="stage-dot" style="border-color: var(--accent-pink); color: var(--accent-pink);">&#128200;</div>
+                    <div class="stage-name" style="color: var(--accent-pink);">Monitor</div>
+                    <div class="stage-detail">/actuator/health<br>Logs centralizados<br>Redis/Postgres/Mongo</div>
+                </div>
+            </div>
+
+            <div class="cards-grid" style="margin-top: 36px;">
+                <div class="card">
+                    <div class="card-title">Render — 4 Web Services</div>
+                    <div class="card-text">Cada microservicio se despliega como un Web Service independiente con su propio build command, start command y variables de entorno.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Configuración por Perfiles</div>
+                    <div class="card-text"><code>SPRING_PROFILES_ACTIVE=prod</code> activa <code>application-prod.properties</code> con DSNs reales de Aiven, Atlas y Upstash.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Flyway Migrations</div>
+                    <div class="card-text">Evolución controlada del schema PostgreSQL. En producción solo <code>ddl-auto=validate</code> — nunca generación automática de tablas.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 11: STACK TECNOLÓGICO ========== -->
+    <div class="slide" data-slide="10">
+        <div class="slide-content">
+            <div class="slide-label">Stack Tecnológico</div>
+            <div class="slide-title">Tecnologías <span class="gradient-text">clave</span></div>
+            <div class="two-cols stagger">
+                <div>
+                    <div class="col-title">Backend & Datos</div>
+                    <div class="tech-grid">
+                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-blue);"></span> Java 21 LTS</div>
+                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-green);"></span> Spring Boot 4.0.3</div>
+                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-purple);"></span> Spring Cloud 2025</div>
+                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-red);"></span> Redis (Upstash)</div>
+                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-cyan);"></span> PostgreSQL (Aiven)</div>
+                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-green);"></span> MongoDB Atlas</div>
+                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-orange);"></span> Amazon S3</div>
+                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-pink);"></span> Flyway</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="col-title">Frontend & Integraciones</div>
+                    <div class="tech-grid">
+                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-orange);"></span> Thymeleaf 3</div>
+                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-blue);"></span> Bootstrap 5.3</div>
+                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-cyan);"></span> Vanilla JS (ES6)</div>
+                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-purple);"></span> Gemini Vision API</div>
+                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-green);"></span> Groq LLM API</div>
+                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-red);"></span> Google Drive API v3</div>
+                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-pink);"></span> Resend (email)</div>
+                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-orange);"></span> OAuth2 (GitHub + Google)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 12: CIERRE ========== -->
+    <div class="slide title-slide" data-slide="11">
+        <div class="slide-content">
+            <div class="title-logo">&#9670;</div>
+            <div class="title-main" style="font-size: clamp(40px, 5vw, 64px);">Gracias</div>
+            <div class="title-tagline">SlideHub — Sistema de Presentación Multi-Pantalla</div>
+            <div class="slide-subtitle" style="text-align: center; margin: 0 auto 32px;">
+                4 microservicios &middot; 30 historias de usuario &middot; 7 fases de desarrollo<br>
+                Java 21 &middot; Spring Boot 4 &middot; IA Generativa &middot; Cloud-Native
+            </div>
+            <div class="title-chips">
+                <span class="chip" style="border-color: var(--accent-blue); color: var(--accent-blue);">PDCA</span>
+                <span class="chip" style="border-color: var(--accent-green); color: var(--accent-green);">ISO 15504</span>
+                <span class="chip" style="border-color: var(--accent-orange); color: var(--accent-orange);">ISO 12207</span>
+                <span class="chip" style="border-color: var(--accent-red); color: var(--accent-red);">ISO 27001</span>
+                <span class="chip" style="border-color: var(--accent-purple); color: var(--accent-purple);">CI/CD</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const wrapper = document.getElementById('slidesWrapper');
+    const slides = document.querySelectorAll('.slide');
+    const progressBar = document.getElementById('progressBar');
+    const currentSlideEl = document.getElementById('currentSlide');
+    const totalSlidesEl = document.getElementById('totalSlides');
+    const totalSlides = slides.length;
+
+    let currentIndex = 0;
+    let isAnimating = false;
+
+    totalSlidesEl.textContent = String(totalSlides).padStart(2, '0');
+
+    function goToSlide(index) {
+        if (index < 0 || index >= totalSlides || isAnimating) return;
+        isAnimating = true;
+
+        slides[currentIndex].classList.remove('active');
+        currentIndex = index;
+
+        wrapper.style.transform = `translateY(-${currentIndex * 100}vh)`;
+        progressBar.style.width = `${((currentIndex + 1) / totalSlides) * 100}%`;
+        currentSlideEl.textContent = String(currentIndex + 1).padStart(2, '0');
+
+        setTimeout(() => {
+            slides[currentIndex].classList.add('active');
+            isAnimating = false;
+        }, 200);
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+            e.preventDefault();
+            goToSlide(currentIndex + 1);
+        } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+            e.preventDefault();
+            goToSlide(currentIndex - 1);
+        } else if (e.key === 'Home') {
+            e.preventDefault();
+            goToSlide(0);
+        } else if (e.key === 'End') {
+            e.preventDefault();
+            goToSlide(totalSlides - 1);
+        }
+    });
+
+    // Mouse wheel navigation
+    let wheelTimeout = null;
+    document.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        if (wheelTimeout) return;
+        wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 800);
+
+        if (e.deltaY > 0) {
+            goToSlide(currentIndex + 1);
+        } else if (e.deltaY < 0) {
+            goToSlide(currentIndex - 1);
+        }
+    }, { passive: false });
+
+    // Touch navigation
+    let touchStartY = 0;
+    document.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+    });
+
+    document.addEventListener('touchend', (e) => {
+        const diff = touchStartY - e.changedTouches[0].clientY;
+        if (Math.abs(diff) > 50) {
+            if (diff > 0) goToSlide(currentIndex + 1);
+            else goToSlide(currentIndex - 1);
+        }
+    });
+
+    // Click on progress area to navigate
+    document.querySelector('.slide-counter').addEventListener('click', () => {
+        const target = prompt(`Ir a slide (1-${totalSlides}):`);
+        if (target) goToSlide(parseInt(target) - 1);
+    });
+</script>
+
+</body>
+</html>
