@@ -6,7 +6,7 @@ Este documento establece las políticas de privacidad, normas de uso, exención 
 
 ## 1. Derechos de Autor (Copyright)
 
-**Copyright &copy; 2026 Brixo / SlideHub. Todos los derechos reservados (All Rights Reserved).**
+**Copyright &copy; 2026 Codebymike / SlideHub. Todos los derechos reservados (All Rights Reserved).**
 
 Este repositorio y su código fuente son **código cerrado** y se publican únicamente con fines de visibilidad, portafolio y referencia. 
 *   **No se concede ninguna licencia** implícita ni explícita para usar, copiar, modificar, fusionar, publicar, distribuir, sublicenciar y/o vender copias del software.
