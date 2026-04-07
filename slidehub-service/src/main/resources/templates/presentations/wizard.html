@@ -755,9 +755,17 @@
             dropZone.addEventListener('drop', e => {
                 e.preventDefault(); dropZone.classList.remove('drag-over');
                 const files = Array.from(e.dataTransfer.files);
-                const pptxFile = files.find(f => f.name.toLowerCase().endsWith('.pptx'));
+                const pptxFile = files.find(f =>
+                    f.name.toLowerCase().endsWith('.pptx') ||
+                    f.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+                );
                 if (pptxFile) {
                     showImportTab('pptx');
+                    try {
+                        const dt = new DataTransfer();
+                        dt.items.add(pptxFile);
+                        document.getElementById('pptx-file-input').files = dt.files;
+                    } catch (_) {}
                     onPptxSelected({ target: { files: [pptxFile] } });
                     return;
                 }
