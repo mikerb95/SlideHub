@@ -186,12 +186,12 @@
     <nav class="sh-nav">
         <div class="sh-nav-inner">
             <div class="flex items-center gap-3">
-                <a href="/presentations" class="flex items-center gap-3 no-underline text-[var(--sh-text-1)]">
+                <a href="#" onclick="confirmLeaveWizard(event)" class="flex items-center gap-3 no-underline text-[var(--sh-text-1)]">
                     <span class="font-brand text-base tracking-tight">SlideHub</span>
                 </a>
                 <span class="sh-badge ml-1">SETUP</span>
             </div>
-            <a href="/presentations" class="sh-btn sh-btn-ghost text-xs">
+            <a href="#" onclick="confirmLeaveWizard(event)" class="sh-btn sh-btn-ghost text-xs">
                 <i class="fa-solid fa-arrow-left"></i> Volver
             </a>
         </div>
@@ -1540,6 +1540,40 @@
                 if (n >= 1 && n <= W.totalSteps) goToStep(n);
             }
         })();
+    </script>
+
+    <!-- ═══ Modal: Confirmar salida del wizard ═══ -->
+    <div id="leave-wizard-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);">
+        <div class="rounded-tech border p-6 max-w-sm w-full mx-4" style="background: var(--sh-surface); border-color: var(--sh-border-active);">
+            <div class="flex items-center gap-3 mb-3">
+                <i class="fa-solid fa-triangle-exclamation" style="color: var(--sh-yellow); font-size: 1.25rem;"></i>
+                <h3 class="font-semibold text-sm" style="color: var(--sh-text-1);">¿Salir del asistente?</h3>
+            </div>
+            <p class="text-xs mb-5" style="color: var(--sh-text-3);">
+                El progreso no guardado se perderá. ¿Seguro que quieres volver a Presentaciones?
+            </p>
+            <div class="flex gap-2 justify-end">
+                <button onclick="closeLeaveModal()" class="sh-btn sh-btn-ghost text-xs">
+                    Cancelar
+                </button>
+                <a id="leave-wizard-confirm" href="/presentations" class="sh-btn sh-btn-danger text-xs">
+                    Sí, salir
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function confirmLeaveWizard(e) {
+            e.preventDefault();
+            document.getElementById('leave-wizard-modal').classList.remove('hidden');
+        }
+        function closeLeaveModal() {
+            document.getElementById('leave-wizard-modal').classList.add('hidden');
+        }
+        document.getElementById('leave-wizard-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeLeaveModal();
+        });
     </script>
 </body>
 

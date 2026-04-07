@@ -6,10 +6,10 @@ package com.codebymike.slidehub.state.model;
  * El campo returnSlide se usa en Fase 4 para volver al slide previo tras un
  * demo.
  */
-public record DemoState(String mode, Integer slide, String url, Integer returnSlide) {
+public record DemoState(String mode, Integer slide, String url, Integer returnSlide, Integer scrollY) {
 
     /** Estado inicial por defecto: modo slides, slide 1. */
     public static DemoState defaultSlides() {
-        return new DemoState("slides", 1, null, null);
+        return new DemoState("slides", 1, null, null, 0);
     }
 }

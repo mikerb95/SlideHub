@@ -62,8 +62,8 @@ public class MgrService {
     public Map<String, Object> getUserStats() {
         Map<String, Object> stats = new LinkedHashMap<>();
         stats.put("total", userRepository.count());
-        stats.put("presenters", userRepository.countByRole(Role.HOST));
-        stats.put("admins", userRepository.countByRole(Role.PRESENTER));
+        stats.put("hosts", userRepository.countByRole(Role.HOST));
+        stats.put("presenters", userRepository.countByRole(Role.PRESENTER));
         stats.put("developers", userRepository.countByRole(Role.DEVELOPER));
         stats.put("local", userRepository.countLocalUsers());
         stats.put("github", userRepository.countGithubUsers());

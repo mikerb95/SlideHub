@@ -1,6 +1,7 @@
 package com.codebymike.slidehub.state.controller;
 
 import com.codebymike.slidehub.state.model.DemoState;
+import com.codebymike.slidehub.state.model.ScrollDeltaRequest;
 import com.codebymike.slidehub.state.model.SetDemoRequest;
 import com.codebymike.slidehub.state.service.DemoStateService;
 import org.springframework.http.ResponseEntity;
@@ -33,5 +34,11 @@ public class DemoController {
     @PostMapping
     public ResponseEntity<DemoState> setDemoState(@RequestBody SetDemoRequest request) {
         return ResponseEntity.ok(demoStateService.setDemoState(request));
+    }
+
+    /** Desplaza el iframe en modo URL sumando delta píxeles al scrollY actual. */
+    @PostMapping("/scroll")
+    public ResponseEntity<DemoState> scrollDemo(@RequestBody ScrollDeltaRequest request) {
+        return ResponseEntity.ok(demoStateService.scroll(request.delta()));
     }
 }

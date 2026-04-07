@@ -1,6 +1,7 @@
 package com.codebymike.slidehub.state.service;
 
 import com.codebymike.slidehub.state.model.DemoState;
+import com.codebymike.slidehub.state.model.ScrollDeltaRequest;
 import com.codebymike.slidehub.state.model.SetDemoRequest;
 import tools.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -58,7 +59,7 @@ public class DemoStateService {
     public DemoState setDemoState(SetDemoRequest request) {
         DemoState newState;
         if ("url".equals(request.mode())) {
-            newState = new DemoState("url", null, request.url(), request.returnSlide());
+            newState = new DemoState("url", null, request.url(), request.returnSlide(), 0);
         } else {
             // Modo "slides": limpiar url y restaurar slide previo si existe
             DemoState current = getDemoState();
@@ -71,7 +72,7 @@ public class DemoStateService {
             }
             // Restaurar el slide activo en state-service (Fase 4 tarea 41)
             slideStateService.setSlide(restoreSlide, null);
-            newState = new DemoState("slides", restoreSlide, null, null);
+            newState = new DemoState("slides", restoreSlide, null, null, 0);
         }
         try {
             String json = objectMapper.writeValueAsString(newState);
@@ -80,5 +81,25 @@ public class DemoStateService {
             log.error("Error guardando demo state en Redis: {}", e.getMessage());
         }
         return newState;
+    }
+
+    /**
+     * Desplaza la vista del iframe en modo URL sumando delta (px) al scrollY actual.
+     * Mínimo 0. Solo opera si el modo actual es "url".
+     */
+    public DemoState scroll(int delta) {
+        DemoState current = getDemoState();
+        if (!"url".equals(current.mode())) {
+            return current;
+        }
+        int newScrollY = Math.max(0, (current.scrollY() != null ? current.scrollY() : 0) + delta);
+        DemoState updated = new DemoState(current.mode(), current.slide(), current.url(), current.returnSlide(), newScrollY);
+        try {
+            String json = objectMapper.writeValueAsString(updated);
+            redis.opsForValue().set(DEMO_KEY, json);
+        } catch (Exception e) {
+            log.error("Error guardando scroll en Redis: {}", e.getMessage());
+        }
+        return updated;
     }
 }

@@ -55,13 +55,17 @@
             inset: 0;
             width: 100%;
             height: 100%;
+            overflow: hidden;
             z-index: 10;
         }
 
         #url-view iframe {
             width: 100%;
-            height: 100%;
+            height: 300vh;
             border: none;
+            display: block;
+            transform-origin: top left;
+            transition: transform 0.25s ease;
         }
 
         #error-msg {
@@ -293,6 +297,7 @@
         let totalSlides = 0;
         let currentMode = null;
         let currentUrl = null;
+        let currentScrollY = 0;
         let slideUrls = [];
         let deviceToken = localStorage.getItem(DEVICE_STORAGE_KEY) || '';
         const wrapper = document.getElementById('slide-wrapper');
@@ -363,12 +368,39 @@
 
         async function poll() {
             try {
-                const res = await fetch(API_SLIDE_URL);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
+                const [slideRes, demoRes] = await Promise.all([fetch(API_SLIDE_URL), fetch(API_DEMO_URL)]);
+                if (!slideRes.ok) throw new Error(`HTTP ${slideRes.status}`);
+                const data = await slideRes.json();
                 errorMsg.style.display = 'none';
                 const effectiveTotal = slideUrls.length > 0 ? slideUrls.length : data.totalSlides;
                 if (effectiveTotal !== totalSlides) { totalSlides = effectiveTotal; buildSlides(totalSlides); }
+
+                if (demoRes.ok) {
+                    const demo = await demoRes.json();
+                    if (demo.mode === 'url') {
+                        if (currentMode !== 'url' || demo.url !== currentUrl) {
+                            currentMode = 'url'; currentUrl = demo.url;
+                            wrapper.style.display = 'none';
+                            urlView.style.display = 'block';
+                            slidesIframe.src = demo.url;
+                        }
+                        const scrollY = demo.scrollY ?? 0;
+                        if (scrollY !== currentScrollY) {
+                            currentScrollY = scrollY;
+                            slidesIframe.style.transform = `translateY(-${scrollY}px)`;
+                        }
+                        return;
+                    } else {
+                        if (currentMode === 'url') {
+                            currentMode = 'slides'; currentScrollY = 0;
+                            urlView.style.display = 'none';
+                            slidesIframe.src = 'about:blank';
+                            slidesIframe.style.transform = '';
+                            wrapper.style.display = '';
+                        }
+                    }
+                }
+
                 if (data.slide !== currentSlide) { currentSlide = data.slide; showSlide(currentSlide); }
             } catch (e) { errorMsg.style.display = 'block'; }
         }
