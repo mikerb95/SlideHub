@@ -886,6 +886,19 @@
             } catch (_) { }
         });
 
+        async function scrollDemo(delta) {
+            try {
+                await fetch(`${API_DEMO_URL}/scroll`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ delta })
+                });
+            } catch (_) { }
+        }
+
+        document.getElementById('btn-mp-scroll-up').addEventListener('click', () => scrollDemo(-300));
+        document.getElementById('btn-mp-scroll-down').addEventListener('click', () => scrollDemo(300));
+
         document.getElementById('btn-start-session').addEventListener('click', startSession);
         document.getElementById('btn-add-participant').addEventListener('click', addParticipant);
         document.getElementById('btn-assign-slide').addEventListener('click', assignSlideToParticipant);
