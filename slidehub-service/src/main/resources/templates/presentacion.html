@@ -922,7 +922,7 @@
                     <div class="iso-item-icon" style="background: rgba(220,38,38,0.12); color: var(--accent-red);">L1</div>
                     <div>
                         <div class="iso-item-title">Nivel 1 — Proceso Ejecutado</div>
-                        <div class="iso-item-desc">El software se construye y cumple su propósito. Los 4 microservicios funcionan, sirven sus endpoints y se comunican entre sí.</div>
+                        <div class="iso-item-desc">El software se construye y cumple su propósito. El monolito modular funciona, sirve sus endpoints y coordina los módulos state, ui y ai.</div>
                     </div>
                 </div>
                 <div class="iso-item">
@@ -972,7 +972,7 @@
                             <div class="iso-item-icon" style="background: rgba(37,99,235,0.12); color: var(--accent-blue);">&#9997;</div>
                             <div>
                                 <div class="iso-item-title">Desarrollo</div>
-                                <div class="iso-item-desc">Análisis de requisitos (30 HU), diseño arquitectónico (4 microservicios), codificación en Java 21, integración y testing con JUnit 5.</div>
+                                <div class="iso-item-desc">Análisis de requisitos (30 HU), diseño arquitectónico (monolito modular), codificación en Java 21, integración y testing con JUnit 5.</div>
                             </div>
                         </div>
                         <div class="iso-item">
@@ -1054,7 +1054,7 @@
                 <div class="card">
                     <div class="card-icon" style="background: rgba(124,58,237,0.12); color: var(--accent-purple);">&#127760;</div>
                     <div class="card-title">A.13 — Seguridad en Comunicaciones</div>
-                    <div class="card-text">Gateway centralizado como único punto de entrada. CORS y headers configurados en gateway-service. Comunicación interna REST entre servicios en red privada.</div>
+                    <div class="card-text">Un único punto de entrada en <code>slidehub-service :8080</code>. CORS y headers de seguridad configurados centralmente. Módulos internos sin exposición directa.</div>
                 </div>
                 <div class="card">
                     <div class="card-icon" style="background: rgba(8,145,178,0.12); color: var(--accent-cyan);">&#128187;</div>
