@@ -4,6 +4,8 @@ import com.codebymike.slidehub.ui.model.QuestionStatus;
 import com.codebymike.slidehub.ui.model.User;
 import com.codebymike.slidehub.ui.repository.UserRepository;
 import com.codebymike.slidehub.ui.service.QuestionService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
 /**

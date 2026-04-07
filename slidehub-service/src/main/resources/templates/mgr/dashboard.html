@@ -119,6 +119,74 @@
             color: var(--text-2);
             margin-bottom: 12px;
         }
+
+        /* ── Filtros de usuarios ── */
+        .user-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 0.3rem;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-size: 0.62rem;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: var(--text-2);
+            margin-right: 0.15rem;
+        }
+
+        .filter-pill {
+            font-size: 0.68rem;
+            padding: 3px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-2);
+            cursor: pointer;
+            font-family: inherit;
+            transition: border-color .15s, color .15s, background .15s;
+        }
+
+        .filter-pill:hover {
+            border-color: #444;
+            color: var(--text-1);
+        }
+
+        .filter-pill.active {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: #00e67610;
+        }
+
+        .filter-pill.active-role-HOST    { border-color:#00e676; color:#00e676; background:#00e67610; }
+        .filter-pill.active-role-PRESENTER { border-color:#38bdf8; color:#38bdf8; background:#0ea5e910; }
+        .filter-pill.active-role-DEVELOPER { border-color:#a78bfa; color:#a78bfa; background:#7c3aed10; }
+        .filter-pill.active-auth-github  { border-color:#e2e8f0; color:#e2e8f0; background:#ffffff08; }
+        .filter-pill.active-auth-google  { border-color:#ea4335; color:#ea4335; background:#ea433510; }
+        .filter-pill.active-auth-local   { border-color:#ffd740; color:#ffd740; background:#ffd74010; }
+
+        .user-count-badge {
+            font-size: 0.65rem;
+            color: var(--text-2);
+            margin-left: auto;
+        }
+
+        .user-count-badge span {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .tbl tr.hidden-by-filter {
+            display: none;
+        }
     </style>
 </head>
 
