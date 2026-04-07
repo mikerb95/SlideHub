@@ -42,12 +42,12 @@ public class MgrService {
     private String s3Bucket;
 
     public MgrService(UserRepository userRepository,
-                      PresentationRepository presentationRepository,
-                      PresentationSessionRepository sessionRepository,
-                      RedisTemplate<String, String> redisTemplate,
-                      MongoTemplate mongoTemplate,
-                      DataSource dataSource,
-                      S3Client s3Client) {
+            PresentationRepository presentationRepository,
+            PresentationSessionRepository sessionRepository,
+            RedisTemplate<String, String> redisTemplate,
+            MongoTemplate mongoTemplate,
+            DataSource dataSource,
+            S3Client s3Client) {
         this.userRepository = userRepository;
         this.presentationRepository = presentationRepository;
         this.sessionRepository = sessionRepository;
@@ -133,7 +133,8 @@ public class MgrService {
     }
 
     private boolean checkS3() {
-        if (s3Bucket == null || s3Bucket.isBlank()) return false;
+        if (s3Bucket == null || s3Bucket.isBlank())
+            return false;
         try {
             s3Client.headBucket(HeadBucketRequest.builder().bucket(s3Bucket).build());
             return true;

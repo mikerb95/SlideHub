@@ -84,7 +84,8 @@ public class DemoStateService {
     }
 
     /**
-     * Desplaza la vista del iframe en modo URL sumando delta (px) al scrollY actual.
+     * Desplaza la vista del iframe en modo URL sumando delta (px) al scrollY
+     * actual.
      * Mínimo 0. Solo opera si el modo actual es "url".
      */
     public DemoState scroll(int delta) {
@@ -93,7 +94,8 @@ public class DemoStateService {
             return current;
         }
         int newScrollY = Math.max(0, (current.scrollY() != null ? current.scrollY() : 0) + delta);
-        DemoState updated = new DemoState(current.mode(), current.slide(), current.url(), current.returnSlide(), newScrollY);
+        DemoState updated = new DemoState(current.mode(), current.slide(), current.url(), current.returnSlide(),
+                newScrollY);
         try {
             String json = objectMapper.writeValueAsString(updated);
             redis.opsForValue().set(DEMO_KEY, json);
