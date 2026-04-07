@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -112,10 +113,12 @@ public class StreamController {
         return sessionRepository.findByPresentationIdAndActiveTrue(presentationId)
                 .map(session -> {
                     ViewerService.ViewerStats stats = viewerService.getStats(session.getId());
+                    List<String> handRaisers = viewerService.getHandRaisers(session.getId());
                     return ResponseEntity.ok(Map.of(
                             "viewerCount", stats.viewerCount(),
-                            "handCount", stats.handCount()));
+                            "handCount", stats.handCount(),
+                            "handRaisers", handRaisers));
                 })
-                .orElse(ResponseEntity.ok(Map.of("viewerCount", 0L, "handCount", 0L)));
+                .orElse(ResponseEntity.ok(Map.of("viewerCount", 0L, "handCount", 0L, "handRaisers", List.of())));
     }
 }
