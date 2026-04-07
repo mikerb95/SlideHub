@@ -23,4 +23,9 @@ public class LegalController {
     public String copyright() {
         return "legal/copyright";
     }
+
+    @GetMapping("/pricing")
+    public String pricing() {
+        return "public/pricing";
+    }
 }

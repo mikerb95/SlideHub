@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Precios - SlideHub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Tailwind via CDN for layout utilities -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .pricing-card { background: #1e293b; border: 1px solid #334155; border-radius: 1rem; transition: transform 0.2s; }
+        .pricing-card:hover { transform: translateY(-5px); border-color: #3b82f6; }
+        .pro-card { background: linear-gradient(180deg, #1e293b 0%, #172554 100%); border-color: #3b82f6; position: relative; }
+        .badge-popular { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #3b82f6; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+        .btn-custom { border-radius: 0.5rem; font-weight: 600; padding: 0.75rem 1.5rem; transition: all 0.2s; width: 100%; }
+        .btn-primary-custom { background: #3b82f6; color: white; border: none; }
+        .btn-primary-custom:hover { background: #2563eb; color: white; }
+        .btn-outline-custom { background: transparent; color: #f8fafc; border: 1px solid #475569; }
+        .btn-outline-custom:hover { background: #334155; color: white; }
+        .feature-icon { color: #10b981; margin-right: 0.5rem; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <nav class="navbar navbar-dark bg-[#0f172a] border-b border-slate-800 py-3">
+        <div class="container">
+            <a class="navbar-brand font-bold flex items-center gap-2" href="/showcase">
+                <i class="fa-solid fa-layer-group text-blue-500"></i>
+                SlideHub
+            </a>
+            <div class="d-flex gap-2">
+                <a href="/auth/login" class="btn btn-outline-light btn-sm rounded-pill px-4">Iniciar Sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow container py-16">
+        <div class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Planes diseñados para ti</h1>
+            <p class="text-slate-400 text-lg max-w-2xl mx-auto">Selecciona el plan de SlideHub que mejor se adapte a tus necesidades de presentación, desde reuniones pequeñas hasta conferencias interactivas profesionales.</p>
+        </div>
+
+        <div class="row g-4 justify-content-center max-w-6xl mx-auto">
+            <!-- Free Tier -->
+            <div class="col-md-4">
+                <div class="pricing-card p-8 h-100 flex flex-col">
+                    <h3 class="text-xl font-bold text-slate-300 mb-2">Free</h3>
+                    <div class="mb-4">
+                        <span class="text-4xl font-bold">$0</span>
+                        <span class="text-slate-400">/mes</span>
+                    </div>
+                    <p class="text-slate-400 text-sm mb-6 pb-6 border-b border-slate-700">Perfecto para estudiantes y pequeñas reuniones.</p>
+                    
+                    <ul class="list-unstyled space-y-4 mb-8 flex-grow text-slate-300">
+                        <li><i class="fa-solid fa-check feature-icon"></i> Presentaciones de hasta 20 diapositivas</li>
+                        <li><i class="fa-solid fa-check feature-icon"></i> Preguntas y respuestas en vivo (Q&A)</li>
+                        <li><i class="fa-solid fa-check feature-icon"></i> Participación con levantar la mano</li>
+                        <li><i class="fa-solid fa-check feature-icon"></i> Solicitud de ayuda en grupo (háptica)</li>
+                        <li><i class="fa-solid fa-check feature-icon"></i> Asignación de diapositivas a compañeros</li>
+                    </ul>
+                    <a href="/auth/register" class="btn btn-outline-custom mt-auto">Comienza Gratis</a>
+                </div>
+            </div>
+
+            <!-- Basic Tier -->
+            <div class="col-md-4">
+                <div class="pricing-card p-8 h-100 flex flex-col relative border-slate-600">
+                    <h3 class="text-xl font-bold text-blue-400 mb-2">Básico</h3>
+                    <div class="mb-4">
+                        <span class="text-4xl font-bold">$9</span>
+                        <span class="text-slate-400">/mes</span>
+                    </div>
+                    <p class="text-slate-400 text-sm mb-6 pb-6 border-b border-slate-700">Para educadores y profesionales habituales.</p>
+                    
+                    <ul class="list-unstyled space-y-4 mb-8 flex-grow text-slate-300">
+                        <li><i class="fa-solid fa-check feature-icon"></i> <span class="font-semibold text-white">Todo lo de Free, más:</span></li>
+                        <li><i class="fa-solid fa-check feature-icon"></i> Presentaciones de hasta 50 diapositivas</li>
+                        <li><i class="fa-solid fa-check feature-icon text-blue-400"></i> Generación automática de notas con IA</li>
+                        <li><i class="fa-solid fa-check feature-icon text-blue-400"></i> Generación de contexto de ayuda adicional</li>
+                    </ul>
+                    <a href="/auth/register" class="btn btn-outline-custom mt-auto">Elegir Básico</a>
+                </div>
+            </div>
+
+            <!-- Pro Tier -->
+            <div class="col-md-4">
+                <div class="pricing-card pro-card p-8 h-100 flex flex-col">
+                    <span class="badge-popular">MÁS POPULAR</span>
+                    <h3 class="text-xl font-bold text-white mb-2">Pro</h3>
+                    <div class="mb-4">
+                        <span class="text-4xl font-bold text-white">$19</span>
+                        <span class="text-blue-200">/mes</span>
+                    </div>
+                    <p class="text-blue-200 text-sm mb-6 pb-6 border-b border-blue-900/50">La experiencia definitiva para conferencistas.</p>
+                    
+                    <ul class="list-unstyled space-y-4 mb-8 flex-grow text-slate-200">
+                        <li><i class="fa-solid fa-check feature-icon"></i> <span class="font-semibold text-white">Todo lo de Básico, más:</span></li>
+                        <li><i class="fa-solid fa-check feature-icon"></i> Diapositivas ilimitadas</li>
+                        <li><i class="fa-solid fa-check feature-icon text-blue-400"></i> Modo Demo avanzado e iFrames</li>
+                        <li><i class="fa-solid fa-check feature-icon text-blue-400"></i> Push-to-Talk inteligente</li>
+                        <li><i class="fa-solid fa-check feature-icon text-blue-400"></i> Transcripción e IA Conversacional</li>
+                    </ul>
+                    <a href="/auth/register" class="btn btn-primary-custom mt-auto">Obtener Pro</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="mt-auto border-t border-slate-800 py-8 bg-[#0f172a]">
+        <div class="container text-center text-slate-500 text-sm flex flex-col md:flex-row justify-between items-center">
+            <p class="mb-2 md:mb-0">© 2026 SlideHub. Todos los derechos reservados.</p>
+            <div class="flex gap-4">
+                <a href="/privacidad" class="text-slate-500 hover:text-white transition">Privacidad</a>
+                <a href="/politicadeuso" class="text-slate-500 hover:text-white transition">Términos</a>
+                <a href="/copyright" class="text-slate-500 hover:text-white transition">Copyright</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
