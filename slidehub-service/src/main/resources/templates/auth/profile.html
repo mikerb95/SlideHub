@@ -91,7 +91,7 @@
                             email@ejemplo.com</div>
                     </div>
                 </div>
-                <span class="sh-badge-blue" th:text="${user?.role} ?: 'PRESENTER'">PRESENTER</span>
+                <span class="sh-badge-blue" th:text="${user?.role} ?: 'HOST'">HOST</span>
             </div>
             <form id="profilePictureForm" th:action="@{/auth/profile/picture}" method="post"
                 enctype="multipart/form-data" class="hidden">
