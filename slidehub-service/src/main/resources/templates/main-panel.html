@@ -1059,6 +1059,13 @@
                 } catch (_) {}
             }
 
+            window.mpDownloadQuestions = function () {
+                const a = document.createElement('a');
+                a.href = `${Q_API}/export`;
+                a.download = '';
+                a.click();
+            };
+
             window.mpMarkQuestion = async function (questionId, status) {
                 try {
                     await fetch(`${Q_API}/${questionId}/status`, {

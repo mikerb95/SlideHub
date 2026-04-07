@@ -93,7 +93,14 @@
             <div id="questions-panel" style="display:none;">
                 <div class="sh-label mb-3 flex items-center justify-between">
                     <span><i class="fa-solid fa-circle-question mr-1"></i>PREGUNTAS EN VIVO</span>
-                    <span id="q-pending-badge" class="sh-badge" style="display:none;"></span>
+                    <div class="flex items-center gap-2">
+                        <span id="q-pending-badge" class="sh-badge" style="display:none;"></span>
+                        <button th:if="${presentationId != null and presentationId != ''}"
+                            onclick="downloadQuestions()"
+                            class="sh-btn sh-btn-ghost text-[0.6rem] py-0.5 px-1.5" title="Descargar CSV">
+                            <i class="fa-solid fa-download"></i>
+                        </button>
+                    </div>
                 </div>
                 <div id="q-list" class="flex flex-col gap-2">
                     <p class="text-xs font-mono text-[var(--sh-text-3)]">Sin preguntas aún.</p>
