@@ -112,7 +112,7 @@ public class SecurityConfig {
                                                 .requestMatchers("/calidad", "/status", "/status/api/checks",
                                                                 "/actuator/health", "/actuator/info",
                                                                 "/sustentacion", "/presentacion", "/metodologia",
-                                                                "/matriz-pdca",
+                                                                "/matriz-pdca", "/lista",
                                                                 "/ai-guide",
                                                                 "/uptime", "/api/uptime/status")
                                                 .permitAll()
