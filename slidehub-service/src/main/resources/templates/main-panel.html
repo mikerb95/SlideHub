@@ -612,16 +612,19 @@
         }
 
         function updateDemoBadge(demo) {
+            const scrollCtrl = document.getElementById('demo-scroll-controls');
             if (demo.mode === 'url') {
                 demoModeBadge.textContent = 'URL ACTIVA';
                 demoModeBadge.className = 'sh-badge-amber';
                 document.querySelectorAll('.quick-link-btn').forEach(btn => {
                     btn.classList.toggle('active-demo', btn.dataset.url === demo.url);
                 });
+                scrollCtrl.classList.remove('hidden');
             } else {
                 demoModeBadge.textContent = 'diapositivas';
                 demoModeBadge.className = 'sh-badge';
                 document.querySelectorAll('.quick-link-btn').forEach(btn => btn.classList.remove('active-demo'));
+                scrollCtrl.classList.add('hidden');
             }
         }
 
