@@ -37,6 +37,11 @@ public class DocsController {
         return "metodologia";
     }
 
+    @GetMapping("/presentacion")
+    public String presentacion() {
+        return "presentacion";
+    }
+
     @GetMapping("/sustentacion")
     public String sustentacion() {
         return "sustentacion";
