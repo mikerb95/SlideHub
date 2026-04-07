@@ -105,27 +105,29 @@ def send_webhook(presentation_id, slide_count, status, error=None):
     if not WEBHOOK_URL:
         print("WEBHOOK_URL no definida, omitiendo callback.")
         return
-        
+
     payload = {
         "presentationId": presentation_id,
         "slideCount": slide_count,
         "status": status,
         "error": error
     }
-    
-    req = urllib.request.Request(
-        url=WEBHOOK_URL,
-        data=json.dumps(payload).encode('utf-8'),
-        headers={
-            'Content-Type': 'application/json',
-            'X-Webhook-Secret': WEBHOOK_SECRET
-        },
-        method='POST'
-    )
-    
+
     try:
-        with urllib.request.urlopen(req) as response:
-            resp_body = response.read()
-            print(f"Webhook enviado. Respuesta: {response.status} - {resp_body.decode('utf-8')}")
-    except Exception as e:
+        response = requests.post(
+            WEBHOOK_URL,
+            json=payload,
+            headers={
+                'X-Webhook-Secret': WEBHOOK_SECRET or ''
+            },
+            timeout=15,
+            allow_redirects=True
+        )
+        print(f"Webhook enviado. Status: {response.status_code} URL final: {response.url}")
+        if response.history:
+            for r in response.history:
+                print(f"  Redirect {r.status_code} → {r.headers.get('Location', '?')}")
+        if not response.ok:
+            print(f"  Cuerpo de error: {response.text[:500]}")
+    except requests.exceptions.RequestException as e:
         print(f"Fallo enviando webhook: {str(e)}")
