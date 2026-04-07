@@ -268,8 +268,10 @@ public class AuthController {
             return "redirect:/auth/login";
         }
 
-        String username = resolveUsername(authentication);
-        userRepository.findByUsername(username).ifPresent(user -> populateProfileModel(model, user));
+        User user = findCurrentUser(authentication);
+        if (user != null) {
+            populateProfileModel(model, user);
+        }
 
         return "auth/profile";
     }
