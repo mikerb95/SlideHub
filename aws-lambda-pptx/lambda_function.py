@@ -110,9 +110,10 @@ def lambda_handler(event, context):
             print(f"Convirtiendo PPTX → PDF con LibreOffice ({lo_path})...")
             lo_env = os.environ.copy()
             lo_env['HOME'] = '/tmp'
-            lo_env['LD_LIBRARY_PATH'] = '/tmp/instdir/program:' + lo_env.get('LD_LIBRARY_PATH', '')
-            lo_env['UNO_PATH'] = '/tmp/instdir/program'
-            lo_env['PATH'] = '/tmp/instdir/program:' + lo_env.get('PATH', '')
+            lo_env['LD_LIBRARY_PATH'] = _LO_PROGRAM_DIR + ':' + lo_env.get('LD_LIBRARY_PATH', '')
+            lo_env['UNO_PATH'] = _LO_PROGRAM_DIR
+            lo_env['PATH'] = _LO_PROGRAM_DIR + ':' + lo_env.get('PATH', '')
+            lo_env['SAL_USE_VCLPLUGIN'] = 'svp'  # headless plugin sin X11
             result = subprocess.run([
                 lo_path,
                 '--headless', '--invisible', '--nodefault',
@@ -123,7 +124,8 @@ def lambda_handler(event, context):
                 file_path
             ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=lo_env)
             if result.returncode != 0:
-                print(f"soffice stderr: {result.stderr.decode(errors='replace')}")
+                print(f"soffice stdout: {result.stdout.decode(errors='replace')[:1000]}")
+                print(f"soffice stderr: {result.stderr.decode(errors='replace')[:2000]}")
                 raise subprocess.CalledProcessError(result.returncode, result.args)
 
             if not os.path.exists(pdf_path):
