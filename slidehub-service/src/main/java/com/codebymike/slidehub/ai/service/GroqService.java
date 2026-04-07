@@ -1,6 +1,7 @@
 package com.codebymike.slidehub.ai.service;
 
 import com.codebymike.slidehub.ai.model.NoteContent;
+import com.codebymike.slidehub.ai.model.PresenterNote;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
@@ -171,6 +172,46 @@ public class GroqService {
             return "No tengo suficiente contexto para responder con precisión, pero puedes explicar el objetivo del módulo y su flujo principal.";
         }
         return answer;
+    }
+
+    // ── Expansión de notas ────────────────────────────────────────────────────
+
+    /**
+     * Genera una explicación expandida de las notas del presentador para un slide.
+     * Pensado para ser consultado desde el control remoto cuando el participante
+     * presiona "Expandir info". El resultado se cachea en MongoDB.
+     *
+     * @param note la nota a expandir (debe tener al menos título y puntos)
+     * @return texto expandido en español (3-5 párrafos)
+     */
+    public String expandNote(PresenterNote note) {
+        String pointsList = note.getPoints() != null
+                ? note.getPoints().stream().map(p -> "- " + p).reduce("", (a, b) -> a + "\n" + b).strip()
+                : "";
+        String phrases = note.getKeyPhrases() != null ? String.join(", ", note.getKeyPhrases()) : "";
+
+        String prompt = """
+                Tienes las siguientes notas del presentador para el slide "%s":
+
+                Puntos clave:
+                %s
+
+                Frases clave: %s
+
+                Genera una explicación expandida en español (3-5 párrafos) que profundice en cada punto.
+                La explicación debe ser útil para que quien la lea entienda el tema y pueda responder preguntas del público.
+                Sé técnico pero claro. Responde SOLO el texto continuo, sin listas, sin JSON ni markdown.
+                """.formatted(
+                note.getTitle() != null ? note.getTitle() : "Slide " + note.getSlideNumber(),
+                pointsList,
+                phrases);
+
+        String result = callGroqRaw(prompt,
+                "Eres un asistente técnico para presentadores. Genera explicaciones claras y útiles en español.");
+        result = stripMarkdownCode(result);
+        return result.isBlank()
+                ? "No se pudo generar la explicación expandida."
+                : result;
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

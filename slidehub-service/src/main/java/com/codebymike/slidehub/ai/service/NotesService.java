@@ -133,6 +133,36 @@ public class NotesService {
         return generated;
     }
 
+    // ── Expansión bajo demanda ────────────────────────────────────────────────
+
+    /**
+     * Devuelve el contenido expandido de un slide, generándolo con Groq si aún no
+     * existe. Usa MongoDB como caché: si {@code expandedContent} ya está guardado,
+     * lo retorna directamente sin llamar a la IA.
+     *
+     * @param presentationId ID de la presentación
+     * @param slideNumber    número de slide (1-based)
+     * @return texto expandido
+     * @throws IllegalArgumentException si no hay nota base para ese slide
+     */
+    public String expandNote(String presentationId, int slideNumber) {
+        PresenterNote note = noteRepository
+                .findByPresentationIdAndSlideNumber(presentationId, slideNumber)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No hay notas generadas para el slide " + slideNumber));
+
+        if (note.getExpandedContent() != null && !note.getExpandedContent().isBlank()) {
+            log.debug("expandNote: retornando caché para {}/{}", presentationId, slideNumber);
+            return note.getExpandedContent();
+        }
+
+        log.info("expandNote: generando con Groq para {}/{}", presentationId, slideNumber);
+        String expanded = groqService.expandNote(note);
+        note.setExpandedContent(expanded);
+        noteRepository.save(note);
+        return expanded;
+    }
+
     // ── Helpers privados ──────────────────────────────────────────────────────
 
     /**
