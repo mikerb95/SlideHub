@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Privacidad — SlideHub</title>
+    <th:block th:replace="~{fragments/head :: assets}"></th:block>
+</head>
+
+<body class="sh bg-sh-deep antialiased min-h-screen text-[var(--sh-text-2)]">
+
+    <nav class="sh-nav">
+        <div class="sh-nav-inner">
+            <div class="flex items-center gap-3">
+                <a href="/showcase" class="font-brand text-lg tracking-tight text-[var(--sh-text-1)]">SlideHub</a>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="/showcase" class="sh-btn sh-btn-ghost text-xs py-1.5 px-4">Volver</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-3xl mx-auto px-6 pt-32 pb-16">
+        <h1 class="font-brand text-4xl text-[var(--sh-text-1)] mb-8">Política de Privacidad</h1>
+
+        <div class="space-y-6 text-sm leading-relaxed">
+            <p>
+                SlideHub respeta la privacidad de sus usuarios (Presentadores y Audiencia) y se compromete a proteger los datos personales.
+            </p>
+
+            <div>
+                <h2 class="text-[var(--sh-text-1)] text-lg font-bold mb-2">Información Recopilada</h2>
+                <p>
+                    Recopilamos direcciones de correo electrónico, nombres de usuario, tokens de autenticación OAuth2 (GitHub y Google), direcciones IP para la sesión en curso y archivos subidos (diapositivas/imágenes).
+                </p>
+            </div>
+
+            <div>
+                <h2 class="text-[var(--sh-text-1)] text-lg font-bold mb-2">Uso de la Información</h2>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>Gestionar y autenticar el acceso (inicio de sesión local y OAuth2).</li>
+                    <li>Sincronizar las pantallas de los participantes mediante identificadores de sesión.</li>
+                    <li>Enviar correos electrónicos transaccionales o de verificación de cuentas (a través de Resend).</li>
+                </ul>
+            </div>
+
+            <div>
+                <h2 class="text-[var(--sh-text-1)] text-lg font-bold mb-2">Procesamiento de Inteligencia Artificial (IA)</h2>
+                <p>
+                    Las diapositivas, textos y repositorios de código vinculados son procesados a través de integraciones de terceros (Google Gemini, Gemini Vision y Groq API) para la generación de notas y asistentes de despliegue. Al utilizar estas funciones, el usuario acepta que fragmentos de sus repositorios e imágenes sean enviados de manera segura a las API de estos proveedores.
+                </p>
+            </div>
+
+            <div>
+                <h2 class="text-[var(--sh-text-1)] text-lg font-bold mb-2">Almacenamiento</h2>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li><strong>Imágenes y Diapositivas:</strong> Amazon S3.</li>
+                    <li><strong>Datos Relacionales (Usuarios, perfiles):</strong> Base de datos PostgreSQL administrada por Aiven.</li>
+                    <li><strong>Notas generadas (IA):</strong> Base de datos MongoDB.</li>
+                    <li><strong>Estado en tiempo real:</strong> Redis (volátil, no persistente a largo plazo).</li>
+                </ul>
+            </div>
+
+            <div>
+                <h2 class="text-[var(--sh-text-1)] text-lg font-bold mb-2">Terceros</h2>
+                <p>
+                    No vendemos ni compartimos información personal con terceros con fines publicitarios.
+                </p>
+            </div>
+        </div>
+    </main>
+
+</body>
+
+</html>

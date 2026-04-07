@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Uso — SlideHub</title>
+    <th:block th:replace="~{fragments/head :: assets}"></th:block>
+</head>
+
+<body class="sh bg-sh-deep antialiased min-h-screen text-[var(--sh-text-2)]">
+
+    <nav class="sh-nav">
+        <div class="sh-nav-inner">
+            <div class="flex items-center gap-3">
+                <a href="/showcase" class="font-brand text-lg tracking-tight text-[var(--sh-text-1)]">SlideHub</a>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="/showcase" class="sh-btn sh-btn-ghost text-xs py-1.5 px-4">Volver</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-3xl mx-auto px-6 pt-32 pb-16">
+        <h1 class="font-brand text-4xl text-[var(--sh-text-1)] mb-8">Política de Uso</h1>
+
+        <div class="space-y-6 text-sm leading-relaxed">
+            <p>
+                Al utilizar SlideHub, ya sea como presentador o espectador, aceptas las siguientes reglas (Términos de Servicio):
+            </p>
+
+            <div>
+                <h2 class="text-[var(--sh-text-1)] text-lg font-bold mb-2">1. Uso Aceptable</h2>
+                <p>
+                    SlideHub debe utilizarse para la gestión y sincronización de diapositivas en presentaciones profesionales, académicas o personales.
+                </p>
+            </div>
+
+            <div>
+                <h2 class="text-[var(--sh-text-1)] text-lg font-bold mb-2">2. Actividades Prohibidas</h2>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>Subir contenido ilegal, ofensivo, que infrinja derechos de autor de terceros o que contenga malware.</li>
+                    <li>Abusar de las integraciones de IA (Gemini/Groq) intentando inyectar prompts maliciosos (prompt injection) o abusar de los límites de tasa (rate limits).</li>
+                    <li>Interferir o intentar eludir la seguridad y el flujo de los presentadores en la red o modificar el comportamiento del módulo de sincronización.</li>
+                </ul>
+            </div>
+
+            <div>
+                <h2 class="text-[var(--sh-text-1)] text-lg font-bold mb-2">3. Control de Cuenta</h2>
+                <p>
+                    Usted es responsable de mantener la confidencialidad de sus contraseñas y cuentas. Las cuentas que violen nuestras políticas podrán ser suspendidas sin previo aviso.
+                </p>
+            </div>
+
+            <div>
+                <h2 class="text-[var(--sh-text-1)] text-lg font-bold mb-2">4. Archivos de Google Drive</h2>
+                <p>
+                    La integración con Google Drive requiere permisos de lectura (<code>drive.readonly</code>). Solo accederemos a las carpetas y archivos explícitamente compartidos por el usuario con el fin de importar las diapositivas.
+                </p>
+            </div>
+        </div>
+    </main>
+
+</body>
+
+</html>
