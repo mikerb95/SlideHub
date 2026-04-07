@@ -65,7 +65,8 @@ public class SecurityConfig {
                                 .authorizeHttpRequests(auth -> auth
                                                 // Vistas públicas (HU-005, HU-011, HU-012, HU-013, Legal, Pricing)
                                                 .requestMatchers("/slides", "/remote", "/demo", "/showcase", "/join",
-                                                                "/privacidad", "/politicadeuso", "/copyright", "/pricing")
+                                                                "/privacidad", "/politicadeuso", "/copyright",
+                                                                "/pricing")
                                                 .permitAll()
                                                 // Join de reunión por QR + comandos en remoto (públicos pero
                                                 // tokenizados)
