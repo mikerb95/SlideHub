@@ -127,7 +127,7 @@ public class SecurityConfig {
                                 .formLogin(form -> form
                                                 .loginPage("/auth/login")
                                                 .loginProcessingUrl("/auth/login")
-                                                .defaultSuccessUrl("/presentations", true)
+                                                .successHandler(formLoginSuccessHandler())
                                                 .failureUrl("/auth/login?error=true")
                                                 .permitAll())
                                 // Login OAuth2 (GitHub y Google)
