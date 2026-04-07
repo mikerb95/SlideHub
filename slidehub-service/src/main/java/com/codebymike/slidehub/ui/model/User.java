@@ -92,6 +92,16 @@ public class User {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    // ── Auditoría de IP ──────────────────────────────────────────────────────────
+
+    /** Dirección IP utilizada al registrar la cuenta. */
+    @Column(name = "registration_ip", length = 45)
+    private String registrationIp;
+
+    /** Última dirección IP desde la cual inició sesión. */
+    @Column(name = "last_login_ip", length = 45)
+    private String lastLoginIp;
+
     // ── Constructores ─────────────────────────────────────────────────────────
 
     public User() {
