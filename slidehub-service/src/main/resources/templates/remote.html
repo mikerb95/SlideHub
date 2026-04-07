@@ -726,6 +726,20 @@
 
         // ── Demo controls ─────────────────────────────────────────────────────
 
+        async function scrollDemo(delta) {
+            try {
+                await fetch(`${API_DEMO_URL}/scroll`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ delta })
+                });
+                if (navigator.vibrate) navigator.vibrate(20);
+            } catch (_) { }
+        }
+
+        document.getElementById('btn-scroll-up').addEventListener('click', () => scrollDemo(-300));
+        document.getElementById('btn-scroll-down').addEventListener('click', () => scrollDemo(300));
+
         async function activateDemoLink(url) {
             try {
                 await fetch(API_DEMO_URL, {
