@@ -93,16 +93,16 @@ public class SecurityConfig {
                                                 .permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/devices",
                                                                 "/api/devices/token/*")
-                                                .hasRole("ADMIN")
+                                                .hasRole("DEVELOPER")
                                                 // Auth pública — incluye rutas OAuth2 de Spring Security
                                                 .requestMatchers("/auth/**", "/oauth2/**", "/login/oauth2/**")
                                                 .permitAll()
                                                 // Assets estáticos de slides
                                                 .requestMatchers("/presentation/**").permitAll()
                                                 // Importación y gestión de presentaciones — requiere PRESENTER o ADMIN
-                                                .requestMatchers("/presentations/**").hasAnyRole("PRESENTER", "ADMIN")
+                                                .requestMatchers("/presentations/**").hasAnyRole("HOST", "PRESENTER")
                                                 .requestMatchers("/api/presentations/**")
-                                                .hasAnyRole("PRESENTER", "ADMIN")
+                                                .hasAnyRole("HOST", "PRESENTER")
                                                 // Polling de dispositivos (pasa por gateway, llega como /api/**)
                                                 .requestMatchers("/api/**").permitAll()
                                                 // Recursos estáticos (CSS, JS, imágenes)
@@ -123,7 +123,7 @@ public class SecurityConfig {
                                                 .hasRole("DEVELOPER")
                                                 // Panel del presentador y main panel — requiere PRESENTER o ADMIN
                                                 .requestMatchers("/presenter", "/main-panel")
-                                                .hasAnyRole("PRESENTER", "ADMIN")
+                                                .hasAnyRole("HOST", "PRESENTER")
                                                 // Perfil del usuario — requiere estar autenticado
                                                 .requestMatchers("/auth/profile").authenticated()
                                                 .anyRequest().authenticated())
