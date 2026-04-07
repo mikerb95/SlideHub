@@ -271,7 +271,7 @@ public class MeetingService {
             return new AssignmentCheck(false, "single", "");
         }
 
-        return new AssignmentCheck(true, "single", "Tu slide asignada está activa");
+        return new AssignmentCheck(true, "double", "Tu slide asignada está activa");
     }
 
     @Transactional
