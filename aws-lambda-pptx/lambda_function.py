@@ -1,18 +1,20 @@
 import json
 import os
 import boto3
-import urllib.request
 import urllib.parse
 import tempfile
 import subprocess
 import fitz  # PyMuPDF
+import requests
 
 s3_client = boto3.client('s3')
 
 # Variables de Entorno Configadas en la Lambda
 WEBHOOK_URL = os.environ.get('SLIDEHUB_WEBHOOK_URL')
 WEBHOOK_SECRET = os.environ.get('SLIDEHUB_WEBHOOK_SECRET')
-LIBREOFFICE_PATH = os.environ.get('LIBREOFFICE_PATH', '/opt/instdir/program/soffice.bin')
+# En imagen de contenedor: /usr/bin/soffice (dnf install libreoffice-impress)
+# Con layer shelfio: /opt/instdir/program/soffice.bin
+LIBREOFFICE_PATH = os.environ.get('LIBREOFFICE_PATH', '/usr/bin/soffice')
 
 def lambda_handler(event, context):
     print(f"Evento recibido: {json.dumps(event)}")
