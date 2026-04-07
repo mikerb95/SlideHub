@@ -190,14 +190,21 @@
                         slideView.style.display = 'none'; urlView.style.display = 'block';
                         iframe.src = demo.url;
                     }
+                    const scrollY = demo.scrollY ?? 0;
+                    if (scrollY !== currentScrollY) {
+                        currentScrollY = scrollY;
+                        iframe.style.transform = `translateY(-${scrollY}px)`;
+                    }
                     const rs = demo.returnSlide;
                     returnLabel.textContent = rs ? `Volver a la diapositiva ${rs}` : 'Volver a diapositivas';
                     btnReturn.classList.add('visible');
                 } else {
                     btnReturn.classList.remove('visible');
                     if (currentMode !== 'slides') {
-                        currentMode = 'slides'; urlView.style.display = 'none';
-                        iframe.src = 'about:blank'; slideView.style.display = 'flex';
+                        currentMode = 'slides'; currentScrollY = 0;
+                        urlView.style.display = 'none';
+                        iframe.src = 'about:blank'; iframe.style.transform = '';
+                        slideView.style.display = 'flex';
                     }
                     const targetSlide = demo.slide ?? slideData.slide;
                     if (targetSlide !== currentSlide) { currentSlide = targetSlide; showSlide(currentSlide); }
