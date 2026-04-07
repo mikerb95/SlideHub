@@ -94,6 +94,7 @@ def lambda_handler(event, context):
                 lo_path,
                 '--headless', '--invisible', '--nodefault',
                 '--nofirststartwizard',
+                '-env:UserInstallation=file:///tmp/lo-user-profile',
                 '--convert-to', 'pdf',
                 '--outdir', temp_dir,
                 file_path
