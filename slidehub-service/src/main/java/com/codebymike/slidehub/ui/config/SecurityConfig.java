@@ -61,7 +61,8 @@ public class SecurityConfig {
 
                 http
                                 .authenticationProvider(authenticationProvider())
-                                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**", "/mgr/bootstrap", "/mgr/api/**", "/api/webhooks/**"))
+                                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**", "/mgr/bootstrap", "/mgr/api/**",
+                                                "/api/webhooks/**"))
                                 .authorizeHttpRequests(auth -> auth
                                                 // Vistas públicas (HU-005, HU-011, HU-012, HU-013, Legal, Pricing)
                                                 .requestMatchers("/slides", "/remote", "/demo", "/showcase", "/join",

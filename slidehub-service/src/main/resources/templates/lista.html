@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,229 +8,301 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <style>
-        body { background-color: #f8f9fa; font-family: system-ui, -apple-system, sans-serif; }
-        .list-group-item { display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background-color 0.2s;}
-        .list-group-item:hover { background-color: #e9ecef; }
-        h1 { margin-top: 2rem; margin-bottom: 1.5rem; text-align: center; }
-        .badge { font-size: 1rem; margin-right: 10px; }
+        body {
+            background-color: #f8f9fa;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .list-group-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .list-group-item:hover {
+            background-color: #e9ecef;
+        }
+
+        h1 {
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .badge {
+            font-size: 1rem;
+            margin-right: 10px;
+        }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <h1>Notas de Sustentación</h1>
-    <ul class="list-group list-group-flush shadow-sm rounded">
-        <!-- 1 -->
-        <li class="list-group-item p-3" data-bs-toggle="modal" data-bs-target="#modal1">
-            <div>
-                <span class="badge bg-primary text-white">1</span>
-                <strong>Arquitectura y Memoria Java:</strong> SlideHub se compila con JDK 21, sobre JRE/JVM. Utiliza el Stack para ejecución de requests REST y el Heap para instanciar objetos transitorios en memoria (DTOs). 
-            </div>
-            <button class="btn btn-sm btn-outline-secondary">Ver más</button>
-        </li>
-        <!-- 2 -->
-        <li class="list-group-item p-3" data-bs-toggle="modal" data-bs-target="#modal2">
-            <div>
-                <span class="badge bg-primary text-white">2</span>
-                <strong>Arquitectura MVC y Producto estructurado:</strong> Aplicada a un "Monolito Modular". Separación total en paquetes de 'controller', 'service', 'model' y 'config', priorizando la extrema mantenibilidad.
-            </div>
-            <button class="btn btn-sm btn-outline-secondary">Ver más</button>
-        </li>
-        <!-- 3 -->
-        <li class="list-group-item p-3" data-bs-toggle="modal" data-bs-target="#modal3">
-            <div>
-                <span class="badge bg-primary text-white">3</span>
-                <strong>Conexión BD, Interface y Patrones GoF:</strong> Conectado a base de datos PostgreSQL vía Spring Data JPA. Integrando Thymeleaf dinámicamente. Evidencia clara de patrones Singleton, Strategy y Builder en la lógica general.
-            </div>
-            <button class="btn btn-sm btn-outline-secondary">Ver más</button>
-        </li>
-        <!-- 4 -->
-        <li class="list-group-item p-3" data-bs-toggle="modal" data-bs-target="#modal4">
-            <div>
-                <span class="badge bg-primary text-white">4</span>
-                <strong>Autenticación y Roles Dinámicos:</strong> Sistema de co-existencia Híbrida: Formulario Local (BCrypt) + OAuth2 (Google/GitHub). Separación de endpoint con autorización dinámica mediante perfiles `HOST`, `PRESENTER` y `DEVELOPER`.
-            </div>
-            <button class="btn btn-sm btn-outline-secondary">Ver más</button>
-        </li>
-        <!-- 5 -->
-        <li class="list-group-item p-3" data-bs-toggle="modal" data-bs-target="#modal5">
-            <div>
-                <span class="badge bg-primary text-white">5</span>
-                <strong>Integridad CRUD:</strong> Implementación y mapeo para Listar, Crear, Editar y Eliminar de extremo a extremo, evaluando y limitando inconsistencias de base de datos desde formularios restrictivos.
-            </div>
-            <button class="btn btn-sm btn-outline-secondary">Ver más</button>
-        </li>
-        <!-- 6 -->
-        <li class="list-group-item p-3" data-bs-toggle="modal" data-bs-target="#modal6">
-            <div>
-                <span class="badge bg-primary text-white">6</span>
-                <strong>Gestión de Reportes / Filtros:</strong> Desarrollo de Panel Administrativo asincrónico para rol DEVELOPER, realizando Queries filtrados para mapear a los tipos de usuarios (OAuth v. Locales / Host v. Pres).
-            </div>
-            <button class="btn btn-sm btn-outline-secondary">Ver más</button>
-        </li>
-        <!-- 7 -->
-        <li class="list-group-item p-3" data-bs-toggle="modal" data-bs-target="#modal7">
-            <div>
-                <span class="badge bg-primary text-white">7</span>
-                <strong>Usabilidad, Accesibilidad y UX:</strong> Interfaces táctiles exageradas sin manual, modo oscuro global, navegación "Zero-Config" automatizando slides con Haptic Feedback (Vibración) en notificaciones y Reconocimiento Audio IA.
-            </div>
-            <button class="btn btn-sm btn-outline-secondary">Ver más</button>
-        </li>
-        <!-- 8 -->
-        <li class="list-group-item p-3" data-bs-toggle="modal" data-bs-target="#modal8">
-            <div>
-                <span class="badge bg-primary text-white">8</span>
-                <strong>Procesos Calidad de Software, V&V y PDCA:</strong> Aplicación de la mejora continua Deming reportada en las fases retrospectivas. Ejecución continua en Render e implementación MockMvc y pruebas documentadas bajo normativas ISO.
-            </div>
-            <button class="btn btn-sm btn-outline-secondary">Ver más</button>
-        </li>
-    </ul>
-    
-    <!-- Copyright -->
-</div>
+    <div class="container">
+        <h1>Notas de Sustentación</h1>
+        <ul class="list-group list-group-flush shadow-sm rounded">
+            <!-- 1 -->
+            <li class="list-group-item p-3" data-bs-toggle="modal" data-bs-target="#modal1">
+                <div>
+                    <span class="badge bg-primary text-white">1</span>
+                    <strong>Arquitectura y Memoria Java:</strong> SlideHub se compila con JDK 21, sobre JRE/JVM. Utiliza
+                    el Stack para ejecución de requests REST y el Heap para instanciar objetos transitorios en memoria
+                    (DTOs).
+                </div>
+                <button class="btn btn-sm btn-outline-secondary">Ver más</button>
+            </li>
+            <!-- 2 -->
+            <li class="list-group-item p-3" data-bs-toggle="modal" data-bs-target="#modal2">
+                <div>
+                    <span class="badge bg-primary text-white">2</span>
+                    <strong>Arquitectura MVC y Producto estructurado:</strong> Aplicada a un "Monolito Modular".
+                    Separación total en paquetes de 'controller', 'service', 'model' y 'config', priorizando la extrema
+                    mantenibilidad.
+                </div>
+                <button class="btn btn-sm btn-outline-secondary">Ver más</button>
+            </li>
+            <!-- 3 -->
+            <li class="list-group-item p-3" data-bs-toggle="modal" data-bs-target="#modal3">
+                <div>
+                    <span class="badge bg-primary text-white">3</span>
+                    <strong>Conexión BD, Interface y Patrones GoF:</strong> Conectado a base de datos PostgreSQL vía
+                    Spring Data JPA. Integrando Thymeleaf dinámicamente. Evidencia clara de patrones Singleton, Strategy
+                    y Builder en la lógica general.
+                </div>
+                <button class="btn btn-sm btn-outline-secondary">Ver más</button>
+            </li>
+            <!-- 4 -->
+            <li class="list-group-item p-3" data-bs-toggle="modal" data-bs-target="#modal4">
+                <div>
+                    <span class="badge bg-primary text-white">4</span>
+                    <strong>Autenticación y Roles Dinámicos:</strong> Sistema de co-existencia Híbrida: Formulario Local
+                    (BCrypt) + OAuth2 (Google/GitHub). Separación de endpoint con autorización dinámica mediante
+                    perfiles `HOST`, `PRESENTER` y `DEVELOPER`.
+                </div>
+                <button class="btn btn-sm btn-outline-secondary">Ver más</button>
+            </li>
+            <!-- 5 -->
+            <li class="list-group-item p-3" data-bs-toggle="modal" data-bs-target="#modal5">
+                <div>
+                    <span class="badge bg-primary text-white">5</span>
+                    <strong>Integridad CRUD:</strong> Implementación y mapeo para Listar, Crear, Editar y Eliminar de
+                    extremo a extremo, evaluando y limitando inconsistencias de base de datos desde formularios
+                    restrictivos.
+                </div>
+                <button class="btn btn-sm btn-outline-secondary">Ver más</button>
+            </li>
+            <!-- 6 -->
+            <li class="list-group-item p-3" data-bs-toggle="modal" data-bs-target="#modal6">
+                <div>
+                    <span class="badge bg-primary text-white">6</span>
+                    <strong>Gestión de Reportes / Filtros:</strong> Desarrollo de Panel Administrativo asincrónico para
+                    rol DEVELOPER, realizando Queries filtrados para mapear a los tipos de usuarios (OAuth v. Locales /
+                    Host v. Pres).
+                </div>
+                <button class="btn btn-sm btn-outline-secondary">Ver más</button>
+            </li>
+            <!-- 7 -->
+            <li class="list-group-item p-3" data-bs-toggle="modal" data-bs-target="#modal7">
+                <div>
+                    <span class="badge bg-primary text-white">7</span>
+                    <strong>Usabilidad, Accesibilidad y UX:</strong> Interfaces táctiles exageradas sin manual, modo
+                    oscuro global, navegación "Zero-Config" automatizando slides con Haptic Feedback (Vibración) en
+                    notificaciones y Reconocimiento Audio IA.
+                </div>
+                <button class="btn btn-sm btn-outline-secondary">Ver más</button>
+            </li>
+            <!-- 8 -->
+            <li class="list-group-item p-3" data-bs-toggle="modal" data-bs-target="#modal8">
+                <div>
+                    <span class="badge bg-primary text-white">8</span>
+                    <strong>Procesos Calidad de Software, V&V y PDCA:</strong> Aplicación de la mejora continua Deming
+                    reportada en las fases retrospectivas. Ejecución continua en Render e implementación MockMvc y
+                    pruebas documentadas bajo normativas ISO.
+                </div>
+                <button class="btn btn-sm btn-outline-secondary">Ver más</button>
+            </li>
+        </ul>
 
-<!-- MODALES DE EXPANSIÓN -->
+        <!-- Copyright -->
+    </div>
 
-<!-- Modal 1 -->
-<div class="modal fade" id="modal1" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">1. Arquitectura de Plataforma e Infraestructura</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                El core descansa en <strong>Java 21 (JDK)</strong>, corriendo en instancias Web ejecutadas desde un contenedor (JVM/JRE). <br><br>
-                El ciclo de vida se optimiza garantizando la gestión de memoria nativa y garbage collection: <br>
-                - <strong>Stack:</strong> Contiene las peticiones síncronas y asíncronas REST del Pooling, aislando peticiones activas. Paso por valor asegura que el scope de la petición nunca contamine data de otro thread.<br>
-                - <strong>Heap:</strong> Aloja las dependencias permanentes pesadas Singleton (@Service, WebClient), Modelos inmutables estandarizados Record, permitiendo la destrucción limpia de los Data Transfer Objects (DTO) transitorios con el GC sin memory leaks.
+    <!-- MODALES DE EXPANSIÓN -->
+
+    <!-- Modal 1 -->
+    <div class="modal fade" id="modal1" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">1. Arquitectura de Plataforma e Infraestructura</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    El core descansa en <strong>Java 21 (JDK)</strong>, corriendo en instancias Web ejecutadas desde un
+                    contenedor (JVM/JRE). <br><br>
+                    El ciclo de vida se optimiza garantizando la gestión de memoria nativa y garbage collection: <br>
+                    - <strong>Stack:</strong> Contiene las peticiones síncronas y asíncronas REST del Pooling, aislando
+                    peticiones activas. Paso por valor asegura que el scope de la petición nunca contamine data de otro
+                    thread.<br>
+                    - <strong>Heap:</strong> Aloja las dependencias permanentes pesadas Singleton (@Service, WebClient),
+                    Modelos inmutables estandarizados Record, permitiendo la destrucción limpia de los Data Transfer
+                    Objects (DTO) transitorios con el GC sin memory leaks.
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal 2 -->
-<div class="modal fade" id="modal2" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">2. Estructura y Código Organizado por Patrón</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                Diseñado como un Monolito Modular basado fuertemente en Arquitectura Separada MVC: 
-                <ul>
-                    <li><strong>Modelo (Records, Models, Entities - M):</strong> Dominio para aislar POJO y mapeos limpios.</li>
-                    <li><strong>Vista (Thymeleaf - V):</strong> Se inyecta exclusivamente un Fragmento que renderiza de manera segura el HTML con dependencias sin exponer el control.</li>
-                    <li><strong>Controlador (Controllers - C):</strong> Delegadores dedicados estrictamente a la ruteada HTTP (Ej. `DocsController`). Traspasan lógica hacia Business Layers (Servicios), asegurando Escalabilidad a medida.</li>
-                </ul>
-                Documentación impecable (AGENTS.md) centraliza cada regla de mantenibilidad en sus implementaciones técnicas.
+    <!-- Modal 2 -->
+    <div class="modal fade" id="modal2" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">2. Estructura y Código Organizado por Patrón</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Diseñado como un Monolito Modular basado fuertemente en Arquitectura Separada MVC:
+                    <ul>
+                        <li><strong>Modelo (Records, Models, Entities - M):</strong> Dominio para aislar POJO y mapeos
+                            limpios.</li>
+                        <li><strong>Vista (Thymeleaf - V):</strong> Se inyecta exclusivamente un Fragmento que renderiza
+                            de manera segura el HTML con dependencias sin exponer el control.</li>
+                        <li><strong>Controlador (Controllers - C):</strong> Delegadores dedicados estrictamente a la
+                            ruteada HTTP (Ej. `DocsController`). Traspasan lógica hacia Business Layers (Servicios),
+                            asegurando Escalabilidad a medida.</li>
+                    </ul>
+                    Documentación impecable (AGENTS.md) centraliza cada regla de mantenibilidad en sus implementaciones
+                    técnicas.
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal 3 -->
-<div class="modal fade" id="modal3" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">3. Data y Extensibilidad del Software</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                La persistencia es controlada por el ORM Hibernate y Spring Data JPA consumiendo en instancias remotas DSN. Thymeleaf compila en server-side las iteraciones y directivas de los Objetos mapeados desde el MVC respondiendo un Frontend robusto.<br><br>
-                <strong>Extensibilidad y Principios Patrones GOF:</strong>
-                - <strong>Singleton:</strong> Repositorios e interfaces controladas e inyectadas 1 a 1 de por vida (Application Context Beans).<br>
-                - <strong>Strategy:</strong> Aplicado a nivel de Servicios de Spring para la gestión condicional que redirige hacia Identidad de usuario Google OAuth de frente a Github por polimorfismo.<br>
-                - <strong>Builder:</strong> Modelos enlazados en cadenas responsivas para instanciar clientes HTTP dinámicos WebClient y SDKs hacia dependencias Cloud de forma transparente.
+    <!-- Modal 3 -->
+    <div class="modal fade" id="modal3" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">3. Data y Extensibilidad del Software</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    La persistencia es controlada por el ORM Hibernate y Spring Data JPA consumiendo en instancias
+                    remotas DSN. Thymeleaf compila en server-side las iteraciones y directivas de los Objetos mapeados
+                    desde el MVC respondiendo un Frontend robusto.<br><br>
+                    <strong>Extensibilidad y Principios Patrones GOF:</strong>
+                    - <strong>Singleton:</strong> Repositorios e interfaces controladas e inyectadas 1 a 1 de por vida
+                    (Application Context Beans).<br>
+                    - <strong>Strategy:</strong> Aplicado a nivel de Servicios de Spring para la gestión condicional que
+                    redirige hacia Identidad de usuario Google OAuth de frente a Github por polimorfismo.<br>
+                    - <strong>Builder:</strong> Modelos enlazados en cadenas responsivas para instanciar clientes HTTP
+                    dinámicos WebClient y SDKs hacia dependencias Cloud de forma transparente.
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal 4 -->
-<div class="modal fade" id="modal4" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">4. Interceptión Auth Dinámica</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                Combina control de sesión clásico de Formularios Local (con contraseñas encriptadas mediante Cipher algorítmico BCrypt) permitiendo en su mismo ambiente acceso Single-sign On externalizado a Proveedores OAuth2 (Google & Github).<br><br>
-                Filtrado granular bajo cadena delegada estipula jerarquías inmutables: 
-                <br> - Rol <code>DEVELOPER</code> monitor de infraestructura
-                <br> - Rol <code>HOST</code> creador, control total
-                <br> - Rol <code>PRESENTER</code> panel lectural invitado
+    <!-- Modal 4 -->
+    <div class="modal fade" id="modal4" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">4. Interceptión Auth Dinámica</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Combina control de sesión clásico de Formularios Local (con contraseñas encriptadas mediante Cipher
+                    algorítmico BCrypt) permitiendo en su mismo ambiente acceso Single-sign On externalizado a
+                    Proveedores OAuth2 (Google & Github).<br><br>
+                    Filtrado granular bajo cadena delegada estipula jerarquías inmutables:
+                    <br> - Rol <code>DEVELOPER</code> monitor de infraestructura
+                    <br> - Rol <code>HOST</code> creador, control total
+                    <br> - Rol <code>PRESENTER</code> panel lectural invitado
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal 5 -->
-<div class="modal fade" id="modal5" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">5. Integridad Transaccional del Formato</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                Funcionalidad Operacional activa transaccional (`@Transactional`) hacia BDs. Validaciones pre-procesadas en Interfaz bloquean la rotura y consistencia de datos de BD para los flujos de Importaciones hacia GDrive, Gestión AI-Notes, y Cajas Modales. Si ocurre un Request de Borrado (DELETE) sobre una colección de notas inexistente, la aplicación evita el aborto o Error 500 reincidiendo hacia un 204 No Content gestionado a nivel aplicativo para el Front.
+    <!-- Modal 5 -->
+    <div class="modal fade" id="modal5" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">5. Integridad Transaccional del Formato</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Funcionalidad Operacional activa transaccional (`@Transactional`) hacia BDs. Validaciones
+                    pre-procesadas en Interfaz bloquean la rotura y consistencia de datos de BD para los flujos de
+                    Importaciones hacia GDrive, Gestión AI-Notes, y Cajas Modales. Si ocurre un Request de Borrado
+                    (DELETE) sobre una colección de notas inexistente, la aplicación evita el aborto o Error 500
+                    reincidiendo hacia un 204 No Content gestionado a nivel aplicativo para el Front.
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal 6 -->
-<div class="modal fade" id="modal6" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">6. Generación Estadística Filtrada</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                Consolida en su panel para Administradores de Infraestructura (Página Mgr Dashboard) un despliegue de filtros multicriterio en Query de base de datos directa que totaliza e interpola las segregaciones de registro. Se cuenta, segmenta y analiza la cuota productiva originada por Identidades Locales vs Entornos Cloud, lo que facilita y agiliza las gestiones financieras operacionales de la escalabilidad requerida ante tomas de decisión críticas.
+    <!-- Modal 6 -->
+    <div class="modal fade" id="modal6" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">6. Generación Estadística Filtrada</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Consolida en su panel para Administradores de Infraestructura (Página Mgr Dashboard) un despliegue
+                    de filtros multicriterio en Query de base de datos directa que totaliza e interpola las
+                    segregaciones de registro. Se cuenta, segmenta y analiza la cuota productiva originada por
+                    Identidades Locales vs Entornos Cloud, lo que facilita y agiliza las gestiones financieras
+                    operacionales de la escalabilidad requerida ante tomas de decisión críticas.
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal 7 -->
-<div class="modal fade" id="modal7" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">7. Principios Ergonómicos (Navegabilidad e Inmersión)</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                La experiencia se centra en reducir fricción y maximizar la interacción segura sin entrenamiento previo:<br>
-                - Controles táctiles exagerados eliminan necesidad de visualización al ser pulsados en tarima.<br>
-                - Notificaciones y vibración háptica brindan una interfaz sin pantallas para control.<br>
-                - Inmersión total con el Dictado automático y Respuesta de Inteligencia artificial generativa para inclusividad accesibilidad sin trabas operativas.
+    <!-- Modal 7 -->
+    <div class="modal fade" id="modal7" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">7. Principios Ergonómicos (Navegabilidad e Inmersión)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    La experiencia se centra en reducir fricción y maximizar la interacción segura sin entrenamiento
+                    previo:<br>
+                    - Controles táctiles exagerados eliminan necesidad de visualización al ser pulsados en tarima.<br>
+                    - Notificaciones y vibración háptica brindan una interfaz sin pantallas para control.<br>
+                    - Inmersión total con el Dictado automático y Respuesta de Inteligencia artificial generativa para
+                    inclusividad accesibilidad sin trabas operativas.
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal 8 -->
-<div class="modal fade" id="modal8" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">8. Estándares SQA y Evidencia Modular</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                Validaciones automatizadas vía Maven en CI/CD asegurando el funcionamiento asíncrono con MockMvc para los servicios críticos.<br>
-                La evolución del Software incorporó Metodología y matriz de SQA (Normativas ISO/Patrones) implementando a la par, el marco estratégico Deming en todos sus avances ("Planificación, Realización, Testeo y Ajuste") debidamente plasmados en los Retrospectivos de documentación `FASE-X-RESUMEN` lo que valida al producto como íntegremante comercial, auditable, escalable y verificado.
+    <!-- Modal 8 -->
+    <div class="modal fade" id="modal8" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">8. Estándares SQA y Evidencia Modular</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Validaciones automatizadas vía Maven en CI/CD asegurando el funcionamiento asíncrono con MockMvc
+                    para los servicios críticos.<br>
+                    La evolución del Software incorporó Metodología y matriz de SQA (Normativas ISO/Patrones)
+                    implementando a la par, el marco estratégico Deming en todos sus avances ("Planificación,
+                    Realización, Testeo y Ajuste") debidamente plasmados en los Retrospectivos de documentación
+                    `FASE-X-RESUMEN` lo que valida al producto como íntegremante comercial, auditable, escalable y
+                    verificado.
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 </body>
+
 </html>
