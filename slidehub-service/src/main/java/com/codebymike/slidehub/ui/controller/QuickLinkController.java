@@ -21,7 +21,7 @@ import java.util.Map;
  * Seguridad:<br>
  * - GET /api/presentations/{id}/links → permitAll (desde SecurityConfig vía
  * /api/**)<br>
- * - POST / PUT / DELETE → hasAnyRole("PRESENTER","ADMIN") (desde
+ * - POST / PUT / DELETE → hasAnyRole("HOST","PRESENTER") (desde
  * SecurityConfig)
  */
 @RestController
