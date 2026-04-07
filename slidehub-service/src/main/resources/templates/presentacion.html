@@ -1111,12 +1111,12 @@
 
             <div class="cards-grid" style="margin-top: 36px;">
                 <div class="card">
-                    <div class="card-title">Render — 4 Web Services</div>
-                    <div class="card-text">Cada microservicio se despliega como un Web Service independiente con su propio build command, start command y variables de entorno.</div>
+                    <div class="card-title">Render — Web Service único</div>
+                    <div class="card-text">Build: <code>./mvnw -pl slidehub-service package -am</code> · Start: <code>java -jar slidehub-service/target/*.jar</code> · Publicado en <strong>slide.lat</strong></div>
                 </div>
                 <div class="card">
                     <div class="card-title">Configuración por Perfiles</div>
-                    <div class="card-text"><code>SPRING_PROFILES_ACTIVE=prod</code> activa <code>application-prod.properties</code> con DSNs reales de Aiven, Atlas y Upstash.</div>
+                    <div class="card-text"><code>SPRING_PROFILES_ACTIVE=prod</code> activa <code>application-prod.properties</code> con DSNs reales de Aiven, Atlas y Upstash Redis.</div>
                 </div>
                 <div class="card">
                     <div class="card-title">Flyway Migrations</div>
@@ -1169,8 +1169,8 @@
             <div class="title-main" style="font-size: clamp(40px, 5vw, 64px);">Gracias</div>
             <div class="title-tagline">SlideHub — Sistema de Presentación Multi-Pantalla</div>
             <div class="slide-subtitle" style="text-align: center; margin: 0 auto 32px;">
-                4 microservicios &middot; 30 historias de usuario &middot; 7 fases de desarrollo<br>
-                Java 21 &middot; Spring Boot 4 &middot; IA Generativa &middot; Cloud-Native
+                Monolito modular &middot; 30 historias de usuario &middot; 7 fases de desarrollo<br>
+                Java 21 &middot; Spring Boot 4 &middot; IA Generativa &middot; <strong>slide.lat</strong>
             </div>
             <div class="title-chips">
                 <span class="chip" style="border-color: var(--accent-blue); color: var(--accent-blue);">PDCA</span>
