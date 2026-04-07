@@ -815,37 +815,33 @@
     <div class="slide" data-slide="4">
         <div class="slide-content">
             <div class="slide-label">Overview de la Plataforma</div>
-            <div class="slide-title">Arquitectura de <span class="gradient-text">4 microservicios</span></div>
+            <div class="slide-title">Monolito <span class="gradient-text">modular</span> en Spring Boot</div>
             <div class="arch-diagram stagger">
-                <div class="arch-service" style="border-top: 3px solid var(--accent-orange);">
-                    <div class="svc-icon">&#9737;</div>
-                    <div class="svc-name">Gateway</div>
-                    <div class="port">:8080</div>
-                    <div class="card-text" style="margin-top:8px;">Enrutamiento + Config Server</div>
-                </div>
-                <div class="arch-arrow">&#10132;</div>
-                <div class="arch-service" style="border-top: 3px solid var(--accent-blue);">
+                <div class="arch-service" style="border-top: 3px solid var(--accent-blue); min-width: 220px;">
                     <div class="svc-icon">&#9889;</div>
-                    <div class="svc-name">State Service</div>
-                    <div class="port">:8081 &middot; Redis</div>
-                    <div class="card-text" style="margin-top:8px;">Estado en tiempo real</div>
+                    <div class="svc-name">Módulo State</div>
+                    <div class="port">Redis — tiempo real</div>
+                    <div class="card-text" style="margin-top:8px;">Control de slides, modo demo, polling multi-pantalla</div>
                 </div>
-                <div class="arch-arrow">&#10132;</div>
-                <div class="arch-service" style="border-top: 3px solid var(--accent-green);">
+                <div class="arch-arrow">+</div>
+                <div class="arch-service" style="border-top: 3px solid var(--accent-green); min-width: 220px;">
                     <div class="svc-icon">&#9783;</div>
-                    <div class="svc-name">UI Service</div>
-                    <div class="port">:8082 &middot; PostgreSQL</div>
-                    <div class="card-text" style="margin-top:8px;">Vistas + Auth + S3</div>
+                    <div class="svc-name">Módulo UI</div>
+                    <div class="port">PostgreSQL · S3</div>
+                    <div class="card-text" style="margin-top:8px;">Vistas Thymeleaf, Auth (local + OAuth2), Google Drive</div>
                 </div>
-                <div class="arch-arrow">&#10132;</div>
-                <div class="arch-service" style="border-top: 3px solid var(--accent-purple);">
+                <div class="arch-arrow">+</div>
+                <div class="arch-service" style="border-top: 3px solid var(--accent-purple); min-width: 220px;">
                     <div class="svc-icon">&#10024;</div>
-                    <div class="svc-name">AI Service</div>
-                    <div class="port">:8083 &middot; MongoDB</div>
-                    <div class="card-text" style="margin-top:8px;">Gemini + Groq + Notas</div>
+                    <div class="svc-name">Módulo AI</div>
+                    <div class="port">MongoDB Atlas</div>
+                    <div class="card-text" style="margin-top:8px;">Gemini Vision + Groq, notas y Deploy Tutor</div>
                 </div>
             </div>
-            <div class="tech-grid" style="margin-top: 32px; justify-content: center;">
+            <div style="text-align:center; margin-top:20px; font-size:13px; color:var(--text-muted);">
+                Un único servicio desplegable — <code style="background:rgba(37,99,235,0.08); padding:2px 8px; border-radius:4px; color:var(--accent-blue); font-family:'JetBrains Mono',monospace;">slidehub-service :8080</code> &rarr; <strong style="color:var(--accent-blue);">slide.lat</strong>
+            </div>
+            <div class="tech-grid" style="margin-top: 24px; justify-content: center;">
                 <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-blue);"></span> Spring Boot 4.0.3</div>
                 <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-green);"></span> Java 21</div>
                 <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-purple);"></span> Spring Cloud 2025</div>
