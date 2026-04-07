@@ -553,26 +553,31 @@
         document.getElementById('dev-modal').classList.add('hidden');
     }
 
+    const DEV_SUBMIT_DEFAULT_HTML  = '<i class="fa-solid fa-user-plus"></i>Guardar';
+    const DEV_SUBMIT_LOADING_HTML  = '<i class="fa-solid fa-spinner fa-spin"></i>Guardando...';
+
     document.getElementById('dev-modal-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const id       = document.getElementById('dev-form-id').value.trim();
-        const username = document.getElementById('dev-form-username').value.trim();
-        const email    = document.getElementById('dev-form-email').value.trim();
-        const password = document.getElementById('dev-form-password').value;
-        const secret   = document.getElementById('dev-form-secret').value;
-        const errEl    = document.getElementById('dev-modal-error');
+        const id        = document.getElementById('dev-form-id').value.trim();
+        const username  = document.getElementById('dev-form-username').value.trim();
+        const email     = document.getElementById('dev-form-email').value.trim();
+        const password  = document.getElementById('dev-form-password').value;
+        const secret    = document.getElementById('dev-form-secret').value;
+        const errEl     = document.getElementById('dev-modal-error');
         const submitBtn = document.getElementById('dev-submit-btn');
+        const cancelBtn = document.getElementById('dev-cancel-btn');
 
-        errEl.textContent = '';
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Guardando...';
+        errEl.textContent    = '';
+        submitBtn.disabled   = true;
+        submitBtn.innerHTML  = DEV_SUBMIT_LOADING_HTML;
+        cancelBtn.disabled   = true;
 
         const isEdit = id !== '';
         const url    = isEdit ? `/mgr/api/developers/${id}` : '/mgr/api/developers';
         const method = isEdit ? 'PUT' : 'POST';
 
         try {
-            const res = await fetch(url, {
+            const res  = await fetch(url, {
                 method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, email, password, secret })
@@ -588,8 +593,9 @@
         } catch (_) {
             errEl.textContent = 'Error de red.';
         } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Guardar';
+            submitBtn.disabled  = false;
+            submitBtn.innerHTML = DEV_SUBMIT_DEFAULT_HTML;
+            cancelBtn.disabled  = false;
         }
     });
 
