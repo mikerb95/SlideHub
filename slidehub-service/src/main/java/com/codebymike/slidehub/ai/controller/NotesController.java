@@ -103,6 +103,31 @@ public class NotesController {
     }
 
     /**
+     * Genera (o devuelve desde caché) una explicación expandida del slide.
+     * Llamado desde el control remoto cuando el participante pulsa "Expandir info".
+     * Si otro participante ya solicitó la expansión del mismo slide, devuelve el
+     * resultado cacheado en MongoDB sin llamar a Groq de nuevo.
+     *
+     * @param presentationId ID de la presentación
+     * @param slideNumber    número de slide (1-based)
+     * @return {@code { "expanded": "texto..." }} o error 404/500
+     */
+    @PostMapping("/{presentationId}/{slideNumber}/expand")
+    public ResponseEntity<Map<String, Object>> expandNote(@PathVariable String presentationId,
+            @PathVariable int slideNumber) {
+        try {
+            String expanded = notesService.expandNote(presentationId, slideNumber);
+            return ResponseEntity.ok(Map.of("expanded", expanded));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            log.error("Error expandiendo nota {}/{}: {}", presentationId, slideNumber, e.getMessage());
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "No se pudo generar la expansión: " + e.getMessage()));
+        }
+    }
+
+    /**
      * Elimina todas las notas de una presentación (HU-019).
      * Responde 204 No Content aunque no existan notas (HU-019 §2).
      */
