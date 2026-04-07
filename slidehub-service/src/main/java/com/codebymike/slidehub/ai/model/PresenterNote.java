@@ -28,6 +28,8 @@ public class PresenterNote {
     private String suggestedTime;
     private List<String> keyPhrases;
     private List<String> demoTags;
+    /** Contenido expandido generado por Groq bajo demanda. Null hasta que se solicite. */
+    private String expandedContent;
 
     // Constructor completo para creación
     public PresenterNote(String presentationId, int slideNumber, String title,
@@ -109,5 +111,13 @@ public class PresenterNote {
 
     public void setDemoTags(List<String> demoTags) {
         this.demoTags = demoTags;
+    }
+
+    public String getExpandedContent() {
+        return expandedContent;
+    }
+
+    public void setExpandedContent(String expandedContent) {
+        this.expandedContent = expandedContent;
     }
 }
