@@ -50,7 +50,7 @@ public class UserService {
      * @throws UserAlreadyExistsException si el username o email ya existe
      */
     @Transactional
-    public User registerUser(String username, String email, String rawPassword) {
+    public User registerUser(String username, String email, String rawPassword, String ipAddress) {
         if (username == null || !username.matches("^[a-zA-Z0-9._-]{3,30}$")) {
             throw new IllegalArgumentException(
                     "El nombre de usuario solo puede contener letras, numeros, puntos, guiones y guiones bajos (3-30 caracteres).");
@@ -73,9 +73,11 @@ public class UserService {
         user.setEmailVerified(false);
         user.setEmailVerificationToken(verificationToken);
         user.setCreatedAt(LocalDateTime.now());
+        user.setRegistrationIp(ipAddress);
+        user.setLastLoginIp(ipAddress);
 
         User saved = userRepository.save(user);
-        log.info("Usuario registrado: {} ({})", username, email);
+        log.info("Usuario registrado: {} ({}) desde IP: {}", username, email, ipAddress);
 
         sendVerificationEmail(email, verificationToken);
 

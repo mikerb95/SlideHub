@@ -172,6 +172,12 @@ public class SecurityConfig {
         @Bean
         public AuthenticationSuccessHandler formLoginSuccessHandler() {
                 return (request, response, authentication) -> {
+                        String ipAddress = request.getRemoteAddr();
+                        resolveUserFromAuth(authentication).ifPresent(user -> {
+                                user.setLastLoginIp(ipAddress);
+                                userRepository.save(user);
+                        });
+
                         boolean isDeveloper = authentication.getAuthorities().stream()
                                         .anyMatch(a -> a.getAuthority().equals("ROLE_DEVELOPER"));
                         response.sendRedirect(isDeveloper ? "/mgr" : "/presentations");
@@ -181,6 +187,15 @@ public class SecurityConfig {
         @Bean
         public AuthenticationSuccessHandler oauth2SuccessHandler() {
                 return (request, response, authentication) -> {
+                        String ipAddress = request.getRemoteAddr();
+                        resolveUserFromAuth(authentication).ifPresent(user -> {
+                                if (user.getRegistrationIp() == null) {
+                                        user.setRegistrationIp(ipAddress);
+                                }
+                                user.setLastLoginIp(ipAddress);
+                                userRepository.save(user);
+                        });
+
                         // Drive auth: redirige al wizard, no hace login normal
                         if (authentication instanceof OAuth2AuthenticationToken oauthToken
                                         && "google-drive".equals(oauthToken.getAuthorizedClientRegistrationId())) {

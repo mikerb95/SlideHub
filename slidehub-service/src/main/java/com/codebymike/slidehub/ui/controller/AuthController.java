@@ -108,6 +108,7 @@ public class AuthController {
             @RequestParam String email,
             @RequestParam String password,
             @RequestParam("confirmPassword") String confirmPassword,
+            jakarta.servlet.http.HttpServletRequest request,
             Model model) {
         if (!password.equals(confirmPassword)) {
             model.addAttribute("errorMessage", "Las contraseñas no coinciden.");
@@ -118,7 +119,8 @@ public class AuthController {
             return "auth/register";
         }
         try {
-            userService.registerUser(username, email, password);
+            String ipAddress = request.getRemoteAddr();
+            userService.registerUser(username, email, password, ipAddress);
             model.addAttribute("successMessage",
                     "¡Cuenta creada! Revisa tu email (" + email
                             + ") para confirmar tu cuenta antes de iniciar sesión.");

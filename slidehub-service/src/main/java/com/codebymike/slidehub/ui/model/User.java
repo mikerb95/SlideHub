@@ -245,4 +245,20 @@ public class User {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    public String getRegistrationIp() {
+        return registrationIp;
+    }
+
+    public void setRegistrationIp(String registrationIp) {
+        this.registrationIp = registrationIp;
+    }
+
+    public String getLastLoginIp() {
+        return lastLoginIp;
+    }
+
+    public void setLastLoginIp(String lastLoginIp) {
+        this.lastLoginIp = lastLoginIp;
+    }
 }
