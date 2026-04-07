@@ -21,8 +21,8 @@ public record PresentationSummary(
         LocalDateTime localDate = p.getCreatedAt();
         if (localDate != null) {
             localDate = localDate.atZone(ZoneId.systemDefault())
-                                 .withZoneSameInstant(ZoneId.of("America/Bogota"))
-                                 .toLocalDateTime();
+                    .withZoneSameInstant(ZoneId.of("America/Bogota"))
+                    .toLocalDateTime();
         }
         return new PresentationSummary(
                 p.getId(),
