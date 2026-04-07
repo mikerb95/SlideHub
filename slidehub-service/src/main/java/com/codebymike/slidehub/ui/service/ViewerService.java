@@ -72,6 +72,16 @@ public class ViewerService {
                 hands != null ? hands : 0L);
     }
 
+    /** Devuelve los nombres de los viewers con la mano levantada, en orden arbitrario. */
+    public List<String> getHandRaisers(String sessionId) {
+        Set<String> tokens = redis.opsForSet().members(handsKey(sessionId));
+        if (tokens == null || tokens.isEmpty()) return List.of();
+        List<Object> names = redis.opsForHash().multiGet(viewersKey(sessionId), List.copyOf(tokens));
+        return names.stream()
+                .map(n -> (n != null && !n.toString().isBlank()) ? n.toString() : "Anónimo")
+                .toList();
+    }
+
     /** Verifica que el viewerToken pertenezca a la sesión activa. */
     public boolean isRegistered(String sessionId, String viewerToken) {
         return Boolean.TRUE.equals(redis.opsForHash().hasKey(viewersKey(sessionId), viewerToken));
