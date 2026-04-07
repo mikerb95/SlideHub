@@ -66,7 +66,7 @@ public class SecurityConfig {
                                                 // Vistas públicas (HU-005, HU-011, HU-012, HU-013, Legal, Pricing)
                                                 .requestMatchers("/slides", "/remote", "/demo", "/showcase", "/join",
                                                                 "/privacidad", "/politicadeuso", "/copyright",
-                                                                "/pricing")
+                                                                "/pricing", "/checkout", "/billing/process")
                                                 .permitAll()
                                                 // Join de reunión por QR + comandos en remoto (públicos pero
                                                 // tokenizados)
