@@ -110,7 +110,7 @@ public class SecurityConfig {
                                                 // Documentación/calidad y checks de prueba públicos
                                                 .requestMatchers("/calidad", "/status", "/status/api/checks",
                                                                 "/actuator/health", "/actuator/info",
-                                                                "/sustentacion", "/metodologia", "/matriz-pdca",
+                                                                "/sustentacion", "/presentacion", "/metodologia", "/matriz-pdca",
                                                                 "/ai-guide",
                                                                 "/uptime", "/api/uptime/status")
                                                 .permitAll()
