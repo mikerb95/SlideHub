@@ -14,7 +14,8 @@ import java.util.Map;
 
 /**
  * Controlador REST que expone un endpoint Webhook para recibir notificaciones
- * de la función Lambda externa tras la conversión de archivos PPTX a componentes de la presentación.
+ * de la función Lambda externa tras la conversión de archivos PPTX a
+ * componentes de la presentación.
  */
 @RestController
 @RequestMapping("/api/webhooks/pptx")
@@ -28,8 +29,10 @@ public class PptxWebhookController {
     /**
      * Constructor del controlador de webhooks PPTX.
      * 
-     * @param presentationService Servicio que maneja la lógica de negocio de las presentaciones.
-     * @param webhookSecret Secreto preconfigurado para validar las solicitudes entrantes del Webhook.
+     * @param presentationService Servicio que maneja la lógica de negocio de las
+     *                            presentaciones.
+     * @param webhookSecret       Secreto preconfigurado para validar las
+     *                            solicitudes entrantes del Webhook.
      */
     public PptxWebhookController(
             PresentationService presentationService,
@@ -39,10 +42,13 @@ public class PptxWebhookController {
     }
 
     /**
-     * Maneja las peticiones entrantes del tipo POST provenientes de la función Lambda tras la conversión de un PPTX.
+     * Maneja las peticiones entrantes del tipo POST provenientes de la función
+     * Lambda tras la conversión de un PPTX.
      * 
-     * @param providedSecret Secreto de cabecera proporcionado por el emisor para validación de seguridad.
-     * @param payload Contenido en formato JSON con la resolución (estado, conteo de slides, errores) de la conversión.
+     * @param providedSecret Secreto de cabecera proporcionado por el emisor para
+     *                       validación de seguridad.
+     * @param payload        Contenido en formato JSON con la resolución (estado,
+     *                       conteo de slides, errores) de la conversión.
      * @return Una respuesta HTTP que indica si la validación fue exitosa o no.
      */
     @PostMapping
