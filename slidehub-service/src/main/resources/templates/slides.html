@@ -283,6 +283,7 @@
     <script th:inline="javascript">
         const POLL_INTERVAL_MS = /*[[${pollIntervalMs}]]*/ 1000;
         const API_SLIDE_URL = '/api/slide';
+        const API_DEMO_URL = '/api/demo';
         const PRESENTATION_ID = /*[[${presentationId}]]*/ '';
         const SLIDES_CATALOG_API = PRESENTATION_ID ? `/api/presentations/${PRESENTATION_ID}/slides` : '';
         const DEVICE_TYPE = 'slides-screen';
@@ -290,9 +291,13 @@
 
         let currentSlide = 0;
         let totalSlides = 0;
+        let currentMode = null;
+        let currentUrl = null;
         let slideUrls = [];
         let deviceToken = localStorage.getItem(DEVICE_STORAGE_KEY) || '';
         const wrapper = document.getElementById('slide-wrapper');
+        const urlView = document.getElementById('url-view');
+        const slidesIframe = document.getElementById('slides-iframe');
         const errorMsg = document.getElementById('error-msg');
 
         function ensureDeviceToken() {
