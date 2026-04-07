@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -595,6 +597,35 @@
             0%   { box-shadow: 0 0 0 0   rgba(248, 81, 73, 0.5); }
             70%  { box-shadow: 0 0 0 10px rgba(248, 81, 73, 0);   }
             100% { box-shadow: 0 0 0 0   rgba(248, 81, 73, 0);   }
+        }
+
+        /* ── HOST swap button (solo presentadores autenticados) ── */
+        #host-panel-link {
+            position: fixed;
+            top: 0.7rem;
+            right: 0.7rem;
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--sh-border-active);
+            color: var(--sh-blue);
+            border-radius: var(--sh-r-md);
+            padding: 0.3rem 0.65rem;
+            font-family: var(--sh-font-mono);
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            z-index: 300;
+            -webkit-tap-highlight-color: transparent;
+            transition: border-color 0.15s, background 0.15s;
+        }
+
+        #host-panel-link:active {
+            background: rgba(30, 41, 59, 0.95);
+            border-color: var(--sh-blue);
         }
     </style>
 </head>
