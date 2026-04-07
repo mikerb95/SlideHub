@@ -141,6 +141,39 @@
             transform: translateX(-50%) scale(0.97);
         }
 
+        /* ── Scroll controls (URL demo mode) ── */
+        #scroll-controls {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        #scroll-controls.visible {
+            display: flex;
+        }
+
+        .scroll-btn {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 1px solid var(--sh-border-active);
+            background: var(--sh-elevated);
+            color: var(--sh-text-1);
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        .scroll-btn:active {
+            transform: scale(0.93);
+            background: var(--sh-border);
+        }
+
         /* ── Assist card ── */
         #assist-card {
             position: fixed;
@@ -424,8 +457,8 @@
         Diapositiva &mdash; / &mdash;
     </div>
 
-    <!-- Controles de navegación -->
-    <div class="flex gap-12 items-center">
+    <!-- Controles de navegación (slides mode) -->
+    <div id="nav-controls" class="flex gap-12 items-center">
         <button class="remote-btn" id="btn-prev" disabled aria-label="Anterior">
             <i class="fa-solid fa-chevron-left"></i>
         </button>
@@ -434,8 +467,18 @@
         </button>
     </div>
 
+    <!-- Controles de scroll (URL demo mode) -->
+    <div id="scroll-controls">
+        <button class="scroll-btn" id="btn-scroll-up" aria-label="Subir">
+            <i class="fa-solid fa-chevron-up"></i>
+        </button>
+        <button class="scroll-btn" id="btn-scroll-down" aria-label="Bajar">
+            <i class="fa-solid fa-chevron-down"></i>
+        </button>
+    </div>
+
     <!-- Ayuda de deslizamiento -->
-    <div class="mt-10 font-mono text-xs text-[var(--sh-text-3)] opacity-50">
+    <div id="swipe-hint" class="mt-10 font-mono text-xs text-[var(--sh-text-3)] opacity-50">
         &larr; desliza &rarr;
     </div>
 
