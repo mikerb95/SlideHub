@@ -257,9 +257,9 @@
 
         <!-- ── Actions ── -->
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
-            <a th:href="@{/presenter}" class="sh-btn text-xs">
+            <a href="#" class="sh-btn text-xs" onclick="if (document.referrer) { history.back(); } else { window.location.href = '/presenter'; } return false;">
                 <i class="fa-solid fa-arrow-left"></i>
-                Presentador
+                Volver
             </a>
             <form th:action="@{/auth/logout}" method="post" class="sm:ml-auto">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf}">
