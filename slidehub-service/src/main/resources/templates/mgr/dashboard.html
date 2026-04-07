@@ -618,16 +618,19 @@
         pendingDeleteDevId = pendingDeleteDevName = null;
     }
 
+    const DEV_DEL_DEFAULT_HTML  = '<i class="fa-solid fa-trash-can"></i>Eliminar';
+    const DEV_DEL_LOADING_HTML  = '<i class="fa-solid fa-spinner fa-spin"></i>Eliminando...';
+
     document.getElementById('dev-del-confirm-btn').addEventListener('click', async () => {
         const secret  = document.getElementById('dev-del-secret').value;
         const errEl   = document.getElementById('dev-del-error');
         const btn     = document.getElementById('dev-del-confirm-btn');
         errEl.textContent = '';
-        btn.disabled = true;
-        btn.textContent = 'Eliminando...';
+        btn.disabled  = true;
+        btn.innerHTML = DEV_DEL_LOADING_HTML;
 
         try {
-            const res = await fetch(`/mgr/api/developers/${pendingDeleteDevId}?secret=${encodeURIComponent(secret)}`, {
+            const res  = await fetch(`/mgr/api/developers/${pendingDeleteDevId}?secret=${encodeURIComponent(secret)}`, {
                 method: 'DELETE'
             });
             const data = await res.json();
@@ -641,8 +644,8 @@
         } catch (_) {
             errEl.textContent = 'Error de red.';
         } finally {
-            btn.disabled = false;
-            btn.textContent = 'Eliminar';
+            btn.disabled  = false;
+            btn.innerHTML = DEV_DEL_DEFAULT_HTML;
         }
     });
 </script>
