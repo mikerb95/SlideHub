@@ -16,7 +16,38 @@ WEBHOOK_SECRET = os.environ.get('SLIDEHUB_WEBHOOK_SECRET')
 # Con layer shelfio: /opt/instdir/program/soffice.bin
 LIBREOFFICE_PATH = os.environ.get('LIBREOFFICE_PATH', '/usr/bin/soffice')
 
+def _find_soffice():
+    """Busca soffice en ubicaciones comunes y retorna el path encontrado."""
+    candidates = [
+        LIBREOFFICE_PATH,
+        '/opt/instdir/program/soffice.bin',
+        '/opt/libreoffice/program/soffice.bin',
+        '/opt/lo/program/soffice.bin',
+        '/usr/bin/soffice',
+        '/usr/lib/libreoffice/program/soffice.bin',
+    ]
+    for p in candidates:
+        if os.path.exists(p):
+            return p
+    # Último recurso: buscar en /opt
+    if os.path.exists('/opt'):
+        for root, dirs, files in os.walk('/opt'):
+            if 'soffice.bin' in files:
+                return os.path.join(root, 'soffice.bin')
+            if 'soffice' in files:
+                return os.path.join(root, 'soffice')
+    return None
+
+
 def lambda_handler(event, context):
+    # ── Diagnóstico de LibreOffice ──────────────────────────────────────
+    soffice = _find_soffice()
+    if soffice:
+        print(f"soffice encontrado en: {soffice}")
+    else:
+        opt_contents = os.listdir('/opt') if os.path.exists('/opt') else []
+        print(f"soffice NO encontrado. /opt contiene: {opt_contents}")
+
     print(f"Evento recibido: {json.dumps(event)}")
     
     try:
@@ -41,9 +72,10 @@ def lambda_handler(event, context):
             s3_client.download_file(bucket, raw_key, file_path)
             
             # Convertir PPTX a PDF usando LibreOffice (invocado como subproceso headless)
-            print("Convirtiendo PPTX a PDF usando LibreOffice...")
+            lo_path = _find_soffice() or LIBREOFFICE_PATH
+            print(f"Convirtiendo PPTX a PDF usando LibreOffice ({lo_path})...")
             lo_cmd = [
-                LIBREOFFICE_PATH,
+                lo_path,
                 '--headless',
                 '--invisible',
                 '--nodefault',
