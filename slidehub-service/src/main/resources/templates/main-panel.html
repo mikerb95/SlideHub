@@ -310,8 +310,14 @@
                 <div id="mp-q-list" class="flex flex-col gap-2 max-h-[320px] overflow-y-auto">
                     <p class="text-xs font-mono text-[var(--sh-text-3)]">Sin preguntas pendientes.</p>
                 </div>
-                <button class="sh-btn sh-btn-ghost text-[0.65rem] w-full justify-center mt-2"
-                    id="mp-q-show-all-btn" onclick="mpToggleAllQuestions()">Ver todas</button>
+                <div class="flex gap-1 mt-2">
+                    <button class="sh-btn sh-btn-ghost text-[0.65rem] flex-1 justify-center"
+                        id="mp-q-show-all-btn" onclick="mpToggleAllQuestions()">Ver todas</button>
+                    <button class="sh-btn sh-btn-ghost text-[0.65rem] px-2.5" title="Descargar preguntas CSV"
+                        onclick="mpDownloadQuestions()">
+                        <i class="fa-solid fa-download"></i>
+                    </button>
+                </div>
             </div>
 
             <!-- QUICK SLIDE -->

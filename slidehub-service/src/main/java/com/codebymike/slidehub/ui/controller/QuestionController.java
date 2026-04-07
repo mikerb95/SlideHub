@@ -102,6 +102,23 @@ public class QuestionController {
         return ResponseEntity.ok(questionService.listForPresentation(presentationId));
     }
 
+    /**
+     * Presenter/Admin: exporta todas las preguntas de la sesión activa como CSV.
+     * Incluye todas las preguntas (PENDING, ANSWERED, DISMISSED).
+     */
+    @GetMapping("/export")
+    public ResponseEntity<byte[]> export(@PathVariable String presentationId,
+            Authentication authentication) {
+        resolveUser(authentication);
+        List<QuestionService.QuestionItem> questions = questionService.listForPresentation(presentationId);
+        byte[] csv = buildCsv(questions).getBytes(StandardCharsets.UTF_8);
+        String filename = "preguntas-" + presentationId + ".csv";
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
+                .body(csv);
+    }
+
     /** Presenter/Admin: actualiza el estado de una pregunta. */
     @PutMapping("/{questionId}/status")
     public ResponseEntity<?> updateStatus(@PathVariable String presentationId,
@@ -116,6 +133,28 @@ public class QuestionController {
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
         }
+    }
+
+    private String buildCsv(List<QuestionService.QuestionItem> questions) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("estado,autor,pregunta,votos,fecha\n");
+        for (QuestionService.QuestionItem q : questions) {
+            String author = q.anonymous() ? "Anónimo" : (q.displayName() != null ? q.displayName() : "Sin nombre");
+            sb.append(csvEscape(q.status())).append(',')
+              .append(csvEscape(author)).append(',')
+              .append(csvEscape(q.content())).append(',')
+              .append(q.upvotes()).append(',')
+              .append(q.createdAt()).append('\n');
+        }
+        return sb.toString();
+    }
+
+    private String csvEscape(String value) {
+        if (value == null) return "";
+        if (value.contains(",") || value.contains("\"") || value.contains("\n") || value.contains("\r")) {
+            return "\"" + value.replace("\"", "\"\"") + "\"";
+        }
+        return value;
     }
 
     private User resolveUser(Authentication auth) {
