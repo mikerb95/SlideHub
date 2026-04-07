@@ -349,11 +349,32 @@
 
         <!-- ── Tabla usuarios ─────────────────────────────────────────────── -->
         <section>
-            <div class="section-title"><i class="fa-solid fa-user-list mr-1"></i>Usuarios registrados
+            <div class="section-title">
+                <i class="fa-solid fa-user-list mr-1"></i>Usuarios registrados
                 <span style="color:var(--accent);" th:text="'(' + ${#lists.size(users)} + ')'"></span>
             </div>
+
+            <!-- Filtros -->
+            <div class="user-filters">
+                <div class="filter-group">
+                    <span class="filter-label">Rol</span>
+                    <button class="filter-pill active" id="fp-role-all"    onclick="setFilter('role','all')">Todos</button>
+                    <button class="filter-pill"         id="fp-role-HOST"       onclick="setFilter('role','HOST')">Host</button>
+                    <button class="filter-pill"         id="fp-role-PRESENTER"  onclick="setFilter('role','PRESENTER')">Presenter</button>
+                    <button class="filter-pill"         id="fp-role-DEVELOPER"  onclick="setFilter('role','DEVELOPER')">Dev</button>
+                </div>
+                <div class="filter-group" style="margin-left:1rem;">
+                    <span class="filter-label">Auth</span>
+                    <button class="filter-pill active" id="fp-auth-all"    onclick="setFilter('auth','all')">Todos</button>
+                    <button class="filter-pill"         id="fp-auth-local"  onclick="setFilter('auth','local')"><i class="fa-solid fa-key mr-1"></i>Local</button>
+                    <button class="filter-pill"         id="fp-auth-github" onclick="setFilter('auth','github')"><i class="fa-brands fa-github mr-1"></i>GitHub</button>
+                    <button class="filter-pill"         id="fp-auth-google" onclick="setFilter('auth','google')"><i class="fa-brands fa-google mr-1"></i>Google</button>
+                </div>
+                <div class="user-count-badge" id="user-filter-count"></div>
+            </div>
+
             <div class="card overflow-x-auto">
-                <table class="tbl w-full">
+                <table class="tbl w-full" id="users-table">
                     <thead>
                         <tr>
                             <th class="text-left">Usuario</th>
@@ -366,7 +387,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="u : ${users}">
+                        <tr th:each="u : ${users}"
+                            th:attr="data-role=${u.role},
+                                     data-auth=${u.githubId != null ? 'github' : (u.googleId != null ? 'google' : 'local')}">
                             <td th:text="${u.username}" style="font-weight:600;"></td>
                             <td style="color:var(--text-2);" th:text="${u.email}"></td>
                             <td>
@@ -375,18 +398,13 @@
                                     th:text="${u.role}"></span>
                             </td>
                             <td style="color:var(--text-2); font-size:.78rem;">
-                                <span th:if="${u.githubId != null}"><i
-                                        class="fa-brands fa-github mr-1"></i>GitHub</span>
-                                <span th:if="${u.googleId != null}"><i
-                                        class="fa-brands fa-google mr-1"></i>Google</span>
-                                <span th:if="${u.githubId == null and u.googleId == null}"><i
-                                        class="fa-solid fa-key mr-1"></i>Local</span>
+                                <span th:if="${u.githubId != null}"><i class="fa-brands fa-github mr-1"></i>GitHub</span>
+                                <span th:if="${u.googleId != null}"><i class="fa-brands fa-google mr-1"></i>Google</span>
+                                <span th:if="${u.githubId == null and u.googleId == null}"><i class="fa-solid fa-key mr-1"></i>Local</span>
                             </td>
                             <td>
-                                <i th:if="${u.emailVerified}" class="fa-solid fa-check"
-                                    style="color:var(--accent);"></i>
-                                <i th:unless="${u.emailVerified}" class="fa-solid fa-xmark"
-                                    style="color:var(--red);"></i>
+                                <i th:if="${u.emailVerified}" class="fa-solid fa-check" style="color:var(--accent);"></i>
+                                <i th:unless="${u.emailVerified}" class="fa-solid fa-xmark" style="color:var(--red);"></i>
                             </td>
                             <td style="color:var(--text-2); font-size:.78rem;"
                                 th:text="${u.createdAt != null ? #temporals.format(u.createdAt, 'dd MMM yyyy') : '—'}">
