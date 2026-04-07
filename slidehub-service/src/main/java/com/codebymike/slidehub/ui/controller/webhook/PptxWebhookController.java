@@ -54,13 +54,18 @@ public class PptxWebhookController {
         }
 
         // 3. Procesar estado
-        if ("READY".equals(status) && slideCount != null && slideCount > 0) {
-            presentationService.initializeSlidesAndMarkReady(presentationId, slideCount);
-            return ResponseEntity.ok("Procesado con éxito");
-        } else {
-            log.error("Falló la conversión PPTX en Lambda para {}. Motivo: {}", presentationId, error);
-            presentationService.markAsFailed(presentationId);
-            return ResponseEntity.ok("Fallo registrado.");
+        try {
+            if ("READY".equals(status) && slideCount != null && slideCount > 0) {
+                presentationService.initializeSlidesAndMarkReady(presentationId, slideCount);
+                return ResponseEntity.ok("Procesado con éxito");
+            } else {
+                log.error("Falló la conversión PPTX en Lambda para {}. Motivo: {}", presentationId, error);
+                presentationService.markAsFailed(presentationId);
+                return ResponseEntity.ok("Fallo registrado.");
+            }
+        } catch (Exception ex) {
+            log.error("Error procesando webhook para {}: {}", presentationId, ex.getMessage());
+            return ResponseEntity.internalServerError().body("Error interno: " + ex.getMessage());
         }
     }
 }
