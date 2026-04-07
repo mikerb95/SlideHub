@@ -827,6 +827,52 @@
                 btn.innerHTML = DEV_DEL_DEFAULT_HTML;
             }
         });
+
+        // ── Filtros de usuarios ──────────────────────────────────────────────────
+        let currentFilters = { role: 'all', auth: 'all' };
+
+        function setFilter(type, value) {
+            currentFilters[type] = value;
+            
+            // Actualizar botones
+            document.querySelectorAll(`[id^="fp-${type}-"]`).forEach(el => el.classList.remove('active'));
+            document.getElementById(`fp-${type}-${value}`).classList.add('active');
+
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const table = document.getElementById('users-table');
+            if (!table) return;
+            const rows = table.querySelectorAll('tbody tr');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const roleMatch = currentFilters.role === 'all' || row.dataset.role === currentFilters.role;
+                const authMatch = currentFilters.auth === 'all' || row.dataset.auth === currentFilters.auth;
+                
+                if (roleMatch && authMatch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            const countBadge = document.getElementById('user-filter-count');
+            if (countBadge) {
+                if (visibleCount < rows.length) {
+                    countBadge.innerHTML = `<span><i class="fa-solid fa-filter mr-1"></i>Mostrando ${visibleCount} de ${rows.length}</span>`;
+                    countBadge.style.display = 'inline-flex';
+                } else {
+                    countBadge.style.display = 'none';
+                }
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            applyFilters();
+        });
     </script>
 </body>
 
