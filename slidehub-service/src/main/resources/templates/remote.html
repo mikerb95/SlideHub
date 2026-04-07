@@ -632,6 +632,14 @@
 
 <body class="sh antialiased">
 
+    <!-- HOST-only: acceso rápido a /main-panel (invisible para participantes sin sesión) -->
+    <a sec:authorize="hasAnyRole('PRESENTER', 'ADMIN')"
+       id="host-panel-link"
+       th:href="${presentationId != null and presentationId != '' ? '/main-panel?presentationId=' + presentationId : '/main-panel'}">
+        <i class="fa-solid fa-table-cells-large"></i>
+        Panel
+    </a>
+
     <!-- ═══════════════════════ TOP — Miniaturas ═══════════════════════ -->
     <div class="remote-top">
         <div class="thumb-col-current">

@@ -43,6 +43,14 @@
     <div class="container">
         <h1>Notas de Sustentación</h1>
         <ul class="list-group list-group-flush shadow-sm rounded">
+            <!-- 0 -->
+            <li class="list-group-item p-3" data-bs-toggle="modal" data-bs-target="#modal0">
+                <div>
+                    <span class="badge bg-primary text-white">0</span>
+                    <strong>Ciclo de Vida del Software:</strong> Faseo metódico aplicado: Planificación, Análisis, Diseño, Implementación, Pruebas y Mantenimiento. Soportado en CI/CD, Git y control de versiones con mejora continua.
+                </div>
+                <button class="btn btn-sm btn-outline-secondary">Ver más</button>
+            </li>
             <!-- 1 -->
             <li class="list-group-item p-3" data-bs-toggle="modal" data-bs-target="#modal1">
                 <div>
@@ -129,6 +137,26 @@
     </div>
 
     <!-- MODALES DE EXPANSIÓN -->
+
+    <!-- Modal 0 -->
+    <div class="modal fade" id="modal0" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">0. Ciclo de Vida del Software</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <strong>Fases aplicadas en SlideHub (Monolito Evolutivo):</strong><br><br>
+                    - <strong>Planificación y Análisis:</strong> Levantamiento de Historias de Usuario, product backlog y arquitectura preliminar de microservicios.<br>
+                    - <strong>Diseño:</strong> UX móvil (Figma) y Arquitectura de un "Monolito Modular".<br>
+                    - <strong>Implementación (Codificación):</strong> Base en Java 21, Spring Boot y patrones GoF, estructurando una API REST e Interfaces Thymeleaf bajo el patrón MVC.<br>
+                    - <strong>Pruebas (V&V):</strong> MockMvc para endpoints e integración, guiadas por SQA (Normativas ISO/Patrones).<br>
+                    - <strong>Despliegue y Mantenimiento:</strong> Integración continua (CI/CD) albergado en Render, manejando versionamiento mediante GitHub y ciclos PDCA que permitieron iterar fases previas.
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal 1 -->
     <div class="modal fade" id="modal1" tabindex="-1" aria-hidden="true">
