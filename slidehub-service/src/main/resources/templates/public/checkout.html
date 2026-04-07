@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - SlideHub</title>
+    <th:block th:replace="~{fragments/head :: assets}"></th:block>
+    <style>
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 1rem;
+            color: var(--sh-text-3);
+            font-size: 0.9rem;
+        }
+
+        .checkout-input {
+            width: 100%;
+            background: rgba(13, 17, 23, 1);
+            border: 1px solid var(--sh-border-color, rgba(48, 54, 61, 1));
+            color: var(--sh-text-1);
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border-radius: 0.5rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .checkout-input:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.1);
+        }
+        
+        .checkout-input::placeholder {
+            color: var(--sh-text-3);
+        }
+
+        .sh-panel-glass {
+            background: rgba(22, 27, 34, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(48, 54, 61, 0.8);
+            border-radius: 12px;
+        }
+
+        .sh-divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(48, 54, 61, 0.8), transparent);
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+
+<body class="sh bg-sh-deep antialiased min-h-screen flex flex-col font-sans">
+
+    <!-- Simple Nav for Checkout to maintain focus -->
+    <nav class="sh-nav">
+        <div class="sh-nav-inner flex justify-between items-center w-full">
+            <a href="/pricing" class="flex items-center gap-2 text-[var(--sh-text-2)] hover:text-[#58a6ff] transition-colors text-sm font-mono">
+                <i class="fa-solid fa-arrow-left"></i> Volver a planes
+            </a>
+            <div class="flex items-center gap-3">
+                <span class="font-brand tracking-tight text-[var(--sh-text-1)] text-lg">SlideHub</span>
+                <span class="sh-badge ml-1 text-xs">CHECKOUT</span>
+            </div>
+            <div class="w-20"></div> <!-- Spacer for centering -->
+        </div>
+    </nav>
+
+    <main class="flex-grow flex items-center justify-center p-6 relative">
+        <!-- Glow Effect background -->
+        <div class="absolute w-[600px] h-[600px] opacity-10 blur-[100px] rounded-full pointer-events-none" style="background: radial-gradient(circle, #58a6ff 0%, transparent 60%); top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+
+        <div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+            
+            <!-- Resumen de Pedido -->
+            <div class="flex flex-col text-[var(--sh-text-2)] p-6">
+                <h2 class="text-[var(--sh-text-1)] text-xl font-semibold mb-2">Resumen del pedido</h2>
+                <p class="text-sm text-[var(--sh-text-3)] mb-8">Revisa los detalles de tu suscripción antes de proceder con el pago.</p>
+                
+                <div class="sh-panel-glass p-5 mb-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-white font-medium text-lg">Plan Pro</h3>
+                            <p class="text-xs font-mono text-[var(--sh-text-3)] mt-1">Facturación anual</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-white font-bold text-xl">$10</span>
+                            <span class="text-xs text-[var(--sh-text-3)]">/mes</span>
+                        </div>
+                    </div>
+                    <ul class="text-sm space-y-2 mt-4 text-[var(--sh-text-2)] font-mono">
+                        <li><i class="fa-solid fa-check text-green-400 mr-2"></i> Diapositivas ilimitadas</li>
+                        <li><i class="fa-solid fa-check text-green-400 mr-2"></i> Generación IA avanzada</li>
+                        <li><i class="fa-solid fa-check text-green-400 mr-2"></i> Exportación PDF/PPTX</li>
+                        <li><i class="fa-solid fa-check text-green-400 mr-2"></i> Soporte prioritario 24/7</li>
+                    </ul>
+                </div>
+
+                <div class="space-y-3 font-mono text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-[var(--sh-text-3)]">Subtotal</span>
+                        <span>$120.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-[var(--sh-text-3)]">Descuento Anual (16%)</span>
+                        <span class="text-green-400">-$24.00</span>
+                    </div>
+                    <div class="sh-divider my-3"></div>
+                    <div class="flex justify-between items-end">
+                        <span class="text-white font-semibold">Total a Pagar</span>
+                        <div class="text-right">
+                            <span class="text-white font-bold text-2xl">$96.00</span>
+                            <p class="text-[10px] text-[var(--sh-text-3)]">USD (impuestos incl.)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pasarela de Pago -->
+            <div class="sh-panel-glass p-8">
+                <h2 class="text-white text-xl font-semibold mb-6 flex items-center justify-between">
+                    Detalles de Pago
+                    <div class="flex gap-2 text-xl text-[var(--sh-text-3)]">
+                        <i class="fa-brands fa-cc-visa hover:text-white transition-colors cursor-pointer"></i>
+                        <i class="fa-brands fa-cc-mastercard hover:text-white transition-colors cursor-pointer"></i>
+                        <i class="fa-brands fa-cc-amex hover:text-white transition-colors cursor-pointer"></i>
+                    </div>
+                </h2>
+
+                <form action="/billing/process" method="POST" class="space-y-5" onsubmit="event.preventDefault(); window.location.href='/showcase?paid=true'">
+                    <!-- Email -->
+                    <div>
+                        <label class="block text-xs font-mono text-[var(--sh-text-2)] mb-1.5 uppercase tracking-wider">Correo Electrónico</label>
+                        <div class="input-group">
+                            <i class="fa-solid fa-envelope"></i>
+                            <input type="email" placeholder="tu@email.com" class="checkout-input" required>
+                        </div>
+                    </div>
+
+                    <!-- Titular Tarjeta -->
+                    <div>
+                        <label class="block text-xs font-mono text-[var(--sh-text-2)] mb-1.5 uppercase tracking-wider">Titular de la Tarjeta</label>
+                        <div class="input-group">
+                            <i class="fa-solid fa-user"></i>
+                            <input type="text" placeholder="Nombre como aparece en la tarjeta" class="checkout-input" required>
+                        </div>
+                    </div>
+
+                    <!-- Número de Tarjeta -->
+                    <div>
+                        <label class="block text-xs font-mono text-[var(--sh-text-2)] mb-1.5 uppercase tracking-wider">Número de Tarjeta</label>
+                        <div class="input-group">
+                            <i class="fa-solid fa-credit-card"></i>
+                            <input type="text" placeholder="0000 0000 0000 0000" class="checkout-input" pattern="\d{4}\s?\d{4}\s?\d{4}\s?\d{4}" maxlength="19" required>
+                        </div>
+                    </div>
+
+                    <!-- Vencimiento y CVC -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-mono text-[var(--sh-text-2)] mb-1.5 uppercase tracking-wider">Expiración</label>
+                            <input type="text" placeholder="MM/AA" class="checkout-input !pl-4" pattern="(0[1-9]|1[0-2])\/?([0-9]{2})" maxlength="5" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-mono text-[var(--sh-text-2)] mb-1.5 uppercase tracking-wider">CVC</label>
+                            <div class="input-group">
+                                <i class="fa-solid fa-lock"></i>
+                                <input type="password" placeholder="123" class="checkout-input" maxlength="4" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dirección de facturación (opcional) -->
+                    <div>
+                        <label class="block text-xs font-mono text-[var(--sh-text-2)] mb-1.5 uppercase tracking-wider">País / Región</label>
+                        <select class="checkout-input !pl-4 appearance-none">
+                            <option value="CO">Colombia</option>
+                            <option value="US">Estados Unidos</option>
+                            <option value="MX">México</option>
+                            <option value="ES">España</option>
+                            <option value="AR">Argentina</option>
+                            <option value="CL">Argentina</option>
+                            <option value="PE">Chile</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full sh-btn sh-btn-primary py-3 rounded-lg flex items-center justify-center gap-2 font-semibold shadow-lg shadow-blue-900/20 mt-4 transition-all hover:scale-[1.01]">
+                        <i class="fa-solid fa-lock"></i> Pagar $96.00 de forma segura
+                    </button>
+                    <p class="text-center text-[10px] text-[var(--sh-text-3)] font-mono mt-2">
+                        <i class="fa-solid fa-shield-halved mr-1"></i> Transacción cifrada con AES-256 bits. Pagos procesados por Stripe.
+                    </p>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-6 border-t border-[#30363d] text-center">
+        <p class="text-xs text-[var(--sh-text-3)] font-mono">
+            &copy; 2026 SlideHub. Todos los derechos reservados. <a href="/privacidad" class="text-[var(--sh-text-2)] hover:text-[#58a6ff]">Privacidad</a> | <a href="/terminos" class="text-[var(--sh-text-2)] hover:text-[#58a6ff]">Términos</a>
+        </p>
+    </footer>
+
+</body>
+</html>
