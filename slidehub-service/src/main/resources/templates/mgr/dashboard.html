@@ -439,6 +439,206 @@
             setTimeout(() => toast.classList.add('hidden'), 300);
         }, 3200);
     }
+
+    // ── Developer modals ──────────────────────────────────────────────────────
+
+    function openCreateDevModal() {
+        document.getElementById('dev-modal-title').textContent = 'Nuevo Developer';
+        document.getElementById('dev-form-id').value = '';
+        document.getElementById('dev-form-username').value = '';
+        document.getElementById('dev-form-email').value = '';
+        document.getElementById('dev-form-password').value = '';
+        document.getElementById('dev-form-password').placeholder = 'Contraseña';
+        document.getElementById('dev-form-secret').value = '';
+        document.getElementById('dev-modal-error').textContent = '';
+        document.getElementById('dev-modal').classList.remove('hidden');
+        document.getElementById('dev-form-username').focus();
+    }
+
+    function openEditDevModal(btn) {
+        document.getElementById('dev-modal-title').textContent = 'Editar Developer';
+        document.getElementById('dev-form-id').value = btn.dataset.id;
+        document.getElementById('dev-form-username').value = btn.dataset.name;
+        document.getElementById('dev-form-email').value = btn.dataset.email;
+        document.getElementById('dev-form-password').value = '';
+        document.getElementById('dev-form-password').placeholder = 'Nueva contraseña (dejar vacío para no cambiar)';
+        document.getElementById('dev-form-secret').value = '';
+        document.getElementById('dev-modal-error').textContent = '';
+        document.getElementById('dev-modal').classList.remove('hidden');
+        document.getElementById('dev-form-username').focus();
+    }
+
+    function closeDevModal() {
+        document.getElementById('dev-modal').classList.add('hidden');
+    }
+
+    document.getElementById('dev-modal-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id       = document.getElementById('dev-form-id').value.trim();
+        const username = document.getElementById('dev-form-username').value.trim();
+        const email    = document.getElementById('dev-form-email').value.trim();
+        const password = document.getElementById('dev-form-password').value;
+        const secret   = document.getElementById('dev-form-secret').value;
+        const errEl    = document.getElementById('dev-modal-error');
+        const submitBtn = document.getElementById('dev-submit-btn');
+
+        errEl.textContent = '';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Guardando...';
+
+        const isEdit = id !== '';
+        const url    = isEdit ? `/mgr/api/developers/${id}` : '/mgr/api/developers';
+        const method = isEdit ? 'PUT' : 'POST';
+
+        try {
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password, secret })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                closeDevModal();
+                showToast(data.message, false);
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                errEl.textContent = data.error || 'Error inesperado.';
+            }
+        } catch (_) {
+            errEl.textContent = 'Error de red.';
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Guardar';
+        }
+    });
+
+    let pendingDeleteDevId   = null;
+    let pendingDeleteDevName = null;
+
+    function openDeleteDevModal(btn) {
+        pendingDeleteDevId   = btn.dataset.id;
+        pendingDeleteDevName = btn.dataset.name;
+        document.getElementById('dev-del-msg').innerHTML =
+            `¿Eliminar al developer <strong style="color:var(--text-1);">${pendingDeleteDevName}</strong>?`;
+        document.getElementById('dev-del-secret').value = '';
+        document.getElementById('dev-del-error').textContent = '';
+        document.getElementById('dev-del-modal').classList.remove('hidden');
+        document.getElementById('dev-del-secret').focus();
+    }
+
+    function closeDeleteDevModal() {
+        document.getElementById('dev-del-modal').classList.add('hidden');
+        pendingDeleteDevId = pendingDeleteDevName = null;
+    }
+
+    document.getElementById('dev-del-confirm-btn').addEventListener('click', async () => {
+        const secret  = document.getElementById('dev-del-secret').value;
+        const errEl   = document.getElementById('dev-del-error');
+        const btn     = document.getElementById('dev-del-confirm-btn');
+        errEl.textContent = '';
+        btn.disabled = true;
+        btn.textContent = 'Eliminando...';
+
+        try {
+            const res = await fetch(`/mgr/api/developers/${pendingDeleteDevId}?secret=${encodeURIComponent(secret)}`, {
+                method: 'DELETE'
+            });
+            const data = await res.json();
+            if (res.ok) {
+                closeDeleteDevModal();
+                showToast(data.message, false);
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                errEl.textContent = data.error || 'Error inesperado.';
+            }
+        } catch (_) {
+            errEl.textContent = 'Error de red.';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Eliminar';
+        }
+    });
 </script>
+
+<!-- Modal crear / editar Developer -->
+<div id="dev-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden"
+     style="background:rgba(0,0,0,.75);">
+    <div class="card p-6 w-full max-w-sm space-y-4">
+        <div class="flex items-center justify-between">
+            <h3 id="dev-modal-title" style="font-size:.85rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em;"></h3>
+            <button onclick="closeDevModal()"
+                    style="background:none;border:none;cursor:pointer;color:var(--text-2);font-size:.9rem;">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <form id="dev-modal-form" class="space-y-3">
+            <input type="hidden" id="dev-form-id">
+            <div>
+                <label style="font-size:.7rem; color:var(--text-2); text-transform:uppercase; letter-spacing:.08em;">Usuario</label>
+                <input id="dev-form-username" type="text" required autocomplete="off"
+                       style="width:100%; background:#1e1e1e; border:1px solid var(--border); border-radius:5px; padding:7px 10px; color:var(--text-1); font-size:.82rem; margin-top:4px; box-sizing:border-box;">
+            </div>
+            <div>
+                <label style="font-size:.7rem; color:var(--text-2); text-transform:uppercase; letter-spacing:.08em;">Email</label>
+                <input id="dev-form-email" type="email" required autocomplete="off"
+                       style="width:100%; background:#1e1e1e; border:1px solid var(--border); border-radius:5px; padding:7px 10px; color:var(--text-1); font-size:.82rem; margin-top:4px; box-sizing:border-box;">
+            </div>
+            <div>
+                <label style="font-size:.7rem; color:var(--text-2); text-transform:uppercase; letter-spacing:.08em;">Contraseña</label>
+                <input id="dev-form-password" type="password" autocomplete="new-password"
+                       style="width:100%; background:#1e1e1e; border:1px solid var(--border); border-radius:5px; padding:7px 10px; color:var(--text-1); font-size:.82rem; margin-top:4px; box-sizing:border-box;">
+            </div>
+            <div>
+                <label style="font-size:.7rem; color:var(--amber); text-transform:uppercase; letter-spacing:.08em;"><i class="fa-solid fa-key mr-1"></i>Clave CREATE_DEV</label>
+                <input id="dev-form-secret" type="password" required autocomplete="off"
+                       style="width:100%; background:#1e1e1e; border:1px solid #ffd74040; border-radius:5px; padding:7px 10px; color:var(--text-1); font-size:.82rem; margin-top:4px; box-sizing:border-box;">
+            </div>
+            <p id="dev-modal-error" style="font-size:.75rem; color:var(--red); min-height:1em;"></p>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="closeDevModal()"
+                        style="font-size:.8rem; color:var(--text-2); padding:6px 14px; border:1px solid var(--border); border-radius:6px; background:transparent; cursor:pointer;">
+                    Cancelar
+                </button>
+                <button id="dev-submit-btn" type="submit"
+                        style="font-size:.8rem; color:#000; padding:6px 14px; border-radius:6px; background:var(--accent); border:none; cursor:pointer; font-weight:700;">
+                    Guardar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal eliminar Developer -->
+<div id="dev-del-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden"
+     style="background:rgba(0,0,0,.75);">
+    <div class="card p-6 w-full max-w-sm space-y-4">
+        <div class="flex items-center justify-between">
+            <h3 style="font-size:.85rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em;">
+                <i class="fa-solid fa-triangle-exclamation mr-1" style="color:var(--red);"></i>Eliminar Developer
+            </h3>
+            <button onclick="closeDeleteDevModal()"
+                    style="background:none;border:none;cursor:pointer;color:var(--text-2);font-size:.9rem;">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <p id="dev-del-msg" style="font-size:.82rem; color:var(--text-2); line-height:1.5;"></p>
+        <div>
+            <label style="font-size:.7rem; color:var(--amber); text-transform:uppercase; letter-spacing:.08em;"><i class="fa-solid fa-key mr-1"></i>Clave CREATE_DEV para confirmar</label>
+            <input id="dev-del-secret" type="password" autocomplete="off"
+                   style="width:100%; background:#1e1e1e; border:1px solid #ffd74040; border-radius:5px; padding:7px 10px; color:var(--text-1); font-size:.82rem; margin-top:4px; box-sizing:border-box;">
+        </div>
+        <p id="dev-del-error" style="font-size:.75rem; color:var(--red); min-height:1em;"></p>
+        <div class="flex justify-end gap-3">
+            <button onclick="closeDeleteDevModal()"
+                    style="font-size:.8rem; color:var(--text-2); padding:6px 14px; border:1px solid var(--border); border-radius:6px; background:transparent; cursor:pointer;">
+                Cancelar
+            </button>
+            <button id="dev-del-confirm-btn"
+                    style="font-size:.8rem; color:#fff; padding:6px 14px; border-radius:6px; background:var(--red); border:none; cursor:pointer; font-weight:600;">
+                <i class="fa-solid fa-trash-can mr-1"></i>Eliminar
+            </button>
+        </div>
+    </div>
+</div>
 </body>
 </html>

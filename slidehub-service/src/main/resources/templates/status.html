@@ -135,15 +135,15 @@
 </head>
 
 <body class="sh bg-sh-deep antialiased min-h-screen">
-    <nav class="sh-nav" style="position: sticky;">
-        <div class="sh-nav-inner status-nav">
-            <div class="flex items-center gap-2 sm:gap-3">
-                <span class="font-brand text-base tracking-tight">System Status</span>
-                <div class="sh-status ml-1 hidden sm:inline-flex">
-                    <i class="fa-solid fa-wave-square text-xs" style="color: var(--sh-blue);"></i>
-                </div>
+    <nav class="sh-nav" style="position:sticky;top:0;z-index:50;">
+        <div class="sh-nav-inner">
+            <div class="flex items-center gap-3">
+                <a href="/presentations" class="sh-btn sh-btn-ghost text-xs"><i class="fa-solid fa-arrow-left"></i></a>
+                <span class="font-brand text-base">SlideHub</span>
+                <span class="text-[var(--sh-text-3)] text-xs">/</span>
+                <span class="font-mono text-xs text-[var(--sh-text-2)]">System Status</span>
             </div>
-            <div class="status-nav-actions flex items-center gap-2">
+            <div class="flex items-center gap-2">
                 <a href="/presenter" class="sh-btn sh-btn-ghost text-xs">
                     <i class="fa-solid fa-chalkboard"></i>
                     <span class="hidden sm:inline">Presentador</span>
