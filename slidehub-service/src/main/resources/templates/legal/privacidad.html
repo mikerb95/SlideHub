@@ -26,13 +26,16 @@
 
         <div class="space-y-6 text-sm leading-relaxed">
             <p>
-                SlideHub respeta la privacidad de sus usuarios (Presentadores y Audiencia) y se compromete a proteger los datos personales.
+                SlideHub respeta la privacidad de sus usuarios (Presentadores y Audiencia) y se compromete a proteger
+                los datos personales.
             </p>
 
             <div>
                 <h2 class="text-[var(--sh-text-1)] text-lg font-bold mb-2">Información Recopilada</h2>
                 <p>
-                    Recopilamos direcciones de correo electrónico, nombres de usuario, tokens de autenticación OAuth2 (GitHub y Google), direcciones IP para la sesión en curso y archivos subidos (diapositivas/imágenes).
+                    Recopilamos direcciones de correo electrónico, nombres de usuario, tokens de autenticación OAuth2
+                    (GitHub y Google), direcciones IP para la sesión en curso y archivos subidos
+                    (diapositivas/imágenes).
                 </p>
             </div>
 
@@ -41,14 +44,19 @@
                 <ul class="list-disc pl-5 space-y-1">
                     <li>Gestionar y autenticar el acceso (inicio de sesión local y OAuth2).</li>
                     <li>Sincronizar las pantallas de los participantes mediante identificadores de sesión.</li>
-                    <li>Enviar correos electrónicos transaccionales o de verificación de cuentas (a través de Resend).</li>
+                    <li>Enviar correos electrónicos transaccionales o de verificación de cuentas (a través de Resend).
+                    </li>
                 </ul>
             </div>
 
             <div>
-                <h2 class="text-[var(--sh-text-1)] text-lg font-bold mb-2">Procesamiento de Inteligencia Artificial (IA)</h2>
+                <h2 class="text-[var(--sh-text-1)] text-lg font-bold mb-2">Procesamiento de Inteligencia Artificial (IA)
+                </h2>
                 <p>
-                    Las diapositivas, textos y repositorios de código vinculados son procesados a través de integraciones de terceros (Google Gemini, Gemini Vision y Groq API) para la generación de notas y asistentes de despliegue. Al utilizar estas funciones, el usuario acepta que fragmentos de sus repositorios e imágenes sean enviados de manera segura a las API de estos proveedores.
+                    Las diapositivas, textos y repositorios de código vinculados son procesados a través de
+                    integraciones de terceros (Google Gemini, Gemini Vision y Groq API) para la generación de notas y
+                    asistentes de despliegue. Al utilizar estas funciones, el usuario acepta que fragmentos de sus
+                    repositorios e imágenes sean enviados de manera segura a las API de estos proveedores.
                 </p>
             </div>
 
@@ -56,7 +64,8 @@
                 <h2 class="text-[var(--sh-text-1)] text-lg font-bold mb-2">Almacenamiento</h2>
                 <ul class="list-disc pl-5 space-y-1">
                     <li><strong>Imágenes y Diapositivas:</strong> Amazon S3.</li>
-                    <li><strong>Datos Relacionales (Usuarios, perfiles):</strong> Base de datos PostgreSQL administrada por Aiven.</li>
+                    <li><strong>Datos Relacionales (Usuarios, perfiles):</strong> Base de datos PostgreSQL administrada
+                        por Aiven.</li>
                     <li><strong>Notas generadas (IA):</strong> Base de datos MongoDB.</li>
                     <li><strong>Estado en tiempo real:</strong> Redis (volátil, no persistente a largo plazo).</li>
                 </ul>
