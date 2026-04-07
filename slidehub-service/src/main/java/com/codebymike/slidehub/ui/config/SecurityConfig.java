@@ -99,7 +99,7 @@ public class SecurityConfig {
                                                 .permitAll()
                                                 // Assets estáticos de slides
                                                 .requestMatchers("/presentation/**").permitAll()
-                                                // Importación y gestión de presentaciones — requiere PRESENTER o ADMIN
+                                                // Importación y gestión de presentaciones — requiere HOST o PRESENTER
                                                 .requestMatchers("/presentations/**").hasAnyRole("HOST", "PRESENTER")
                                                 .requestMatchers("/api/presentations/**")
                                                 .hasAnyRole("HOST", "PRESENTER")
@@ -121,7 +121,7 @@ public class SecurityConfig {
                                                 // Panel de gestión — solo DEVELOPER
                                                 .requestMatchers("/mgr", "/mgr/**")
                                                 .hasRole("DEVELOPER")
-                                                // Panel del presentador y main panel — requiere PRESENTER o ADMIN
+                                                // Panel del presentador y main panel — requiere HOST o PRESENTER
                                                 .requestMatchers("/presenter", "/main-panel")
                                                 .hasAnyRole("HOST", "PRESENTER")
                                                 // Perfil del usuario — requiere estar autenticado
