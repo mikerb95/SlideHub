@@ -167,6 +167,15 @@ public class SecurityConfig {
          * Usuarios nuevos (profileCompleted=false) van a /auth/complete-profile.
          */
         @Bean
+        public AuthenticationSuccessHandler formLoginSuccessHandler() {
+                return (request, response, authentication) -> {
+                        boolean isDeveloper = authentication.getAuthorities().stream()
+                                        .anyMatch(a -> a.getAuthority().equals("ROLE_DEVELOPER"));
+                        response.sendRedirect(isDeveloper ? "/mgr" : "/presentations");
+                };
+        }
+
+        @Bean
         public AuthenticationSuccessHandler oauth2SuccessHandler() {
                 return (request, response, authentication) -> {
                         // Drive auth: redirige al wizard, no hace login normal
