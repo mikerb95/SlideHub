@@ -1,165 +1,154 @@
 import json
 import os
+import io
+import tarfile
 import boto3
 import urllib.parse
 import tempfile
 import subprocess
 import fitz  # PyMuPDF
 import requests
+import brotli as brotli_lib
 
 s3_client = boto3.client('s3')
 
-# Variables de Entorno Configadas en la Lambda
-WEBHOOK_URL = os.environ.get('SLIDEHUB_WEBHOOK_URL')
+WEBHOOK_URL    = os.environ.get('SLIDEHUB_WEBHOOK_URL')
 WEBHOOK_SECRET = os.environ.get('SLIDEHUB_WEBHOOK_SECRET')
-# En imagen de contenedor: /usr/bin/soffice (dnf install libreoffice-impress)
-# Con layer shelfio: /opt/instdir/program/soffice.bin
-LIBREOFFICE_PATH = os.environ.get('LIBREOFFICE_PATH', '/usr/bin/soffice')
 
-def _find_soffice():
-    """Busca soffice en ubicaciones comunes y retorna el path encontrado."""
-    candidates = [
-        LIBREOFFICE_PATH,
-        '/opt/instdir/program/soffice.bin',
-        '/opt/libreoffice/program/soffice.bin',
-        '/opt/lo/program/soffice.bin',
-        '/usr/bin/soffice',
-        '/usr/lib/libreoffice/program/soffice.bin',
-    ]
-    for p in candidates:
-        if os.path.exists(p):
-            return p
-    # Último recurso: buscar en /opt
-    if os.path.exists('/opt'):
-        for root, dirs, files in os.walk('/opt'):
+# Paths del layer shelfio-brotli
+_BROTLI_ARCHIVE   = '/opt/lo.tar.br'
+_SOFFICE_EXTRACTED = '/tmp/instdir/program/soffice.bin'
+
+
+def _ensure_libreoffice():
+    """
+    El layer shelfio almacena LibreOffice como lo.tar.br.
+    Lo extraemos a /tmp/ en el primer cold start; las invocaciones
+    siguientes reutilizan el contenido ya extraído.
+    """
+    if os.path.exists(_SOFFICE_EXTRACTED):
+        return _SOFFICE_EXTRACTED
+
+    if not os.path.exists(_BROTLI_ARCHIVE):
+        raise FileNotFoundError(
+            f"Layer brotli no encontrado en {_BROTLI_ARCHIVE}. "
+            f"/opt contiene: {os.listdir('/opt') if os.path.exists('/opt') else '(vacío)'}"
+        )
+
+    print(f"Cold start: extrayendo LibreOffice desde {_BROTLI_ARCHIVE}...")
+
+    # 1. Descomprimir brotli → tar (escribir a disco para no saturar RAM)
+    tar_path = '/tmp/lo.tar'
+    with open(_BROTLI_ARCHIVE, 'rb') as f:
+        compressed = f.read()
+    with open(tar_path, 'wb') as f:
+        f.write(brotli_lib.decompress(compressed))
+    del compressed  # liberar RAM
+
+    # 2. Extraer tar a /tmp/
+    with tarfile.open(tar_path) as tar:
+        tar.extractall('/tmp/')
+    os.remove(tar_path)
+
+    if not os.path.exists(_SOFFICE_EXTRACTED):
+        # Buscar dónde quedó realmente
+        for root, dirs, files in os.walk('/tmp'):
             if 'soffice.bin' in files:
-                return os.path.join(root, 'soffice.bin')
-            if 'soffice' in files:
-                return os.path.join(root, 'soffice')
-    return None
+                found = os.path.join(root, 'soffice.bin')
+                print(f"soffice.bin encontrado en: {found}")
+                os.chmod(found, 0o755)
+                return found
+        raise FileNotFoundError("soffice.bin no encontrado tras la extracción del layer.")
+
+    os.chmod(_SOFFICE_EXTRACTED, 0o755)
+    print(f"LibreOffice listo en: {_SOFFICE_EXTRACTED}")
+    return _SOFFICE_EXTRACTED
 
 
 def lambda_handler(event, context):
-    # ── Diagnóstico de LibreOffice ──────────────────────────────────────
-    soffice = _find_soffice()
-    if soffice:
-        print(f"soffice encontrado en: {soffice}")
-    else:
-        opt_contents = os.listdir('/opt') if os.path.exists('/opt') else []
-        print(f"soffice NO encontrado. /opt contiene: {opt_contents}")
-
     print(f"Evento recibido: {json.dumps(event)}")
-    
+
     try:
-        # Extraer info del evento S3
         record = event['Records'][0]
-        bucket = record['s3']['bucket']['name']
+        bucket  = record['s3']['bucket']['name']
         raw_key = urllib.parse.unquote_plus(record['s3']['object']['key'])
-        
-        # Validar correcta ubicación (raw-pptx/{presentationId}.pptx)
+
         if not raw_key.startswith('raw-pptx/') or not raw_key.endswith('.pptx'):
             print(f"Ignorando archivo no válido: {raw_key}")
             return {'statusCode': 400, 'body': 'Ruta o formato no válido'}
-            
+
         presentation_id = raw_key.split('/')[1].replace('.pptx', '')
-        
+
+        # Resolver path de soffice (extrae del layer si es necesario)
+        lo_path = _ensure_libreoffice()
+
         with tempfile.TemporaryDirectory() as temp_dir:
             file_path = os.path.join(temp_dir, f"{presentation_id}.pptx")
-            pdf_path = os.path.join(temp_dir, f"{presentation_id}.pdf")
-            
-            # Descargar archivo pptx
+            pdf_path  = os.path.join(temp_dir, f"{presentation_id}.pdf")
+
             print(f"Descargando {raw_key} de {bucket}")
             s3_client.download_file(bucket, raw_key, file_path)
-            
-            # Convertir PPTX a PDF usando LibreOffice (invocado como subproceso headless)
-            lo_path = _find_soffice() or LIBREOFFICE_PATH
-            print(f"Convirtiendo PPTX a PDF usando LibreOffice ({lo_path})...")
-            lo_cmd = [
+
+            print(f"Convirtiendo PPTX → PDF con LibreOffice ({lo_path})...")
+            subprocess.run([
                 lo_path,
-                '--headless',
-                '--invisible',
-                '--nodefault',
+                '--headless', '--invisible', '--nodefault',
                 '--nofirststartwizard',
                 '--convert-to', 'pdf',
                 '--outdir', temp_dir,
                 file_path
-            ]
-            subprocess.run(lo_cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            
+            ], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
             if not os.path.exists(pdf_path):
                 raise Exception("La conversión a PDF falló silenciosamente.")
-                
-            # Convertir PDF a Arrays de PNGs (diapositivas) con PyMuPDF
-            print("Convirtiendo PDF a PNGs...")
+
+            print("Convirtiendo PDF → PNGs...")
             doc = fitz.open(pdf_path)
             total_slides = len(doc)
-            
-            uploaded_keys = []
-            
-            # El for genera Slide_1.PNG en adelante
+
             for i in range(total_slides):
                 page = doc.load_page(i)
-                # Zoom (dpi alto) para mejor resolución [resolución = matrix 2.0]
-                pix = page.get_pixmap(matrix=fitz.Matrix(2.0, 2.0))
+                pix  = page.get_pixmap(matrix=fitz.Matrix(2.0, 2.0))
                 png_path = os.path.join(temp_dir, f"Slide_{i+1}.PNG")
                 pix.save(png_path)
-                
-                # Subir PNG al S3 en la carpeta final (alineado con buildSlideKey de Java)
+
                 target_key = f"slides/{presentation_id}/{i+1}.png"
                 s3_client.upload_file(
                     png_path, bucket, target_key,
                     ExtraArgs={'ContentType': 'image/png'}
                 )
-                uploaded_keys.append(target_key)
-                
-            print(f"Éxito: {total_slides} diapositivas extraídas y subidas S3.")
 
-            # Limpiar el PPTX original para no acumular almacenamiento
+            print(f"Éxito: {total_slides} diapositivas subidas a S3.")
+
             s3_client.delete_object(Bucket=bucket, Key=raw_key)
             print(f"raw-pptx eliminado: {raw_key}")
 
-            # Notificar al Backend de SlideHub
             send_webhook(presentation_id, total_slides, "READY")
-            
-            return {
-                'statusCode': 200,
-                'body': json.dumps({'total_slides': total_slides})
-            }
-            
+            return {'statusCode': 200, 'body': json.dumps({'total_slides': total_slides})}
+
     except Exception as e:
         print(f"Error procesando el archivo: {str(e)}")
-        # Intentar notificar error si tenemos el presentation_id
         if 'presentation_id' in locals():
             send_webhook(presentation_id, 0, "FAILED", error=str(e))
         raise e
+
 
 def send_webhook(presentation_id, slide_count, status, error=None):
     if not WEBHOOK_URL:
         print("WEBHOOK_URL no definida, omitiendo callback.")
         return
 
-    payload = {
-        "presentationId": presentation_id,
-        "slideCount": slide_count,
-        "status": status,
-        "error": error
-    }
-
     try:
         response = requests.post(
             WEBHOOK_URL,
-            json=payload,
-            headers={
-                'X-Webhook-Secret': WEBHOOK_SECRET or ''
-            },
+            json={"presentationId": presentation_id, "slideCount": slide_count,
+                  "status": status, "error": error},
+            headers={'X-Webhook-Secret': WEBHOOK_SECRET or ''},
             timeout=15,
             allow_redirects=True
         )
-        print(f"Webhook enviado. Status: {response.status_code} URL final: {response.url}")
-        if response.history:
-            for r in response.history:
-                print(f"  Redirect {r.status_code} → {r.headers.get('Location', '?')}")
+        print(f"Webhook enviado. Status: {response.status_code} URL: {response.url}")
         if not response.ok:
-            print(f"  Cuerpo de error: {response.text[:500]}")
+            print(f"  Error body: {response.text[:500]}")
     except requests.exceptions.RequestException as e:
         print(f"Fallo enviando webhook: {str(e)}")
