@@ -1071,8 +1071,9 @@
                     const data = await res.json();
                     if (data.viewerCount > 0) {
                         qaSection.style.display = 'block';
+                        const raisers = data.handRaisers || [];
                         mpViewerStats.textContent = `👁 ${data.viewerCount} espectadores` +
-                            (data.handCount > 0 ? `   ✋ ${data.handCount} manos levantadas` : '');
+                            (raisers.length > 0 ? `   ✋ ${raisers.join(', ')}` : '');
                     }
                 } catch (_) {}
             }
