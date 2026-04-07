@@ -13,7 +13,7 @@ import java.security.MessageDigest;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/webhooks/pptx-conversion")
+@RequestMapping("/api/webhooks/pptx")
 public class PptxWebhookController {
 
     private static final Logger log = LoggerFactory.getLogger(PptxWebhookController.class);
