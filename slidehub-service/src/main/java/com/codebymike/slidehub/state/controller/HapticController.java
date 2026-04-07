@@ -45,6 +45,12 @@ public class HapticController {
         }
     }
 
+    /**
+     * Consume y retorna el siguiente evento haptico pendiente para el participante.
+     *
+     * @param participantToken token unico del participante que consulta sus eventos
+     * @return 200 con el evento haptico si existe, 204 No Content si no hay eventos pendientes
+     */
     @GetMapping("/next")
     public ResponseEntity<?> next(@RequestParam("participantToken") String participantToken) {
         return hapticEventService.popNext(participantToken)
