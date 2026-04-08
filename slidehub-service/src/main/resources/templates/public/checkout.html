@@ -93,7 +93,8 @@
                     <div class="flex justify-between items-start mb-4">
                         <div>
                             <h3 class="text-white font-medium text-lg" th:text="${planLabel}">Plan Pro</h3>
-                            <p class="text-xs font-mono text-[var(--sh-text-3)] mt-1" th:text="${billingLabel}">Facturación anual</p>
+                            <p class="text-xs font-mono text-[var(--sh-text-3)] mt-1" th:text="${billingLabel}">
+                                Facturación anual</p>
                         </div>
                         <div class="text-right">
                             <span class="text-white font-bold text-xl" th:text="${displayAmount}">$10</span>
@@ -136,7 +137,8 @@
                         <span class="text-white font-semibold">Total a Pagar</span>
                         <div class="text-right">
                             <span class="text-white font-bold text-2xl" th:text="${displayAmount}">$96.00</span>
-                            <p class="text-[10px] text-[var(--sh-text-3)]" th:text="${displayPeriod + ' (impuestos incl.)'}">USD (impuestos incl.)</p>
+                            <p class="text-[10px] text-[var(--sh-text-3)]"
+                                th:text="${displayPeriod + ' (impuestos incl.)'}">USD (impuestos incl.)</p>
                         </div>
                     </div>
                 </div>
@@ -227,7 +229,9 @@
 
                     <button type="submit"
                         class="w-full sh-btn sh-btn-primary py-3 rounded-lg flex items-center justify-center gap-2 font-semibold shadow-lg shadow-blue-900/20 mt-4 transition-all hover:scale-[1.01]">
-                        <i class="fa-solid fa-lock"></i> <span th:text="${'Pagar ' + displayAmount + ' de forma segura'}">Pagar $96.00 de forma segura</span>
+                        <i class="fa-solid fa-lock"></i> <span
+                            th:text="${'Pagar ' + displayAmount + ' de forma segura'}">Pagar $96.00 de forma
+                            segura</span>
                     </button>
                     <p class="text-center text-[10px] text-[var(--sh-text-3)] font-mono mt-2">
                         <i class="fa-solid fa-shield-halved mr-1"></i> Transacción cifrada con AES-256 bits. Pagos

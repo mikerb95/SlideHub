@@ -2,7 +2,6 @@ package com.codebymike.slidehub.ui.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,7 +26,8 @@ public class CheckoutController {
         model.addAttribute("planCode", normalizedPlan);
         model.addAttribute("billingCode", normalizedBilling);
         model.addAttribute("planLabel", planLabel);
-        model.addAttribute("billingLabel", "annual".equals(normalizedBilling) ? "Facturación anual" : "Facturación mensual");
+        model.addAttribute("billingLabel",
+                "annual".equals(normalizedBilling) ? "Facturación anual" : "Facturación mensual");
         model.addAttribute("displayAmount", formatCop(subtotal));
         model.addAttribute("displayPeriod", "annual".equals(normalizedBilling) ? "COP/año" : "COP/mes");
         model.addAttribute("annualDiscount", annualDiscount);
@@ -39,7 +39,8 @@ public class CheckoutController {
     @PostMapping("/billing/process")
     public String processBilling(@RequestParam(name = "plan", defaultValue = "pro") String plan,
             @RequestParam(name = "billing", defaultValue = "monthly") String billing) {
-        // En una implementación real, aquí se procesaría el pago con Stripe u otra pasarela
+        // En una implementación real, aquí se procesaría el pago con Stripe u otra
+        // pasarela
         return "redirect:/showcase?paid=true&plan=" + plan + "&billing=" + billing;
     }
 
