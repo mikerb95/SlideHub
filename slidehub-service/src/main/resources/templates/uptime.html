@@ -172,6 +172,7 @@
     </div>
 
     <script>
+        const UPTIME_STATUS_URL = /*[[@{/api/uptime/status}]]*/ '/api/uptime/status';
         const COLOR_MAP = {
             green: 'var(--sh-green)',
             amber: 'var(--sh-amber)',
@@ -181,7 +182,21 @@
 
         async function loadStatus() {
             try {
-                const res = await fetch('/api/uptime/status');
+                const res = await fetch(UPTIME_STATUS_URL, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
+                const contentType = res.headers.get('content-type') || '';
+                if (!contentType.includes('application/json')) {
+                    throw new Error('Respuesta no JSON');
+                }
+
                 const d = await res.json();
 
                 if (!d.available) {
@@ -246,7 +261,7 @@
                 }
 
             } catch (e) {
-                renderUnavailable('Error de red al consultar el estado.');
+                renderUnavailable('No se pudo obtener el estado de uptime.');
             }
         }
 

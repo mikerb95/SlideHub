@@ -49,7 +49,8 @@ public class UptimeService {
      * {@code available=false} para que el frontend lo maneje con gracia.
      */
     public Map<String, Object> getStatus() {
-        if (apiKey == null || apiKey.isBlank()) {
+        String resolvedApiKey = resolveApiKey();
+        if (resolvedApiKey.isBlank()) {
             return unavailable("UPTIMEROBOT_API_KEY no configurada.");
         }
 
@@ -57,7 +58,7 @@ public class UptimeService {
             // BodyInserters.fromFormData ya setea Content-Type: application/x-www-form-urlencoded
             // NO agregar el header manualmente o se duplica y corrompe la request
             MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-            form.add("api_key", apiKey);
+            form.add("api_key", resolvedApiKey);
             form.add("format", "json");
             form.add("response_times", "1");
             form.add("response_times_limit", "10");
@@ -201,5 +202,23 @@ public class UptimeService {
         if (seconds < 60) return seconds + "s";
         if (seconds < 3600) return (seconds / 60) + "m";
         return (seconds / 3600) + "h " + ((seconds % 3600) / 60) + "m";
+    }
+
+    private String resolveApiKey() {
+        if (apiKey != null && !apiKey.isBlank()) {
+            return apiKey.trim();
+        }
+
+        String directEnv = System.getenv("UPTIMEROBOT_API_KEY");
+        if (directEnv != null && !directEnv.isBlank()) {
+            return directEnv.trim();
+        }
+
+        String namespacedEnv = System.getenv("SLIDEHUB_UPTIMEROBOT_API_KEY");
+        if (namespacedEnv != null && !namespacedEnv.isBlank()) {
+            return namespacedEnv.trim();
+        }
+
+        return "";
     }
 }
