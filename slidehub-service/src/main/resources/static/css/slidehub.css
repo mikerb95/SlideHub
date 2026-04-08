@@ -527,6 +527,22 @@ a {
     justify-content: space-between;
 }
 
+.sh-nav .text-xs {
+    font-size: 1.125rem !important;
+}
+
+.sh-nav .text-sm {
+    font-size: 1.3125rem !important;
+}
+
+.sh-nav .text-base {
+    font-size: 1.5rem !important;
+}
+
+.sh-nav .text-lg {
+    font-size: 1.6875rem !important;
+}
+
 
 /* ═══════════════════════════════════════
    12. METRIC CARD
