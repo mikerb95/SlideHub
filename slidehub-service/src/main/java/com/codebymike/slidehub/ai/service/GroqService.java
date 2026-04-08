@@ -14,8 +14,10 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.JsonNode;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Cliente HTTP para Groq API — generación de notas del presentador (CLAUDE.md
@@ -40,6 +42,9 @@ public class GroqService {
     @Value("${slidehub.ai.groq.model}")
     private String model;
 
+    @Value("${slidehub.ai.groq.fallback-models:llama-3.1-8b-instant,llama-3.3-70b-versatile}")
+    private String fallbackModels;
+
     public GroqService(@Value("${slidehub.ai.groq.base-url}") String baseUrl,
             ObjectMapper objectMapper) {
         this.groqClient = WebClient.builder()
@@ -62,51 +67,75 @@ public class GroqService {
     public NoteContent generateNote(String repoContext, String slideDescription, int slideNumber) {
         String prompt = buildNotePrompt(repoContext, slideDescription, slideNumber);
 
-        var requestBody = Map.of(
-                "model", model,
-                "messages", List.of(
-                        Map.of("role", "system",
-                                "content",
-                                "Eres un asistente que genera notas de presentación en español. "
-                                        + "Responde SIEMPRE en JSON válido, sin markdown ni texto adicional."),
-                        Map.of("role", "user", "content", prompt)),
-                "temperature", 0.7,
-                "max_tokens", 1024);
+        String systemMessage = "Eres un asistente que genera notas de presentación en español. "
+            + "Responde SIEMPRE en JSON válido, sin markdown ni texto adicional.";
+        List<Map<String, String>> messages = List.of(
+            Map.of("role", "system", "content", systemMessage),
+            Map.of("role", "user", "content", prompt));
 
-        try {
-            Map<?, ?> response = groqClient.post()
-                    .uri("/openai/v1/chat/completions")
-                    .header("Authorization", "Bearer " + apiKey)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(requestBody)
-                    .retrieve()
-                    .bodyToMono(Map.class)
-                    .block();
+        Exception lastException = null;
+        String lastErrorDetail = "";
 
-            String rawJson = extractMessageContent(response);
-            rawJson = stripMarkdownJson(rawJson);
-            log.debug("Groq generateNote respondió (slide {}): {} chars", slideNumber, rawJson.length());
+        for (String candidateModel : resolveCandidateModels()) {
+            for (int attempt = 1; attempt <= 2; attempt++) {
+            try {
+                Map<?, ?> response = callGroqChatCompletion(candidateModel, messages, 0.7, 1024);
+                String rawJson = extractMessageContent(response);
+                rawJson = stripMarkdownJson(rawJson);
+                log.debug("Groq generateNote respondió (slide {}, model {}): {} chars",
+                    slideNumber, candidateModel, rawJson.length());
+                return objectMapper.readValue(rawJson, NoteContent.class);
+            } catch (org.springframework.web.reactive.function.client.WebClientResponseException e) {
+                lastException = e;
+                lastErrorDetail = e.getResponseBodyAsString();
 
-            return objectMapper.readValue(rawJson, NoteContent.class);
+                if (isModelDecommissioned(lastErrorDetail)) {
+                log.warn("Modelo Groq descontinuado ({}). Probando fallback para slide {}.",
+                    candidateModel, slideNumber);
+                break;
+                }
 
-        } catch (org.springframework.web.reactive.function.client.WebClientResponseException e) {
-            log.error("Error 400 de Groq (slide {}): {}", slideNumber, e.getResponseBodyAsString());
-            return new NoteContent(
-                    "Slide " + slideNumber,
-                    List.of("No se pudo generar la nota con IA. Detalle: " + e.getResponseBodyAsString()),
-                    "~2 min",
-                    List.of(),
-                    List.of());
-        } catch (Exception e) {
-            log.error("Error generando nota con Groq (slide {}): {}", slideNumber, e.getMessage());
-            // Devuelve nota de fallback en lugar de propagar la excepción
-            return new NoteContent(
-                    "Slide " + slideNumber,
-                    List.of("No se pudo generar la nota con IA. " + e.getMessage()),
-                    "~2 min",
-                    List.of(),
-                    List.of());
+                if (attempt < 2) {
+                log.warn("Fallo Groq en slide {} con modelo {} (intento {}/2). Reintentando...",
+                    slideNumber, candidateModel, attempt);
+                sleepBeforeRetry();
+                continue;
+                }
+
+                log.error("Error de Groq en slide {} con modelo {}: {}",
+                    slideNumber, candidateModel, lastErrorDetail);
+            } catch (Exception e) {
+                lastException = e;
+                lastErrorDetail = e.getMessage() != null ? e.getMessage() : "Error desconocido";
+
+                if (attempt < 2) {
+                log.warn("Fallo Groq en slide {} con modelo {} (intento {}/2). Reintentando...",
+                    slideNumber, candidateModel, attempt);
+                sleepBeforeRetry();
+                continue;
+                }
+
+                log.error("Error generando nota con Groq (slide {}, model {}): {}",
+                    slideNumber, candidateModel, lastErrorDetail);
+            }
+            }
         }
+
+        if (lastException != null) {
+            return new NoteContent(
+                "Slide " + slideNumber,
+                List.of("No se pudo generar la nota con IA. Detalle: " + lastErrorDetail),
+                "~2 min",
+                List.of(),
+                List.of());
+        }
+
+        return new NoteContent(
+            "Slide " + slideNumber,
+            List.of("No se pudo generar la nota con IA. Intenta de nuevo en unos segundos."),
+            "~2 min",
+            List.of(),
+            List.of());
     }
 
     /**
@@ -305,28 +334,80 @@ public class GroqService {
      * respuesta.
      */
     private String callGroqRaw(String userPrompt, String systemMessage) {
+        List<Map<String, String>> messages = List.of(
+                Map.of("role", "system", "content", systemMessage),
+                Map.of("role", "user", "content", userPrompt));
+
+        for (String candidateModel : resolveCandidateModels()) {
+            try {
+                Map<?, ?> response = callGroqChatCompletion(candidateModel, messages, 0.4, 2048);
+                return extractMessageContent(response);
+            } catch (org.springframework.web.reactive.function.client.WebClientResponseException e) {
+                String detail = e.getResponseBodyAsString();
+                if (isModelDecommissioned(detail)) {
+                    log.warn("Modelo Groq descontinuado ({}). Probando fallback.", candidateModel);
+                    continue;
+                }
+                log.error("Error en llamada genérica a Groq (modelo {}): {}", candidateModel, detail);
+                return "";
+            } catch (Exception e) {
+                log.error("Error en llamada genérica a Groq (modelo {}): {}", candidateModel, e.getMessage());
+                return "";
+            }
+        }
+
+        return "";
+    }
+
+    private Map<?, ?> callGroqChatCompletion(String modelName,
+            List<Map<String, String>> messages,
+            double temperature,
+            int maxTokens) {
         var requestBody = Map.of(
-                "model", model,
-                "messages", List.of(
-                        Map.of("role", "system", "content", systemMessage),
-                        Map.of("role", "user", "content", userPrompt)),
-                "temperature", 0.4,
-                "max_tokens", 2048);
+                "model", modelName,
+                "messages", messages,
+                "temperature", temperature,
+                "max_tokens", maxTokens);
 
+        return groqClient.post()
+                .uri("/openai/v1/chat/completions")
+                .header("Authorization", "Bearer " + apiKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToMono(Map.class)
+                .block();
+    }
+
+    private List<String> resolveCandidateModels() {
+        Set<String> candidates = new LinkedHashSet<>();
+        if (model != null && !model.isBlank()) {
+            candidates.add(model.trim());
+        }
+        if (fallbackModels != null && !fallbackModels.isBlank()) {
+            for (String entry : fallbackModels.split(",")) {
+                String candidate = entry.trim();
+                if (!candidate.isBlank()) {
+                    candidates.add(candidate);
+                }
+            }
+        }
+        return new ArrayList<>(candidates);
+    }
+
+    private boolean isModelDecommissioned(String responseBody) {
+        if (responseBody == null || responseBody.isBlank()) {
+            return false;
+        }
+        return responseBody.contains("model_decommissioned")
+                || responseBody.contains("decommissioned");
+    }
+
+    private void sleepBeforeRetry() {
         try {
-            Map<?, ?> response = groqClient.post()
-                    .uri("/openai/v1/chat/completions")
-                    .header("Authorization", "Bearer " + apiKey)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(requestBody)
-                    .retrieve()
-                    .bodyToMono(Map.class)
-                    .block();
-
-            return extractMessageContent(response);
-        } catch (Exception e) {
-            log.error("Error en llamada genérica a Groq: {}", e.getMessage());
-            return "";
+            Thread.sleep(400);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
         }
     }
 
