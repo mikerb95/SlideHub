@@ -55,13 +55,14 @@ public class GeminiService {
      * @return descripción textual del slide, o cadena vacía si hay error
      */
     public String analyzeSlideImage(byte[] imageData) {
+        String mimeType = detectImageMimeType(imageData);
         String base64 = Base64.getEncoder().encodeToString(imageData);
 
         var requestBody = Map.of(
                 "contents", List.of(Map.of(
                         "parts", List.of(
                                 Map.of("inlineData", Map.of(
-                                        "mimeType", "image/png",
+                                        "mimeType", mimeType,
                                         "data", base64)),
                                 Map.of("text",
                                         "Analiza esta diapositiva de presentación. "
@@ -78,6 +79,38 @@ public class GeminiService {
             log.error("Error analizando imagen con Gemini Vision: {}", e.getMessage());
             return "";
         }
+    }
+
+    private String detectImageMimeType(byte[] imageData) {
+        if (imageData == null || imageData.length < 12) {
+            return "application/octet-stream";
+        }
+
+        if ((imageData[0] & 0xFF) == 0x89
+                && (imageData[1] & 0xFF) == 0x50
+                && (imageData[2] & 0xFF) == 0x4E
+                && (imageData[3] & 0xFF) == 0x47) {
+            return "image/png";
+        }
+
+        if ((imageData[0] & 0xFF) == 0xFF
+                && (imageData[1] & 0xFF) == 0xD8
+                && (imageData[2] & 0xFF) == 0xFF) {
+            return "image/jpeg";
+        }
+
+        if ((imageData[0] & 0xFF) == 0x52
+                && (imageData[1] & 0xFF) == 0x49
+                && (imageData[2] & 0xFF) == 0x46
+                && (imageData[3] & 0xFF) == 0x46
+                && (imageData[8] & 0xFF) == 0x57
+                && (imageData[9] & 0xFF) == 0x45
+                && (imageData[10] & 0xFF) == 0x42
+                && (imageData[11] & 0xFF) == 0x50) {
+            return "image/webp";
+        }
+
+        return "application/octet-stream";
     }
 
     // ── Extracción de contexto de repositorio ─────────────────────────────────

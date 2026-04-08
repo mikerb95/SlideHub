@@ -209,10 +209,11 @@ public class GroqService {
                 Genera una explicación expandida en español (3-5 párrafos) que profundice en cada punto.
                 La explicación debe ser útil para que quien la lea entienda el tema y pueda responder preguntas del público.
                 Sé técnico pero claro. Responde SOLO el texto continuo, sin listas, sin JSON ni markdown.
-                """.formatted(
-                note.getTitle() != null ? note.getTitle() : "Slide " + note.getSlideNumber(),
-                pointsList,
-                phrases);
+                """
+                .formatted(
+                        note.getTitle() != null ? note.getTitle() : "Slide " + note.getSlideNumber(),
+                        pointsList,
+                        phrases);
 
         String result = callGroqRaw(prompt,
                 "Eres un asistente técnico para presentadores. Genera explicaciones claras y útiles en español.");
