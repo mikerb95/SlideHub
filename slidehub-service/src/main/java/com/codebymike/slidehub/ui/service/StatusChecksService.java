@@ -22,6 +22,7 @@ public class StatusChecksService {
 
     private final String applicationName;
     private final String renderUrl;
+    private final String baseUrl;
     private final String redisHost;
     private final int redisPort;
     private final String mongodbUri;
@@ -36,6 +37,7 @@ public class StatusChecksService {
     public StatusChecksService(
             @Value("${spring.application.name:slidehub-service}") String applicationName,
             @Value("${slidehub.render.url:}") String renderUrl,
+            @Value("${slidehub.base-url:}") String baseUrl,
             @Value("${slidehub.redis.host:${REDIS_HOST:}}") String redisHost,
             @Value("${slidehub.redis.port:${REDIS_PORT:6379}}") int redisPort,
             @Value("${slidehub.mongodb.uri:${MONGODB_URI:}}") String mongodbUri,
@@ -46,6 +48,7 @@ public class StatusChecksService {
             @Value("${slidehub.status.cache-ttl-ms:1000}") long cacheTtlMs) {
         this.applicationName = applicationName;
         this.renderUrl = renderUrl;
+        this.baseUrl = baseUrl;
         this.redisHost = redisHost;
         this.redisPort = redisPort;
         this.mongodbUri = mongodbUri;
@@ -81,8 +84,9 @@ public class StatusChecksService {
 
         checks.add(localAppCheck(timestamp));
 
-        if (isConfigured(renderUrl)) {
-            checks.add(checkHttp("render", normalizeBaseUrl(renderUrl), timestamp));
+        String renderCheckUrl = effectiveRenderCheckUrl();
+        if (isConfigured(renderCheckUrl)) {
+            checks.add(checkHttp("render", renderCheckUrl, timestamp));
         } else {
             checks.add(notConfigured("render", timestamp));
         }
@@ -207,6 +211,16 @@ public class StatusChecksService {
         }
         String trimmed = url.trim();
         return trimmed.endsWith("/") ? trimmed.substring(0, trimmed.length() - 1) : trimmed;
+    }
+
+    private String effectiveRenderCheckUrl() {
+        if (isConfigured(renderUrl)) {
+            return normalizeBaseUrl(renderUrl);
+        }
+        if (isConfigured(baseUrl)) {
+            return normalizeBaseUrl(baseUrl);
+        }
+        return "";
     }
 
     private boolean isConfigured(String value) {
