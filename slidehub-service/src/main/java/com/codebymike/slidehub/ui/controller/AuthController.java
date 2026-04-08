@@ -106,6 +106,7 @@ public class AuthController {
     @PostMapping("/register")
     public String register(@RequestParam String username,
             @RequestParam String email,
+            @RequestParam String phoneNumber,
             @RequestParam String password,
             @RequestParam("confirmPassword") String confirmPassword,
             jakarta.servlet.http.HttpServletRequest request,
@@ -120,7 +121,7 @@ public class AuthController {
         }
         try {
             String ipAddress = request.getRemoteAddr();
-            userService.registerUser(username, email, password, ipAddress);
+            userService.registerUser(username, email, phoneNumber, password, ipAddress);
             model.addAttribute("successMessage",
                     "¡Cuenta creada! Revisa tu email (" + email
                             + ") para confirmar tu cuenta antes de iniciar sesión.");

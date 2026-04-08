@@ -24,6 +24,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 public class UserService {
 
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
+    private static final String EMAIL_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+    private static final String PHONE_REGEX = "^\\+?[0-9()\\-\\s]{7,20}$";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -50,10 +52,17 @@ public class UserService {
      * @throws UserAlreadyExistsException si el username o email ya existe
      */
     @Transactional
-    public User registerUser(String username, String email, String rawPassword, String ipAddress) {
+    public User registerUser(String username, String email, String phoneNumber, String rawPassword, String ipAddress) {
         if (username == null || !username.matches("^[a-zA-Z0-9._-]{3,30}$")) {
             throw new IllegalArgumentException(
                     "El nombre de usuario solo puede contener letras, numeros, puntos, guiones y guiones bajos (3-30 caracteres).");
+        }
+        if (email == null || !email.matches(EMAIL_REGEX)) {
+            throw new IllegalArgumentException("El correo electrónico no tiene un formato válido.");
+        }
+        if (phoneNumber == null || !phoneNumber.matches(PHONE_REGEX)) {
+            throw new IllegalArgumentException(
+                    "El número de teléfono no tiene un formato válido (solo dígitos, espacios, +, -, () y longitud 7-20).");
         }
         if (userRepository.findByUsername(username).isPresent()) {
             throw new UserAlreadyExistsException("El nombre de usuario ya está registrado.");
@@ -68,6 +77,7 @@ public class UserService {
         user.setId(UUID.randomUUID().toString());
         user.setUsername(username);
         user.setEmail(email);
+        user.setPhoneNumber(phoneNumber);
         user.setPasswordHash(passwordEncoder.encode(rawPassword));
         user.setRole(Role.HOST);
         user.setEmailVerified(false);

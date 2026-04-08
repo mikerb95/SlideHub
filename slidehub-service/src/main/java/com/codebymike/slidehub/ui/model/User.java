@@ -31,6 +31,9 @@ public class User {
     @Column(nullable = false, unique = true, length = 255)
     private String email;
 
+    @Column(name = "phone_number", length = 25)
+    private String phoneNumber;
+
     /** Null para cuentas creadas solo via OAuth2 sin contraseña local. */
     @Column(name = "password_hash")
     private String passwordHash;
@@ -140,6 +143,14 @@ public class User {
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public Role getRole() {
