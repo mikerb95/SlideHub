@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,7 @@ public class EmailService {
      */
     public void send(String to, String subject, String html) {
         try {
-            resendClient.post()
+            String responseBody = resendClient.post()
                     .uri("/emails")
                     .header("Authorization", "Bearer " + apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -55,11 +56,21 @@ public class EmailService {
                             "subject", subject,
                             "html", html))
                     .retrieve()
-                    .bodyToMono(Void.class)
-                    .doOnError(e -> log.error("Error enviando email a {}: {}", to, e.getMessage()))
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                    resp -> resp.bodyToMono(String.class)
+                        .map(body -> new IllegalStateException(
+                            "Resend respondió con " + resp.statusCode() + ": " + body)))
+                .bodyToMono(String.class)
                     .block();
+
+            log.info("Email enviado vía Resend a {} con asunto '{}'. Respuesta: {}",
+                to,
+                subject,
+                responseBody != null && !responseBody.isBlank() ? responseBody : "(sin cuerpo)");
+        } catch (WebClientResponseException e) {
+            log.error("Resend rechazó el email a {} con asunto '{}': status={}, body={}",
+                to, subject, e.getStatusCode(), e.getResponseBodyAsString(), e);
         } catch (Exception e) {
-            // No propagar el error de email para no bloquear el flujo de registro
             log.error("Fallo al enviar email a {} (asunto: {}): {}", to, subject, e.getMessage());
         }
     }
