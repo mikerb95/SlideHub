@@ -387,18 +387,18 @@
                 let selectedApplied = false;
 
                 filteredCountries.forEach(country => {
-                        const option = document.createElement('option');
-                        option.value = country.dialCode;
-                        option.textContent = `${flagFromIso2(country.iso2)} ${country.name} (${country.dialCode})`;
-                        if (!selectedApplied && selectedDialCode && country.dialCode === selectedDialCode) {
-                            option.selected = true;
-                            selectedApplied = true;
-                        } else if (!selectedApplied && !selectedDialCode && country.iso2 === 'CO') {
-                            option.selected = true;
-                            selectedApplied = true;
-                        }
-                        phoneCountry.appendChild(option);
-                    });
+                    const option = document.createElement('option');
+                    option.value = country.dialCode;
+                    option.textContent = `${flagFromIso2(country.iso2)} ${country.name} (${country.dialCode})`;
+                    if (!selectedApplied && selectedDialCode && country.dialCode === selectedDialCode) {
+                        option.selected = true;
+                        selectedApplied = true;
+                    } else if (!selectedApplied && !selectedDialCode && country.iso2 === 'CO') {
+                        option.selected = true;
+                        selectedApplied = true;
+                    }
+                    phoneCountry.appendChild(option);
+                });
 
                 if (phoneCountry.options.length === 0) {
                     const emptyOption = document.createElement('option');

@@ -54,7 +54,8 @@ public class WompiCheckoutService {
         if (isBlank(publicKey) || isBlank(integritySecret)) {
             return Map.of(
                     "enabled", false,
-                    "message", "Wompi no está configurado. Define Wompi public key e integrity secret en variables de entorno.");
+                    "message",
+                    "Wompi no está configurado. Define Wompi public key e integrity secret en variables de entorno.");
         }
 
         int amountCop = resolveAmountCop(normalizedPlan, normalizedBilling);
@@ -144,7 +145,8 @@ public class WompiCheckoutService {
 
     private String buildRedirectUrl() {
         String normalizedBase = (baseUrl == null ? "" : baseUrl.trim()).replaceAll("/$", "");
-        String normalizedPath = redirectPath == null || redirectPath.isBlank() ? "/checkout/result" : redirectPath.trim();
+        String normalizedPath = redirectPath == null || redirectPath.isBlank() ? "/checkout/result"
+                : redirectPath.trim();
         if (!normalizedPath.startsWith("/")) {
             normalizedPath = "/" + normalizedPath;
         }
