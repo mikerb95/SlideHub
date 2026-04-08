@@ -56,20 +56,20 @@ public class EmailService {
                             "subject", subject,
                             "html", html))
                     .retrieve()
-                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
-                    resp -> resp.bodyToMono(String.class)
-                        .map(body -> new IllegalStateException(
-                            "Resend respondió con " + resp.statusCode() + ": " + body)))
-                .bodyToMono(String.class)
+                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                            resp -> resp.bodyToMono(String.class)
+                                    .map(body -> new IllegalStateException(
+                                            "Resend respondió con " + resp.statusCode() + ": " + body)))
+                    .bodyToMono(String.class)
                     .block();
 
             log.info("Email enviado vía Resend a {} con asunto '{}'. Respuesta: {}",
-                to,
-                subject,
-                responseBody != null && !responseBody.isBlank() ? responseBody : "(sin cuerpo)");
+                    to,
+                    subject,
+                    responseBody != null && !responseBody.isBlank() ? responseBody : "(sin cuerpo)");
         } catch (WebClientResponseException e) {
             log.error("Resend rechazó el email a {} con asunto '{}': status={}, body={}",
-                to, subject, e.getStatusCode(), e.getResponseBodyAsString(), e);
+                    to, subject, e.getStatusCode(), e.getResponseBodyAsString(), e);
         } catch (Exception e) {
             log.error("Fallo al enviar email a {} (asunto: {}): {}", to, subject, e.getMessage());
         }
