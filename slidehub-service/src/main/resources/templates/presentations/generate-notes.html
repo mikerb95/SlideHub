@@ -149,6 +149,20 @@
                         </div>
                     </div>
 
+                    <div class="mb-4">
+                        <label class="block text-xs font-mono text-[var(--sh-text-3)] mb-1">
+                            <i class="fa-solid fa-file-lines mr-1"></i>ARCHIVOS DE CONTEXTO (OPCIONAL)
+                        </label>
+                        <input type="file" id="context-files" class="sh-input w-full"
+                            accept=".md,.markdown,.txt,.xml,.yml,.yaml,.properties,.json,.java,.gradle,.dockerfile"
+                            multiple>
+                        <div class="text-[var(--sh-text-3)] text-xs mt-1">
+                            Adjunta README, <span class="font-mono">pom.xml</span>,
+                            <span class="font-mono">Dockerfile</span> u otros archivos de texto para generar notas
+                            incluso sin conexión a GitHub.
+                        </div>
+                    </div>
+
                     <!-- Pipeline description -->
                     <div class="rounded p-3 mb-4" style="background: var(--sh-deep); font-size: 0.75rem;">
                         <div class="flex items-center gap-2 mb-1.5 text-[var(--sh-text-3)]">
@@ -283,6 +297,7 @@
 
         async function generateAllNotes() {
             const repoUrl = document.getElementById('repo-url').value.trim();
+            const contextFilesInput = document.getElementById('context-files');
             const btn = document.getElementById('btn-generate');
 
             btn.disabled = true;
@@ -301,13 +316,24 @@
                 }
             }, INTER_SLIDE_MS);
 
-            const params = new URLSearchParams();
-            if (repoUrl) params.append('repoUrl', repoUrl);
+            const formData = new FormData();
+            if (repoUrl) {
+                formData.append('repoUrl', repoUrl);
+            }
+
+            if (contextFilesInput && contextFilesInput.files) {
+                for (const file of contextFilesInput.files) {
+                    formData.append('contextFiles', file);
+                }
+            }
 
             try {
                 const res = await fetch(
-                    `/api/presentations/${presentationId}/generate-notes?${params}`,
-                    { method: 'POST' }
+                    `/api/presentations/${presentationId}/generate-notes`,
+                    {
+                        method: 'POST',
+                        body: formData
+                    }
                 );
                 clearInterval(fakeTimer);
                 const data = await res.json();

@@ -34,10 +34,10 @@ public class NotesBridgeService {
     private final RepoAnalysisService repoAnalysisService;
     private final PresenterNoteRepository presenterNoteRepository;
     private final ObjectMapper objectMapper;
-        private static final Set<String> ALLOWED_CONTEXT_EXTENSIONS = Set.of(
+    private static final Set<String> ALLOWED_CONTEXT_EXTENSIONS = Set.of(
             "md", "markdown", "txt", "xml", "yml", "yaml", "properties", "json", "dockerfile", "gradle", "java");
-        private static final long MAX_CONTEXT_BYTES_PER_FILE = 512_000; // 500 KB
-        private static final int MAX_CONTEXT_CHARS_TOTAL = 18_000;
+    private static final long MAX_CONTEXT_BYTES_PER_FILE = 512_000; // 500 KB
+    private static final int MAX_CONTEXT_CHARS_TOTAL = 18_000;
 
     public NotesBridgeService(NotesService notesService,
             RepoAnalysisService repoAnalysisService,
@@ -63,13 +63,13 @@ public class NotesBridgeService {
     public int generateAllNotes(String presentationId, String repoUrl,
             List<Map<String, Object>> slideRefs) {
         return generateAllNotes(presentationId, repoUrl, slideRefs, null);
-        }
+    }
 
-        /**
-         * Variante de generación con archivos de contexto adicionales cargados por el
-         * usuario.
-         */
-        public int generateAllNotes(String presentationId, String repoUrl,
+    /**
+     * Variante de generación con archivos de contexto adicionales cargados por el
+     * usuario.
+     */
+    public int generateAllNotes(String presentationId, String repoUrl,
             List<Map<String, Object>> slideRefs,
             MultipartFile[] contextFiles) {
         List<SlideReference> slides = slideRefs.stream()
@@ -81,7 +81,7 @@ public class NotesBridgeService {
         GenerateAllRequest request = new GenerateAllRequest(
                 presentationId,
                 repoUrl != null ? repoUrl : "",
-            extraContext,
+                extraContext,
                 slides);
 
         try {
