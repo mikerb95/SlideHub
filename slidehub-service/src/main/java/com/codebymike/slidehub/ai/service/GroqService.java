@@ -68,74 +68,74 @@ public class GroqService {
         String prompt = buildNotePrompt(repoContext, slideDescription, slideNumber);
 
         String systemMessage = "Eres un asistente que genera notas de presentación en español. "
-            + "Responde SIEMPRE en JSON válido, sin markdown ni texto adicional.";
+                + "Responde SIEMPRE en JSON válido, sin markdown ni texto adicional.";
         List<Map<String, String>> messages = List.of(
-            Map.of("role", "system", "content", systemMessage),
-            Map.of("role", "user", "content", prompt));
+                Map.of("role", "system", "content", systemMessage),
+                Map.of("role", "user", "content", prompt));
 
         Exception lastException = null;
         String lastErrorDetail = "";
 
         for (String candidateModel : resolveCandidateModels()) {
             for (int attempt = 1; attempt <= 2; attempt++) {
-            try {
-                Map<?, ?> response = callGroqChatCompletion(candidateModel, messages, 0.7, 1024);
-                String rawJson = extractMessageContent(response);
-                rawJson = stripMarkdownJson(rawJson);
-                log.debug("Groq generateNote respondió (slide {}, model {}): {} chars",
-                    slideNumber, candidateModel, rawJson.length());
-                return objectMapper.readValue(rawJson, NoteContent.class);
-            } catch (org.springframework.web.reactive.function.client.WebClientResponseException e) {
-                lastException = e;
-                lastErrorDetail = e.getResponseBodyAsString();
+                try {
+                    Map<?, ?> response = callGroqChatCompletion(candidateModel, messages, 0.7, 1024);
+                    String rawJson = extractMessageContent(response);
+                    rawJson = stripMarkdownJson(rawJson);
+                    log.debug("Groq generateNote respondió (slide {}, model {}): {} chars",
+                            slideNumber, candidateModel, rawJson.length());
+                    return objectMapper.readValue(rawJson, NoteContent.class);
+                } catch (org.springframework.web.reactive.function.client.WebClientResponseException e) {
+                    lastException = e;
+                    lastErrorDetail = e.getResponseBodyAsString();
 
-                if (isModelDecommissioned(lastErrorDetail)) {
-                log.warn("Modelo Groq descontinuado ({}). Probando fallback para slide {}.",
-                    candidateModel, slideNumber);
-                break;
+                    if (isModelDecommissioned(lastErrorDetail)) {
+                        log.warn("Modelo Groq descontinuado ({}). Probando fallback para slide {}.",
+                                candidateModel, slideNumber);
+                        break;
+                    }
+
+                    if (attempt < 2) {
+                        log.warn("Fallo Groq en slide {} con modelo {} (intento {}/2). Reintentando...",
+                                slideNumber, candidateModel, attempt);
+                        sleepBeforeRetry();
+                        continue;
+                    }
+
+                    log.error("Error de Groq en slide {} con modelo {}: {}",
+                            slideNumber, candidateModel, lastErrorDetail);
+                } catch (Exception e) {
+                    lastException = e;
+                    lastErrorDetail = e.getMessage() != null ? e.getMessage() : "Error desconocido";
+
+                    if (attempt < 2) {
+                        log.warn("Fallo Groq en slide {} con modelo {} (intento {}/2). Reintentando...",
+                                slideNumber, candidateModel, attempt);
+                        sleepBeforeRetry();
+                        continue;
+                    }
+
+                    log.error("Error generando nota con Groq (slide {}, model {}): {}",
+                            slideNumber, candidateModel, lastErrorDetail);
                 }
-
-                if (attempt < 2) {
-                log.warn("Fallo Groq en slide {} con modelo {} (intento {}/2). Reintentando...",
-                    slideNumber, candidateModel, attempt);
-                sleepBeforeRetry();
-                continue;
-                }
-
-                log.error("Error de Groq en slide {} con modelo {}: {}",
-                    slideNumber, candidateModel, lastErrorDetail);
-            } catch (Exception e) {
-                lastException = e;
-                lastErrorDetail = e.getMessage() != null ? e.getMessage() : "Error desconocido";
-
-                if (attempt < 2) {
-                log.warn("Fallo Groq en slide {} con modelo {} (intento {}/2). Reintentando...",
-                    slideNumber, candidateModel, attempt);
-                sleepBeforeRetry();
-                continue;
-                }
-
-                log.error("Error generando nota con Groq (slide {}, model {}): {}",
-                    slideNumber, candidateModel, lastErrorDetail);
-            }
             }
         }
 
         if (lastException != null) {
             return new NoteContent(
-                "Slide " + slideNumber,
-                List.of("No se pudo generar la nota con IA. Detalle: " + lastErrorDetail),
-                "~2 min",
-                List.of(),
-                List.of());
+                    "Slide " + slideNumber,
+                    List.of("No se pudo generar la nota con IA. Detalle: " + lastErrorDetail),
+                    "~2 min",
+                    List.of(),
+                    List.of());
         }
 
         return new NoteContent(
-            "Slide " + slideNumber,
-            List.of("No se pudo generar la nota con IA. Intenta de nuevo en unos segundos."),
-            "~2 min",
-            List.of(),
-            List.of());
+                "Slide " + slideNumber,
+                List.of("No se pudo generar la nota con IA. Intenta de nuevo en unos segundos."),
+                "~2 min",
+                List.of(),
+                List.of());
     }
 
     /**
