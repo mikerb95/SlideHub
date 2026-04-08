@@ -706,15 +706,12 @@
     <!-- ========== SLIDE 2: OBJETIVO GENERAL ========== -->
     <div class="slide" data-slide="1">
         <div class="slide-content">
-            <div class="slide-label">Objetivo General</div>
+            <div class="slide-label">Propósito de la Herramienta</div>
             <div class="slide-title">
-                Reescribir y escalar el módulo de <span class="gradient-text">presentaciones</span>
+                Controlar y enriquecer tus <span class="gradient-text">presentaciones</span>
             </div>
             <div class="slide-subtitle" style="margin-bottom: 32px;">
-                Desarrollar una plataforma de control de presentaciones en tiempo real,
-                migrando el módulo PHP/CodeIgniter 4 a un monolito modular Java con Spring Boot,
-                integrando inteligencia artificial generativa para asistir
-                al presentador y automatizar el despliegue.
+                Permitir a los oradores gestionar en tiempo real sus diapositivas, sincronizando múltiples pantallas y obteniendo asistencia inteligente para la exposición, todo desde una interfaz intuitiva y accesible.
             </div>
             <div class="cards-grid">
                 <div class="card">
@@ -743,32 +740,46 @@
             <div class="slide-title">Metas <span class="gradient-text">concretas</span> del proyecto</div>
             <ol class="objective-list stagger">
                 <li>
-                    <span class="marker" style="background: rgba(37,99,235,0.12); color: var(--accent-blue);">1</span>
-                    <span>Diseñar e implementar un monolito modular (módulos state, ui y ai) con responsabilidades separadas y un único punto de despliegue.</span>
+                    <span class="marker" style="background: rgba(37,99,235,0.12); color: var(--accent-blue);">0</span>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <strong style="color: var(--text-primary); font-size: 16px;">Fase 0: Migración Base</strong>
+                        <span>Preparar la infraestructura base y la configuración inicial de los proyectos y repositorios.</span>
+                    </div>
                 </li>
                 <li>
-                    <span class="marker" style="background: rgba(124,58,237,0.12); color: var(--accent-purple);">2</span>
-                    <span>Implementar sincronización en tiempo real de diapositivas entre N pantallas usando Redis como store de estado.</span>
+                    <span class="marker" style="background: rgba(124,58,237,0.12); color: var(--accent-purple);">1</span>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <strong style="color: var(--text-primary); font-size: 16px;">Fase 1: State y Sincronización</strong>
+                        <span>Implementar la sincronización en tiempo real de la presentación y el control de estado base.</span>
+                    </div>
                 </li>
                 <li>
-                    <span class="marker" style="background: rgba(8,145,178,0.12); color: var(--accent-cyan);">3</span>
-                    <span>Integrar autenticación local (BCrypt) y OAuth2 (GitHub + Google) con Spring Security y persistencia en PostgreSQL.</span>
+                    <span class="marker" style="background: rgba(8,145,178,0.12); color: var(--accent-cyan);">2</span>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <strong style="color: var(--text-primary); font-size: 16px;">Fase 2: Interfaz y Seguridad</strong>
+                        <span>Agregar seguridad, vistas unificadas, control de acceso y sistema de autenticación integral OAuth.</span>
+                    </div>
                 </li>
                 <li>
-                    <span class="marker" style="background: rgba(5,150,105,0.12); color: var(--accent-green);">4</span>
-                    <span>Desarrollar un módulo de IA que genere notas del presentador mediante Gemini Vision y Groq, almacenadas en MongoDB.</span>
+                    <span class="marker" style="background: rgba(5,150,105,0.12); color: var(--accent-green);">3</span>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <strong style="color: var(--text-primary); font-size: 16px;">Fase 3: Asistencia AI</strong>
+                        <span>Integrar la inteligencia artificial estructurada y generativa de notas con soporte de MongoDB.</span>
+                    </div>
                 </li>
                 <li>
-                    <span class="marker" style="background: rgba(217,119,6,0.12); color: var(--accent-orange);">5</span>
-                    <span>Construir un "Deploy Tutor" que analice repositorios y genere Dockerfiles + guías de despliegue automáticas.</span>
+                    <span class="marker" style="background: rgba(217,119,6,0.12); color: var(--accent-orange);">4</span>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <strong style="color: var(--text-primary); font-size: 16px;">Fase 4: Consolidación y Servicios Web</strong>
+                        <span>Refinar componentes y preparar las utilidades como subidas y tutorías en un único entorno.</span>
+                    </div>
                 </li>
                 <li>
-                    <span class="marker" style="background: rgba(219,39,119,0.12); color: var(--accent-pink);">6</span>
-                    <span>Implementar importación de diapositivas desde Google Drive y subida manual a Amazon S3.</span>
-                </li>
-                <li>
-                    <span class="marker" style="background: rgba(220,38,38,0.12); color: var(--accent-red);">7</span>
-                    <span>Desplegar toda la plataforma en Render con integración continua y configuración por perfiles (dev/prod).</span>
+                    <span class="marker" style="background: rgba(219,39,119,0.12); color: var(--accent-pink);">5</span>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <strong style="color: var(--text-primary); font-size: 16px;">Fase 5: Tutor Cloud</strong>
+                        <span>Lanzar definitivamente el despliegue del tutor automático y completar los ciclos en vivo.</span>
+                    </div>
                 </li>
             </ol>
         </div>
@@ -862,88 +873,61 @@
                 <div class="pdca-card plan">
                     <div class="phase-letter">P</div>
                     <div class="phase-name" style="color: var(--accent-blue);">Plan</div>
-                    <ul>
-                        <li>Análisis del módulo PHP original y extracción de 30 historias de usuario</li>
-                        <li>Diseño de arquitectura modular con módulos state, ui y ai con responsabilidades claras</li>
-                        <li>Selección de stack: Spring Boot 4 + Redis + PostgreSQL + MongoDB</li>
-                        <li>Planificación en 7 fases (Fase 0 a Fase 6) con entregables definidos</li>
-                    </ul>
+                    <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">
+                        Se establecieron claramente las bases y requerimientos del proyecto, analizando el sistema original para segmentar y estructurar el trabajo en 6 fases iterativas, asegurando una visión clara de la arquitectura basada en microservicios hacia un monolito robusto.
+                    </p>
                 </div>
                 <div class="pdca-card do-phase">
                     <div class="phase-letter">D</div>
                     <div class="phase-name" style="color: var(--accent-green);">Do</div>
-                    <ul>
-                        <li>Implementación incremental: estado &#10132; vistas &#10132; auth &#10132; IA &#10132; deploy</li>
-                        <li>Integración de Gemini Vision, Groq, Google Drive y Resend vía WebClient</li>
-                        <li>Desarrollo de OAuth2 dual (GitHub + Google) con persistencia en JPA</li>
-                        <li>Deploy Tutor: análisis de repos + generación de Dockerfiles automáticos</li>
-                    </ul>
+                    <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">
+                        Se ejecutó el desarrollo construyendo primero el núcleo de sincronización, la interfaz táctil y por último la capa de inteligencia artificial unificando dependencias clave para orquestar la seguridad en Spring Boot de manera segura y escalable.
+                    </p>
                 </div>
                 <div class="pdca-card check">
                     <div class="phase-letter">C</div>
                     <div class="phase-name" style="color: var(--accent-orange);">Check</div>
-                    <ul>
-                        <li>Tests unitarios con JUnit 5 + MockMvc por cada controller y servicio</li>
-                        <li>Validación de contratos REST: status codes, JSON schema, edge cases</li>
-                        <li>Verificación contra criterios de aceptación del CSV de historias de usuario</li>
-                        <li>Health checks en cada servicio: <code>/actuator/health</code></li>
-                    </ul>
+                    <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">
+                        Después de cada fase estructural, se auditaron y validaron los contratos de las API REST, el estado global visual de las pantallas y el cumplimiento eficaz del flujo de control usando pruebas funcionales, asegurando el acoplamiento óptimo de la nube.
+                    </p>
                 </div>
                 <div class="pdca-card act">
                     <div class="phase-letter">A</div>
                     <div class="phase-name" style="color: var(--accent-purple);">Act</div>
-                    <ul>
-                        <li>Despliegue en Render con perfiles <code>prod</code> y variables de entorno</li>
-                        <li>Migraciones Flyway para evolución segura del esquema PostgreSQL</li>
-                        <li>Documentación de decisiones en AGENTS.md y resúmenes por fase</li>
-                        <li>Iteración sobre feedback: nuevas HU y mejoras de rendimiento</li>
-                    </ul>
+                    <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">
+                        Incorporando los aprendizajes de cada ciclo, se afinó la configuración del servidor web unificando todo en un punto de entrada central, resolviendo deficiencias de escalabilidad, refinando procesos con migraciones e incrementando la resiliencia en la fase productiva.
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ========== SLIDE 7: ISO 15504 ========== -->
+    <!-- ========== SLIDE 7: AWS S3 & LAMBDA ========== -->
     <div class="slide" data-slide="6">
         <div class="slide-content">
             <div class="iso-header">
-                <span class="iso-badge" style="background: rgba(37,99,235,0.12); color: var(--accent-blue);">ISO/IEC 15504</span>
-                <span class="slide-label" style="margin: 0;">SPICE — Evaluación de Madurez del Proceso</span>
+                <span class="iso-badge" style="background: rgba(37,99,235,0.12); color: var(--accent-blue);">AWS Cloud</span>
+                <span class="slide-label" style="margin: 0;">Integración de S3 y Lambda</span>
             </div>
             <div class="slide-title" style="font-size: clamp(28px, 3vw, 40px);">
-                Niveles de <span class="gradient-text">capacidad</span> del proceso
+                Procesamiento y <span class="gradient-text">almacenamiento</span> escalable
             </div>
             <div class="iso-desc">
-                ISO 15504 (SPICE) evalúa la madurez de los procesos de software en 6 niveles (0-5).
-                SlideHub aplica prácticas que posicionan el proyecto en los niveles superiores de capacidad.
+                El sistema utiliza servicios de Amazon Web Services para el almacenamiento seguro y la manipulación escalable de los recursos gráficos de forma serverless.
             </div>
             <div class="iso-items stagger">
                 <div class="iso-item">
-                    <div class="iso-item-icon" style="background: rgba(220,38,38,0.12); color: var(--accent-red);">L1</div>
+                    <div class="iso-item-icon" style="background: rgba(220,38,38,0.12); color: var(--accent-red);">S3</div>
                     <div>
-                        <div class="iso-item-title">Nivel 1 — Proceso Ejecutado</div>
-                        <div class="iso-item-desc">El software se construye y cumple su propósito. El monolito modular funciona, sirve sus endpoints y coordina los módulos state, ui y ai.</div>
+                        <div class="iso-item-title">Amazon S3 — Object Storage</div>
+                        <div class="iso-item-desc">Los recursos, diapositivas y activos generados por los usuarios se almacenan en buckets de S3 integrados directamente mediante el SDK v2 de Java de forma eficiente.</div>
                     </div>
                 </div>
                 <div class="iso-item">
-                    <div class="iso-item-icon" style="background: rgba(217,119,6,0.12); color: var(--accent-orange);">L2</div>
+                    <div class="iso-item-icon" style="background: rgba(217,119,6,0.12); color: var(--accent-orange);">&#9889;</div>
                     <div>
-                        <div class="iso-item-title">Nivel 2 — Proceso Gestionado</div>
-                        <div class="iso-item-desc">Planificación por fases (0-6) con entregables definidos. Historias de usuario documentadas con criterios de aceptación en CSV. Gestión de configuración con Git.</div>
-                    </div>
-                </div>
-                <div class="iso-item">
-                    <div class="iso-item-icon" style="background: rgba(5,150,105,0.12); color: var(--accent-green);">L3</div>
-                    <div>
-                        <div class="iso-item-title">Nivel 3 — Proceso Establecido</div>
-                        <div class="iso-item-desc">Convenciones estandarizadas en AGENTS.md y CLAUDE.md: estructura de paquetes, patrones de código (records, inyección por constructor, ResponseEntity), y guías de testing.</div>
-                    </div>
-                </div>
-                <div class="iso-item">
-                    <div class="iso-item-icon" style="background: rgba(37,99,235,0.12); color: var(--accent-blue);">L4</div>
-                    <div>
-                        <div class="iso-item-title">Nivel 4 — Proceso Predecible</div>
-                        <div class="iso-item-desc">Health checks (<code>/actuator/health</code>) y tests automatizados por servicio. Monitoreo de estado con endpoints dedicados. Migraciones Flyway para evolución controlada del schema.</div>
+                        <div class="iso-item-title">AWS Lambda — Serverless</div>
+                        <div class="iso-item-desc">Las funciones basadas en eventos permiten optimizar o transformar recursos bajo demanda minimizando los costos estructurales y de procesamiento del monolito central.</div>
                     </div>
                 </div>
             </div>
