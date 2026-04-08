@@ -35,6 +35,15 @@
             padding: 1rem;
         }
 
+        .note-thumb {
+            width: 96px;
+            height: 64px;
+            object-fit: cover;
+            border-radius: var(--sh-r-md);
+            border: 1px solid var(--sh-border);
+            margin-bottom: 0.65rem;
+        }
+
         .key-phrase {
             background: rgba(88, 166, 255, 0.2);
             border-radius: var(--sh-r-md);
@@ -233,6 +242,8 @@
                                 <div th:each="note : ${existingNotes}"
                                     th:if="${note.get('slideNumber') == slide.number}"
                                     th:id="${'note-content-' + slide.number}" class="note-card">
+                                    <img th:src="${slide.s3Url}" th:alt="${'Miniatura diapositiva ' + slide.number}"
+                                        class="note-thumb" loading="lazy" onerror="this.style.display='none'">
                                     <div class="font-semibold text-sm text-[var(--sh-text-1)] mb-2"
                                         th:text="${note.get('title')}">Título</div>
                                     <ul class="mb-2 pl-4 space-y-1 text-sm text-[var(--sh-text-2)]">

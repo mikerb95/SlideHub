@@ -75,7 +75,20 @@ public class NotesService {
         // ── Paso 2: Contexto técnico del repositorio ───────────────────────
         String repoContext = "";
         if (request.repoUrl() != null && !request.repoUrl().isBlank()) {
-            repoContext = geminiService.extractRepoContext(request.repoUrl(), slideDescription);
+            try {
+                repoContext = geminiService.extractRepoContext(request.repoUrl(), slideDescription);
+            } catch (Exception ex) {
+                log.warn("No se pudo extraer contexto desde GitHub para {}/{}: {}",
+                        request.presentationId(), request.slideNumber(), ex.getMessage());
+            }
+        }
+
+        if (request.extraContext() != null && !request.extraContext().isBlank()) {
+            if (!repoContext.isBlank()) {
+                repoContext = repoContext + "\n\nContexto adicional cargado por el usuario:\n" + request.extraContext();
+            } else {
+                repoContext = "Contexto adicional cargado por el usuario:\n" + request.extraContext();
+            }
         }
 
         // ── Paso 3: Generación de nota con Groq ────────────────────────────
@@ -107,7 +120,8 @@ public class NotesService {
                         request.repoUrl(),
                         null, // imageData: null; se descargará desde imageUrl
                         slide.imageUrl(),
-                        null // slideContext: null (se usará la imagen)
+                    null, // slideContext: null (se usará la imagen)
+                    request.extraContext()
                 );
                 generate(noteRequest);
                 generated++;

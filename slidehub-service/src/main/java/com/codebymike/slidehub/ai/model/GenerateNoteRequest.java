@@ -11,6 +11,8 @@ package com.codebymike.slidehub.ai.model;
  *                       imageData; puede ser null)
  * @param slideContext   Descripción breve del slide como fallback si no hay
  *                       imagen
+ * @param extraContext   Contexto textual adicional (README, pom.xml,
+ *                       Dockerfile, etc.) cuando no hay acceso a GitHub
  */
 public record GenerateNoteRequest(
         String presentationId,
@@ -18,5 +20,6 @@ public record GenerateNoteRequest(
         String repoUrl,
         String imageData,
         String imageUrl,
-        String slideContext) {
+        String slideContext,
+        String extraContext) {
 }
