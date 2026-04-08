@@ -89,6 +89,14 @@ public class GroqService {
 
             return objectMapper.readValue(rawJson, NoteContent.class);
 
+        } catch (org.springframework.web.reactive.function.client.WebClientResponseException e) {
+            log.error("Error 400 de Groq (slide {}): {}", slideNumber, e.getResponseBodyAsString());
+            return new NoteContent(
+                    "Slide " + slideNumber,
+                    List.of("No se pudo generar la nota con IA. Detalle: " + e.getResponseBodyAsString()),
+                    "~2 min",
+                    List.of(),
+                    List.of());
         } catch (Exception e) {
             log.error("Error generando nota con Groq (slide {}): {}", slideNumber, e.getMessage());
             // Devuelve nota de fallback en lugar de propagar la excepción

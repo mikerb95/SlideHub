@@ -20,7 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Consulta la API de UptimeRobot v2 para obtener el estado del monitor de SlideHub.
+ * Consulta la API de UptimeRobot v2 para obtener el estado del monitor de
+ * SlideHub.
  * Toda la comunicación es vía HTTP con WebClient — sin SDK de terceros.
  */
 @Service
@@ -28,8 +29,8 @@ public class UptimeService {
 
     private static final Logger log = LoggerFactory.getLogger(UptimeService.class);
     private static final String UPTIMEROBOT_API = "https://api.uptimerobot.com";
-    private static final DateTimeFormatter DT_FMT =
-            DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm").withZone(ZoneId.of("America/Bogota"));
+    private static final DateTimeFormatter DT_FMT = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")
+            .withZone(ZoneId.of("America/Bogota"));
 
     private final WebClient client;
 
@@ -55,7 +56,8 @@ public class UptimeService {
         }
 
         try {
-            // BodyInserters.fromFormData ya setea Content-Type: application/x-www-form-urlencoded
+            // BodyInserters.fromFormData ya setea Content-Type:
+            // application/x-www-form-urlencoded
             // NO agregar el header manualmente o se duplica y corrompe la request
             MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
             form.add("api_key", resolvedApiKey);
@@ -94,7 +96,7 @@ public class UptimeService {
 
             // Uptime ratios — formato "99.350-99.128-99.128" (7d-30d-90d)
             String[] ratios = m.path("custom_uptime_ratio").asText("").split("-");
-            String uptime7d  = parseRatio(ratios, 0);
+            String uptime7d = parseRatio(ratios, 0);
             String uptime30d = parseRatio(ratios, 1);
             String uptime90d = parseRatio(ratios, 2);
 
@@ -118,8 +120,8 @@ public class UptimeService {
                 for (JsonNode entry : logs) {
                     int type = entry.path("type").asInt();
                     if (type == 1 || type == 2) {
-                        long ts  = entry.path("datetime").asLong();
-                        int  dur = entry.path("duration").asInt();
+                        long ts = entry.path("datetime").asLong();
+                        int dur = entry.path("duration").asInt();
                         Map<String, String> incident = new HashMap<>();
                         incident.put("type", type == 1 ? "DOWN" : "UP");
                         incident.put("datetime", DT_FMT.format(Instant.ofEpochSecond(ts)));
@@ -136,7 +138,7 @@ public class UptimeService {
             result.put("status", status);
             result.put("statusLabel", resolveLabel(status));
             result.put("statusColor", resolveColor(status));
-            result.put("uptime7d",  uptime7d);
+            result.put("uptime7d", uptime7d);
             result.put("uptime30d", uptime30d);
             result.put("uptime90d", uptime90d);
             result.put("avgResponseMs", avgResponse);
@@ -157,13 +159,16 @@ public class UptimeService {
 
     /**
      * Extrae y formatea un ratio del array de uptime.
-     * Si el valor es 0.000 (monitor recién creado, sin datos suficientes) devuelve null
+     * Si el valor es 0.000 (monitor recién creado, sin datos suficientes) devuelve
+     * null
      * para que el frontend muestre "Sin datos" en lugar de "0.00%".
      */
     private String parseRatio(String[] parts, int index) {
-        if (index >= parts.length) return null;
+        if (index >= parts.length)
+            return null;
         String raw = parts[index].trim();
-        if (raw.isEmpty()) return null;
+        if (raw.isEmpty())
+            return null;
         try {
             double val = Double.parseDouble(raw);
             return val <= 0.0 ? null : raw;
@@ -199,8 +204,10 @@ public class UptimeService {
     }
 
     private String formatDuration(int seconds) {
-        if (seconds < 60) return seconds + "s";
-        if (seconds < 3600) return (seconds / 60) + "m";
+        if (seconds < 60)
+            return seconds + "s";
+        if (seconds < 3600)
+            return (seconds / 60) + "m";
         return (seconds / 3600) + "h " + ((seconds % 3600) / 60) + "m";
     }
 

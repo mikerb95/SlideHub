@@ -22,7 +22,9 @@
             cursor: default;
         }
 
-        .uptime-bar-tick:hover { opacity: 0.75; }
+        .uptime-bar-tick:hover {
+            opacity: 0.75;
+        }
 
         .stat-card {
             background: var(--sh-deep);
@@ -55,7 +57,9 @@
             font-size: 0.83rem;
         }
 
-        .incident-row:last-child { border-bottom: none; }
+        .incident-row:last-child {
+            border-bottom: none;
+        }
 
         .pulse-dot {
             width: 10px;
@@ -64,14 +68,36 @@
             flex-shrink: 0;
         }
 
-        .pulse-dot.green  { background: var(--sh-green); box-shadow: 0 0 0 3px rgba(74,222,128,0.2); animation: pulse-g 2s infinite; }
-        .pulse-dot.amber  { background: var(--sh-amber); box-shadow: 0 0 0 3px rgba(251,191,36,0.2); }
-        .pulse-dot.red    { background: #f87171;         box-shadow: 0 0 0 3px rgba(248,113,113,0.2); }
-        .pulse-dot.gray   { background: var(--sh-text-3); }
+        .pulse-dot.green {
+            background: var(--sh-green);
+            box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2);
+            animation: pulse-g 2s infinite;
+        }
+
+        .pulse-dot.amber {
+            background: var(--sh-amber);
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
+        }
+
+        .pulse-dot.red {
+            background: #f87171;
+            box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.2);
+        }
+
+        .pulse-dot.gray {
+            background: var(--sh-text-3);
+        }
 
         @keyframes pulse-g {
-            0%, 100% { box-shadow: 0 0 0 3px rgba(74,222,128,0.2); }
-            50%       { box-shadow: 0 0 0 6px rgba(74,222,128,0.05); }
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 0 0 6px rgba(74, 222, 128, 0.05);
+            }
         }
 
         .skeleton {
@@ -82,8 +108,13 @@
         }
 
         @keyframes skeleton-shimmer {
-            0%   { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
         }
     </style>
 </head>
@@ -166,7 +197,7 @@
         <footer class="text-center text-xs text-[var(--sh-text-3)] font-mono">
             Datos proporcionados por
             <a href="https://uptimerobot.com" target="_blank" rel="noopener"
-               class="text-[var(--sh-blue)] hover:underline">UptimeRobot</a>
+                class="text-[var(--sh-blue)] hover:underline">UptimeRobot</a>
             · Se actualiza cada 60 segundos
         </footer>
     </div>
@@ -176,8 +207,8 @@
         const COLOR_MAP = {
             green: 'var(--sh-green)',
             amber: 'var(--sh-amber)',
-            red:   '#f87171',
-            gray:  'var(--sh-text-3)'
+            red: '#f87171',
+            gray: 'var(--sh-text-3)'
         };
 
         async function loadStatus() {
@@ -299,11 +330,12 @@
         }
 
         function esc(s) {
-            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
 
         loadStatus();
         setInterval(loadStatus, 60_000);
     </script>
 </body>
+
 </html>
