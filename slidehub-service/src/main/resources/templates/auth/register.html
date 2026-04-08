@@ -51,8 +51,6 @@
 
                 <div class="mb-4">
                     <label for="phoneNumber" class="sh-input-label">Número de teléfono</label>
-                    <input type="text" class="sh-input mb-2" id="phoneCountrySearch"
-                        placeholder="Buscar país o indicativo (ej: Colombia, +57)" autocomplete="off">
                     <div class="grid grid-cols-3 gap-2">
                         <select id="phoneCountry" class="sh-input col-span-1" aria-label="País e indicativo"></select>
                         <input type="tel" class="sh-input col-span-2" id="phoneLocal" autocomplete="tel-national"
@@ -119,7 +117,6 @@
             const passwordInput = document.getElementById('password');
             const confirmInput = document.getElementById('confirmPassword');
             const emailInput = document.getElementById('email');
-            const phoneCountrySearch = document.getElementById('phoneCountrySearch');
             const phoneCountry = document.getElementById('phoneCountry');
             const phoneLocal = document.getElementById('phoneLocal');
             const phoneInput = document.getElementById('phoneNumber');
@@ -129,7 +126,7 @@
             const phoneFeedback = document.getElementById('phone-feedback');
             const submitBtn = document.querySelector('button[type="submit"]');
 
-            if (!passwordInput || !strengthFeedback || !emailInput || !phoneInput || !phoneCountry || !phoneLocal || !phoneCountrySearch) return;
+            if (!passwordInput || !strengthFeedback || !emailInput || !phoneInput || !phoneCountry || !phoneLocal) return;
 
             function setFeedback(el, message, type) {
                 el.textContent = message;
@@ -169,8 +166,6 @@
 
             function populateCountryOptions() {
                 const selectedDialCode = (phoneCountry.value || '').trim();
-                const searchValue = (phoneCountrySearch.value || '').trim().toLowerCase();
-                const normalizedSearchDigits = searchValue.replace(/[^0-9+]/g, '');
 
                 const countries = [
                     { iso2: 'AF', name: 'Afganistán', dialCode: '+93' },
@@ -370,23 +365,12 @@
                     { iso2: 'PS', name: 'Palestina', dialCode: '+970' }
                 ];
 
-                const filteredCountries = countries
-                    .sort((a, b) => a.name.localeCompare(b.name, 'es'))
-                    .filter(country => {
-                        if (!searchValue) {
-                            return true;
-                        }
-                        const byName = country.name.toLowerCase().includes(searchValue);
-                        const byDial = normalizedSearchDigits
-                            ? country.dialCode.includes(normalizedSearchDigits)
-                            : false;
-                        return byName || byDial;
-                    });
-
                 phoneCountry.innerHTML = '';
                 let selectedApplied = false;
 
-                filteredCountries.forEach(country => {
+                countries
+                    .sort((a, b) => a.name.localeCompare(b.name, 'es'))
+                    .forEach(country => {
                     const option = document.createElement('option');
                     option.value = country.dialCode;
                     option.textContent = `${flagFromIso2(country.iso2)} ${country.name} (${country.dialCode})`;
@@ -397,8 +381,8 @@
                         option.selected = true;
                         selectedApplied = true;
                     }
-                    phoneCountry.appendChild(option);
-                });
+                        phoneCountry.appendChild(option);
+                    });
 
                 if (phoneCountry.options.length === 0) {
                     const emptyOption = document.createElement('option');
@@ -467,10 +451,6 @@
             populateCountryOptions();
 
             emailInput.addEventListener('input', validate);
-            phoneCountrySearch.addEventListener('input', () => {
-                populateCountryOptions();
-                validate();
-            });
             phoneCountry.addEventListener('change', validate);
             phoneLocal.addEventListener('input', validate);
             passwordInput.addEventListener('input', validate);
