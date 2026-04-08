@@ -371,16 +371,16 @@
                 countries
                     .sort((a, b) => a.name.localeCompare(b.name, 'es'))
                     .forEach(country => {
-                    const option = document.createElement('option');
-                    option.value = country.dialCode;
-                    option.textContent = `${flagFromIso2(country.iso2)} ${country.name} (${country.dialCode})`;
-                    if (!selectedApplied && selectedDialCode && country.dialCode === selectedDialCode) {
-                        option.selected = true;
-                        selectedApplied = true;
-                    } else if (!selectedApplied && !selectedDialCode && country.iso2 === 'CO') {
-                        option.selected = true;
-                        selectedApplied = true;
-                    }
+                        const option = document.createElement('option');
+                        option.value = country.dialCode;
+                        option.textContent = `${flagFromIso2(country.iso2)} ${country.name} (${country.dialCode})`;
+                        if (!selectedApplied && selectedDialCode && country.dialCode === selectedDialCode) {
+                            option.selected = true;
+                            selectedApplied = true;
+                        } else if (!selectedApplied && !selectedDialCode && country.iso2 === 'CO') {
+                            option.selected = true;
+                            selectedApplied = true;
+                        }
                         phoneCountry.appendChild(option);
                     });
 
