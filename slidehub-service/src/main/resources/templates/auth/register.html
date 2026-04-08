@@ -52,12 +52,14 @@
                     <label for="password" class="sh-input-label">Contraseña</label>
                     <input type="password" class="sh-input" id="password" name="password" autocomplete="new-password"
                         placeholder="Mínimo 8 caracteres" minlength="8" required>
+                    <div id="password-strength-feedback" class="pwd-feedback warn mt-1 text-xs">Mínimo 8 caracteres.</div>
                 </div>
 
                 <div class="mb-5">
                     <label for="confirmPassword" class="sh-input-label">Confirmar contraseña</label>
                     <input type="password" class="sh-input" id="confirmPassword" name="confirmPassword"
                         autocomplete="new-password" placeholder="Repite la contraseña" minlength="8" required>
+                    <div id="password-match-feedback" class="pwd-feedback warn mt-1 text-xs">Confirma la contraseña para continuar.</div>
                 </div>
 
                 <button type="submit" class="sh-btn sh-btn-blue w-full justify-center">
@@ -95,6 +97,69 @@
         </div>
     </div>
 
+    <script>
+        (function () {
+            const passwordInput = document.getElementById('password');
+            const confirmInput = document.getElementById('confirmPassword');
+            const strengthFeedback = document.getElementById('password-strength-feedback');
+            const matchFeedback = document.getElementById('password-match-feedback');
+            const submitBtn = document.querySelector('button[type="submit"]');
+
+            if (!passwordInput || !strengthFeedback) return;
+
+            function setFeedback(el, message, type) {
+                el.textContent = message;
+                el.classList.remove('ok', 'warn', 'error');
+                el.classList.add(type);
+            }
+
+            function evaluateStrength(password) {
+                if (password.length < 8) {
+                    return { valid: false, message: 'Muy corta (mínimo 8 caracteres).', type: 'error' };
+                }
+
+                const hasUpper = /[A-Z]/.test(password);
+                const hasLower = /[a-z]/.test(password);
+                const hasDigit = /\d/.test(password);
+                const hasSymbol = /[^A-Za-z0-9]/.test(password);
+                const score = [hasUpper, hasLower, hasDigit, hasSymbol].filter(Boolean).length;
+
+                if (score <= 1) {
+                    return { valid: true, message: 'Válida, pero débil. Recomendado: mayúsculas, números y símbolos.', type: 'warn' };
+                }
+
+                if (score === 2 || score === 3) {
+                    return { valid: true, message: 'Contraseña aceptable.', type: 'ok' };
+                }
+
+                return { valid: true, message: 'Contraseña fuerte.', type: 'ok' };
+            }
+
+            function validate() {
+                const password = passwordInput.value || '';
+                const confirmation = confirmInput.value || '';
+
+                const strength = evaluateStrength(password);
+                setFeedback(strengthFeedback, strength.message, strength.type);
+
+                let matchValid = false;
+                if (!confirmation) {
+                    setFeedback(matchFeedback, 'Confirma la contraseña para continuar.', 'warn');
+                } else if (password !== confirmation) {
+                    setFeedback(matchFeedback, 'Las contraseñas no coinciden.', 'error');
+                } else {
+                    matchValid = true;
+                    setFeedback(matchFeedback, 'Las contraseñas coinciden.', 'ok');
+                }
+
+                submitBtn.disabled = !(strength.valid && matchValid);
+            }
+
+            passwordInput.addEventListener('input', validate);
+            confirmInput.addEventListener('input', validate);
+            validate();
+        })();
+    </script>
 </body>
 
 </html>
