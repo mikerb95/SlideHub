@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,9 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-        *, *::before, *::after {
+        *,
+        *::before,
+        *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -31,7 +34,7 @@
             --gradient-2: linear-gradient(135deg, #0891b2, #059669);
             --gradient-3: linear-gradient(135deg, #d97706, #dc2626);
             --gradient-4: linear-gradient(135deg, #db2777, #7c3aed);
-            --border: rgba(0,0,0,0.09);
+            --border: rgba(0, 0, 0, 0.09);
             --radius: 16px;
         }
 
@@ -71,6 +74,7 @@
             z-index: 1000;
             letter-spacing: 1px;
         }
+
         .slide-counter .current {
             color: var(--accent-blue);
             font-weight: 600;
@@ -89,6 +93,7 @@
             z-index: 1000;
             transition: opacity 0.3s;
         }
+
         .nav-hint .key {
             display: inline-flex;
             align-items: center;
@@ -125,6 +130,7 @@
             transform: translateY(40px);
             transition: all 0.7s cubic-bezier(0.22, 1, 0.36, 1);
         }
+
         .slide.active .slide-content {
             opacity: 1;
             transform: translateY(0);
@@ -147,6 +153,7 @@
             top: -200px;
             right: -100px;
         }
+
         .slide:nth-child(even)::before {
             background: var(--accent-purple);
             bottom: -200px;
@@ -201,13 +208,14 @@
             border-radius: var(--radius);
             padding: 24px;
             transition: all 0.3s ease;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
+
         .card:hover {
             background: var(--bg-card-hover);
-            border-color: rgba(0,0,0,0.14);
+            border-color: rgba(0, 0, 0, 0.14);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
         .card-icon {
@@ -283,11 +291,12 @@
             border-radius: 10px;
             font-size: 13px;
             transition: all 0.2s;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
         }
+
         .story-item:hover {
             background: var(--bg-card-hover);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
         .story-id {
@@ -321,12 +330,13 @@
             border-radius: var(--radius);
             min-width: 180px;
             transition: all 0.3s;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
+
         .arch-service:hover {
             transform: scale(1.03);
-            border-color: rgba(0,0,0,0.16);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            border-color: rgba(0, 0, 0, 0.16);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
         }
 
         .arch-service .port {
@@ -368,6 +378,7 @@
             position: relative;
             overflow: hidden;
         }
+
         .pdca-card::before {
             content: '';
             position: absolute;
@@ -376,10 +387,22 @@
             right: 0;
             height: 3px;
         }
-        .pdca-card.plan::before { background: var(--accent-blue); }
-        .pdca-card.do-phase::before { background: var(--accent-green); }
-        .pdca-card.check::before { background: var(--accent-orange); }
-        .pdca-card.act::before { background: var(--accent-purple); }
+
+        .pdca-card.plan::before {
+            background: var(--accent-blue);
+        }
+
+        .pdca-card.do-phase::before {
+            background: var(--accent-green);
+        }
+
+        .pdca-card.check::before {
+            background: var(--accent-orange);
+        }
+
+        .pdca-card.act::before {
+            background: var(--accent-purple);
+        }
 
         .pdca-card .phase-letter {
             font-family: 'JetBrains Mono', monospace;
@@ -411,6 +434,7 @@
             padding-left: 16px;
             position: relative;
         }
+
         .pdca-card ul li::before {
             content: '›';
             position: absolute;
@@ -458,7 +482,7 @@
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 12px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
         }
 
         .iso-item .iso-item-icon {
@@ -583,25 +607,55 @@
             border: 1px solid var(--border);
             color: var(--text-secondary);
             background: var(--bg-card);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
         /* Animations for staggered children */
-        .slide.active .stagger > * {
+        .slide.active .stagger>* {
             opacity: 0;
             transform: translateY(20px);
             animation: fadeInUp 0.5s ease forwards;
         }
-        .slide.active .stagger > *:nth-child(1) { animation-delay: 0.1s; }
-        .slide.active .stagger > *:nth-child(2) { animation-delay: 0.18s; }
-        .slide.active .stagger > *:nth-child(3) { animation-delay: 0.26s; }
-        .slide.active .stagger > *:nth-child(4) { animation-delay: 0.34s; }
-        .slide.active .stagger > *:nth-child(5) { animation-delay: 0.42s; }
-        .slide.active .stagger > *:nth-child(6) { animation-delay: 0.50s; }
-        .slide.active .stagger > *:nth-child(7) { animation-delay: 0.58s; }
-        .slide.active .stagger > *:nth-child(8) { animation-delay: 0.66s; }
-        .slide.active .stagger > *:nth-child(9) { animation-delay: 0.74s; }
-        .slide.active .stagger > *:nth-child(10) { animation-delay: 0.82s; }
+
+        .slide.active .stagger>*:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .slide.active .stagger>*:nth-child(2) {
+            animation-delay: 0.18s;
+        }
+
+        .slide.active .stagger>*:nth-child(3) {
+            animation-delay: 0.26s;
+        }
+
+        .slide.active .stagger>*:nth-child(4) {
+            animation-delay: 0.34s;
+        }
+
+        .slide.active .stagger>*:nth-child(5) {
+            animation-delay: 0.42s;
+        }
+
+        .slide.active .stagger>*:nth-child(6) {
+            animation-delay: 0.50s;
+        }
+
+        .slide.active .stagger>*:nth-child(7) {
+            animation-delay: 0.58s;
+        }
+
+        .slide.active .stagger>*:nth-child(8) {
+            animation-delay: 0.66s;
+        }
+
+        .slide.active .stagger>*:nth-child(9) {
+            animation-delay: 0.74s;
+        }
+
+        .slide.active .stagger>*:nth-child(10) {
+            animation-delay: 0.82s;
+        }
 
         @keyframes fadeInUp {
             to {
@@ -645,7 +699,7 @@
             border-radius: 10px;
             font-size: 13px;
             color: var(--text-secondary);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
         }
 
         .tech-badge .tech-dot {
@@ -656,600 +710,759 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .slide-content { padding: 30px 24px; }
-            .cards-grid { grid-template-columns: 1fr; }
-            .pdca-grid { grid-template-columns: 1fr; }
-            .two-cols { grid-template-columns: 1fr; }
-            .stories-grid { grid-template-columns: 1fr; }
-            .arch-diagram { flex-direction: column; }
-            .arch-arrow { transform: rotate(90deg); }
-            .pipeline { flex-direction: column; gap: 16px; }
-            .pipeline::before { display: none; }
+            .slide-content {
+                padding: 30px 24px;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pdca-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .two-cols {
+                grid-template-columns: 1fr;
+            }
+
+            .stories-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .arch-diagram {
+                flex-direction: column;
+            }
+
+            .arch-arrow {
+                transform: rotate(90deg);
+            }
+
+            .pipeline {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .pipeline::before {
+                display: none;
+            }
         }
     </style>
 </head>
+
 <body>
 
-<div class="progress-bar" id="progressBar"></div>
+    <div class="progress-bar" id="progressBar"></div>
 
-<div class="nav-hint">
-    <span class="key">&#9650;</span>
-    <span class="key">&#9660;</span>
-    <span>navegar</span>
-</div>
-
-<div class="slide-counter">
-    <span class="current" id="currentSlide">01</span>
-    <span>/ </span>
-    <span id="totalSlides">12</span>
-</div>
-
-<div class="slides-wrapper" id="slidesWrapper">
-
-    <!-- ========== SLIDE 1: TÍTULO ========== -->
-    <div class="slide title-slide active" data-slide="0">
-        <div class="slide-content">
-            <div class="title-logo">&#9670;</div>
-            <div class="title-main">SlideHub</div>
-            <div class="title-tagline">Sistema de Presentación Multi-Pantalla en Tiempo Real</div>
-            <div class="title-chips">
-                <span class="chip">Java 21</span>
-                <span class="chip">Spring Boot 4</span>
-                <span class="chip">Microservicios</span>
-                <span class="chip">IA Generativa</span>
-                <span class="chip">OAuth2</span>
-                <span class="chip">Redis</span>
-            </div>
-        </div>
+    <div class="nav-hint">
+        <span class="key">&#9650;</span>
+        <span class="key">&#9660;</span>
+        <span>navegar</span>
     </div>
 
-    <!-- ========== SLIDE 2: OBJETIVO GENERAL ========== -->
-    <div class="slide" data-slide="1">
-        <div class="slide-content">
-            <div class="slide-label">Propósito de la Herramienta</div>
-            <div class="slide-title">
-                Controlar y enriquecer tus <span class="gradient-text">presentaciones</span>
-            </div>
-            <div class="slide-subtitle" style="margin-bottom: 32px;">
-                Permitir a los oradores gestionar en tiempo real sus diapositivas, sincronizando múltiples pantallas y obteniendo asistencia inteligente para la exposición, todo desde una interfaz intuitiva y accesible.
-            </div>
-            <div class="cards-grid">
-                <div class="card">
-                    <div class="card-icon" style="background: rgba(37,99,235,0.12); color: var(--accent-blue);">&#9881;</div>
-                    <div class="card-title">Monolito modular con Java</div>
-                    <div class="card-text">Módulos state, ui y ai con responsabilidades separadas dentro de un único servicio Spring Boot desplegable.</div>
-                </div>
-                <div class="card">
-                    <div class="card-icon" style="background: rgba(124,58,237,0.12); color: var(--accent-purple);">&#9733;</div>
-                    <div class="card-title">IA como valor agregado</div>
-                    <div class="card-text">Gemini Vision + Groq generan notas del presentador y guías de despliegue automáticas.</div>
-                </div>
-                <div class="card">
-                    <div class="card-icon" style="background: rgba(5,150,105,0.12); color: var(--accent-green);">&#9729;</div>
-                    <div class="card-title">Cloud-native</div>
-                    <div class="card-text">Desplegado en Render (<code>slide.lat</code>) con Redis, PostgreSQL (Aiven), MongoDB Atlas y S3.</div>
+    <div class="slide-counter">
+        <span class="current" id="currentSlide">01</span>
+        <span>/ </span>
+        <span id="totalSlides">12</span>
+    </div>
+
+    <div class="slides-wrapper" id="slidesWrapper">
+
+        <!-- ========== SLIDE 1: TÍTULO ========== -->
+        <div class="slide title-slide active" data-slide="0">
+            <div class="slide-content">
+                <div class="title-logo">&#9670;</div>
+                <div class="title-main">SlideHub</div>
+                <div class="title-tagline">Sistema de Presentación Multi-Pantalla en Tiempo Real</div>
+                <div class="title-chips">
+                    <span class="chip">Java 21</span>
+                    <span class="chip">Spring Boot 4</span>
+                    <span class="chip">Microservicios</span>
+                    <span class="chip">IA Generativa</span>
+                    <span class="chip">OAuth2</span>
+                    <span class="chip">Redis</span>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- ========== SLIDE 3: OBJETIVOS ESPECÍFICOS ========== -->
-    <div class="slide" data-slide="2">
-        <div class="slide-content">
-            <div class="slide-label">Objetivos Específicos</div>
-            <div class="slide-title">Metas <span class="gradient-text">concretas</span> del proyecto</div>
-            <ol class="objective-list stagger">
-                <li>
-                    <span class="marker" style="background: rgba(37,99,235,0.12); color: var(--accent-blue);">0</span>
-                    <div style="display:flex; flex-direction:column; gap:4px;">
-                        <strong style="color: var(--text-primary); font-size: 16px;">Fase 0: Migración Base</strong>
-                        <span>Preparar la infraestructura base y la configuración inicial de los proyectos y repositorios.</span>
-                    </div>
-                </li>
-                <li>
-                    <span class="marker" style="background: rgba(124,58,237,0.12); color: var(--accent-purple);">1</span>
-                    <div style="display:flex; flex-direction:column; gap:4px;">
-                        <strong style="color: var(--text-primary); font-size: 16px;">Fase 1: State y Sincronización</strong>
-                        <span>Implementar la sincronización en tiempo real de la presentación y el control de estado base.</span>
-                    </div>
-                </li>
-                <li>
-                    <span class="marker" style="background: rgba(8,145,178,0.12); color: var(--accent-cyan);">2</span>
-                    <div style="display:flex; flex-direction:column; gap:4px;">
-                        <strong style="color: var(--text-primary); font-size: 16px;">Fase 2: Interfaz y Seguridad</strong>
-                        <span>Agregar seguridad, vistas unificadas, control de acceso y sistema de autenticación integral OAuth.</span>
-                    </div>
-                </li>
-                <li>
-                    <span class="marker" style="background: rgba(5,150,105,0.12); color: var(--accent-green);">3</span>
-                    <div style="display:flex; flex-direction:column; gap:4px;">
-                        <strong style="color: var(--text-primary); font-size: 16px;">Fase 3: Asistencia AI</strong>
-                        <span>Integrar la inteligencia artificial estructurada y generativa de notas con soporte de MongoDB.</span>
-                    </div>
-                </li>
-                <li>
-                    <span class="marker" style="background: rgba(217,119,6,0.12); color: var(--accent-orange);">4</span>
-                    <div style="display:flex; flex-direction:column; gap:4px;">
-                        <strong style="color: var(--text-primary); font-size: 16px;">Fase 4: Consolidación y Servicios Web</strong>
-                        <span>Refinar componentes y preparar las utilidades como subidas y tutorías en un único entorno.</span>
-                    </div>
-                </li>
-                <li>
-                    <span class="marker" style="background: rgba(219,39,119,0.12); color: var(--accent-pink);">5</span>
-                    <div style="display:flex; flex-direction:column; gap:4px;">
-                        <strong style="color: var(--text-primary); font-size: 16px;">Fase 5: Tutor Cloud</strong>
-                        <span>Lanzar definitivamente el despliegue del tutor automático y completar los ciclos en vivo.</span>
-                    </div>
-                </li>
-            </ol>
-        </div>
-    </div>
-
-    <!-- ========== SLIDE 4: HISTORIAS DE USUARIO ========== -->
-    <div class="slide" data-slide="3">
-        <div class="slide-content">
-            <div class="slide-label">Historias de Usuario</div>
-            <div class="slide-title"><span class="gradient-text">30 historias</span> en 7 módulos</div>
-            <div class="stories-grid stagger">
-                <div class="story-item">
-                    <span class="story-id" style="background: rgba(37,99,235,0.12); color: var(--accent-blue);">HU-001 ~ 003</span>
-                    <span class="story-text">Login, registro y logout con sesiones seguras</span>
+        <!-- ========== SLIDE 2: OBJETIVO GENERAL ========== -->
+        <div class="slide" data-slide="1">
+            <div class="slide-content">
+                <div class="slide-label">Propósito de la Herramienta</div>
+                <div class="slide-title">
+                    Controlar y enriquecer tus <span class="gradient-text">presentaciones</span>
                 </div>
-                <div class="story-item">
-                    <span class="story-id" style="background: rgba(8,145,178,0.12); color: var(--accent-cyan);">HU-004 ~ 011</span>
-                    <span class="story-text">Control de slides, remote, demo mode, main-panel, polling sync</span>
+                <div class="slide-subtitle" style="margin-bottom: 32px;">
+                    Permitir a los oradores gestionar en tiempo real sus diapositivas, sincronizando múltiples pantallas
+                    y obteniendo asistencia inteligente para la exposición, todo desde una interfaz intuitiva y
+                    accesible.
                 </div>
-                <div class="story-item">
-                    <span class="story-id" style="background: rgba(5,150,105,0.12); color: var(--accent-green);">HU-012 ~ 013</span>
-                    <span class="story-text">Showcase landing page y servicio de imágenes estáticas</span>
-                </div>
-                <div class="story-item">
-                    <span class="story-id" style="background: rgba(217,119,6,0.12); color: var(--accent-orange);">HU-014 ~ 015</span>
-                    <span class="story-text">Registro y consulta de dispositivos conectados (PRESENTER)</span>
-                </div>
-                <div class="story-item">
-                    <span class="story-id" style="background: rgba(124,58,237,0.12); color: var(--accent-purple);">HU-016 ~ 020</span>
-                    <span class="story-text">Generación, consulta y borrado de notas IA + health checks</span>
-                </div>
-                <div class="story-item">
-                    <span class="story-id" style="background: rgba(219,39,119,0.12); color: var(--accent-pink);">HU-021 ~ 026</span>
-                    <span class="story-text">OAuth2 GitHub/Google, perfil, importación Drive, upload S3</span>
-                </div>
-                <div class="story-item">
-                    <span class="story-id" style="background: rgba(220,38,38,0.12); color: var(--accent-red);">HU-027 ~ 030</span>
-                    <span class="story-text">Deploy Tutor: análisis de repos, Dockerfile y guías + Gemini Vision</span>
+                <div class="cards-grid">
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(37,99,235,0.12); color: var(--accent-blue);">
+                            &#9881;</div>
+                        <div class="card-title">Monolito modular con Java</div>
+                        <div class="card-text">Módulos state, ui y ai con responsabilidades separadas dentro de un único
+                            servicio Spring Boot desplegable.</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(124,58,237,0.12); color: var(--accent-purple);">
+                            &#9733;</div>
+                        <div class="card-title">IA como valor agregado</div>
+                        <div class="card-text">Gemini Vision + Groq generan notas del presentador y guías de despliegue
+                            automáticas.</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(5,150,105,0.12); color: var(--accent-green);">
+                            &#9729;</div>
+                        <div class="card-title">Cloud-native</div>
+                        <div class="card-text">Desplegado en Render (<code>slide.lat</code>) con Redis, PostgreSQL
+                            (Aiven), MongoDB Atlas y S3.</div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- ========== SLIDE 5: OVERVIEW ========== -->
-    <div class="slide" data-slide="4">
-        <div class="slide-content">
-            <div class="slide-label">Overview de la Plataforma</div>
-            <div class="slide-title">Monolito <span class="gradient-text">modular</span> en Spring Boot</div>
-            <div class="arch-diagram stagger">
-                <div class="arch-service" style="border-top: 3px solid var(--accent-blue); min-width: 220px;">
-                    <div class="svc-icon">&#9889;</div>
-                    <div class="svc-name">Módulo State</div>
-                    <div class="port">Redis — tiempo real</div>
-                    <div class="card-text" style="margin-top:8px;">Control de slides, modo demo, polling multi-pantalla</div>
-                </div>
-                <div class="arch-arrow">+</div>
-                <div class="arch-service" style="border-top: 3px solid var(--accent-green); min-width: 220px;">
-                    <div class="svc-icon">&#9783;</div>
-                    <div class="svc-name">Módulo UI</div>
-                    <div class="port">PostgreSQL · S3</div>
-                    <div class="card-text" style="margin-top:8px;">Vistas Thymeleaf, Auth (local + OAuth2), Google Drive</div>
-                </div>
-                <div class="arch-arrow">+</div>
-                <div class="arch-service" style="border-top: 3px solid var(--accent-purple); min-width: 220px;">
-                    <div class="svc-icon">&#10024;</div>
-                    <div class="svc-name">Módulo AI</div>
-                    <div class="port">MongoDB Atlas</div>
-                    <div class="card-text" style="margin-top:8px;">Gemini Vision + Groq, notas y Deploy Tutor</div>
-                </div>
-            </div>
-            <div style="text-align:center; margin-top:20px; font-size:13px; color:var(--text-muted);">
-                Un único servicio desplegable — <code style="background:rgba(37,99,235,0.08); padding:2px 8px; border-radius:4px; color:var(--accent-blue); font-family:'JetBrains Mono',monospace;">slidehub-service :8080</code> &rarr; <strong style="color:var(--accent-blue);">slide.lat</strong>
-            </div>
-            <div class="tech-grid" style="margin-top: 24px; justify-content: center;">
-                <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-blue);"></span> Spring Boot 4.0.3</div>
-                <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-green);"></span> Java 21</div>
-                <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-purple);"></span> Spring Cloud 2025</div>
-                <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-orange);"></span> Thymeleaf</div>
-                <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-cyan);"></span> WebClient</div>
-                <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-pink);"></span> AWS SDK v2</div>
+        <!-- ========== SLIDE 3: OBJETIVOS ESPECÍFICOS ========== -->
+        <div class="slide" data-slide="2">
+            <div class="slide-content">
+                <div class="slide-label">Objetivos Específicos</div>
+                <div class="slide-title">Metas <span class="gradient-text">concretas</span> del proyecto</div>
+                <ol class="objective-list stagger">
+                    <li>
+                        <span class="marker"
+                            style="background: rgba(37,99,235,0.12); color: var(--accent-blue);">0</span>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <strong style="color: var(--text-primary); font-size: 16px;">Fase 0: Migración Base</strong>
+                            <span>Preparar la infraestructura base y la configuración inicial de los proyectos y
+                                repositorios.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="marker"
+                            style="background: rgba(124,58,237,0.12); color: var(--accent-purple);">1</span>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <strong style="color: var(--text-primary); font-size: 16px;">Fase 1: State y
+                                Sincronización</strong>
+                            <span>Implementar la sincronización en tiempo real de la presentación y el control de estado
+                                base.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="marker"
+                            style="background: rgba(8,145,178,0.12); color: var(--accent-cyan);">2</span>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <strong style="color: var(--text-primary); font-size: 16px;">Fase 2: Interfaz y
+                                Seguridad</strong>
+                            <span>Agregar seguridad, vistas unificadas, control de acceso y sistema de autenticación
+                                integral OAuth.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="marker"
+                            style="background: rgba(5,150,105,0.12); color: var(--accent-green);">3</span>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <strong style="color: var(--text-primary); font-size: 16px;">Fase 3: Asistencia AI</strong>
+                            <span>Integrar la inteligencia artificial estructurada y generativa de notas con soporte de
+                                MongoDB.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="marker"
+                            style="background: rgba(217,119,6,0.12); color: var(--accent-orange);">4</span>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <strong style="color: var(--text-primary); font-size: 16px;">Fase 4: Consolidación y
+                                Servicios Web</strong>
+                            <span>Refinar componentes y preparar las utilidades como subidas y tutorías en un único
+                                entorno.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="marker"
+                            style="background: rgba(219,39,119,0.12); color: var(--accent-pink);">5</span>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <strong style="color: var(--text-primary); font-size: 16px;">Fase 5: Tutor Cloud</strong>
+                            <span>Lanzar definitivamente el despliegue del tutor automático y completar los ciclos en
+                                vivo.</span>
+                        </div>
+                    </li>
+                </ol>
             </div>
         </div>
-    </div>
 
-    <!-- ========== SLIDE 6: CICLO PDCA ========== -->
-    <div class="slide" data-slide="5">
-        <div class="slide-content">
-            <div class="slide-label">Mejora Continua</div>
-            <div class="slide-title">Ciclo <span class="gradient-text">PDCA</span> aplicado a SlideHub</div>
-            <div class="pdca-grid stagger">
-                <div class="pdca-card plan">
-                    <div class="phase-letter">P</div>
-                    <div class="phase-name" style="color: var(--accent-blue);">Plan</div>
-                    <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">
-                        Se establecieron claramente las bases y requerimientos del proyecto, analizando el sistema original para segmentar y estructurar el trabajo en 6 fases iterativas, asegurando una visión clara de la arquitectura basada en microservicios hacia un monolito robusto.
-                    </p>
-                </div>
-                <div class="pdca-card do-phase">
-                    <div class="phase-letter">D</div>
-                    <div class="phase-name" style="color: var(--accent-green);">Do</div>
-                    <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">
-                        Se ejecutó el desarrollo construyendo primero el núcleo de sincronización, la interfaz táctil y por último la capa de inteligencia artificial unificando dependencias clave para orquestar la seguridad en Spring Boot de manera segura y escalable.
-                    </p>
-                </div>
-                <div class="pdca-card check">
-                    <div class="phase-letter">C</div>
-                    <div class="phase-name" style="color: var(--accent-orange);">Check</div>
-                    <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">
-                        Después de cada fase estructural, se auditaron y validaron los contratos de las API REST, el estado global visual de las pantallas y el cumplimiento eficaz del flujo de control usando pruebas funcionales, asegurando el acoplamiento óptimo de la nube.
-                    </p>
-                </div>
-                <div class="pdca-card act">
-                    <div class="phase-letter">A</div>
-                    <div class="phase-name" style="color: var(--accent-purple);">Act</div>
-                    <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">
-                        Incorporando los aprendizajes de cada ciclo, se afinó la configuración del servidor web unificando todo en un punto de entrada central, resolviendo deficiencias de escalabilidad, refinando procesos con migraciones e incrementando la resiliencia en la fase productiva.
-                    </p>
+        <!-- ========== SLIDE 4: HISTORIAS DE USUARIO ========== -->
+        <div class="slide" data-slide="3">
+            <div class="slide-content">
+                <div class="slide-label">Historias de Usuario</div>
+                <div class="slide-title"><span class="gradient-text">30 historias</span> en 7 módulos</div>
+                <div class="stories-grid stagger">
+                    <div class="story-item">
+                        <span class="story-id"
+                            style="background: rgba(37,99,235,0.12); color: var(--accent-blue);">HU-001 ~ 003</span>
+                        <span class="story-text">Login, registro y logout con sesiones seguras</span>
+                    </div>
+                    <div class="story-item">
+                        <span class="story-id"
+                            style="background: rgba(8,145,178,0.12); color: var(--accent-cyan);">HU-004 ~ 011</span>
+                        <span class="story-text">Control de slides, remote, demo mode, main-panel, polling sync</span>
+                    </div>
+                    <div class="story-item">
+                        <span class="story-id"
+                            style="background: rgba(5,150,105,0.12); color: var(--accent-green);">HU-012 ~ 013</span>
+                        <span class="story-text">Showcase landing page y servicio de imágenes estáticas</span>
+                    </div>
+                    <div class="story-item">
+                        <span class="story-id"
+                            style="background: rgba(217,119,6,0.12); color: var(--accent-orange);">HU-014 ~ 015</span>
+                        <span class="story-text">Registro y consulta de dispositivos conectados (PRESENTER)</span>
+                    </div>
+                    <div class="story-item">
+                        <span class="story-id"
+                            style="background: rgba(124,58,237,0.12); color: var(--accent-purple);">HU-016 ~ 020</span>
+                        <span class="story-text">Generación, consulta y borrado de notas IA + health checks</span>
+                    </div>
+                    <div class="story-item">
+                        <span class="story-id"
+                            style="background: rgba(219,39,119,0.12); color: var(--accent-pink);">HU-021 ~ 026</span>
+                        <span class="story-text">OAuth2 GitHub/Google, perfil, importación Drive, upload S3</span>
+                    </div>
+                    <div class="story-item">
+                        <span class="story-id"
+                            style="background: rgba(220,38,38,0.12); color: var(--accent-red);">HU-027 ~ 030</span>
+                        <span class="story-text">Deploy Tutor: análisis de repos, Dockerfile y guías + Gemini
+                            Vision</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- ========== SLIDE 7: AWS S3 & LAMBDA ========== -->
-    <div class="slide" data-slide="6">
-        <div class="slide-content">
-            <div class="iso-header">
-                <span class="iso-badge" style="background: rgba(37,99,235,0.12); color: var(--accent-blue);">AWS Cloud</span>
-                <span class="slide-label" style="margin: 0;">Integración de S3 y Lambda</span>
+        <!-- ========== SLIDE 5: OVERVIEW ========== -->
+        <div class="slide" data-slide="4">
+            <div class="slide-content">
+                <div class="slide-label">Overview de la Plataforma</div>
+                <div class="slide-title">Monolito <span class="gradient-text">modular</span> en Spring Boot</div>
+                <div class="arch-diagram stagger">
+                    <div class="arch-service" style="border-top: 3px solid var(--accent-blue); min-width: 220px;">
+                        <div class="svc-icon">&#9889;</div>
+                        <div class="svc-name">Módulo State</div>
+                        <div class="port">Redis — tiempo real</div>
+                        <div class="card-text" style="margin-top:8px;">Control de slides, modo demo, polling
+                            multi-pantalla</div>
+                    </div>
+                    <div class="arch-arrow">+</div>
+                    <div class="arch-service" style="border-top: 3px solid var(--accent-green); min-width: 220px;">
+                        <div class="svc-icon">&#9783;</div>
+                        <div class="svc-name">Módulo UI</div>
+                        <div class="port">PostgreSQL · S3</div>
+                        <div class="card-text" style="margin-top:8px;">Vistas Thymeleaf, Auth (local + OAuth2), Google
+                            Drive</div>
+                    </div>
+                    <div class="arch-arrow">+</div>
+                    <div class="arch-service" style="border-top: 3px solid var(--accent-purple); min-width: 220px;">
+                        <div class="svc-icon">&#10024;</div>
+                        <div class="svc-name">Módulo AI</div>
+                        <div class="port">MongoDB Atlas</div>
+                        <div class="card-text" style="margin-top:8px;">Gemini Vision + Groq, notas y Deploy Tutor</div>
+                    </div>
+                </div>
+                <div style="text-align:center; margin-top:20px; font-size:13px; color:var(--text-muted);">
+                    Un único servicio desplegable — <code
+                        style="background:rgba(37,99,235,0.08); padding:2px 8px; border-radius:4px; color:var(--accent-blue); font-family:'JetBrains Mono',monospace;">slidehub-service :8080</code>
+                    &rarr; <strong style="color:var(--accent-blue);">slide.lat</strong>
+                </div>
+                <div class="tech-grid" style="margin-top: 24px; justify-content: center;">
+                    <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-blue);"></span>
+                        Spring Boot 4.0.3</div>
+                    <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-green);"></span> Java
+                        21</div>
+                    <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-purple);"></span>
+                        Spring Cloud 2025</div>
+                    <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-orange);"></span>
+                        Thymeleaf</div>
+                    <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-cyan);"></span>
+                        WebClient</div>
+                    <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-pink);"></span> AWS
+                        SDK v2</div>
+                </div>
             </div>
-            <div class="slide-title" style="font-size: clamp(28px, 3vw, 40px);">
-                Procesamiento y <span class="gradient-text">almacenamiento</span> escalable
+        </div>
+
+        <!-- ========== SLIDE 6: CICLO PDCA ========== -->
+        <div class="slide" data-slide="5">
+            <div class="slide-content">
+                <div class="slide-label">Mejora Continua</div>
+                <div class="slide-title">Ciclo <span class="gradient-text">PDCA</span> aplicado a SlideHub</div>
+                <div class="pdca-grid stagger">
+                    <div class="pdca-card plan">
+                        <div class="phase-letter">P</div>
+                        <div class="phase-name" style="color: var(--accent-blue);">Plan</div>
+                        <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">
+                            Se establecieron claramente las bases y requerimientos del proyecto, analizando el sistema
+                            original para segmentar y estructurar el trabajo en 6 fases iterativas, asegurando una
+                            visión clara de la arquitectura basada en microservicios hacia un monolito robusto.
+                        </p>
+                    </div>
+                    <div class="pdca-card do-phase">
+                        <div class="phase-letter">D</div>
+                        <div class="phase-name" style="color: var(--accent-green);">Do</div>
+                        <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">
+                            Se ejecutó el desarrollo construyendo primero el núcleo de sincronización, la interfaz
+                            táctil y por último la capa de inteligencia artificial unificando dependencias clave para
+                            orquestar la seguridad en Spring Boot de manera segura y escalable.
+                        </p>
+                    </div>
+                    <div class="pdca-card check">
+                        <div class="phase-letter">C</div>
+                        <div class="phase-name" style="color: var(--accent-orange);">Check</div>
+                        <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">
+                            Después de cada fase estructural, se auditaron y validaron los contratos de las API REST, el
+                            estado global visual de las pantallas y el cumplimiento eficaz del flujo de control usando
+                            pruebas funcionales, asegurando el acoplamiento óptimo de la nube.
+                        </p>
+                    </div>
+                    <div class="pdca-card act">
+                        <div class="phase-letter">A</div>
+                        <div class="phase-name" style="color: var(--accent-purple);">Act</div>
+                        <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">
+                            Incorporando los aprendizajes de cada ciclo, se afinó la configuración del servidor web
+                            unificando todo en un punto de entrada central, resolviendo deficiencias de escalabilidad,
+                            refinando procesos con migraciones e incrementando la resiliencia en la fase productiva.
+                        </p>
+                    </div>
+                </div>
             </div>
-            <div class="iso-desc">
-                El sistema utiliza servicios de Amazon Web Services para el almacenamiento seguro y la manipulación escalable de los recursos gráficos de forma serverless.
+        </div>
+
+        <!-- ========== SLIDE 7: AWS S3 & LAMBDA ========== -->
+        <div class="slide" data-slide="6">
+            <div class="slide-content">
+                <div class="iso-header">
+                    <span class="iso-badge" style="background: rgba(37,99,235,0.12); color: var(--accent-blue);">AWS
+                        Cloud</span>
+                    <span class="slide-label" style="margin: 0;">Integración de S3 y Lambda</span>
+                </div>
+                <div class="slide-title" style="font-size: clamp(28px, 3vw, 40px);">
+                    Procesamiento y <span class="gradient-text">almacenamiento</span> escalable
+                </div>
+                <div class="iso-desc">
+                    El sistema utiliza servicios de Amazon Web Services para el almacenamiento seguro y la manipulación
+                    escalable de los recursos gráficos de forma serverless.
+                </div>
+                <div class="iso-items stagger">
+                    <div class="iso-item">
+                        <div class="iso-item-icon" style="background: rgba(220,38,38,0.12); color: var(--accent-red);">
+                            S3</div>
+                        <div>
+                            <div class="iso-item-title">Amazon S3 — Object Storage</div>
+                            <div class="iso-item-desc">Los recursos, diapositivas y activos generados por los usuarios
+                                se almacenan en buckets de S3 integrados directamente mediante el SDK v2 de Java de
+                                forma eficiente.</div>
+                        </div>
+                    </div>
+                    <div class="iso-item">
+                        <div class="iso-item-icon"
+                            style="background: rgba(217,119,6,0.12); color: var(--accent-orange);">&#9889;</div>
+                        <div>
+                            <div class="iso-item-title">AWS Lambda — Serverless</div>
+                            <div class="iso-item-desc">Las funciones basadas en eventos permiten optimizar o transformar
+                                recursos bajo demanda minimizando los costos estructurales y de procesamiento del
+                                monolito central.</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="iso-items stagger">
-                <div class="iso-item">
-                    <div class="iso-item-icon" style="background: rgba(220,38,38,0.12); color: var(--accent-red);">S3</div>
+        </div>
+
+        <!-- ========== SLIDE 8: ISO 12207 ========== -->
+        <div class="slide" data-slide="7">
+            <div class="slide-content">
+                <div class="iso-header">
+                    <span class="iso-badge"
+                        style="background: rgba(5,150,105,0.12); color: var(--accent-green);">ISO/IEC 12207</span>
+                    <span class="slide-label" style="margin: 0;">Ciclo de Vida del Software</span>
+                </div>
+                <div class="slide-title" style="font-size: clamp(28px, 3vw, 40px);">
+                    Procesos del <span class="gradient-text">ciclo de vida</span> aplicados
+                </div>
+                <div class="iso-desc">
+                    ISO 12207 define los procesos para adquirir, suministrar, desarrollar, operar y mantener software.
+                    SlideHub implementa los siguientes procesos clave:
+                </div>
+                <div class="two-cols">
                     <div>
-                        <div class="iso-item-title">Amazon S3 — Object Storage</div>
-                        <div class="iso-item-desc">Los recursos, diapositivas y activos generados por los usuarios se almacenan en buckets de S3 integrados directamente mediante el SDK v2 de Java de forma eficiente.</div>
+                        <div class="col-title">Procesos Principales</div>
+                        <div class="iso-items stagger">
+                            <div class="iso-item">
+                                <div class="iso-item-icon"
+                                    style="background: rgba(37,99,235,0.12); color: var(--accent-blue);">&#9997;</div>
+                                <div>
+                                    <div class="iso-item-title">Desarrollo</div>
+                                    <div class="iso-item-desc">Análisis de requisitos (30 HU), diseño arquitectónico
+                                        (monolito modular), codificación en Java 21, integración y testing con JUnit 5.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="iso-item">
+                                <div class="iso-item-icon"
+                                    style="background: rgba(5,150,105,0.12); color: var(--accent-green);">&#9654;</div>
+                                <div>
+                                    <div class="iso-item-title">Operación</div>
+                                    <div class="iso-item-desc">Despliegue en Render con perfiles prod, variables de
+                                        entorno, y health checks. Operación continua con Redis, PostgreSQL y MongoDB
+                                        gestionados.</div>
+                                </div>
+                            </div>
+                            <div class="iso-item">
+                                <div class="iso-item-icon"
+                                    style="background: rgba(124,58,237,0.12); color: var(--accent-purple);">&#8635;
+                                </div>
+                                <div>
+                                    <div class="iso-item-title">Mantenimiento</div>
+                                    <div class="iso-item-desc">Migraciones Flyway, versionado semántico en commits,
+                                        documentación por fases (FASE-0 a FASE-6 RESUMEN).</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="iso-item">
-                    <div class="iso-item-icon" style="background: rgba(217,119,6,0.12); color: var(--accent-orange);">&#9889;</div>
                     <div>
-                        <div class="iso-item-title">AWS Lambda — Serverless</div>
-                        <div class="iso-item-desc">Las funciones basadas en eventos permiten optimizar o transformar recursos bajo demanda minimizando los costos estructurales y de procesamiento del monolito central.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========== SLIDE 8: ISO 12207 ========== -->
-    <div class="slide" data-slide="7">
-        <div class="slide-content">
-            <div class="iso-header">
-                <span class="iso-badge" style="background: rgba(5,150,105,0.12); color: var(--accent-green);">ISO/IEC 12207</span>
-                <span class="slide-label" style="margin: 0;">Ciclo de Vida del Software</span>
-            </div>
-            <div class="slide-title" style="font-size: clamp(28px, 3vw, 40px);">
-                Procesos del <span class="gradient-text">ciclo de vida</span> aplicados
-            </div>
-            <div class="iso-desc">
-                ISO 12207 define los procesos para adquirir, suministrar, desarrollar, operar y mantener software.
-                SlideHub implementa los siguientes procesos clave:
-            </div>
-            <div class="two-cols">
-                <div>
-                    <div class="col-title">Procesos Principales</div>
-                    <div class="iso-items stagger">
-                        <div class="iso-item">
-                            <div class="iso-item-icon" style="background: rgba(37,99,235,0.12); color: var(--accent-blue);">&#9997;</div>
-                            <div>
-                                <div class="iso-item-title">Desarrollo</div>
-                                <div class="iso-item-desc">Análisis de requisitos (30 HU), diseño arquitectónico (monolito modular), codificación en Java 21, integración y testing con JUnit 5.</div>
+                        <div class="col-title">Procesos de Soporte</div>
+                        <div class="iso-items stagger">
+                            <div class="iso-item">
+                                <div class="iso-item-icon"
+                                    style="background: rgba(217,119,6,0.12); color: var(--accent-orange);">&#128203;
+                                </div>
+                                <div>
+                                    <div class="iso-item-title">Documentación</div>
+                                    <div class="iso-item-desc">README, AGENTS.md (spec técnica), CLAUDE.md (guías de
+                                        código), DEPLOYMENT.md, análisis del módulo original.</div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="iso-item">
-                            <div class="iso-item-icon" style="background: rgba(5,150,105,0.12); color: var(--accent-green);">&#9654;</div>
-                            <div>
-                                <div class="iso-item-title">Operación</div>
-                                <div class="iso-item-desc">Despliegue en Render con perfiles prod, variables de entorno, y health checks. Operación continua con Redis, PostgreSQL y MongoDB gestionados.</div>
+                            <div class="iso-item">
+                                <div class="iso-item-icon"
+                                    style="background: rgba(8,145,178,0.12); color: var(--accent-cyan);">&#128269;</div>
+                                <div>
+                                    <div class="iso-item-title">Gestión de Configuración</div>
+                                    <div class="iso-item-desc">Git con commits descriptivos. Spring Cloud Config Server
+                                        centralizado. Profiles dev/prod separados. Variables de entorno para secretos.
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="iso-item">
-                            <div class="iso-item-icon" style="background: rgba(124,58,237,0.12); color: var(--accent-purple);">&#8635;</div>
-                            <div>
-                                <div class="iso-item-title">Mantenimiento</div>
-                                <div class="iso-item-desc">Migraciones Flyway, versionado semántico en commits, documentación por fases (FASE-0 a FASE-6 RESUMEN).</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <div class="col-title">Procesos de Soporte</div>
-                    <div class="iso-items stagger">
-                        <div class="iso-item">
-                            <div class="iso-item-icon" style="background: rgba(217,119,6,0.12); color: var(--accent-orange);">&#128203;</div>
-                            <div>
-                                <div class="iso-item-title">Documentación</div>
-                                <div class="iso-item-desc">README, AGENTS.md (spec técnica), CLAUDE.md (guías de código), DEPLOYMENT.md, análisis del módulo original.</div>
-                            </div>
-                        </div>
-                        <div class="iso-item">
-                            <div class="iso-item-icon" style="background: rgba(8,145,178,0.12); color: var(--accent-cyan);">&#128269;</div>
-                            <div>
-                                <div class="iso-item-title">Gestión de Configuración</div>
-                                <div class="iso-item-desc">Git con commits descriptivos. Spring Cloud Config Server centralizado. Profiles dev/prod separados. Variables de entorno para secretos.</div>
-                            </div>
-                        </div>
-                        <div class="iso-item">
-                            <div class="iso-item-icon" style="background: rgba(219,39,119,0.12); color: var(--accent-pink);">&#10004;</div>
-                            <div>
-                                <div class="iso-item-title">Verificación y Validación</div>
-                                <div class="iso-item-desc">Tests con MockMvc, validación contra criterios de aceptación, verificación de contratos REST entre servicios.</div>
+                            <div class="iso-item">
+                                <div class="iso-item-icon"
+                                    style="background: rgba(219,39,119,0.12); color: var(--accent-pink);">&#10004;</div>
+                                <div>
+                                    <div class="iso-item-title">Verificación y Validación</div>
+                                    <div class="iso-item-desc">Tests con MockMvc, validación contra criterios de
+                                        aceptación, verificación de contratos REST entre servicios.</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- ========== SLIDE 9: ISO 27001 ========== -->
-    <div class="slide" data-slide="8">
-        <div class="slide-content">
-            <div class="iso-header">
-                <span class="iso-badge" style="background: rgba(220,38,38,0.12); color: var(--accent-red);">ISO/IEC 27001</span>
-                <span class="slide-label" style="margin: 0;">Seguridad de la Información</span>
-            </div>
-            <div class="slide-title" style="font-size: clamp(28px, 3vw, 40px);">
-                Controles de <span class="gradient-text">seguridad</span> implementados
-            </div>
-            <div class="iso-desc">
-                ISO 27001 establece un marco para el Sistema de Gestión de Seguridad de la Información (SGSI).
-                SlideHub aplica controles del Anexo A relevantes para una aplicación web distribuida.
-            </div>
-            <div class="cards-grid stagger">
-                <div class="card">
-                    <div class="card-icon" style="background: rgba(37,99,235,0.12); color: var(--accent-blue);">&#128274;</div>
-                    <div class="card-title">A.9 — Control de Acceso</div>
-                    <div class="card-text">Spring Security con roles (HOST, PRESENTER). Rutas protegidas por rol. Sesiones invalidadas en logout. OAuth2 como segundo factor de identidad.</div>
+        <!-- ========== SLIDE 9: ISO 27001 ========== -->
+        <div class="slide" data-slide="8">
+            <div class="slide-content">
+                <div class="iso-header">
+                    <span class="iso-badge" style="background: rgba(220,38,38,0.12); color: var(--accent-red);">ISO/IEC
+                        27001</span>
+                    <span class="slide-label" style="margin: 0;">Seguridad de la Información</span>
                 </div>
-                <div class="card">
-                    <div class="card-icon" style="background: rgba(5,150,105,0.12); color: var(--accent-green);">&#128272;</div>
-                    <div class="card-title">A.10 — Criptografía</div>
-                    <div class="card-text">Contraseñas hasheadas con BCrypt (factor 10). Tokens OAuth2 encriptados en PostgreSQL. SSL obligatorio en Aiven (PostgreSQL). HTTPS en producción.</div>
+                <div class="slide-title" style="font-size: clamp(28px, 3vw, 40px);">
+                    Controles de <span class="gradient-text">seguridad</span> implementados
                 </div>
-                <div class="card">
-                    <div class="card-icon" style="background: rgba(217,119,6,0.12); color: var(--accent-orange);">&#128421;</div>
-                    <div class="card-title">A.12 — Seguridad Operacional</div>
-                    <div class="card-text">Variables de entorno para secretos (nunca hardcoded). Perfiles separados dev/prod. Health checks y actuator para monitoreo. Logs con SLF4J estructurado.</div>
+                <div class="iso-desc">
+                    ISO 27001 establece un marco para el Sistema de Gestión de Seguridad de la Información (SGSI).
+                    SlideHub aplica controles del Anexo A relevantes para una aplicación web distribuida.
                 </div>
-                <div class="card">
-                    <div class="card-icon" style="background: rgba(124,58,237,0.12); color: var(--accent-purple);">&#127760;</div>
-                    <div class="card-title">A.13 — Seguridad en Comunicaciones</div>
-                    <div class="card-text">Un único punto de entrada en <code>slidehub-service :8080</code>. CORS y headers de seguridad configurados centralmente. Módulos internos sin exposición directa.</div>
-                </div>
-                <div class="card">
-                    <div class="card-icon" style="background: rgba(8,145,178,0.12); color: var(--accent-cyan);">&#128187;</div>
-                    <div class="card-title">A.14 — Desarrollo Seguro</div>
-                    <div class="card-text">Validación de inputs en boundaries. Flyway para migraciones controladas (nunca ddl-auto=create). Inyección por constructor (no reflexión). Sin SDKs innecesarios.</div>
-                </div>
-                <div class="card">
-                    <div class="card-icon" style="background: rgba(219,39,119,0.12); color: var(--accent-pink);">&#128230;</div>
-                    <div class="card-title">A.15 — Relaciones con Proveedores</div>
-                    <div class="card-text">APIs externas (Gemini, Groq, Resend) accedidas solo vía WebClient HTTP — sin SDKs que inyecten dependencias opacas. AWS SDK v2 como excepción justificada (SigV4).</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========== SLIDE 10: PIPELINE CI/CD ========== -->
-    <div class="slide" data-slide="9">
-        <div class="slide-content">
-            <div class="slide-label">Integración y Despliegue Continuo</div>
-            <div class="slide-title">Pipeline <span class="gradient-text">CI/CD</span></div>
-            <div class="slide-subtitle">Cada push a <code style="background:var(--bg-card); border:1px solid var(--border); padding:2px 8px; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:14px;">main</code> dispara el pipeline completo en Render para <code style="background:var(--bg-card); border:1px solid var(--border); padding:2px 8px; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:14px;">slidehub-service</code>.</div>
-
-            <div class="pipeline stagger">
-                <div class="pipeline-stage">
-                    <div class="stage-dot" style="border-color: var(--accent-blue); color: var(--accent-blue);">&#128196;</div>
-                    <div class="stage-name" style="color: var(--accent-blue);">Source</div>
-                    <div class="stage-detail">Push a main<br>Git webhook<br>Render detecta cambios</div>
-                </div>
-                <div class="pipeline-stage">
-                    <div class="stage-dot" style="border-color: var(--accent-cyan); color: var(--accent-cyan);">&#128295;</div>
-                    <div class="stage-name" style="color: var(--accent-cyan);">Build</div>
-                    <div class="stage-detail">Maven wrapper<br><code style="font-size:10px">./mvnw -pl service package -am</code><br>Compilación Java 21</div>
-                </div>
-                <div class="pipeline-stage">
-                    <div class="stage-dot" style="border-color: var(--accent-green); color: var(--accent-green);">&#9989;</div>
-                    <div class="stage-name" style="color: var(--accent-green);">Test</div>
-                    <div class="stage-detail">JUnit 5 + MockMvc<br>Tests unitarios<br>Validación de contratos</div>
-                </div>
-                <div class="pipeline-stage">
-                    <div class="stage-dot" style="border-color: var(--accent-orange); color: var(--accent-orange);">&#128230;</div>
-                    <div class="stage-name" style="color: var(--accent-orange);">Package</div>
-                    <div class="stage-detail">JAR ejecutable<br>spring-boot-maven-plugin<br>Perfil prod activado</div>
-                </div>
-                <div class="pipeline-stage">
-                    <div class="stage-dot" style="border-color: var(--accent-purple); color: var(--accent-purple);">&#9729;</div>
-                    <div class="stage-name" style="color: var(--accent-purple);">Deploy</div>
-                    <div class="stage-detail">Render Web Service<br><code style="font-size:10px">java -jar target/*.jar</code><br>Zero-downtime</div>
-                </div>
-                <div class="pipeline-stage">
-                    <div class="stage-dot" style="border-color: var(--accent-pink); color: var(--accent-pink);">&#128200;</div>
-                    <div class="stage-name" style="color: var(--accent-pink);">Monitor</div>
-                    <div class="stage-detail">/actuator/health<br>Logs centralizados<br>Redis/Postgres/Mongo</div>
-                </div>
-            </div>
-
-            <div class="cards-grid" style="margin-top: 36px;">
-                <div class="card">
-                    <div class="card-title">Render — Web Service único</div>
-                    <div class="card-text">Build: <code>./mvnw -pl slidehub-service package -am</code> · Start: <code>java -jar slidehub-service/target/*.jar</code> · Publicado en <strong>slide.lat</strong></div>
-                </div>
-                <div class="card">
-                    <div class="card-title">Configuración por Perfiles</div>
-                    <div class="card-text"><code>SPRING_PROFILES_ACTIVE=prod</code> activa <code>application-prod.properties</code> con DSNs reales de Aiven, Atlas y Upstash Redis.</div>
-                </div>
-                <div class="card">
-                    <div class="card-title">Flyway Migrations</div>
-                    <div class="card-text">Evolución controlada del schema PostgreSQL. En producción solo <code>ddl-auto=validate</code> — nunca generación automática de tablas.</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========== SLIDE 11: STACK TECNOLÓGICO ========== -->
-    <div class="slide" data-slide="10">
-        <div class="slide-content">
-            <div class="slide-label">Stack Tecnológico</div>
-            <div class="slide-title">Tecnologías <span class="gradient-text">clave</span></div>
-            <div class="two-cols stagger">
-                <div>
-                    <div class="col-title">Backend & Datos</div>
-                    <div class="tech-grid">
-                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-blue);"></span> Java 21 LTS</div>
-                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-green);"></span> Spring Boot 4.0.3</div>
-                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-purple);"></span> Spring Cloud 2025</div>
-                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-red);"></span> Redis (Upstash)</div>
-                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-cyan);"></span> PostgreSQL (Aiven)</div>
-                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-green);"></span> MongoDB Atlas</div>
-                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-orange);"></span> Amazon S3</div>
-                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-pink);"></span> Flyway</div>
+                <div class="cards-grid stagger">
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(37,99,235,0.12); color: var(--accent-blue);">
+                            &#128274;</div>
+                        <div class="card-title">A.9 — Control de Acceso</div>
+                        <div class="card-text">Spring Security con roles (HOST, PRESENTER). Rutas protegidas por rol.
+                            Sesiones invalidadas en logout. OAuth2 como segundo factor de identidad.</div>
                     </div>
-                </div>
-                <div>
-                    <div class="col-title">Frontend & Integraciones</div>
-                    <div class="tech-grid">
-                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-orange);"></span> Thymeleaf 3</div>
-                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-blue);"></span> Bootstrap 5.3</div>
-                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-cyan);"></span> Vanilla JS (ES6)</div>
-                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-purple);"></span> Gemini Vision API</div>
-                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-green);"></span> Groq LLM API</div>
-                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-red);"></span> Google Drive API v3</div>
-                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-pink);"></span> Resend (email)</div>
-                        <div class="tech-badge"><span class="tech-dot" style="background: var(--accent-orange);"></span> OAuth2 (GitHub + Google)</div>
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(5,150,105,0.12); color: var(--accent-green);">
+                            &#128272;</div>
+                        <div class="card-title">A.10 — Criptografía</div>
+                        <div class="card-text">Contraseñas hasheadas con BCrypt (factor 10). Tokens OAuth2 encriptados
+                            en PostgreSQL. SSL obligatorio en Aiven (PostgreSQL). HTTPS en producción.</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(217,119,6,0.12); color: var(--accent-orange);">
+                            &#128421;</div>
+                        <div class="card-title">A.12 — Seguridad Operacional</div>
+                        <div class="card-text">Variables de entorno para secretos (nunca hardcoded). Perfiles separados
+                            dev/prod. Health checks y actuator para monitoreo. Logs con SLF4J estructurado.</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(124,58,237,0.12); color: var(--accent-purple);">
+                            &#127760;</div>
+                        <div class="card-title">A.13 — Seguridad en Comunicaciones</div>
+                        <div class="card-text">Un único punto de entrada en <code>slidehub-service :8080</code>. CORS y
+                            headers de seguridad configurados centralmente. Módulos internos sin exposición directa.
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(8,145,178,0.12); color: var(--accent-cyan);">
+                            &#128187;</div>
+                        <div class="card-title">A.14 — Desarrollo Seguro</div>
+                        <div class="card-text">Validación de inputs en boundaries. Flyway para migraciones controladas
+                            (nunca ddl-auto=create). Inyección por constructor (no reflexión). Sin SDKs innecesarios.
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon" style="background: rgba(219,39,119,0.12); color: var(--accent-pink);">
+                            &#128230;</div>
+                        <div class="card-title">A.15 — Relaciones con Proveedores</div>
+                        <div class="card-text">APIs externas (Gemini, Groq, Resend) accedidas solo vía WebClient HTTP —
+                            sin SDKs que inyecten dependencias opacas. AWS SDK v2 como excepción justificada (SigV4).
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- ========== SLIDE 12: CIERRE ========== -->
-    <div class="slide title-slide" data-slide="11">
-        <div class="slide-content">
-            <div class="title-logo">&#9670;</div>
-            <div class="title-main" style="font-size: clamp(40px, 5vw, 64px);">Gracias</div>
-            <div class="title-tagline">SlideHub — Sistema de Presentación Multi-Pantalla</div>
-            <div class="slide-subtitle" style="text-align: center; margin: 0 auto 32px;">
-                Monolito modular &middot; 30 historias de usuario &middot; 7 fases de desarrollo<br>
-                Java 21 &middot; Spring Boot 4 &middot; IA Generativa &middot; <strong>slide.lat</strong>
-            </div>
-            <div class="title-chips">
-                <span class="chip" style="border-color: var(--accent-blue); color: var(--accent-blue);">PDCA</span>
-                <span class="chip" style="border-color: var(--accent-green); color: var(--accent-green);">ISO 15504</span>
-                <span class="chip" style="border-color: var(--accent-orange); color: var(--accent-orange);">ISO 12207</span>
-                <span class="chip" style="border-color: var(--accent-red); color: var(--accent-red);">ISO 27001</span>
-                <span class="chip" style="border-color: var(--accent-purple); color: var(--accent-purple);">CI/CD</span>
+        <!-- ========== SLIDE 10: PIPELINE CI/CD ========== -->
+        <div class="slide" data-slide="9">
+            <div class="slide-content">
+                <div class="slide-label">Integración y Despliegue Continuo</div>
+                <div class="slide-title">Pipeline <span class="gradient-text">CI/CD</span></div>
+                <div class="slide-subtitle">Cada push a <code
+                        style="background:var(--bg-card); border:1px solid var(--border); padding:2px 8px; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:14px;">main</code>
+                    dispara el pipeline completo en Render para <code
+                        style="background:var(--bg-card); border:1px solid var(--border); padding:2px 8px; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:14px;">slidehub-service</code>.
+                </div>
+
+                <div class="pipeline stagger">
+                    <div class="pipeline-stage">
+                        <div class="stage-dot" style="border-color: var(--accent-blue); color: var(--accent-blue);">
+                            &#128196;</div>
+                        <div class="stage-name" style="color: var(--accent-blue);">Source</div>
+                        <div class="stage-detail">Push a main<br>Git webhook<br>Render detecta cambios</div>
+                    </div>
+                    <div class="pipeline-stage">
+                        <div class="stage-dot" style="border-color: var(--accent-cyan); color: var(--accent-cyan);">
+                            &#128295;</div>
+                        <div class="stage-name" style="color: var(--accent-cyan);">Build</div>
+                        <div class="stage-detail">Maven wrapper<br><code
+                                style="font-size:10px">./mvnw -pl service package -am</code><br>Compilación Java 21
+                        </div>
+                    </div>
+                    <div class="pipeline-stage">
+                        <div class="stage-dot" style="border-color: var(--accent-green); color: var(--accent-green);">
+                            &#9989;</div>
+                        <div class="stage-name" style="color: var(--accent-green);">Test</div>
+                        <div class="stage-detail">JUnit 5 + MockMvc<br>Tests unitarios<br>Validación de contratos</div>
+                    </div>
+                    <div class="pipeline-stage">
+                        <div class="stage-dot" style="border-color: var(--accent-orange); color: var(--accent-orange);">
+                            &#128230;</div>
+                        <div class="stage-name" style="color: var(--accent-orange);">Package</div>
+                        <div class="stage-detail">JAR ejecutable<br>spring-boot-maven-plugin<br>Perfil prod activado
+                        </div>
+                    </div>
+                    <div class="pipeline-stage">
+                        <div class="stage-dot" style="border-color: var(--accent-purple); color: var(--accent-purple);">
+                            &#9729;</div>
+                        <div class="stage-name" style="color: var(--accent-purple);">Deploy</div>
+                        <div class="stage-detail">Render Web Service<br><code
+                                style="font-size:10px">java -jar target/*.jar</code><br>Zero-downtime</div>
+                    </div>
+                    <div class="pipeline-stage">
+                        <div class="stage-dot" style="border-color: var(--accent-pink); color: var(--accent-pink);">
+                            &#128200;</div>
+                        <div class="stage-name" style="color: var(--accent-pink);">Monitor</div>
+                        <div class="stage-detail">/actuator/health<br>Logs centralizados<br>Redis/Postgres/Mongo</div>
+                    </div>
+                </div>
+
+                <div class="cards-grid" style="margin-top: 36px;">
+                    <div class="card">
+                        <div class="card-title">Render — Web Service único</div>
+                        <div class="card-text">Build: <code>./mvnw -pl slidehub-service package -am</code> · Start:
+                            <code>java -jar slidehub-service/target/*.jar</code> · Publicado en
+                            <strong>slide.lat</strong></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Configuración por Perfiles</div>
+                        <div class="card-text"><code>SPRING_PROFILES_ACTIVE=prod</code> activa
+                            <code>application-prod.properties</code> con DSNs reales de Aiven, Atlas y Upstash Redis.
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Flyway Migrations</div>
+                        <div class="card-text">Evolución controlada del schema PostgreSQL. En producción solo
+                            <code>ddl-auto=validate</code> — nunca generación automática de tablas.</div>
+                    </div>
+                </div>
             </div>
         </div>
+
+        <!-- ========== SLIDE 11: STACK TECNOLÓGICO ========== -->
+        <div class="slide" data-slide="10">
+            <div class="slide-content">
+                <div class="slide-label">Stack Tecnológico</div>
+                <div class="slide-title">Tecnologías <span class="gradient-text">clave</span></div>
+                <div class="two-cols stagger">
+                    <div>
+                        <div class="col-title">Backend & Datos</div>
+                        <div class="tech-grid">
+                            <div class="tech-badge"><span class="tech-dot"
+                                    style="background: var(--accent-blue);"></span> Java 21 LTS</div>
+                            <div class="tech-badge"><span class="tech-dot"
+                                    style="background: var(--accent-green);"></span> Spring Boot 4.0.3</div>
+                            <div class="tech-badge"><span class="tech-dot"
+                                    style="background: var(--accent-purple);"></span> Spring Cloud 2025</div>
+                            <div class="tech-badge"><span class="tech-dot"
+                                    style="background: var(--accent-red);"></span> Redis (Upstash)</div>
+                            <div class="tech-badge"><span class="tech-dot"
+                                    style="background: var(--accent-cyan);"></span> PostgreSQL (Aiven)</div>
+                            <div class="tech-badge"><span class="tech-dot"
+                                    style="background: var(--accent-green);"></span> MongoDB Atlas</div>
+                            <div class="tech-badge"><span class="tech-dot"
+                                    style="background: var(--accent-orange);"></span> Amazon S3</div>
+                            <div class="tech-badge"><span class="tech-dot"
+                                    style="background: var(--accent-pink);"></span> Flyway</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="col-title">Frontend & Integraciones</div>
+                        <div class="tech-grid">
+                            <div class="tech-badge"><span class="tech-dot"
+                                    style="background: var(--accent-orange);"></span> Thymeleaf 3</div>
+                            <div class="tech-badge"><span class="tech-dot"
+                                    style="background: var(--accent-blue);"></span> Bootstrap 5.3</div>
+                            <div class="tech-badge"><span class="tech-dot"
+                                    style="background: var(--accent-cyan);"></span> Vanilla JS (ES6)</div>
+                            <div class="tech-badge"><span class="tech-dot"
+                                    style="background: var(--accent-purple);"></span> Gemini Vision API</div>
+                            <div class="tech-badge"><span class="tech-dot"
+                                    style="background: var(--accent-green);"></span> Groq LLM API</div>
+                            <div class="tech-badge"><span class="tech-dot"
+                                    style="background: var(--accent-red);"></span> Google Drive API v3</div>
+                            <div class="tech-badge"><span class="tech-dot"
+                                    style="background: var(--accent-pink);"></span> Resend (email)</div>
+                            <div class="tech-badge"><span class="tech-dot"
+                                    style="background: var(--accent-orange);"></span> OAuth2 (GitHub + Google)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== SLIDE 12: CIERRE ========== -->
+        <div class="slide title-slide" data-slide="11">
+            <div class="slide-content">
+                <div class="title-logo">&#9670;</div>
+                <div class="title-main" style="font-size: clamp(40px, 5vw, 64px);">Gracias</div>
+                <div class="title-tagline">SlideHub — Sistema de Presentación Multi-Pantalla</div>
+                <div class="slide-subtitle" style="text-align: center; margin: 0 auto 32px;">
+                    Monolito modular &middot; 30 historias de usuario &middot; 7 fases de desarrollo<br>
+                    Java 21 &middot; Spring Boot 4 &middot; IA Generativa &middot; <strong>slide.lat</strong>
+                </div>
+                <div class="title-chips">
+                    <span class="chip" style="border-color: var(--accent-blue); color: var(--accent-blue);">PDCA</span>
+                    <span class="chip" style="border-color: var(--accent-green); color: var(--accent-green);">ISO
+                        15504</span>
+                    <span class="chip" style="border-color: var(--accent-orange); color: var(--accent-orange);">ISO
+                        12207</span>
+                    <span class="chip" style="border-color: var(--accent-red); color: var(--accent-red);">ISO
+                        27001</span>
+                    <span class="chip"
+                        style="border-color: var(--accent-purple); color: var(--accent-purple);">CI/CD</span>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-</div>
+    <script>
+        const wrapper = document.getElementById('slidesWrapper');
+        const slides = document.querySelectorAll('.slide');
+        const progressBar = document.getElementById('progressBar');
+        const currentSlideEl = document.getElementById('currentSlide');
+        const totalSlidesEl = document.getElementById('totalSlides');
+        const totalSlides = slides.length;
 
-<script>
-    const wrapper = document.getElementById('slidesWrapper');
-    const slides = document.querySelectorAll('.slide');
-    const progressBar = document.getElementById('progressBar');
-    const currentSlideEl = document.getElementById('currentSlide');
-    const totalSlidesEl = document.getElementById('totalSlides');
-    const totalSlides = slides.length;
+        let currentIndex = 0;
+        let isAnimating = false;
 
-    let currentIndex = 0;
-    let isAnimating = false;
+        totalSlidesEl.textContent = String(totalSlides).padStart(2, '0');
 
-    totalSlidesEl.textContent = String(totalSlides).padStart(2, '0');
+        function goToSlide(index) {
+            if (index < 0 || index >= totalSlides || isAnimating) return;
+            isAnimating = true;
 
-    function goToSlide(index) {
-        if (index < 0 || index >= totalSlides || isAnimating) return;
-        isAnimating = true;
+            slides[currentIndex].classList.remove('active');
+            currentIndex = index;
 
-        slides[currentIndex].classList.remove('active');
-        currentIndex = index;
+            wrapper.style.transform = `translateY(-${currentIndex * 100}vh)`;
+            progressBar.style.width = `${((currentIndex + 1) / totalSlides) * 100}%`;
+            currentSlideEl.textContent = String(currentIndex + 1).padStart(2, '0');
 
-        wrapper.style.transform = `translateY(-${currentIndex * 100}vh)`;
-        progressBar.style.width = `${((currentIndex + 1) / totalSlides) * 100}%`;
-        currentSlideEl.textContent = String(currentIndex + 1).padStart(2, '0');
-
-        setTimeout(() => {
-            slides[currentIndex].classList.add('active');
-            isAnimating = false;
-        }, 200);
-    }
-
-    // Keyboard navigation
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
-            e.preventDefault();
-            goToSlide(currentIndex + 1);
-        } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
-            e.preventDefault();
-            goToSlide(currentIndex - 1);
-        } else if (e.key === 'Home') {
-            e.preventDefault();
-            goToSlide(0);
-        } else if (e.key === 'End') {
-            e.preventDefault();
-            goToSlide(totalSlides - 1);
+            setTimeout(() => {
+                slides[currentIndex].classList.add('active');
+                isAnimating = false;
+            }, 200);
         }
-    });
 
-    // Mouse wheel navigation
-    let wheelTimeout = null;
-    document.addEventListener('wheel', (e) => {
-        e.preventDefault();
-        if (wheelTimeout) return;
-        wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 800);
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+                e.preventDefault();
+                goToSlide(currentIndex + 1);
+            } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+                e.preventDefault();
+                goToSlide(currentIndex - 1);
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                goToSlide(0);
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                goToSlide(totalSlides - 1);
+            }
+        });
 
-        if (e.deltaY > 0) {
-            goToSlide(currentIndex + 1);
-        } else if (e.deltaY < 0) {
-            goToSlide(currentIndex - 1);
-        }
-    }, { passive: false });
+        // Mouse wheel navigation
+        let wheelTimeout = null;
+        document.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            if (wheelTimeout) return;
+            wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 800);
 
-    // Touch navigation
-    let touchStartY = 0;
-    document.addEventListener('touchstart', (e) => {
-        touchStartY = e.touches[0].clientY;
-    });
+            if (e.deltaY > 0) {
+                goToSlide(currentIndex + 1);
+            } else if (e.deltaY < 0) {
+                goToSlide(currentIndex - 1);
+            }
+        }, { passive: false });
 
-    document.addEventListener('touchend', (e) => {
-        const diff = touchStartY - e.changedTouches[0].clientY;
-        if (Math.abs(diff) > 50) {
-            if (diff > 0) goToSlide(currentIndex + 1);
-            else goToSlide(currentIndex - 1);
-        }
-    });
+        // Touch navigation
+        let touchStartY = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        });
 
-    // Click on progress area to navigate
-    document.querySelector('.slide-counter').addEventListener('click', () => {
-        const target = prompt(`Ir a slide (1-${totalSlides}):`);
-        if (target) goToSlide(parseInt(target) - 1);
-    });
-</script>
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartY - e.changedTouches[0].clientY;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) goToSlide(currentIndex + 1);
+                else goToSlide(currentIndex - 1);
+            }
+        });
+
+        // Click on progress area to navigate
+        document.querySelector('.slide-counter').addEventListener('click', () => {
+            const target = prompt(`Ir a slide (1-${totalSlides}):`);
+            if (target) goToSlide(parseInt(target) - 1);
+        });
+    </script>
 
 </body>
+
 </html>
