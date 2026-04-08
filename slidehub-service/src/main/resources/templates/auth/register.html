@@ -51,8 +51,30 @@
 
                 <div class="mb-4">
                     <label for="phoneNumber" class="sh-input-label">Número de teléfono</label>
-                    <input type="tel" class="sh-input" id="phoneNumber" name="phoneNumber" autocomplete="tel"
-                        inputmode="tel" placeholder="+57 300 123 4567" pattern="^\+?[0-9()\-\s]{7,20}$" required>
+                    <div class="grid grid-cols-3 gap-2">
+                        <select id="phoneCountry" class="sh-input col-span-1" aria-label="País e indicativo">
+                            <option value="+57" selected>🇨🇴 +57</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+52">🇲🇽 +52</option>
+                            <option value="+54">🇦🇷 +54</option>
+                            <option value="+56">🇨🇱 +56</option>
+                            <option value="+51">🇵🇪 +51</option>
+                            <option value="+593">🇪🇨 +593</option>
+                            <option value="+58">🇻🇪 +58</option>
+                            <option value="+34">🇪🇸 +34</option>
+                            <option value="+55">🇧🇷 +55</option>
+                            <option value="+44">🇬🇧 +44</option>
+                            <option value="+49">🇩🇪 +49</option>
+                            <option value="+33">🇫🇷 +33</option>
+                            <option value="+39">🇮🇹 +39</option>
+                            <option value="+81">🇯🇵 +81</option>
+                            <option value="+82">🇰🇷 +82</option>
+                            <option value="+86">🇨🇳 +86</option>
+                        </select>
+                        <input type="tel" class="sh-input col-span-2" id="phoneLocal" autocomplete="tel-national"
+                            inputmode="tel" placeholder="3001234567" required>
+                    </div>
+                    <input type="hidden" id="phoneNumber" name="phoneNumber" required>
                     <div id="phone-feedback" class="pwd-feedback warn mt-1 text-xs">Ingresa un teléfono válido (7-20
                         caracteres).</div>
                 </div>
@@ -113,6 +135,8 @@
             const passwordInput = document.getElementById('password');
             const confirmInput = document.getElementById('confirmPassword');
             const emailInput = document.getElementById('email');
+            const phoneCountry = document.getElementById('phoneCountry');
+            const phoneLocal = document.getElementById('phoneLocal');
             const phoneInput = document.getElementById('phoneNumber');
             const strengthFeedback = document.getElementById('password-strength-feedback');
             const matchFeedback = document.getElementById('password-match-feedback');
@@ -120,7 +144,7 @@
             const phoneFeedback = document.getElementById('phone-feedback');
             const submitBtn = document.querySelector('button[type="submit"]');
 
-            if (!passwordInput || !strengthFeedback || !emailInput || !phoneInput) return;
+            if (!passwordInput || !strengthFeedback || !emailInput || !phoneInput || !phoneCountry || !phoneLocal) return;
 
             function setFeedback(el, message, type) {
                 el.textContent = message;
@@ -154,9 +178,12 @@
                 const password = passwordInput.value || '';
                 const confirmation = confirmInput.value || '';
                 const email = (emailInput.value || '').trim();
-                const phone = (phoneInput.value || '').trim();
+                const dialCode = (phoneCountry.value || '').trim();
+                const localRaw = (phoneLocal.value || '').trim();
+                const localDigits = localRaw.replace(/\D/g, '');
+                const phone = `${dialCode}${localDigits}`;
                 const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-                const phoneRegex = /^\+?[0-9()\-\s]{7,20}$/;
+                const phoneRegex = /^\+[0-9]{7,20}$/;
 
                 const strength = evaluateStrength(password);
                 setFeedback(strengthFeedback, strength.message, strength.type);
@@ -172,14 +199,16 @@
                 }
 
                 let phoneValid = false;
-                if (!phone) {
+                if (!localRaw) {
                     setFeedback(phoneFeedback, 'Ingresa un teléfono válido (7-20 caracteres).', 'warn');
                 } else if (!phoneRegex.test(phone)) {
-                    setFeedback(phoneFeedback, 'Formato de teléfono inválido. Usa solo dígitos, espacios, +, -, ().', 'error');
+                    setFeedback(phoneFeedback, 'Formato inválido. Ingresa entre 7 y 20 dígitos.', 'error');
                 } else {
                     phoneValid = true;
                     setFeedback(phoneFeedback, 'Teléfono válido.', 'ok');
                 }
+
+                phoneInput.value = phoneValid ? phone : '';
 
                 let matchValid = false;
                 if (!confirmation) {
@@ -195,7 +224,8 @@
             }
 
             emailInput.addEventListener('input', validate);
-            phoneInput.addEventListener('input', validate);
+            phoneCountry.addEventListener('change', validate);
+            phoneLocal.addEventListener('input', validate);
             passwordInput.addEventListener('input', validate);
             confirmInput.addEventListener('input', validate);
             validate();
