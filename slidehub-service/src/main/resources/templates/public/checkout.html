@@ -155,7 +155,7 @@
                     </div>
                 </h2>
 
-                <form action="/billing/process" method="POST" class="space-y-5">
+                <form id="checkout-form" action="/billing/process" method="POST" class="space-y-5">
                     <input type="hidden" name="plan" th:value="${planCode}" value="pro">
                     <input type="hidden" name="billing" th:value="${billingCode}" value="monthly">
                     <!-- Email -->
@@ -165,7 +165,8 @@
                             Electrónico</label>
                         <div class="input-group">
                             <i class="fa-solid fa-envelope"></i>
-                            <input type="email" placeholder="tu@email.com" class="checkout-input" required>
+                            <input id="checkout-email" name="email" type="email" placeholder="tu@email.com"
+                                class="checkout-input" required>
                         </div>
                     </div>
 
@@ -176,8 +177,8 @@
                             de la Tarjeta</label>
                         <div class="input-group">
                             <i class="fa-solid fa-user"></i>
-                            <input type="text" placeholder="Nombre como aparece en la tarjeta" class="checkout-input"
-                                required>
+                            <input id="checkout-full-name" name="fullName" type="text"
+                                placeholder="Nombre completo" class="checkout-input" required>
                         </div>
                     </div>
 
@@ -188,8 +189,8 @@
                             de Tarjeta</label>
                         <div class="input-group">
                             <i class="fa-solid fa-credit-card"></i>
-                            <input type="text" placeholder="0000 0000 0000 0000" class="checkout-input"
-                                pattern="\d{4}\s?\d{4}\s?\d{4}\s?\d{4}" maxlength="19" required>
+                            <input type="text" placeholder="Los datos de tarjeta se ingresan en Wompi"
+                                class="checkout-input" maxlength="64" disabled>
                         </div>
                     </div>
 
@@ -198,15 +199,16 @@
                         <div>
                             <label
                                 class="block text-xs font-mono text-[var(--sh-text-2)] mb-1.5 uppercase tracking-wider">Expiración</label>
-                            <input type="text" placeholder="MM/AA" class="checkout-input !pl-4"
-                                pattern="(0[1-9]|1[0-2])\/?([0-9]{2})" maxlength="5" required>
+                            <input type="text" placeholder="Se solicita en Wompi" class="checkout-input !pl-4"
+                                maxlength="20" disabled>
                         </div>
                         <div>
                             <label
                                 class="block text-xs font-mono text-[var(--sh-text-2)] mb-1.5 uppercase tracking-wider">CVC</label>
                             <div class="input-group">
                                 <i class="fa-solid fa-lock"></i>
-                                <input type="password" placeholder="123" class="checkout-input" maxlength="4" required>
+                                <input type="password" placeholder="Se solicita en Wompi" class="checkout-input"
+                                    maxlength="20" disabled>
                             </div>
                         </div>
                     </div>
@@ -228,14 +230,16 @@
                     </div>
 
                     <button type="submit"
+                        id="checkout-submit"
                         class="w-full sh-btn sh-btn-primary py-3 rounded-lg flex items-center justify-center gap-2 font-semibold shadow-lg shadow-blue-900/20 mt-4 transition-all hover:scale-[1.01]">
                         <i class="fa-solid fa-lock"></i> <span
                             th:text="${'Pagar ' + displayAmount + ' de forma segura'}">Pagar $96.00 de forma
                             segura</span>
                     </button>
+                    <div id="checkout-error" class="text-xs text-red-400 font-mono hidden"></div>
                     <p class="text-center text-[10px] text-[var(--sh-text-3)] font-mono mt-2">
                         <i class="fa-solid fa-shield-halved mr-1"></i> Transacción cifrada con AES-256 bits. Pagos
-                        procesados por Stripe.
+                        procesados por Wompi.
                     </p>
                 </form>
             </div>
@@ -249,6 +253,97 @@
                 class="text-[var(--sh-text-2)] hover:text-[#58a6ff]">Términos</a>
         </p>
     </footer>
+
+    <script src="https://checkout.wompi.co/widget.js"></script>
+    <script>
+        (function () {
+            const form = document.getElementById('checkout-form');
+            const submitButton = document.getElementById('checkout-submit');
+            const errorBox = document.getElementById('checkout-error');
+
+            if (!form || !submitButton) {
+                return;
+            }
+
+            const setLoadingState = (isLoading) => {
+                submitButton.disabled = isLoading;
+                submitButton.classList.toggle('opacity-60', isLoading);
+                submitButton.classList.toggle('cursor-not-allowed', isLoading);
+            };
+
+            const showError = (message) => {
+                if (!errorBox) return;
+                errorBox.textContent = message;
+                errorBox.classList.remove('hidden');
+            };
+
+            const clearError = () => {
+                if (!errorBox) return;
+                errorBox.textContent = '';
+                errorBox.classList.add('hidden');
+            };
+
+            form.addEventListener('submit', async function (event) {
+                event.preventDefault();
+                clearError();
+
+                const plan = form.querySelector('input[name="plan"]')?.value || 'pro';
+                const billing = form.querySelector('input[name="billing"]')?.value || 'monthly';
+                const email = form.querySelector('input[name="email"]')?.value || '';
+                const fullName = form.querySelector('input[name="fullName"]')?.value || '';
+
+                if (!email || !fullName) {
+                    showError('Completa nombre y correo para continuar.');
+                    return;
+                }
+
+                setLoadingState(true);
+                try {
+                    const response = await fetch('/api/billing/wompi/checkout-data', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ plan, billing, email, fullName })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('No se pudo iniciar el checkout.');
+                    }
+
+                    const payload = await response.json();
+
+                    if (!payload.enabled) {
+                        throw new Error(payload.message || 'Wompi no está disponible en este entorno.');
+                    }
+
+                    if (typeof WidgetCheckout === 'undefined') {
+                        throw new Error('No se pudo cargar el widget de Wompi.');
+                    }
+
+                    const checkout = new WidgetCheckout({
+                        currency: payload.currency,
+                        amountInCents: payload.amountInCents,
+                        reference: payload.reference,
+                        publicKey: payload.publicKey,
+                        signature: payload.signature,
+                        redirectUrl: payload.redirectUrl,
+                        customerData: payload.customerData
+                    });
+
+                    checkout.open(function (result) {
+                        const transaction = result && result.transaction ? result.transaction : null;
+                        if (transaction && transaction.id) {
+                            const encodedId = encodeURIComponent(transaction.id);
+                            window.location.href = '/checkout/result?id=' + encodedId;
+                        }
+                    });
+                } catch (error) {
+                    showError(error.message || 'No se pudo abrir Wompi. Inténtalo de nuevo.');
+                } finally {
+                    setLoadingState(false);
+                }
+            });
+        })();
+    </script>
 
 </body>
 
