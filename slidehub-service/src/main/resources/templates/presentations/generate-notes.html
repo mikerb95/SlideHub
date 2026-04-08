@@ -161,6 +161,9 @@
                             <span class="font-mono">Dockerfile</span> u otros archivos de texto para generar notas
                             incluso sin conexión a GitHub.
                         </div>
+                        <div id="context-files-meta" class="text-[var(--sh-text-3)] text-xs font-mono mt-1">
+                            0 archivos seleccionados · 0 B
+                        </div>
                     </div>
 
                     <!-- Pipeline description -->
@@ -295,6 +298,29 @@
         const totalSlides = /*[[${totalSlides}]]*/ 0;
         const INTER_SLIDE_MS = 1500;
 
+        function formatBytes(bytes) {
+            if (!Number.isFinite(bytes) || bytes <= 0) return '0 B';
+            const units = ['B', 'KB', 'MB', 'GB'];
+            let value = bytes;
+            let unitIndex = 0;
+            while (value >= 1024 && unitIndex < units.length - 1) {
+                value /= 1024;
+                unitIndex++;
+            }
+            return `${value >= 10 || unitIndex === 0 ? value.toFixed(0) : value.toFixed(1)} ${units[unitIndex]}`;
+        }
+
+        function updateContextFilesMeta() {
+            const contextFilesInput = document.getElementById('context-files');
+            const meta = document.getElementById('context-files-meta');
+            if (!contextFilesInput || !meta) return;
+
+            const files = Array.from(contextFilesInput.files || []);
+            const totalBytes = files.reduce((sum, file) => sum + (file.size || 0), 0);
+            const countLabel = files.length === 1 ? 'archivo seleccionado' : 'archivos seleccionados';
+            meta.textContent = `${files.length} ${countLabel} · ${formatBytes(totalBytes)}`;
+        }
+
         async function generateAllNotes() {
             const repoUrl = document.getElementById('repo-url').value.trim();
             const contextFilesInput = document.getElementById('context-files');
@@ -366,6 +392,14 @@
             document.getElementById('progress-bar').style.width = Math.min(100, pct) + '%';
             document.getElementById('progress-text').textContent = text;
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const contextFilesInput = document.getElementById('context-files');
+            if (contextFilesInput) {
+                contextFilesInput.addEventListener('change', updateContextFilesMeta);
+            }
+            updateContextFilesMeta();
+        });
     </script>
 </body>
 
