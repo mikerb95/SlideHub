@@ -92,12 +92,12 @@
                 <div class="sh-panel-glass p-5 mb-6">
                     <div class="flex justify-between items-start mb-4">
                         <div>
-                            <h3 class="text-white font-medium text-lg">Plan Pro</h3>
-                            <p class="text-xs font-mono text-[var(--sh-text-3)] mt-1">Facturación anual</p>
+                            <h3 class="text-white font-medium text-lg" th:text="${planLabel}">Plan Pro</h3>
+                            <p class="text-xs font-mono text-[var(--sh-text-3)] mt-1" th:text="${billingLabel}">Facturación anual</p>
                         </div>
                         <div class="text-right">
-                            <span class="text-white font-bold text-xl">$10</span>
-                            <span class="text-xs text-[var(--sh-text-3)]">/mes</span>
+                            <span class="text-white font-bold text-xl" th:text="${displayAmount}">$10</span>
+                            <span class="text-xs text-[var(--sh-text-3)]" th:text="${displayPeriod}">/mes</span>
                         </div>
                     </div>
                     <ul class="text-sm space-y-2 mt-4 text-[var(--sh-text-2)] font-mono">
@@ -125,18 +125,18 @@
                 <div class="space-y-3 font-mono text-sm">
                     <div class="flex justify-between">
                         <span class="text-[var(--sh-text-3)]">Subtotal</span>
-                        <span>$120.00</span>
+                        <span th:text="${displayAmount}">$120.00</span>
                     </div>
-                    <div class="flex justify-between">
+                    <div class="flex justify-between" th:if="${annualDiscount > 0}">
                         <span class="text-[var(--sh-text-3)]">Descuento Anual (16%)</span>
-                        <span class="text-green-400">-$24.00</span>
+                        <span class="text-green-400" th:text="${'-' + displayAnnualDiscount}">-$24.00</span>
                     </div>
                     <div class="sh-divider my-3"></div>
                     <div class="flex justify-between items-end">
                         <span class="text-white font-semibold">Total a Pagar</span>
                         <div class="text-right">
-                            <span class="text-white font-bold text-2xl">$96.00</span>
-                            <p class="text-[10px] text-[var(--sh-text-3)]">USD (impuestos incl.)</p>
+                            <span class="text-white font-bold text-2xl" th:text="${displayAmount}">$96.00</span>
+                            <p class="text-[10px] text-[var(--sh-text-3)]" th:text="${displayPeriod + ' (impuestos incl.)'}">USD (impuestos incl.)</p>
                         </div>
                     </div>
                 </div>
@@ -153,8 +153,9 @@
                     </div>
                 </h2>
 
-                <form action="/billing/process" method="POST" class="space-y-5"
-                    onsubmit="event.preventDefault(); window.location.href='/showcase?paid=true'">
+                <form action="/billing/process" method="POST" class="space-y-5">
+                    <input type="hidden" name="plan" th:value="${planCode}" value="pro">
+                    <input type="hidden" name="billing" th:value="${billingCode}" value="monthly">
                     <!-- Email -->
                     <div>
                         <label
@@ -226,7 +227,7 @@
 
                     <button type="submit"
                         class="w-full sh-btn sh-btn-primary py-3 rounded-lg flex items-center justify-center gap-2 font-semibold shadow-lg shadow-blue-900/20 mt-4 transition-all hover:scale-[1.01]">
-                        <i class="fa-solid fa-lock"></i> Pagar $96.00 de forma segura
+                        <i class="fa-solid fa-lock"></i> <span th:text="${'Pagar ' + displayAmount + ' de forma segura'}">Pagar $96.00 de forma segura</span>
                     </button>
                     <p class="text-center text-[10px] text-[var(--sh-text-3)] font-mono mt-2">
                         <i class="fa-solid fa-shield-halved mr-1"></i> Transacción cifrada con AES-256 bits. Pagos

@@ -238,10 +238,10 @@
             <!-- Billing Toggle -->
             <div class="text-center mb-12 reveal">
                 <div class="billing-toggle">
-                    <button class="toggle-btn active" onclick="setBilling('monthly')">
+                    <button class="toggle-btn active" onclick="setBilling('monthly', this)">
                         <i class="fa-solid fa-calendar"></i> Mensual
                     </button>
-                    <button class="toggle-btn" onclick="setBilling('annual')">
+                    <button class="toggle-btn" onclick="setBilling('annual', this)">
                         <i class="fa-solid fa-calendar-days"></i> Anual
                         <span style="color: #3fb950; margin-left: 0.5rem;">-16%</span>
                     </button>
@@ -291,7 +291,8 @@
                         <li><i class="fa-solid fa-check"></i> <span>Generación de contexto de ayuda adicional</span>
                         </li>
                     </ul>
-                    <a href="/checkout" class="pricing-cta secondary text-center">Elegir Básico</a>
+                    <a href="/checkout?plan=basic&billing=monthly" data-plan="basic"
+                        class="pricing-cta secondary text-center">Elegir Básico</a>
                 </div>
 
                 <!-- Pro -->
@@ -319,7 +320,8 @@
                         <li><i class="fa-solid fa-check"></i> <span>Push-to-Talk inteligente</span></li>
                         <li><i class="fa-solid fa-check"></i> <span>Transcripción e IA Conversacional</span></li>
                     </ul>
-                    <a href="/checkout" class="pricing-cta primary text-center">Obtener Pro</a>
+                    <a href="/checkout?plan=pro&billing=monthly" data-plan="pro"
+                        class="pricing-cta primary text-center">Obtener Pro</a>
                 </div>
             </div>
         </div>
@@ -344,12 +346,12 @@
     </footer>
 
     <script>
-        function setBilling(type) {
+        function setBilling(type, button) {
             const isMonthly = type === 'monthly';
 
             // Update toggle buttons
             document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.closest('.toggle-btn').classList.add('active');
+            if (button) button.classList.add('active');
 
             // Update all pricing cards
             document.querySelectorAll('.pricing-card').forEach(card => {
@@ -376,6 +378,19 @@
                     if (annualSaving) annualSaving.classList.add('show');
                 }
             });
+
+            updateCheckoutLinks(type);
+        }
+
+        function updateCheckoutLinks(billingType) {
+            document.querySelectorAll('a[data-plan]').forEach(link => {
+                const plan = link.getAttribute('data-plan');
+                link.setAttribute('href', `/checkout?plan=${plan}&billing=${billingType}`);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCheckoutLinks('monthly');
         }
 
         // Scroll reveal
