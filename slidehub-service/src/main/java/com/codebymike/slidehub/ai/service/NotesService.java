@@ -120,9 +120,8 @@ public class NotesService {
                         request.repoUrl(),
                         null, // imageData: null; se descargará desde imageUrl
                         slide.imageUrl(),
-                    null, // slideContext: null (se usará la imagen)
-                    request.extraContext()
-                );
+                        null, // slideContext: null (se usará la imagen)
+                        request.extraContext());
                 generate(noteRequest);
                 generated++;
                 log.debug("Nota generada: slide {}/{}", slide.slideNumber(), request.slides().size());

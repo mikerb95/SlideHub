@@ -15,11 +15,11 @@ package com.codebymike.slidehub.ai.model;
  *                       Dockerfile, etc.) cuando no hay acceso a GitHub
  */
 public record GenerateNoteRequest(
-        String presentationId,
-        int slideNumber,
-        String repoUrl,
-        String imageData,
-        String imageUrl,
-        String slideContext,
-        String extraContext) {
+                String presentationId,
+                int slideNumber,
+                String repoUrl,
+                String imageData,
+                String imageUrl,
+                String slideContext,
+                String extraContext) {
 }

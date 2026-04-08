@@ -15,8 +15,8 @@ import java.util.List;
  *                       S3
  */
 public record GenerateAllRequest(
-        String presentationId,
-        String repoUrl,
-        String extraContext,
-        List<SlideReference> slides) {
+                String presentationId,
+                String repoUrl,
+                String extraContext,
+                List<SlideReference> slides) {
 }
