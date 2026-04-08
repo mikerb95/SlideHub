@@ -33,6 +33,9 @@ public class GitHubRepoContextService {
     @Value("${slidehub.github.max-files-for-context:120}")
     private int maxFilesForContext;
 
+    @Value("${slidehub.github.max-file-size-bytes:200000}")
+    private long maxFileSizeBytes;
+
     public GitHubRepoContextService(
             @Value("${slidehub.github.api-base-url:https://api.github.com}") String apiBaseUrl) {
         this.gitHubClient = WebClient.builder()
@@ -141,6 +144,17 @@ public class GitHubRepoContextService {
                 continue;
             }
             long size = toLongSafe(entry.get("size"));
+
+            if (isExcludedPath(path)) {
+                continue;
+            }
+            if (!isRelevantPath(path)) {
+                continue;
+            }
+            if (size > maxFileSizeBytes) {
+                continue;
+            }
+
             files.add(new RepoFile(path, size));
         }
 
@@ -149,6 +163,88 @@ public class GitHubRepoContextService {
             return files.subList(0, maxFilesForContext);
         }
         return files;
+    }
+
+    private boolean isRelevantPath(String path) {
+        String normalized = path.toLowerCase(Locale.ROOT);
+        String fileName = fileName(normalized);
+
+        if (normalized.startsWith("docs/") || normalized.contains("/docs/")) {
+            return true;
+        }
+
+        if (fileName.startsWith("readme")
+                || fileName.startsWith("changelog")
+                || fileName.startsWith("contributing")
+                || fileName.startsWith("license")
+                || fileName.startsWith("notice")) {
+            return true;
+        }
+
+        if (isKnownBuildOrConfigFile(fileName)) {
+            return true;
+        }
+
+        return hasDocumentationExtension(fileName);
+    }
+
+    private boolean isExcludedPath(String path) {
+        String normalized = path.toLowerCase(Locale.ROOT);
+        return normalized.startsWith("node_modules/") || normalized.contains("/node_modules/")
+                || normalized.startsWith("target/") || normalized.contains("/target/")
+                || normalized.startsWith("dist/") || normalized.contains("/dist/")
+                || normalized.startsWith("build/") || normalized.contains("/build/")
+                || normalized.startsWith(".git/") || normalized.contains("/.git/")
+                || normalized.startsWith(".idea/") || normalized.contains("/.idea/")
+                || normalized.startsWith(".vscode/") || normalized.contains("/.vscode/")
+                || normalized.startsWith("coverage/") || normalized.contains("/coverage/")
+                || normalized.startsWith("vendor/") || normalized.contains("/vendor/")
+                || normalized.startsWith(".next/") || normalized.contains("/.next/")
+                || normalized.startsWith("out/") || normalized.contains("/out/");
+    }
+
+    private boolean isKnownBuildOrConfigFile(String fileName) {
+        return fileName.equals("pom.xml")
+                || fileName.equals("build.gradle")
+                || fileName.equals("build.gradle.kts")
+                || fileName.equals("settings.gradle")
+                || fileName.equals("settings.gradle.kts")
+                || fileName.equals("gradle.properties")
+                || fileName.equals("package.json")
+                || fileName.equals("package-lock.json")
+                || fileName.equals("yarn.lock")
+                || fileName.equals("pnpm-lock.yaml")
+                || fileName.equals("pnpm-workspace.yaml")
+                || fileName.equals("npm-shrinkwrap.json")
+                || fileName.equals("dockerfile")
+                || fileName.equals("docker-compose.yml")
+                || fileName.equals("docker-compose.yaml")
+                || fileName.equals("compose.yml")
+                || fileName.equals("compose.yaml")
+                || fileName.equals(".env.example")
+                || fileName.equals(".env.sample")
+                || fileName.equals(".nvmrc")
+                || fileName.equals("mvnw")
+                || fileName.equals("mvnw.cmd");
+    }
+
+    private boolean hasDocumentationExtension(String fileName) {
+        return fileName.endsWith(".md")
+                || fileName.endsWith(".adoc")
+                || fileName.endsWith(".rst")
+                || fileName.endsWith(".txt")
+                || fileName.endsWith(".yaml")
+                || fileName.endsWith(".yml")
+                || fileName.endsWith(".toml")
+                || fileName.endsWith(".ini");
+    }
+
+    private String fileName(String path) {
+        int idx = path.lastIndexOf('/');
+        if (idx < 0 || idx == path.length() - 1) {
+            return path;
+        }
+        return path.substring(idx + 1);
     }
 
     private String buildContextText(RepositoryRef ref, String defaultBranch, String headSha, List<RepoFile> files) {
