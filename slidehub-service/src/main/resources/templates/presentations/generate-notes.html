@@ -245,7 +245,7 @@
 
                             <!-- Thumbnail -->
                             <div class="flex-shrink-0">
-                                <img th:src="${slide.s3Url}" th:alt="${'Diapositiva ' + slide.number}"
+                                <img th:src="@{/api/presentations/{pId}/slides/{n}/image(pId=${presentation.id},n=${slide.number})}" th:alt="${'Diapositiva ' + slide.number}"
                                     class="slide-thumb" loading="lazy" onerror="this.style.display='none'">
                             </div>
 
