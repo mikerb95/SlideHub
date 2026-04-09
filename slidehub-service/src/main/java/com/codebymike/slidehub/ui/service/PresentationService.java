@@ -143,15 +143,8 @@ public class PresentationService {
                 .flatMap(presentation -> presentation.getSlides().stream()
                         .filter(slide -> slide.getNumber() == slideNumber)
                         .findFirst()
-                        .map(slide -> {
-                            String s3Url = slide.getS3Url();
-                            if (s3Url != null && !s3Url.isBlank()) {
-                                return s3Url;
-                            }
-                            // Fallback: construir URL desde la clave S3
-                            return slideUploadService.buildPublicUrl(
-                                    slideUploadService.buildSlideKey(presentationId, slideNumber));
-                        }));
+                        .map(slide -> slideUploadService.generatePresignedSlideUrl(
+                                presentationId, slideNumber, Duration.ofHours(1))));
     }
 
     // ── Importación desde Google Drive ────────────────────────────────────────
