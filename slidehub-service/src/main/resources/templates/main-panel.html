@@ -536,6 +536,13 @@
             }
         }
 
+        function buildPlaybackImageUrl(slideNumber, s3Url) {
+            if (PRESENTATION_ID) {
+                return `/api/presentations/${encodeURIComponent(PRESENTATION_ID)}/slides/${slideNumber}/image`;
+            }
+            return s3Url || `/presentation/Slide${slideNumber}.PNG`;
+        }
+
         async function loadSlidesCatalog() {
             if (!SLIDES_CATALOG_API) {
                 slideUrls = [];
@@ -550,7 +557,7 @@
                 const data = await res.json();
                 slideUrls = (data.slides || [])
                     .sort((a, b) => a.number - b.number)
-                    .map(slide => slide.s3Url || `/presentation/Slide${slide.number}.PNG`);
+                    .map(slide => buildPlaybackImageUrl(slide.number, slide.s3Url));
                 if (slideUrls.length > 0) {
                     totalSlides = slideUrls.length;
                     buildGrid(totalSlides);
