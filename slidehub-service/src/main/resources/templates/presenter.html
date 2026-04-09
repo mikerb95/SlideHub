@@ -187,9 +187,7 @@
                 const data = await res.json();
                 slideUrls = (data.slides || [])
                     .sort((a, b) => a.number - b.number)
-                    .map(slide => PRESENTATION_ID
-                        ? `/api/presentations/${PRESENTATION_ID}/slides/${slide.number}/image`
-                        : (slide.s3Url || `/presentation/Slide${slide.number}.PNG`));
+                    .map(slide => slide.s3Url || `/presentation/Slide${slide.number}.PNG`);
                 if (slideUrls.length > 0) {
                     totalSlides = slideUrls.length;
                     buildSlides(totalSlides);
