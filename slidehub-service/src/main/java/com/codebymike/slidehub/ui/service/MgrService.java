@@ -1,5 +1,7 @@
 package com.codebymike.slidehub.ui.service;
 
+import com.codebymike.slidehub.ui.model.DbColumnMeta;
+import com.codebymike.slidehub.ui.model.DbTableMeta;
 import com.codebymike.slidehub.ui.model.Presentation;
 import com.codebymike.slidehub.ui.model.Role;
 import com.codebymike.slidehub.ui.model.SourceType;
