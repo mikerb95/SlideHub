@@ -84,8 +84,8 @@ public class RepoAnalysisController {
         }
 
         try {
-            RepoAnalysis analysis = repoAnalysisService.reanalyze(repoUrl);
-            return ResponseEntity.ok(analysis);
+            RepoAnalysisService.AnalysisResult result = repoAnalysisService.reanalyze(repoUrl);
+            return ResponseEntity.ok(buildResponse(result));
         } catch (Exception e) {
             if (isGeminiRateLimited(e)) {
                 log.warn("Gemini 429 al re-analizar repositorio {}", repoUrl);
@@ -99,6 +99,93 @@ public class RepoAnalysisController {
             return ResponseEntity.internalServerError()
                     .body(Map.of("error", "Error al re-analizar el repositorio: " + e.getMessage()));
         }
+    }
+
+    /**
+     * Analiza documentación subida manualmente como archivos multipart.
+     * Acepta: .md, .html, .txt, .adoc, .rst, .xml, .json, .yaml, .yml,
+     *         .toml, .ini, .properties, .gradle
+     * Devuelve el análisis y una {@code syntheticRepoUrl} para el paso 3 del wizard.
+     */
+    @PostMapping(value = "/analyze-repo/from-docs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> analyzeFromDocs(
+            @RequestPart("files") List<MultipartFile> files) {
+
+        if (files == null || files.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "No se recibieron archivos."));
+        }
+
+        StringBuilder context = new StringBuilder("Documentación subida manualmente:\n\n");
+        int filesRead = 0;
+        for (MultipartFile file : files) {
+            if (file.isEmpty()) continue;
+            String name = file.getOriginalFilename() != null ? file.getOriginalFilename() : "archivo";
+            try {
+                byte[] bytes = file.getBytes();
+                if (!isTextContent(bytes)) {
+                    log.debug("Archivo binario omitido: {}", name);
+                    continue;
+                }
+                String content = new String(bytes, StandardCharsets.UTF_8);
+                context.append("=== ").append(name).append(" ===\n");
+                // Max 10 KB por archivo para no saturar el contexto de Gemini
+                context.append(content, 0, Math.min(content.length(), 10_000));
+                context.append("\n\n");
+                filesRead++;
+            } catch (Exception e) {
+                log.warn("No se pudo leer archivo {}: {}", name, e.getMessage());
+            }
+        }
+
+        if (filesRead == 0) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "No se pudo leer ningún archivo. Asegúrate de subir archivos de texto (.md, .xml, .json, etc.)."));
+        }
+
+        try {
+            RepoAnalysisService.AnalysisResult result = repoAnalysisService.analyzeFromDocs(context.toString());
+            Map<String, Object> response = new HashMap<>(buildResponse(result));
+            response.put("syntheticRepoUrl", result.analysis().getRepoUrl());
+            response.put("filesRead", filesRead);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            if (isGeminiRateLimited(e)) {
+                return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                        .body(Map.of("error", "Cuota de Gemini excedida. Intenta más tarde.", "code", "GEMINI_QUOTA_EXCEEDED"));
+            }
+            log.error("Error analizando docs manuales: {}", e.getMessage());
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "Error al analizar la documentación: " + e.getMessage()));
+        }
+    }
+
+    // ── helpers ───────────────────────────────────────────────────────────────
+
+    private Map<String, Object> buildResponse(RepoAnalysisService.AnalysisResult result) {
+        RepoAnalysis a = result.analysis();
+        Map<String, Object> map = new HashMap<>();
+        map.put("language", a.getLanguage());
+        map.put("framework", a.getFramework());
+        map.put("buildSystem", a.getBuildSystem());
+        map.put("technologies", a.getTechnologies());
+        map.put("databases", a.getDatabases());
+        map.put("ports", a.getPorts());
+        map.put("summary", a.getSummary());
+        map.put("structure", a.getStructure());
+        map.put("deploymentHints", a.getDeploymentHints());
+        map.put("filesFound", result.filesFound());
+        return map;
+    }
+
+    /** Heurística rápida: si los primeros 512 bytes tienen demasiados bytes no-UTF8, es binario. */
+    private boolean isTextContent(byte[] bytes) {
+        int check = Math.min(bytes.length, 512);
+        int nonPrintable = 0;
+        for (int i = 0; i < check; i++) {
+            int b = bytes[i] & 0xFF;
+            if (b < 9 || (b > 13 && b < 32 && b != 27)) nonPrintable++;
+        }
+        return check == 0 || ((double) nonPrintable / check) < 0.15;
     }
 
     private boolean isGeminiRateLimited(Throwable throwable) {
