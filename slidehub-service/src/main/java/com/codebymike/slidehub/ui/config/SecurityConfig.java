@@ -143,13 +143,14 @@ public class SecurityConfig {
                                                 .failureUrl("/auth/login?error=true")
                                                 .permitAll())
                                 // Login OAuth2 (GitHub y Google)
-                                .oauth2Login(oauth -> oauth
-                                                .loginPage("/auth/login")
-                                                .successHandler(oauth2SuccessHandler())
-                                                .failureUrl("/auth/login?error=oauth2")
-                                                .userInfoEndpoint(userInfo -> userInfo
-                                                                .userService(oAuth2UserService)
-                                                                .oidcUserService(oidcUserService)))
+                                .oauth2Login(oauth -> {
+                                        oauth.loginPage("/auth/login")
+                                                        .successHandler(oauth2SuccessHandler())
+                                                        .failureUrl("/auth/login?error=oauth2")
+                                                        .userInfoEndpoint(userInfo -> userInfo
+                                                                        .userService(oAuth2UserService)
+                                                                        .oidcUserService(oidcUserService));
+                                })
                                 .rememberMe(rm -> rm
                                                 .key(rememberMeKey)
                                                 .userDetailsService(userDetailsService)
