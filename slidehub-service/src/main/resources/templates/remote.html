@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-      lang="es">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -9,7 +7,8 @@
     <title>SlideHub — Control remoto</title>
     <th:block th:replace="~{fragments/head :: assets}"></th:block>
     <style>
-        html, body {
+        html,
+        body {
             height: 100%;
             overflow: hidden;
             touch-action: none;
@@ -292,6 +291,27 @@
         .nav-btn:disabled {
             opacity: 0.25;
             cursor: default;
+        }
+
+        .fs-btn {
+            flex: 0 0 52px;
+            height: 68px;
+            background: var(--sh-elevated);
+            border: 1px solid var(--sh-border);
+            color: var(--sh-text-2);
+            border-radius: var(--sh-r-lg);
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+            transition: background var(--sh-t-fast), color var(--sh-t-fast);
+        }
+
+        .fs-btn:active {
+            background: var(--sh-hover);
+            color: var(--sh-blue);
         }
 
         .side-btn {
@@ -594,9 +614,17 @@
         }
 
         @keyframes sh-pulse-ring {
-            0%   { box-shadow: 0 0 0 0   rgba(248, 81, 73, 0.5); }
-            70%  { box-shadow: 0 0 0 10px rgba(248, 81, 73, 0);   }
-            100% { box-shadow: 0 0 0 0   rgba(248, 81, 73, 0);   }
+            0% {
+                box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.5);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(248, 81, 73, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(248, 81, 73, 0);
+            }
         }
 
         /* ── HOST swap button (solo presentadores autenticados) ── */
@@ -633,9 +661,8 @@
 <body class="sh antialiased">
 
     <!-- HOST-only: acceso rápido a /main-panel (invisible para participantes sin sesión) -->
-    <a sec:authorize="hasAnyRole('PRESENTER', 'ADMIN')"
-       id="host-panel-link"
-       th:href="${presentationId != null and presentationId != '' ? '/main-panel?presentationId=' + presentationId : '/main-panel'}">
+    <a sec:authorize="hasAnyRole('PRESENTER', 'ADMIN')" id="host-panel-link"
+        th:href="${presentationId != null and presentationId != '' ? '/main-panel?presentationId=' + presentationId : '/main-panel'}">
         <i class="fa-solid fa-table-cells-large"></i>
         Panel
     </a>
@@ -698,6 +725,10 @@
         <button class="nav-btn" id="btn-prev" disabled aria-label="Anterior">
             <i class="fa-solid fa-chevron-left"></i>
         </button>
+        <button class="fs-btn" id="btn-fullscreen" type="button" onclick="toggleFullscreen()"
+            aria-label="Pantalla completa">
+            <i class="fa-solid fa-expand" id="fs-icon"></i>
+        </button>
         <button class="nav-btn" id="btn-next" disabled aria-label="Siguiente">
             <i class="fa-solid fa-chevron-right"></i>
         </button>
@@ -706,7 +737,7 @@
             Voz
         </button>
         <button class="side-btn" id="btn-demo-fab" onclick="openSheet()" title="Links rápidos"
-                th:style="${!hasQuickLinks} ? 'display:none!important' : ''">
+            th:style="${!hasQuickLinks} ? 'display:none!important' : ''">
             <i class="fa-solid fa-globe"></i>
         </button>
     </div>
@@ -770,8 +801,7 @@
                         class="demo-link-desc"></span>
                 </span>
             </button>
-            <div th:if="${quickLinks.isEmpty()}"
-                class="text-center py-8 font-mono text-xs text-[var(--sh-text-3)]">
+            <div th:if="${quickLinks.isEmpty()}" class="text-center py-8 font-mono text-xs text-[var(--sh-text-3)]">
                 No hay links de demo configurados.
             </div>
         </div>
@@ -806,31 +836,31 @@
         let deviceToken = localStorage.getItem(DEVICE_STORAGE_KEY) || '';
 
         // ── DOM refs ─────────────────────────────────────────────────────────
-        const btnPrev           = document.getElementById('btn-prev');
-        const btnNext           = document.getElementById('btn-next');
-        const helpBtn           = document.getElementById('help-btn');
-        const micBtn            = document.getElementById('mic-btn');
-        const btnDemoFab        = document.getElementById('btn-demo-fab');
-        const slideCounter      = document.getElementById('slide-counter');
-        const previewCurrent    = document.getElementById('preview-current');
-        const previewNext       = document.getElementById('preview-next');
-        const nextCol           = document.getElementById('next-col');
-        const notesPanel        = document.getElementById('notes-panel');
-        const notesEmpty        = document.getElementById('notes-empty');
-        const notesTitle        = document.getElementById('notes-title');
-        const notesPoints       = document.getElementById('notes-points');
-        const notesMeta         = document.getElementById('notes-meta');
-        const btnExpand         = document.getElementById('btn-expand');
-        const demoPanel         = document.getElementById('demo-panel');
-        const joinOverlay       = document.getElementById('join-overlay');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const helpBtn = document.getElementById('help-btn');
+        const micBtn = document.getElementById('mic-btn');
+        const btnDemoFab = document.getElementById('btn-demo-fab');
+        const slideCounter = document.getElementById('slide-counter');
+        const previewCurrent = document.getElementById('preview-current');
+        const previewNext = document.getElementById('preview-next');
+        const nextCol = document.getElementById('next-col');
+        const notesPanel = document.getElementById('notes-panel');
+        const notesEmpty = document.getElementById('notes-empty');
+        const notesTitle = document.getElementById('notes-title');
+        const notesPoints = document.getElementById('notes-points');
+        const notesMeta = document.getElementById('notes-meta');
+        const btnExpand = document.getElementById('btn-expand');
+        const demoPanel = document.getElementById('demo-panel');
+        const joinOverlay = document.getElementById('join-overlay');
         const participantSelect = document.getElementById('join-participant-select');
-        const customNameInput   = document.getElementById('join-custom-name');
-        const notice            = document.getElementById('notice');
-        const assistCard        = document.getElementById('assist-card');
-        const assistAnswerText  = document.getElementById('assist-answer-text');
-        const expandOverlay     = document.getElementById('expand-modal-overlay');
-        const expandLoading     = document.getElementById('expand-loading');
-        const expandContent     = document.getElementById('expand-content');
+        const customNameInput = document.getElementById('join-custom-name');
+        const notice = document.getElementById('notice');
+        const assistCard = document.getElementById('assist-card');
+        const assistAnswerText = document.getElementById('assist-answer-text');
+        const expandOverlay = document.getElementById('expand-modal-overlay');
+        const expandLoading = document.getElementById('expand-loading');
+        const expandContent = document.getElementById('expand-content');
 
         // ── Device heartbeat ─────────────────────────────────────────────────
 
@@ -1099,7 +1129,7 @@
 
         async function handleSlideChangeHaptic() {
             if (!participantToken || !PRESENTATION_ID || !JOIN_TOKEN
-                    || currentSlide === lastSlideForAssignment) {
+                || currentSlide === lastSlideForAssignment) {
                 vibrate('single');
                 return;
             }
@@ -1317,6 +1347,64 @@
         micBtn.addEventListener('touchcancel', stopRecording);
 
         // ── Init ─────────────────────────────────────────────────────────────
+
+        // ── Fullscreen helpers ──────────────────────────────────────────────
+        function _isFullscreen() {
+            return !!(
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement
+            );
+        }
+
+        function _requestFullscreen(elem) {
+            if (elem.requestFullscreen) return elem.requestFullscreen();
+            if (elem.webkitRequestFullscreen) return elem.webkitRequestFullscreen();
+            if (elem.mozRequestFullScreen) return elem.mozRequestFullScreen();
+            if (elem.msRequestFullscreen) return elem.msRequestFullscreen();
+            return Promise.resolve();
+        }
+
+        function _exitFullscreen() {
+            if (document.exitFullscreen) return document.exitFullscreen();
+            if (document.webkitExitFullscreen) return document.webkitExitFullscreen();
+            if (document.mozCancelFullScreen) return document.mozCancelFullScreen();
+            if (document.msExitFullscreen) return document.msExitFullscreen();
+            return Promise.resolve();
+        }
+
+        function updateFsIcon() {
+            const icon = document.getElementById('fs-icon');
+            if (!icon) return;
+            if (_isFullscreen()) {
+                icon.classList.remove('fa-expand');
+                icon.classList.add('fa-compress');
+            } else {
+                icon.classList.remove('fa-compress');
+                icon.classList.add('fa-expand');
+            }
+        }
+
+        async function toggleFullscreen() {
+            try {
+                if (!_isFullscreen()) {
+                    await _requestFullscreen(document.documentElement);
+                } else {
+                    await _exitFullscreen();
+                }
+            } catch (e) {
+                // silently ignore errors (some browsers block programmatic fullscreen)
+            }
+            updateFsIcon();
+        }
+
+        // keep icon in sync when user toggles fullscreen via browser UI or ESC
+        document.addEventListener('fullscreenchange', updateFsIcon);
+        document.addEventListener('webkitfullscreenchange', updateFsIcon);
+        document.addEventListener('mozfullscreenchange', updateFsIcon);
+        document.addEventListener('MSFullscreenChange', updateFsIcon);
+
 
         if (participantToken) {
             helpBtn.classList.add('visible');
