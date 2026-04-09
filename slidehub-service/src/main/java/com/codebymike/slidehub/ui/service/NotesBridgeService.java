@@ -187,7 +187,7 @@ public class NotesBridgeService {
     @SuppressWarnings("unchecked")
     public Map<String, Object> analyzeRepo(String repoUrl) {
         try {
-            RepoAnalysis analysis = repoAnalysisService.analyze(repoUrl);
+            RepoAnalysis analysis = repoAnalysisService.analyze(repoUrl).analysis();
             return objectMapper.convertValue(analysis, Map.class);
         } catch (Exception e) {
             log.error("Error analizando repo {}: {}", repoUrl, e.getMessage());
