@@ -5,6 +5,9 @@ import com.codebymike.slidehub.ui.model.User;
 import com.codebymike.slidehub.ui.repository.UserRepository;
 import com.codebymike.slidehub.ui.service.NotesBridgeService;
 import com.codebymike.slidehub.ui.service.PresentationService;
+import com.codebymike.slidehub.ui.service.SlideUploadService;
+
+import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -39,13 +42,16 @@ public class PresentationNotesController {
     private final PresentationService presentationService;
     private final NotesBridgeService notesBridgeService;
     private final UserRepository userRepository;
+    private final SlideUploadService slideUploadService;
 
     public PresentationNotesController(PresentationService presentationService,
             NotesBridgeService notesBridgeService,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            SlideUploadService slideUploadService) {
         this.presentationService = presentationService;
         this.notesBridgeService = notesBridgeService;
         this.userRepository = userRepository;
+        this.slideUploadService = slideUploadService;
     }
 
     // ── Vista MVC ─────────────────────────────────────────────────────────────
