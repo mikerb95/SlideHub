@@ -137,20 +137,19 @@ public class PresentationService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<byte[]> getSlideImage(String presentationId, int slideNumber) {
+    public Optional<String> getSlideUrl(String presentationId, int slideNumber) {
         return presentationRepository.findById(presentationId)
                 .flatMap(presentation -> presentation.getSlides().stream()
                         .filter(slide -> slide.getNumber() == slideNumber)
                         .findFirst()
-                        .flatMap(slide -> {
-                            String key = extractS3Key(slide, presentationId);
-                            try {
-                                return Optional.of(slideUploadService.download(key));
-                            } catch (Exception ex) {
-                                log.error("Error descargando slide {}/{} de S3 (key={}): {}",
-                                        presentationId, slideNumber, key, ex.getMessage());
-                                return Optional.empty();
+                        .map(slide -> {
+                            String s3Url = slide.getS3Url();
+                            if (s3Url != null && !s3Url.isBlank()) {
+                                return s3Url;
                             }
+                            // Fallback: construir URL desde la clave S3
+                            return slideUploadService.buildPublicUrl(
+                                    slideUploadService.buildSlideKey(presentationId, slideNumber));
                         }));
     }
 

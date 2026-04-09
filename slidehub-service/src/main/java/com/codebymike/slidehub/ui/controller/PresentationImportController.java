@@ -131,28 +131,13 @@ public class PresentationImportController {
 
     @GetMapping("/api/presentations/{id}/slides/{slideNumber}/image")
     @ResponseBody
-    public ResponseEntity<byte[]> getSlideImage(@PathVariable String id, @PathVariable int slideNumber) {
-        return presentationService.getSlideImage(id, slideNumber)
-            .map(bytes -> ResponseEntity.ok()
+    public ResponseEntity<Void> getSlideImage(@PathVariable String id, @PathVariable int slideNumber) {
+        return presentationService.getSlideUrl(id, slideNumber)
+            .map(url -> ResponseEntity.status(302)
+                .<Void>header(HttpHeaders.LOCATION, url)
                 .header(HttpHeaders.CACHE_CONTROL, "public, max-age=300")
-                .contentType(detectContentType(bytes))
-                .body(bytes))
+                .build())
             .orElse(ResponseEntity.notFound().build());
-    }
-
-    private MediaType detectContentType(byte[] bytes) {
-        if (bytes.length >= 3
-                && bytes[0] == (byte) 0xFF
-                && bytes[1] == (byte) 0xD8
-                && bytes[2] == (byte) 0xFF) {
-            return MediaType.IMAGE_JPEG;
-        }
-        if (bytes.length >= 4
-                && bytes[0] == (byte) 0x89 && bytes[1] == 0x50
-                && bytes[2] == 0x4E && bytes[3] == 0x47) {
-            return MediaType.IMAGE_PNG;
-        }
-        return MediaType.IMAGE_PNG;
     }
 
     /**
