@@ -227,7 +227,11 @@
         <div class="flex items-center gap-3">
             <span style="color:var(--accent); font-size:.8rem; font-weight:700; letter-spacing:.15em;">SLIDEHUB</span>
             <span style="color:var(--border);">/</span>
-            <span style="color:var(--text-2); font-size:.75rem;">MGR PANEL</span>
+            <span style="color:var(--text-1); font-size:.75rem;">MGR</span>
+            <span style="color:var(--border);">/</span>
+            <a href="/mgr/db" style="color:var(--text-2); font-size:.75rem;" class="hover:text-white">
+                <i class="fa-solid fa-database mr-1"></i>DB
+            </a>
         </div>
         <div class="flex items-center gap-4">
             <span style="font-size:.75rem; color:var(--text-2);" th:text="${#authentication.name}"></span>
