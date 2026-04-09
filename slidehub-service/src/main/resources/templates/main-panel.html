@@ -315,8 +315,8 @@
                     <p class="text-xs font-mono text-[var(--sh-text-3)]">Sin preguntas pendientes.</p>
                 </div>
                 <div class="flex gap-1 mt-2">
-                    <button class="sh-btn sh-btn-ghost text-[0.65rem] flex-1 justify-center"
-                        id="mp-q-show-all-btn" onclick="mpToggleAllQuestions()">Ver todas</button>
+                    <button class="sh-btn sh-btn-ghost text-[0.65rem] flex-1 justify-center" id="mp-q-show-all-btn"
+                        onclick="mpToggleAllQuestions()">Ver todas</button>
                     <button class="sh-btn sh-btn-ghost text-[0.65rem] px-2.5" title="Descargar preguntas CSV"
                         onclick="mpDownloadQuestions()">
                         <i class="fa-solid fa-download"></i>
@@ -1063,7 +1063,7 @@
                             </div>` : ''}
                         </div>`;
                     }).join('');
-                } catch (_) {}
+                } catch (_) { }
             }
 
             window.mpDownloadQuestions = function () {
@@ -1081,7 +1081,7 @@
                         body: JSON.stringify({ status })
                     });
                     pollQuestions();
-                } catch (_) {}
+                } catch (_) { }
             };
 
             async function pollStats() {
@@ -1095,12 +1095,12 @@
                         mpViewerStats.textContent = `👁 ${data.viewerCount} espectadores` +
                             (raisers.length > 0 ? `   ✋ ${raisers.join(', ')}` : '');
                     }
-                } catch (_) {}
+                } catch (_) { }
             }
 
             function escHtml(str) {
                 if (!str) return '';
-                return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+                return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
             }
 
             pollQuestions();
