@@ -6,6 +6,7 @@ import com.codebymike.slidehub.ui.service.AuthenticatedSessionTracker;
 import com.codebymike.slidehub.ui.service.CustomOAuth2UserService;
 import com.codebymike.slidehub.ui.service.CustomOidcUserService;
 import com.codebymike.slidehub.ui.service.CustomUserDetailsService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
