@@ -37,6 +37,11 @@ import java.util.Optional;
 @EnableWebSecurity
 public class SecurityConfig {
 
+        private static final int REMEMBER_ME_SECONDS = 30 * 24 * 60 * 60; // 30 días
+
+        @Value("${slidehub.security.remember-me-key:${random.uuid}}")
+        private String rememberMeKey;
+
         private final CustomUserDetailsService userDetailsService;
         private final CustomOAuth2UserService oAuth2UserService;
         private final CustomOidcUserService oidcUserService;
