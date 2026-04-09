@@ -44,16 +44,20 @@ public class RepoAnalysisService {
         this.objectMapper = objectMapper;
     }
 
+    /** Resultado de analyze() que incluye cuántos archivos de doc se encontraron. */
+    public record AnalysisResult(RepoAnalysis analysis, int filesFound) {}
+
     /**
-     * Analiza un repositorio y devuelve su análisis técnico.
+     * Analiza un repositorio y devuelve su análisis técnico junto con el nº de
+     * archivos de documentación encontrados en GitHub.
      *
      * Si ya existe un análisis en MongoDB, lo devuelve sin llamar a Gemini.
      * Si no, llama a Gemini, parsea la respuesta, la guarda y la devuelve.
      *
      * @param repoUrl URL del repositorio GitHub
-     * @return análisis técnico del repositorio
+     * @return análisis técnico + filesFound
      */
-    public RepoAnalysis analyze(String repoUrl) {
+    public AnalysisResult analyze(String repoUrl) {
         Optional<GitHubRepoContextService.RepositorySnapshot> snapshotOpt = gitHubRepoContextService
                 .resolveSnapshot(repoUrl);
 
@@ -61,18 +65,20 @@ public class RepoAnalysisService {
                 .map(GitHubRepoContextService.RepositorySnapshot::normalizedRepoUrl)
                 .orElse(repoUrl);
 
+        int filesFound = snapshotOpt.map(GitHubRepoContextService.RepositorySnapshot::fileCount).orElse(0);
+
         Optional<RepoAnalysis> cached = repository.findByRepoUrl(normalizedRepoUrl);
         if (cached.isPresent()) {
             RepoAnalysis cachedAnalysis = cached.get();
             if (snapshotOpt.isEmpty()) {
                 log.debug("Análisis de repo encontrado en cache (sin snapshot): {}", normalizedRepoUrl);
-                return cachedAnalysis;
+                return new AnalysisResult(cachedAnalysis, filesFound);
             }
 
             String incomingHead = snapshotOpt.get().headCommitSha();
             if (incomingHead != null && incomingHead.equals(cachedAnalysis.getSourceCommitSha())) {
                 log.debug("Cache hit por commit SHA para {}: {}", normalizedRepoUrl, incomingHead);
-                return cachedAnalysis;
+                return new AnalysisResult(cachedAnalysis, filesFound);
             }
 
             log.info("Cache inválida por cambio de commit en {}. previo={}, nuevo={}",
@@ -95,7 +101,27 @@ public class RepoAnalysisService {
 
         RepoAnalysis saved = repository.save(analysis);
         log.info("Análisis de repo guardado en MongoDB: {} ({})", normalizedRepoUrl, saved.getId());
-        return saved;
+        return new AnalysisResult(saved, filesFound);
+    }
+
+    /**
+     * Analiza documentación subida manualmente (sin repo GitHub).
+     * Almacena el resultado con una clave sintética para que el pipeline
+     * de generación de notas lo pueda recuperar.
+     *
+     * @param contextText texto concatenado de los archivos subidos
+     * @return análisis + URL sintética para usar como repoUrl en el paso 3
+     */
+    public AnalysisResult analyzeFromDocs(String contextText) {
+        String syntheticUrl = "docs://manual-" + UUID.randomUUID().toString().substring(0, 8);
+        log.info("Analizando documentación manual con Gemini: {}", syntheticUrl);
+        String rawJson = geminiService.analyzeRepoRaw(syntheticUrl, contextText);
+        RepoAnalysis analysis = parseGeminiResponse(rawJson, syntheticUrl);
+        analysis.setRepoUrl(syntheticUrl);
+        analysis.setAnalyzedAt(LocalDateTime.now());
+        RepoAnalysis saved = repository.save(analysis);
+        log.info("Análisis de docs manual guardado en MongoDB: {}", saved.getId());
+        return new AnalysisResult(saved, 0);
     }
 
     /**
@@ -105,8 +131,7 @@ public class RepoAnalysisService {
      * @param repoUrl URL del repositorio
      * @return nuevo análisis técnico
      */
-    public RepoAnalysis reanalyze(String repoUrl) {
-        // Eliminar análisis previo si existe
+    public AnalysisResult reanalyze(String repoUrl) {
         String normalizedRepoUrl = normalizeRepoUrl(repoUrl);
         repository.findByRepoUrl(normalizedRepoUrl).ifPresent(repository::delete);
         return analyze(repoUrl);
