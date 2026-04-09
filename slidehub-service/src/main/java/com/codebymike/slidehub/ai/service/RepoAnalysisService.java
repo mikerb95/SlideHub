@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Servicio de análisis de repositorios GitHub con Gemini (PLAN-EXPANSION.md

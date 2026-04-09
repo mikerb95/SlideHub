@@ -84,7 +84,8 @@ public class GitHubRepoContextService {
                     ref.repo(),
                     defaultBranch,
                     headSha,
-                    context));
+                    context,
+                    files.size()));
         } catch (Exception e) {
             log.warn("No se pudo resolver contexto GitHub para {}: {}", repoUrl, e.getMessage());
             return Optional.empty();
