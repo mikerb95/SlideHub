@@ -137,6 +137,106 @@ public class MgrService {
         }
     }
 
+    // ── DB Metadata ───────────────────────────────────────────────────────────
+
+    /**
+     * Lista todas las tablas del schema público con su nº de filas.
+     */
+    public List<DbTableMeta> getAllTables() {
+        List<DbTableMeta> tables = new ArrayList<>();
+        String sql = """
+                SELECT table_name FROM information_schema.tables
+                WHERE table_schema = 'public' AND table_type = 'BASE TABLE'
+                ORDER BY table_name
+                """;
+        try (Connection conn = dataSource.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                String name = rs.getString("table_name");
+                long count = queryRowCount(conn, name);
+                tables.add(new DbTableMeta(name, count, List.of()));
+            }
+        } catch (Exception e) {
+            log.warn("Error listando tablas: {}", e.getMessage());
+        }
+        return tables;
+    }
+
+    /**
+     * Devuelve columnas y row count de una tabla específica.
+     */
+    public DbTableMeta getTableDetail(String tableName) {
+        String colSql = """
+                SELECT c.column_name, c.data_type, c.is_nullable, c.column_default,
+                       c.character_maximum_length, c.numeric_precision
+                FROM information_schema.columns c
+                WHERE c.table_name = ? AND c.table_schema = 'public'
+                ORDER BY c.ordinal_position
+                """;
+        String pkSql = """
+                SELECT kcu.column_name
+                FROM information_schema.table_constraints tc
+                JOIN information_schema.key_column_usage kcu
+                     ON tc.constraint_name = kcu.constraint_name
+                     AND tc.table_schema = kcu.table_schema
+                WHERE tc.constraint_type = 'PRIMARY KEY'
+                  AND tc.table_name = ?
+                  AND tc.table_schema = 'public'
+                """;
+        List<DbColumnMeta> columns = new ArrayList<>();
+        long rowCount = 0;
+        try (Connection conn = dataSource.getConnection()) {
+            // Primary keys
+            List<String> pks = new ArrayList<>();
+            try (PreparedStatement ps = conn.prepareStatement(pkSql)) {
+                ps.setString(1, tableName);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) pks.add(rs.getString("column_name"));
+                }
+            }
+            // Columns
+            try (PreparedStatement ps = conn.prepareStatement(colSql)) {
+                ps.setString(1, tableName);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        String colName = rs.getString("column_name");
+                        String dataType = rs.getString("data_type");
+                        Integer charLen = rs.getObject("character_maximum_length", Integer.class);
+                        Integer numPrec = rs.getObject("numeric_precision", Integer.class);
+                        String displayType = buildDisplayType(dataType, charLen, numPrec);
+                        boolean nullable = "YES".equalsIgnoreCase(rs.getString("is_nullable"));
+                        String colDefault = rs.getString("column_default");
+                        columns.add(new DbColumnMeta(colName, displayType, nullable, colDefault, pks.contains(colName)));
+                    }
+                }
+            }
+            rowCount = queryRowCount(conn, tableName);
+        } catch (Exception e) {
+            log.warn("Error obteniendo detalle de tabla {}: {}", tableName, e.getMessage());
+        }
+        return new DbTableMeta(tableName, rowCount, columns);
+    }
+
+    private long queryRowCount(Connection conn, String tableName) {
+        try (PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM \"" + tableName + "\"");
+                ResultSet rs = ps.executeQuery()) {
+            return rs.next() ? rs.getLong(1) : 0;
+        } catch (Exception e) {
+            log.warn("Error contando filas de {}: {}", tableName, e.getMessage());
+            return -1;
+        }
+    }
+
+    private String buildDisplayType(String dataType, Integer charLen, Integer numPrec) {
+        return switch (dataType) {
+            case "character varying" -> charLen != null ? "varchar(%d)".formatted(charLen) : "varchar";
+            case "character" -> charLen != null ? "char(%d)".formatted(charLen) : "char";
+            case "numeric" -> numPrec != null ? "numeric(%d)".formatted(numPrec) : "numeric";
+            default -> dataType;
+        };
+    }
+
     private boolean checkS3() {
         if (s3Bucket == null || s3Bucket.isBlank())
             return false;
