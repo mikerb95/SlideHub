@@ -125,12 +125,15 @@ public class PresentationNotesController {
                     .body(Map.of("error", "La presentación no tiene slides."));
         }
 
-        // Construir lista de referencias de slides para el módulo IA
+        // Construir lista de referencias de slides para el módulo IA.
+        // Usar URLs pre-firmadas para que NotesService pueda descargar las imágenes
+        // aunque el bucket S3 sea privado.
         List<Map<String, Object>> slideRefs = presentation.getSlides().stream()
                 .map(slide -> {
                     Map<String, Object> ref = new HashMap<>();
                     ref.put("slideNumber", slide.getNumber());
-                    ref.put("imageUrl", slide.getS3Url());
+                    ref.put("imageUrl", slideUploadService.generatePresignedSlideUrl(
+                            id, slide.getNumber(), Duration.ofHours(2)));
                     return ref;
                 })
                 .toList();
