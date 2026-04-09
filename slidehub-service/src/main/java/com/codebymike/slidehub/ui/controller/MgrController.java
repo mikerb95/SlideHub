@@ -29,4 +29,12 @@ public class MgrController {
         model.addAttribute("health", mgrService.getServicesHealth());
         return "mgr/dashboard";
     }
+
+    @GetMapping("/db")
+    public String dbView(Model model) {
+        model.addAttribute("tables", mgrService.getAllTables());
+        model.addAttribute("usersDetail", mgrService.getTableDetail("users"));
+        model.addAttribute("presentationsDetail", mgrService.getTableDetail("presentations"));
+        return "mgr/db";
+    }
 }
