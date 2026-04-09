@@ -42,6 +42,9 @@ public class SecurityConfig {
         @Value("${slidehub.security.remember-me-key:${random.uuid}}")
         private String rememberMeKey;
 
+        @Value("${slidehub.security.frame-ancestors:}")
+        private String frameAncestors;
+
         private final CustomUserDetailsService userDetailsService;
         private final CustomOAuth2UserService oAuth2UserService;
         private final CustomOidcUserService oidcUserService;
@@ -162,7 +165,21 @@ public class SecurityConfig {
                                                 .invalidateHttpSession(true)
                                                 .deleteCookies("JSESSIONID", "remember-me"))
                                 .addFilterAfter(userActivityTrackingFilter, UsernamePasswordAuthenticationFilter.class);
-                return http.build();
+                                // Configure headers for framing (iframe embedding)
+                                http.headers(headers -> {
+                                        if (frameAncestors == null || frameAncestors.isBlank()) {
+                                                // Default: allow same-origin framing only
+                                                headers.frameOptions(frame -> frame.sameOrigin());
+                                        } else {
+                                                // If user configured external origins, disable X-Frame-Options
+                                                // and rely on Content-Security-Policy frame-ancestors directive.
+                                                headers.frameOptions(frame -> frame.disable());
+                                                String dirs = "frame-ancestors 'self' " + frameAncestors + ";";
+                                                headers.contentSecurityPolicy(csp -> csp.policyDirectives(dirs));
+                                        }
+                                });
+
+                                return http.build();
         }
 
         /**
