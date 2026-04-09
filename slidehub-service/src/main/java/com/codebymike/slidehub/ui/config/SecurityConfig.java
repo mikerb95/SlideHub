@@ -165,21 +165,21 @@ public class SecurityConfig {
                                                 .invalidateHttpSession(true)
                                                 .deleteCookies("JSESSIONID", "remember-me"))
                                 .addFilterAfter(userActivityTrackingFilter, UsernamePasswordAuthenticationFilter.class);
-                                // Configure headers for framing (iframe embedding)
-                                http.headers(headers -> {
-                                        if (frameAncestors == null || frameAncestors.isBlank()) {
-                                                // Default: allow same-origin framing only
-                                                headers.frameOptions(frame -> frame.sameOrigin());
-                                        } else {
-                                                // If user configured external origins, disable X-Frame-Options
-                                                // and rely on Content-Security-Policy frame-ancestors directive.
-                                                headers.frameOptions(frame -> frame.disable());
-                                                String dirs = "frame-ancestors 'self' " + frameAncestors + ";";
-                                                headers.contentSecurityPolicy(csp -> csp.policyDirectives(dirs));
-                                        }
-                                });
+                // Configure headers for framing (iframe embedding)
+                http.headers(headers -> {
+                        if (frameAncestors == null || frameAncestors.isBlank()) {
+                                // Default: allow same-origin framing only
+                                headers.frameOptions(frame -> frame.sameOrigin());
+                        } else {
+                                // If user configured external origins, disable X-Frame-Options
+                                // and rely on Content-Security-Policy frame-ancestors directive.
+                                headers.frameOptions(frame -> frame.disable());
+                                String dirs = "frame-ancestors 'self' " + frameAncestors + ";";
+                                headers.contentSecurityPolicy(csp -> csp.policyDirectives(dirs));
+                        }
+                });
 
-                                return http.build();
+                return http.build();
         }
 
         /**
