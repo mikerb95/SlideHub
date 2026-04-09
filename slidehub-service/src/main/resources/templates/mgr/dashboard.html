@@ -453,6 +453,13 @@
                             <td style="color:var(--text-2); font-size:.78rem;"
                                 th:text="${u.createdAt != null ? #temporals.format(u.createdAt, 'dd MMM yyyy') : '—'}">
                             </td>
+                            <td style="font-size:.75rem;">
+                                <span th:if="${u.lastLoginIp != null}"
+                                    style="font-family:monospace; color:var(--text-2);"
+                                    th:text="${u.lastLoginIp}"></span>
+                                <span th:if="${u.lastLoginIp == null}"
+                                    style="color:var(--border);">—</span>
+                            </td>
                             <td class="text-right">
                                 <button th:if="${u.role.name() != 'DEVELOPER'}" class="btn-del" th:data-id="${u.id}"
                                     th:data-name="${u.username}" onclick="confirmDeleteUser(this)">
