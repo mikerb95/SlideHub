@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -131,10 +130,10 @@ public class PresentationImportController {
 
     @GetMapping("/api/presentations/{id}/slides/{slideNumber}/image")
     @ResponseBody
-    public ResponseEntity<Void> getSlideImage(@PathVariable String id, @PathVariable int slideNumber) {
+    public ResponseEntity<?> getSlideImage(@PathVariable String id, @PathVariable int slideNumber) {
         return presentationService.getSlideUrl(id, slideNumber)
-            .map(url -> ResponseEntity.status(302)
-                .<Void>header(HttpHeaders.LOCATION, url)
+            .<ResponseEntity<?>>map(url -> ResponseEntity.status(302)
+                .header(HttpHeaders.LOCATION, url)
                 .header(HttpHeaders.CACHE_CONTROL, "public, max-age=300")
                 .build())
             .orElse(ResponseEntity.notFound().build());
