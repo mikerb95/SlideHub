@@ -9,6 +9,11 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
+
+import java.time.Duration;
 
 /**
  * Servicio de upload de diapositivas a Amazon S3 (CLAUDE.md §9.5.2).
@@ -22,6 +27,7 @@ public class SlideUploadService {
     private static final Logger log = LoggerFactory.getLogger(SlideUploadService.class);
 
     private final S3Client s3;
+    private final S3Presigner presigner;
 
     @Value("${aws.s3.bucket}")
     private String bucket;
@@ -29,8 +35,9 @@ public class SlideUploadService {
     @Value("${aws.s3.region}")
     private String region;
 
-    public SlideUploadService(S3Client s3) {
+    public SlideUploadService(S3Client s3, S3Presigner presigner) {
         this.s3 = s3;
+        this.presigner = presigner;
     }
 
     /**
@@ -102,5 +109,38 @@ public class SlideUploadService {
      */
     public String buildPublicUrl(String key) {
         return "https://%s.s3.%s.amazonaws.com/%s".formatted(bucket, region, key);
+    }
+
+    /**
+     * Genera una URL pre-firmada de S3 válida durante {@code ttl}.
+     * Las URLs pre-firmadas son accesibles desde el navegador aunque el bucket sea privado.
+     *
+     * @param key clave S3 del objeto
+     * @param ttl tiempo de validez (ej. {@code Duration.ofHours(1)})
+     * @return URL pre-firmada
+     */
+    public String generatePresignedUrl(String key, Duration ttl) {
+        PresignedGetObjectRequest presigned = presigner.presignGetObject(
+                GetObjectPresignRequest.builder()
+                        .signatureDuration(ttl)
+                        .getObjectRequest(GetObjectRequest.builder()
+                                .bucket(bucket)
+                                .key(key)
+                                .build())
+                        .build());
+        return presigned.url().toString();
+    }
+
+    /**
+     * Genera una URL pre-firmada para el slide de una presentación.
+     * Atajo conveniente para {@link #generatePresignedUrl(String, Duration)}.
+     *
+     * @param presentationId ID de la presentación
+     * @param slideNumber    número de slide (1-based)
+     * @param ttl            tiempo de validez
+     * @return URL pre-firmada
+     */
+    public String generatePresignedSlideUrl(String presentationId, int slideNumber, Duration ttl) {
+        return generatePresignedUrl(buildSlideKey(presentationId, slideNumber), ttl);
     }
 }

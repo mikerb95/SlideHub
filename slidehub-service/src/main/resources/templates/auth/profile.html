@@ -53,7 +53,8 @@
                 <span class="sh-badge ml-0 sm:ml-1 text-[0.62rem]">PERFIL</span>
             </div>
             <div class="flex items-center gap-3">
-                <a th:href="@{/presentations/dashboard}" class="sh-btn sh-btn-ghost text-xs">
+                <a href="/presentations" class="sh-btn sh-btn-ghost text-xs"
+                    onclick="return goBackOrPresentations(event);">
                     <i class="fa-solid fa-arrow-left"></i>
                     <span class="hidden sm:inline">Volver</span>
                 </a>
@@ -274,6 +275,29 @@
     </main>
 
     <script>
+        function goBackOrPresentations(event) {
+            if (event) {
+                event.preventDefault();
+            }
+
+            const referrer = document.referrer;
+            const hasSameOriginReferrer = referrer && (() => {
+                try {
+                    return new URL(referrer).origin === window.location.origin;
+                } catch (error) {
+                    return false;
+                }
+            })();
+
+            if (hasSameOriginReferrer) {
+                window.history.back();
+            } else {
+                window.location.href = '/presentations';
+            }
+
+            return false;
+        }
+
         (function () {
             const form = document.getElementById('create-password-form');
             if (!form) {
