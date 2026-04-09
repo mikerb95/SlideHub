@@ -381,31 +381,110 @@
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════════════ -->
-        <!-- PASO 2: Repositorio GitHub                                         -->
+        <!-- PASO 2: Contexto del proyecto                                      -->
         <!-- ═══════════════════════════════════════════════════════════════════ -->
         <div class="wizard-step" id="step-2">
             <div class="sh-card p-6">
-                <div class="sh-label mb-1"><i class="fa-brands fa-github mr-1"></i>PASO 2</div>
-                <h2 class="font-brand text-2xl mb-2 text-[var(--sh-text-1)]">Repositorio GitHub</h2>
-                <p class="text-sm text-[var(--sh-text-3)] mb-5">Proporciona la URL del repositorio para que Gemini
-                    analice el contexto del proyecto.</p>
+                <div class="sh-label mb-1"><i class="fa-solid fa-file-code mr-1"></i>PASO 2</div>
+                <h2 class="font-brand text-2xl mb-2 text-[var(--sh-text-1)]">Contexto del Proyecto</h2>
+                <p class="text-sm text-[var(--sh-text-3)] mb-4">
+                    Gemini analizará la documentación del proyecto para generar notas de presentación más precisas.
+                    Puedes conectar un repositorio GitHub o subir los archivos manualmente.
+                </p>
 
-                <div class="mb-4">
-                    <label class="sh-input-label">URL del Repositorio</label>
-                    <input type="url" id="repo-url" class="sh-input" placeholder="https://github.com/usuario/proyecto">
-                    <div class="text-xs text-[var(--sh-text-3)] mt-1">Gemini usará el código fuente para generar notas
-                        más precisas.</div>
+                <!-- Tabs -->
+                <div class="flex gap-1 mb-5 border-b border-[var(--sh-border)]">
+                    <button id="tab-github" onclick="switchRepoTab('github')"
+                        class="tab-btn px-4 py-2 text-xs font-mono border-b-2 border-[var(--sh-blue)] text-[var(--sh-blue)] -mb-px">
+                        <i class="fa-brands fa-github mr-1"></i>GitHub
+                    </button>
+                    <button id="tab-upload" onclick="switchRepoTab('upload')"
+                        class="tab-btn px-4 py-2 text-xs font-mono border-b-2 border-transparent text-[var(--sh-text-3)] -mb-px">
+                        <i class="fa-solid fa-upload mr-1"></i>Subir documentación
+                    </button>
                 </div>
 
-                <button type="button" class="sh-btn sh-btn-primary" id="btn-analyze-repo" onclick="analyzeRepo()">
-                    <i class="fa-solid fa-magnifying-glass-chart mr-1"></i> Analizar Repositorio
-                </button>
-                <div id="repo-progress" class="repo-assistant-panel hidden mt-3">
+                <!-- ── Tab GitHub ── -->
+                <div id="tab-panel-github">
+                    <!-- Nota de advertencia -->
+                    <div class="flex gap-2 p-3 rounded-tech mb-4"
+                        style="background:rgba(255,215,64,.07);border:1px solid rgba(255,215,64,.25);">
+                        <i class="fa-solid fa-triangle-exclamation text-[var(--sh-yellow)] mt-0.5 flex-shrink-0 text-xs"></i>
+                        <p class="text-xs text-[var(--sh-text-2)] leading-relaxed">
+                            Solo se leerán archivos de <strong class="text-[var(--sh-text-1)]">documentación</strong>:
+                            <span class="font-mono text-[var(--sh-yellow)]">README</span>,
+                            <span class="font-mono text-[var(--sh-yellow)]">AGENTS.md</span>,
+                            <span class="font-mono text-[var(--sh-yellow)]">CLAUDE.md</span>,
+                            <span class="font-mono text-[var(--sh-yellow)]">pom.xml</span>,
+                            <span class="font-mono text-[var(--sh-yellow)]">package.json</span>,
+                            <span class="font-mono text-[var(--sh-yellow)]">Dockerfile</span>,
+                            archivos <span class="font-mono text-[var(--sh-yellow)]">.md/.yml/.yaml</span>
+                            y carpeta <span class="font-mono text-[var(--sh-yellow)]">docs/</span>.
+                            El código fuente <strong>no</strong> se descarga.
+                        </p>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="sh-input-label">URL del Repositorio</label>
+                        <input type="url" id="repo-url" class="sh-input" placeholder="https://github.com/usuario/proyecto">
+                    </div>
+
+                    <button type="button" class="sh-btn sh-btn-primary" id="btn-analyze-repo" onclick="analyzeRepo()">
+                        <i class="fa-solid fa-magnifying-glass-chart mr-1"></i>Analizar Repositorio
+                    </button>
+                </div>
+
+                <!-- ── Tab upload ── -->
+                <div id="tab-panel-upload" class="hidden">
+                    <!-- Nota de advertencia -->
+                    <div class="flex gap-2 p-3 rounded-tech mb-4"
+                        style="background:rgba(88,166,255,.07);border:1px solid rgba(88,166,255,.2);">
+                        <i class="fa-solid fa-circle-info text-[var(--sh-blue)] mt-0.5 flex-shrink-0 text-xs"></i>
+                        <p class="text-xs text-[var(--sh-text-2)] leading-relaxed">
+                            Sube los archivos de documentación del proyecto:
+                            <span class="font-mono text-[var(--sh-blue)]">.md</span>,
+                            <span class="font-mono text-[var(--sh-blue)]">.html</span>,
+                            <span class="font-mono text-[var(--sh-blue)]">.txt</span>,
+                            <span class="font-mono text-[var(--sh-blue)]">.adoc</span>,
+                            <span class="font-mono text-[var(--sh-blue)]">pom.xml</span>,
+                            <span class="font-mono text-[var(--sh-blue)]">package.json</span>,
+                            <span class="font-mono text-[var(--sh-blue)]">.yaml</span>,
+                            <span class="font-mono text-[var(--sh-blue)]">.toml</span>,
+                            <span class="font-mono text-[var(--sh-blue)]">.properties</span>,
+                            <span class="font-mono text-[var(--sh-blue)]">.gradle</span>.
+                            Máximo 10 archivos, 10 KB por archivo.
+                        </p>
+                    </div>
+
+                    <!-- Drop zone -->
+                    <div id="docs-drop-zone"
+                        class="border-2 border-dashed border-[var(--sh-border)] rounded-tech p-8 text-center cursor-pointer transition-all"
+                        onclick="document.getElementById('docs-file-input').click()"
+                        ondragover="docsDropZoneOver(event)"
+                        ondragleave="docsDropZoneLeave()"
+                        ondrop="docsDropped(event)">
+                        <i class="fa-solid fa-cloud-arrow-up text-2xl text-[var(--sh-text-3)] mb-2 block"></i>
+                        <p class="text-sm text-[var(--sh-text-2)]">Arrastra los archivos aquí o <span class="text-[var(--sh-blue)] underline">selecciona</span></p>
+                        <p class="text-xs text-[var(--sh-text-3)] mt-1">.md · .html · .txt · .adoc · .xml · .json · .yaml · .yml · .toml · .ini · .properties · .gradle</p>
+                    </div>
+                    <input type="file" id="docs-file-input" class="hidden" multiple
+                        accept=".md,.html,.txt,.adoc,.rst,.xml,.json,.yaml,.yml,.toml,.ini,.properties,.gradle">
+
+                    <!-- File list -->
+                    <div id="docs-file-list" class="mt-3 space-y-1 hidden"></div>
+
+                    <button type="button" class="sh-btn sh-btn-primary mt-4" id="btn-analyze-docs" onclick="analyzeFromDocs()" disabled>
+                        <i class="fa-solid fa-magnifying-glass-chart mr-1"></i>Analizar Documentación
+                    </button>
+                </div>
+
+                <!-- ── Shared: progress + result ── -->
+                <div id="repo-progress" class="repo-assistant-panel hidden mt-4">
                     <div class="repo-assistant-title">
                         <i class="fa-solid fa-brain"></i>
                         <span>Gemini está trabajando...</span>
                     </div>
-                    <div id="repo-status-text" class="repo-assistant-status">Analizando estructura del repositorio...
+                    <div id="repo-status-text" class="repo-assistant-status">Analizando documentación del proyecto...
                     </div>
                     <div class="progress-track">
                         <div id="repo-progress-fill" class="progress-fill" style="width: 8%"></div>
@@ -418,12 +497,30 @@
                         <span>Tips de uso</span>
                     </div>
                     <div id="repo-tip-text" class="repo-assistant-tip">
-                        Tip: un repositorio con README claro y estructura consistente mejora la calidad de las notas IA.
+                        Tip: un README claro y un pom.xml/package.json completo mejoran significativamente la calidad de las notas.
                     </div>
                 </div>
+                <!-- Sin documentación encontrada -->
+                <div id="repo-no-docs" class="hidden mt-3 flex gap-2 p-3 rounded-tech"
+                    style="background:rgba(255,82,82,.07);border:1px solid rgba(255,82,82,.25);">
+                    <i class="fa-solid fa-file-circle-xmark text-[var(--sh-red)] mt-0.5 flex-shrink-0 text-sm"></i>
+                    <div>
+                        <p class="text-xs text-[var(--sh-text-2)] leading-relaxed">
+                            <strong class="text-[var(--sh-red)]">No se encontró documentación</strong> en el repositorio
+                            (sin README, pom.xml, ni archivos .md). El análisis puede ser impreciso.
+                        </p>
+                        <button onclick="switchRepoTab('upload')"
+                            class="text-xs text-[var(--sh-blue)] underline mt-1">
+                            Subir documentación manualmente →
+                        </button>
+                    </div>
+                </div>
+                <!-- Resultado exitoso -->
                 <div id="repo-result" class="hidden mt-3 note-card">
-                    <div class="font-mono text-xs text-[var(--sh-green)] mb-2"><i
-                            class="fa-solid fa-check mr-1"></i>Repositorio analizado</div>
+                    <div class="font-mono text-xs text-[var(--sh-green)] mb-2">
+                        <i class="fa-solid fa-check mr-1"></i>Documentación analizada
+                        <span id="repo-files-found" class="text-[var(--sh-text-3)] ml-1"></span>
+                    </div>
                     <div id="repo-summary" class="text-sm text-[var(--sh-text-2)]"></div>
                 </div>
                 <div id="repo-error" class="sh-alert sh-alert-error hidden mt-3"></div>
