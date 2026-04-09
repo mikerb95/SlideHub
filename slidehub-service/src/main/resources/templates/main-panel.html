@@ -577,7 +577,7 @@
                 await fetch(API_SLIDE_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ slide: slideToKeep, totalSlides })
+                    body: JSON.stringify({ slide: slideToKeep, totalSlides, presentationId: PRESENTATION_ID || null })
                 });
             } catch (_) { }
         }

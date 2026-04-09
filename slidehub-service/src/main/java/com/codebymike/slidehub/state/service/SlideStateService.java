@@ -30,6 +30,7 @@ public class SlideStateService {
     private static final String SLIDE_KEY = "current_slide";
     private static final String SLIDE_FIELD = "slide";
     private static final String TOTAL_SLIDES_FIELD = "totalSlides";
+    private static final String PRESENTATION_ID_FIELD = "presentationId";
 
     private final StringRedisTemplate redis;
     private final ObjectMapper objectMapper;
@@ -50,6 +51,7 @@ public class SlideStateService {
         JsonNode state = readStoredState();
         int slide = 1;
         int totalSlides = countSlides();
+        String presentationId = null;
 
         if (state != null) {
             slide = state.path(SLIDE_FIELD).asInt(1);
@@ -57,9 +59,13 @@ public class SlideStateService {
             if (storedTotalSlides > 0) {
                 totalSlides = storedTotalSlides;
             }
+            JsonNode presNode = state.path(PRESENTATION_ID_FIELD);
+            if (!presNode.isMissingNode() && !presNode.isNull()) {
+                presentationId = presNode.asString(null);
+            }
         }
 
-        return new SlideStateResponse(slide, totalSlides);
+        return new SlideStateResponse(slide, totalSlides, presentationId);
     }
 
     /**
@@ -67,14 +73,19 @@ public class SlideStateService {
      * §3,§4).
      * Si totalSlides = 0, guarda el valor tal cual (sin slides importados aún).
      */
-    public SlideStateResponse setSlide(int requestedSlide, Integer requestedTotalSlides) {
+    public SlideStateResponse setSlide(int requestedSlide, Integer requestedTotalSlides, String presentationId) {
         int total = resolveTotalSlides(requestedTotalSlides);
         int bounded = total > 0
                 ? Math.max(1, Math.min(requestedSlide, total))
                 : Math.max(1, requestedSlide);
 
-        storeSlideState(bounded, total);
-        return new SlideStateResponse(bounded, total);
+        storeSlideState(bounded, total, presentationId);
+        return new SlideStateResponse(bounded, total, presentationId);
+    }
+
+    /** Variante de compatibilidad sin presentationId. */
+    public SlideStateResponse setSlide(int requestedSlide, Integer requestedTotalSlides) {
+        return setSlide(requestedSlide, requestedTotalSlides, null);
     }
 
     /**
@@ -160,12 +171,15 @@ public class SlideStateService {
         return countSlides();
     }
 
-    private void storeSlideState(int slide, int totalSlides) {
+    private void storeSlideState(int slide, int totalSlides, String presentationId) {
         try {
             Map<String, Object> state = new LinkedHashMap<>();
             state.put(SLIDE_FIELD, slide);
             if (totalSlides > 0) {
                 state.put(TOTAL_SLIDES_FIELD, totalSlides);
+            }
+            if (presentationId != null && !presentationId.isBlank()) {
+                state.put(PRESENTATION_ID_FIELD, presentationId);
             }
             redis.opsForValue().set(SLIDE_KEY, objectMapper.writeValueAsString(state));
         } catch (Exception e) {

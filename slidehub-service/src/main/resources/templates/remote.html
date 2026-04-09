@@ -788,6 +788,7 @@
 
         const query = new URLSearchParams(window.location.search);
         const PRESENTATION_ID = query.get('presentationId') || '';
+        let activePresentationId = PRESENTATION_ID;
         const JOIN_TOKEN = query.get('joinToken') || '';
         const STORAGE_KEY = `participant-token:${PRESENTATION_ID}`;
         const DEVICE_STORAGE_KEY = `device-token:remote:${PRESENTATION_ID || 'global'}`;
@@ -859,7 +860,7 @@
 
         function slideImageUrl(n) {
             if (!n || n < 1 || n > totalSlides) return '';
-            if (PRESENTATION_ID) return `/api/presentations/${PRESENTATION_ID}/slides/${n}/image`;
+            if (activePresentationId) return `/api/presentations/${activePresentationId}/slides/${n}/image`;
             return `/presentation/Slide${n}.PNG`;
         }
 
@@ -1053,6 +1054,9 @@
                     const prevSlide = currentSlide;
                     currentSlide = data.slide;
                     totalSlides = data.totalSlides;
+                    if (!PRESENTATION_ID && data.presentationId) {
+                        activePresentationId = data.presentationId;
+                    }
                     updateThumbs();
 
                     if (prevSlide !== currentSlide) {

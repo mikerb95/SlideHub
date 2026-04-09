@@ -37,6 +37,7 @@ public class SlideController {
      */
     @PostMapping
     public ResponseEntity<SlideStateResponse> setSlide(@RequestBody SetSlideRequest request) {
-        return ResponseEntity.ok(slideStateService.setSlide(request.slide(), request.totalSlides()));
+        return ResponseEntity.ok(slideStateService.setSlide(
+                request.slide(), request.totalSlides(), request.presentationId()));
     }
 }
