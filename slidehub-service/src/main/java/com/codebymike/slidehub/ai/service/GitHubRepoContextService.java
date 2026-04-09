@@ -348,6 +348,7 @@ public class GitHubRepoContextService {
             String repo,
             String defaultBranch,
             String headCommitSha,
-            String contextText) {
+            String contextText,
+            int fileCount) {
     }
 }
