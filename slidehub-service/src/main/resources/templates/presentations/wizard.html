@@ -1308,17 +1308,36 @@
             return 'https://' + trimmed;
         }
 
-        // ── STEP 2: Repo Analysis ──
+        // ── STEP 2: Tab switcher ──
+        function switchRepoTab(tab) {
+            const isGithub = tab === 'github';
+            document.getElementById('tab-panel-github').classList.toggle('hidden', !isGithub);
+            document.getElementById('tab-panel-upload').classList.toggle('hidden', isGithub);
+            document.getElementById('tab-github').classList.toggle('border-[var(--sh-blue)]', isGithub);
+            document.getElementById('tab-github').classList.toggle('text-[var(--sh-blue)]', isGithub);
+            document.getElementById('tab-github').classList.toggle('border-transparent', !isGithub);
+            document.getElementById('tab-github').classList.toggle('text-[var(--sh-text-3)]', !isGithub);
+            document.getElementById('tab-upload').classList.toggle('border-[var(--sh-blue)]', !isGithub);
+            document.getElementById('tab-upload').classList.toggle('text-[var(--sh-blue)]', !isGithub);
+            document.getElementById('tab-upload').classList.toggle('border-transparent', isGithub);
+            document.getElementById('tab-upload').classList.toggle('text-[var(--sh-text-3)]', isGithub);
+            hideError('repo-error');
+            document.getElementById('repo-result').classList.add('hidden');
+            document.getElementById('repo-no-docs').classList.add('hidden');
+        }
+
+        // ── STEP 2: Repo Analysis (GitHub) ──
         async function analyzeRepo() {
             const repoInput = document.getElementById('repo-url');
             const repoUrl = normalizeRepoUrl(repoInput.value);
-            if (!repoUrl) { showError('repo-error', 'Ingresa una URL de repositorio.'); return; }
+            if (!repoUrl) { showError('repo-error', 'Ingresa una URL de repositorio válida.'); return; }
             repoInput.value = repoUrl;
             W.repoUrl = repoUrl;
             hideError('repo-error');
             document.getElementById('btn-analyze-repo').disabled = true;
-            startRepoAssistantPanel();
             document.getElementById('repo-result').classList.add('hidden');
+            document.getElementById('repo-no-docs').classList.add('hidden');
+            startRepoAssistantPanel();
 
             try {
                 let res = null;
@@ -1326,51 +1345,153 @@
                 const maxAttempts = 3;
 
                 for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-                    updateRepoAssistantPanel('Conectando con Gemini...', 25 + (attempt * 15), 'Intento ' + attempt + ' de ' + maxAttempts);
+                    updateRepoAssistantPanel('Buscando archivos de documentación...', 25 + (attempt * 15), 'Intento ' + attempt + ' de ' + maxAttempts);
                     res = await fetch('/api/ai/analyze-repo', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', ...csrfHeaders() },
                         body: JSON.stringify({ repoUrl })
                     });
-
                     data = await readJsonSafe(res);
-
-                    if (res.status !== 429) {
-                        break;
-                    }
-
+                    if (res.status !== 429) break;
                     if (attempt < maxAttempts) {
                         const waitSeconds = attempt * 4;
-                        updateRepoAssistantPanel(
-                            'Servicio IA iniciando en Render...',
-                            35 + (attempt * 10),
-                            'Reintentando en ' + waitSeconds + 's'
-                        );
+                        updateRepoAssistantPanel('Servicio IA iniciando...', 35 + (attempt * 10), 'Reintentando en ' + waitSeconds + 's');
                         await sleep(waitSeconds * 1000);
                     }
                 }
 
                 stopRepoAssistantPanel();
                 document.getElementById('btn-analyze-repo').disabled = false;
+
                 if (res.ok) {
-                    document.getElementById('repo-result').classList.remove('hidden');
-                    const summary = data.summary || data.language || 'Análisis completado';
+                    const filesFound = data.filesFound ?? 0;
+                    if (filesFound === 0) {
+                        document.getElementById('repo-no-docs').classList.remove('hidden');
+                    } else {
+                        document.getElementById('repo-result').classList.remove('hidden');
+                        document.getElementById('repo-files-found').textContent =
+                            '— ' + filesFound + ' archivo' + (filesFound !== 1 ? 's' : '') + ' encontrado' + (filesFound !== 1 ? 's' : '');
+                    }
                     const parts = [];
                     if (data.language) parts.push('Lenguaje: ' + data.language);
                     if (data.framework) parts.push('Framework: ' + data.framework);
                     if (data.technologies && data.technologies.length) parts.push('Tech: ' + data.technologies.join(', '));
-                    document.getElementById('repo-summary').textContent = parts.length ? parts.join(' | ') : summary;
+                    document.getElementById('repo-summary').textContent =
+                        parts.length ? parts.join(' | ') : (data.summary || 'Análisis completado');
                 } else {
-                    if (res.status === 429) {
-                        showError('repo-error', 'El servicio de IA está iniciando o saturado (429). Espera unos segundos e inténtalo de nuevo.');
-                    } else {
-                        showError('repo-error', data.error || 'Error analizando repositorio.');
-                    }
+                    const msg = res.status === 429
+                        ? 'El servicio de IA está iniciando (429). Espera unos segundos e inténtalo de nuevo.'
+                        : (data.error || 'Error analizando repositorio.');
+                    showError('repo-error', msg);
                 }
             } catch (e) {
                 stopRepoAssistantPanel();
                 document.getElementById('btn-analyze-repo').disabled = false;
-                showError('repo-error', 'Error de conexion.');
+                showError('repo-error', 'Error de conexión.');
+            }
+        }
+
+        // ── STEP 2: Docs drop zone ──
+        let docsFiles = [];
+
+        document.getElementById('docs-file-input').addEventListener('change', function () {
+            addDocsFiles(Array.from(this.files));
+        });
+
+        function docsDropZoneOver(e) {
+            e.preventDefault();
+            document.getElementById('docs-drop-zone').classList.add('border-[var(--sh-blue)]', 'bg-[var(--sh-blue-dim)]');
+        }
+        function docsDropZoneLeave() {
+            document.getElementById('docs-drop-zone').classList.remove('border-[var(--sh-blue)]', 'bg-[var(--sh-blue-dim)]');
+        }
+        function docsDropped(e) {
+            e.preventDefault();
+            docsDropZoneLeave();
+            addDocsFiles(Array.from(e.dataTransfer.files));
+        }
+
+        function addDocsFiles(newFiles) {
+            const allowed = /\.(md|html|txt|adoc|rst|xml|json|yaml|yml|toml|ini|properties|gradle|jar)$/i;
+            newFiles.forEach(f => {
+                if (!allowed.test(f.name)) return;
+                if (docsFiles.length >= 10) return;
+                if (!docsFiles.find(x => x.name === f.name && x.size === f.size)) {
+                    docsFiles.push(f);
+                }
+            });
+            renderDocsFileList();
+        }
+
+        function removeDocsFile(idx) {
+            docsFiles.splice(idx, 1);
+            renderDocsFileList();
+        }
+
+        function renderDocsFileList() {
+            const list = document.getElementById('docs-file-list');
+            const btn = document.getElementById('btn-analyze-docs');
+            if (docsFiles.length === 0) {
+                list.classList.add('hidden');
+                btn.disabled = true;
+                return;
+            }
+            list.classList.remove('hidden');
+            btn.disabled = false;
+            list.innerHTML = docsFiles.map((f, i) => `
+                <div class="flex items-center justify-between px-3 py-1.5 rounded-tech text-xs font-mono"
+                     style="background:var(--sh-deep);border:1px solid var(--sh-border);">
+                    <span class="text-[var(--sh-text-2)] truncate max-w-[80%]">
+                        <i class="fa-solid fa-file-lines mr-1 text-[var(--sh-blue)]"></i>${f.name}
+                        <span class="text-[var(--sh-text-3)] ml-1">(${(f.size/1024).toFixed(1)} KB)</span>
+                    </span>
+                    <button onclick="removeDocsFile(${i})" class="text-[var(--sh-text-3)] hover:text-[var(--sh-red)] ml-2">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>`).join('');
+        }
+
+        // ── STEP 2: Analyze from manual docs ──
+        async function analyzeFromDocs() {
+            if (docsFiles.length === 0) { showError('repo-error', 'Agrega al menos un archivo.'); return; }
+            hideError('repo-error');
+            document.getElementById('btn-analyze-docs').disabled = true;
+            document.getElementById('repo-result').classList.add('hidden');
+            document.getElementById('repo-no-docs').classList.add('hidden');
+            startRepoAssistantPanel();
+            updateRepoAssistantPanel('Leyendo archivos y enviando a Gemini...', 20, docsFiles.length + ' archivo(s)');
+
+            const formData = new FormData();
+            docsFiles.forEach(f => formData.append('files', f));
+
+            try {
+                const res = await fetch('/api/ai/analyze-repo/from-docs', {
+                    method: 'POST',
+                    headers: { ...csrfHeaders() },
+                    body: formData
+                });
+                const data = await readJsonSafe(res);
+                stopRepoAssistantPanel();
+                document.getElementById('btn-analyze-docs').disabled = false;
+
+                if (res.ok) {
+                    W.repoUrl = data.syntheticRepoUrl || null;
+                    document.getElementById('repo-result').classList.remove('hidden');
+                    document.getElementById('repo-files-found').textContent =
+                        '— ' + (data.filesRead ?? docsFiles.length) + ' archivo(s) procesados';
+                    const parts = [];
+                    if (data.language) parts.push('Lenguaje: ' + data.language);
+                    if (data.framework) parts.push('Framework: ' + data.framework);
+                    if (data.technologies && data.technologies.length) parts.push('Tech: ' + data.technologies.join(', '));
+                    document.getElementById('repo-summary').textContent =
+                        parts.length ? parts.join(' | ') : (data.summary || 'Análisis completado');
+                } else {
+                    showError('repo-error', data.error || 'Error analizando documentación.');
+                }
+            } catch (e) {
+                stopRepoAssistantPanel();
+                document.getElementById('btn-analyze-docs').disabled = false;
+                showError('repo-error', 'Error de conexión.');
             }
         }
 
