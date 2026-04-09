@@ -265,7 +265,7 @@
                                 <div th:each="note : ${existingNotes}"
                                     th:if="${note.get('slideNumber') == slide.number}"
                                     th:id="${'note-content-' + slide.number}" class="note-card">
-                                    <img th:src="${slide.s3Url}" th:alt="${'Miniatura diapositiva ' + slide.number}"
+                                    <img th:src="@{/api/presentations/{pId}/slides/{n}/image(pId=${presentation.id},n=${slide.number})}" th:alt="${'Miniatura diapositiva ' + slide.number}"
                                         class="note-thumb" loading="lazy" onerror="this.style.display='none'">
                                     <div class="font-semibold text-sm text-[var(--sh-text-1)] mb-2"
                                         th:text="${note.get('title')}">Título</div>
