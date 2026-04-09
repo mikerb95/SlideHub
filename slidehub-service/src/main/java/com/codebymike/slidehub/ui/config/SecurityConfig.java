@@ -150,10 +150,16 @@ public class SecurityConfig {
                                                 .userInfoEndpoint(userInfo -> userInfo
                                                                 .userService(oAuth2UserService)
                                                                 .oidcUserService(oidcUserService)))
+                                .rememberMe(rm -> rm
+                                                .key(rememberMeKey)
+                                                .userDetailsService(userDetailsService)
+                                                .tokenValiditySeconds(REMEMBER_ME_SECONDS)
+                                                .alwaysRemember(true))
                                 .logout(logout -> logout
                                                 .logoutUrl("/auth/logout")
                                                 .logoutSuccessUrl("/auth/login?logout=true")
-                                                .invalidateHttpSession(true))
+                                                .invalidateHttpSession(true)
+                                                .deleteCookies("JSESSIONID", "remember-me"))
                                 .addFilterAfter(userActivityTrackingFilter, UsernamePasswordAuthenticationFilter.class);
                 return http.build();
         }
