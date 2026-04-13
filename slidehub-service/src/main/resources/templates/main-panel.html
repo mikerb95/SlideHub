@@ -551,12 +551,21 @@
                 div.className = 'slide-thumb';
                 div.dataset.slide = i;
                 const url = slideUrls[i - 1] || `/presentation/Slide${i}.PNG`;
-                div.innerHTML = `<img src="${url}" alt="Diapositiva ${i}" loading="lazy"
+                const realSlideNumber = getRealSlideNumber(i);
+                const isQuick = quickSlideNumbers.has(realSlideNumber);
+                const deleteBtn = isQuick
+                    ? `<button class="delete-quick-btn" title="Eliminar slide rápido"
+                               onclick="event.stopPropagation(); deleteQuickSlide(${realSlideNumber})">
+                           <i class="fa-solid fa-trash"></i>
+                       </button>`
+                    : '';
+                div.innerHTML = `${deleteBtn}
+                                 <img src="${url}" alt="Diapositiva ${i}" loading="lazy"
                                       onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
                                  <div class="slide-thumb-placeholder" style="display:none;width:100%;aspect-ratio:16/9;align-items:center;justify-content:center;color:var(--sh-text-3);font-size:1.5rem;">
                                      <i class="fa-solid fa-image"></i>
                                  </div>
-                                 <div class="slide-num">${i}</div>`;
+                                 <div class="slide-num">${i}${isQuick ? ' <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--sh-accent);font-size:0.6rem;"></i>' : ''}</div>`;
                 div.addEventListener('click', () => goToSlide(i));
                 grid.appendChild(div);
             }
