@@ -32,7 +32,7 @@ class SlideControllerTest {
         given(slideStateService.setSlide(3, 12)).willReturn(new SlideStateResponse(3, 12));
 
         ResponseEntity<SlideStateResponse> response = slideController
-                .setSlide(new com.codebymike.slidehub.state.model.SetSlideRequest(3, 12));
+                .setSlide(new com.codebymike.slidehub.state.model.SetSlideRequest(3, 12, null));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
