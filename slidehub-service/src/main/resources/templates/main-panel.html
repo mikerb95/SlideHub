@@ -721,7 +721,15 @@
                 .map(participant => `
                     <div class="meeting-item">
                         <span>${participant.displayName}</span>
-                        <span class="${participant.presenter ? 'sh-badge-green' : 'sh-badge'}" style="font-size:0.6rem; padding:0.15rem 0.4rem;">${participant.presenter ? 'Expo' : 'Inv'}</span>
+                        <div style="display:flex;align-items:center;gap:0.35rem;">
+                            <span class="${participant.presenter ? 'sh-badge-green' : 'sh-badge'}" style="font-size:0.6rem; padding:0.15rem 0.4rem;">${participant.presenter ? 'Expo' : 'Inv'}</span>
+                            <button onclick="removeParticipant('${participant.id}')"
+                                title="Eliminar participante"
+                                style="background:none;border:none;color:var(--sh-text-3);cursor:pointer;padding:0.1rem 0.2rem;line-height:1;"
+                                onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--sh-text-3)'">
+                                <i class="fa-solid fa-xmark" style="font-size:0.7rem;"></i>
+                            </button>
+                        </div>
                     </div>
                 `)
                 .join('');
@@ -843,6 +851,19 @@
             }
             participantNameInput.value = '';
             await loadParticipants();
+        }
+
+        async function removeParticipant(participantId) {
+            if (!PRESENTATION_ID) return;
+            const res = await fetch(`${MEETING_API}/participants/${encodeURIComponent(participantId)}`, {
+                method: 'DELETE'
+            });
+            if (!res.ok) {
+                showToast('No se pudo eliminar el participante.');
+                return;
+            }
+            await loadParticipants();
+            await loadAssignments();
         }
 
         async function assignSlideToParticipant() {
