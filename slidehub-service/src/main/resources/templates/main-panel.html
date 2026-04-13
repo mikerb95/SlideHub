@@ -899,6 +899,34 @@
             await fetchState();
         }
 
+        // Returns the actual slide number stored in DB for grid position i.
+        // When no catalog is loaded (slideUrls empty), position == number.
+        function getRealSlideNumber(gridPosition) {
+            if (!PRESENTATION_ID || slideUrls.length === 0) return gridPosition;
+            // quickSlideNumbers stores real DB numbers; map grid position back via sorted catalog
+            // The catalog is sorted by number, so position i corresponds to sorted[i-1].number
+            // We need the original sorted array — store it alongside slideUrls
+            return sortedSlideNumbers[gridPosition - 1] ?? gridPosition;
+        }
+
+        async function deleteQuickSlide(slideNumber) {
+            if (!PRESENTATION_ID) return;
+            if (!confirm(`¿Eliminar el slide rápido ${slideNumber}?`)) return;
+
+            const res = await fetch(
+                `/api/presentations/${encodeURIComponent(PRESENTATION_ID)}/quick-slide/${slideNumber}`,
+                { method: 'DELETE' }
+            );
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                showToast(data.error || 'No se pudo eliminar el slide.');
+                return;
+            }
+            showToast('Slide rápido eliminado.');
+            await loadSlidesCatalog();
+            await fetchState();
+        }
+
         // ── Demo controls ──────────────────────────────────────────────────────
 
         async function activateDemoLink(url, title) {
