@@ -8,6 +8,7 @@ import com.codebymike.slidehub.ui.service.CustomOidcUserService;
 import com.codebymike.slidehub.ui.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.http.HttpMethod;
@@ -54,7 +55,7 @@ public class SecurityConfig {
         public SecurityConfig(CustomUserDetailsService userDetailsService,
                         CustomOAuth2UserService oAuth2UserService,
                         CustomOidcUserService oidcUserService,
-                        UserRepository userRepository,
+                        @Lazy UserRepository userRepository,
                         UserActivityTrackingFilter userActivityTrackingFilter) {
                 this.userDetailsService = userDetailsService;
                 this.oAuth2UserService = oAuth2UserService;
