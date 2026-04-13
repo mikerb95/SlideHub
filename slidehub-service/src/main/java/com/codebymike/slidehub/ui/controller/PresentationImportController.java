@@ -334,6 +334,24 @@ public class PresentationImportController {
         }
     }
 
+    @DeleteMapping("/api/presentations/{presentationId}/quick-slide/{slideNumber}")
+    @ResponseBody
+    public ResponseEntity<?> deleteQuickSlide(
+            @PathVariable String presentationId,
+            @PathVariable int slideNumber,
+            Authentication authentication) {
+        try {
+            User user = resolveUser(authentication);
+            presentationService.deleteQuickSlide(user.getId(), presentationId, slideNumber);
+            return ResponseEntity.ok(Map.of("success", true));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        } catch (Exception ex) {
+            log.error("Error eliminando quick slide {}/{}: {}", presentationId, slideNumber, ex.getMessage());
+            return ResponseEntity.internalServerError().body(Map.of("error", ex.getMessage()));
+        }
+    }
+
     @PostMapping("/presentations/{id}/delete")
     public String deletePresentation(
             @PathVariable String id,
