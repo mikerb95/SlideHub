@@ -39,7 +39,7 @@ public class CustomOidcUserService extends OidcUserService {
 
     private final UserRepository userRepository;
 
-    public CustomOidcUserService(UserRepository userRepository) {
+    public CustomOidcUserService(@Lazy UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
