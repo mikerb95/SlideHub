@@ -47,6 +47,10 @@ public class Slide {
     @Column(name = "s3_url", columnDefinition = "TEXT")
     private String s3Url;
 
+    /** true si fue generado con la función "slide rápido" durante la presentación. */
+    @Column(name = "is_quick_slide", nullable = false)
+    private boolean quickSlide = false;
+
     @Column(name = "uploaded_at", nullable = false)
     private LocalDateTime uploadedAt;
 
@@ -103,6 +107,14 @@ public class Slide {
 
     public void setS3Url(String s3Url) {
         this.s3Url = s3Url;
+    }
+
+    public boolean isQuickSlide() {
+        return quickSlide;
+    }
+
+    public void setQuickSlide(boolean quickSlide) {
+        this.quickSlide = quickSlide;
     }
 
     public LocalDateTime getUploadedAt() {
