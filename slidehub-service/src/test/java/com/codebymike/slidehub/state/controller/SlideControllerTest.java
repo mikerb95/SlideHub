@@ -29,7 +29,7 @@ class SlideControllerTest {
 
     @Test
     void setSlide_whenValidPayload_returnsUpdatedSlideState() throws Exception {
-        given(slideStateService.setSlide(3, 12)).willReturn(new SlideStateResponse(3, 12));
+        given(slideStateService.setSlide(3, 12, null)).willReturn(new SlideStateResponse(3, 12));
 
         ResponseEntity<SlideStateResponse> response = slideController
                 .setSlide(new com.codebymike.slidehub.state.model.SetSlideRequest(3, 12, null));
