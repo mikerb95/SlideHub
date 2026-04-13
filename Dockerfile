@@ -22,10 +22,9 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=120s --retries=3 \
 EXPOSE 8080
 
 ENTRYPOINT ["java", \
-  "-Xms48m", "-Xmx192m", \
+  "-Xms32m", "-Xmx128m", \
   "-XX:+UseSerialGC", \
-  "-XX:MaxMetaspaceSize=192m", \
-  "-XX:CompressedClassSpaceSize=64m", \
+  "-XX:MaxMetaspaceSize=300m", \
   "-XX:+TieredCompilation", "-XX:TieredStopAtLevel=1", \
   "-XX:SoftRefLRUPolicyMSPerMB=0", \
   "-Djava.security.egd=file:/dev/./urandom", \
