@@ -22,11 +22,12 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=120s --retries=3 \
 EXPOSE 8080
 
 ENTRYPOINT ["java", \
-  "-Xms48m", "-Xmx300m", \
+  "-Xms48m", "-Xmx192m", \
   "-XX:+UseSerialGC", \
-  "-XX:MaxMetaspaceSize=80m", \
+  "-XX:MaxMetaspaceSize=192m", \
+  "-XX:CompressedClassSpaceSize=64m", \
+  "-XX:+TieredCompilation", "-XX:TieredStopAtLevel=1", \
   "-XX:SoftRefLRUPolicyMSPerMB=0", \
-  "-Dreactor.netty.ioWorkerCount=2", \
   "-Djava.security.egd=file:/dev/./urandom", \
   "-Dspring.profiles.active=prod", \
   "-jar", "app.jar"]
