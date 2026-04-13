@@ -1005,6 +1005,8 @@
 
         document.getElementById('btn-mp-scroll-up').addEventListener('click', () => scrollDemo(-300));
         document.getElementById('btn-mp-scroll-down').addEventListener('click', () => scrollDemo(300));
+        document.getElementById('btn-mp-scroll-top').addEventListener('click', () => scrollDemo(-99999));
+        document.getElementById('btn-mp-scroll-bottom').addEventListener('click', () => scrollDemo(99999));
 
         document.getElementById('btn-start-session').addEventListener('click', startSession);
         document.getElementById('btn-add-participant').addEventListener('click', addParticipant);
