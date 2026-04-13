@@ -189,6 +189,8 @@
                         currentMode = 'url'; currentUrl = demo.url;
                         slideView.style.display = 'none'; urlView.style.display = 'block';
                         iframe.src = demo.url;
+                        iframe.style.transform = '';
+                        currentScrollY = 0;
                     }
                     const scrollY = demo.scrollY ?? 0;
                     if (scrollY !== currentScrollY) {
