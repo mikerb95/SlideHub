@@ -422,6 +422,7 @@ public class PresentationService {
         String s3Url = slideUploadService.upload(key, imageBytes, "image/png");
 
         Slide slide = buildSlide(presentation, nextSlideNumber, nextSlideNumber + ".png", null, s3Url);
+        slide.setQuickSlide(true);
         presentation.getSlides().add(slide);
         presentation.setUpdatedAt(LocalDateTime.now());
         presentationRepository.save(presentation);
