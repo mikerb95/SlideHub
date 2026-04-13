@@ -593,6 +593,7 @@
                 const data = await res.json();
                 const sorted = (data.slides || []).sort((a, b) => a.number - b.number);
                 slideUrls = sorted.map(slide => buildPlaybackImageUrl(slide.number, slide.s3Url));
+                sortedSlideNumbers = sorted.map(s => s.number);
                 quickSlideNumbers = new Set(sorted.filter(s => s.quickSlide).map(s => s.number));
                 if (slideUrls.length > 0) {
                     totalSlides = slideUrls.length;
