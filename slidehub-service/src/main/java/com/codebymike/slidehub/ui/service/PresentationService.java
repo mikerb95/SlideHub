@@ -132,7 +132,7 @@ public class PresentationService {
         return presentationRepository.findById(presentationId)
                 .map(presentation -> presentation.getSlides().stream()
                         .sorted((a, b) -> Integer.compare(a.getNumber(), b.getNumber()))
-                        .map(slide -> new SlideInfo(slide.getNumber(), slide.getFilename(), slide.getS3Url()))
+                        .map(slide -> new SlideInfo(slide.getNumber(), slide.getFilename(), slide.getS3Url(), slide.isQuickSlide()))
                         .toList())
                 .orElse(List.of());
     }
