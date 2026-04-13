@@ -435,6 +435,37 @@ public class PresentationService {
                         primaryColor.getBlue()));
     }
 
+    @Transactional
+    public void deleteQuickSlide(String userId, String presentationId, int slideNumber) {
+        Presentation presentation = presentationRepository.findByIdAndUserId(presentationId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("Presentación no encontrada o sin permisos."));
+
+        Slide target = presentation.getSlides().stream()
+                .filter(s -> s.getNumber() == slideNumber)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Slide %d no existe.".formatted(slideNumber)));
+
+        if (!target.isQuickSlide()) {
+            throw new IllegalArgumentException("Solo se pueden eliminar slides rápidos.");
+        }
+
+        try {
+            slideUploadService.delete(slideUploadService.buildSlideKey(presentationId, slideNumber));
+        } catch (Exception ex) {
+            log.warn("No se pudo eliminar el objeto S3 del slide {}: {}", slideNumber, ex.getMessage());
+        }
+
+        presentation.getSlides().remove(target);
+
+        // Renumerar los slides con número mayor al eliminado
+        presentation.getSlides().stream()
+                .filter(s -> s.getNumber() > slideNumber)
+                .forEach(s -> s.setNumber(s.getNumber() - 1));
+
+        presentation.setUpdatedAt(LocalDateTime.now());
+        presentationRepository.save(presentation);
+    }
+
     // ── Helpers privados ──────────────────────────────────────────────────────
 
     private Presentation buildPresentation(User user,
